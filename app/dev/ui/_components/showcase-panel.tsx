@@ -7,6 +7,7 @@ import {
   Sparkles,
   Type,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -16,42 +17,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import arMessages from "@/messages/ar.json";
+export function ShowcasePanel() {
+  const t = useTranslations("uiShowcase");
 
-type ShowcaseCopy = typeof arMessages.uiShowcase;
-
-type ShowcasePanelProps = {
-  copy: ShowcaseCopy;
-  direction: "rtl" | "ltr";
-  language: "ar" | "en";
-};
-
-export function ShowcasePanel({ copy, direction, language }: ShowcasePanelProps) {
   return (
-    <section lang={language} dir={direction} className="grid gap-6">
+    <section className="grid gap-6">
       <div className="islamic-pattern overflow-hidden rounded-xl border bg-card shadow-soft">
         <div className="grid gap-8 bg-gradient-to-b from-card/78 to-card p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-10">
           <div className="grid content-center gap-5 text-start">
-            <BrandMark label={copy.brand} />
+            <BrandMark label={t("brand")} />
             <div className="grid gap-3">
               <Badge variant="secondary" className="gap-1.5">
                 <Sparkles aria-hidden="true" />
-                {copy.eyebrow}
+                {t("eyebrow")}
               </Badge>
-              <h2 className="max-w-2xl text-3xl font-black tracking-tight text-primary sm:text-4xl">
-                {copy.title}
+              <h2 className="max-w-2xl text-3xl font-black tracking-tight text-balance text-primary sm:text-4xl">
+                {t("title")}
               </h2>
-              <p className="max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-                {copy.intro}
+              <p className="max-w-2xl text-base leading-8 text-pretty text-muted-foreground sm:text-lg">
+                {t("intro")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button variant="gold" size="lg">
                 <Sparkles aria-hidden="true" />
-                {copy.primaryAction}
+                {t("primaryAction")}
               </Button>
               <Button variant="outline" size="lg">
-                {copy.secondaryAction}
+                {t("secondaryAction")}
               </Button>
             </div>
           </div>
@@ -60,27 +53,27 @@ export function ShowcasePanel({ copy, direction, language }: ShowcasePanelProps)
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <Badge className="border-white/15 bg-white/10 text-white">
-                  {copy.progress.badge}
+                  {t("progress.badge")}
                 </Badge>
                 <BookOpenText className="size-6 text-secondary" aria-hidden="true" />
               </div>
               <CardTitle className="text-2xl text-primary-foreground">
-                {copy.progress.title}
+                {t("progress.title")}
               </CardTitle>
               <CardDescription className="text-primary-foreground/72">
-                {copy.progress.description}
+                {t("progress.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-5">
               <div className="flex items-end justify-between gap-4">
-                <span className="text-4xl font-black text-secondary">{copy.progress.percent}</span>
+                <span className="text-4xl font-black text-secondary">{t("progress.percent")}</span>
                 <span className="text-sm text-primary-foreground/72">
-                  {copy.progress.valueLabel}
+                  {t("progress.valueLabel")}
                 </span>
               </div>
-              <Progress value={72} aria-label={copy.progress.ariaLabel} className="bg-white/14" />
+              <Progress value={72} aria-label={t("progress.ariaLabel")} className="bg-white/14" />
               <p className="font-quran text-xl leading-9 text-primary-foreground">
-                {copy.progress.sample}
+                {t("progress.sample")}
               </p>
             </CardContent>
           </Card>
@@ -91,45 +84,45 @@ export function ShowcasePanel({ copy, direction, language }: ShowcasePanelProps)
         <Card>
           <CardHeader>
             <Palette className="size-6 text-secondary" aria-hidden="true" />
-            <CardTitle>{copy.palette.title}</CardTitle>
-            <CardDescription>{copy.palette.description}</CardDescription>
+            <CardTitle>{t("palette.title")}</CardTitle>
+            <CardDescription>{t("palette.description")}</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3">
-            <ColorToken colorClass="bg-ivory" label={copy.palette.ivory} code="#FAF6EC" />
-            <ColorToken colorClass="bg-warm-white" label={copy.palette.warmWhite} code="#FFFDF8" />
-            <ColorToken colorClass="bg-navy" label={copy.palette.navy} code="#0F2547" dark />
-            <ColorToken colorClass="bg-gold" label={copy.palette.gold} code="#C9A24B" />
+            <ColorToken colorClass="bg-ivory" label={t("palette.ivory")} code="#FAF6EC" />
+            <ColorToken colorClass="bg-warm-white" label={t("palette.warmWhite")} code="#FFFDF8" />
+            <ColorToken colorClass="bg-navy" label={t("palette.navy")} code="#0F2547" dark />
+            <ColorToken colorClass="bg-gold" label={t("palette.gold")} code="#C9A24B" />
             <ColorToken
               colorClass="bg-calm-green"
-              label={copy.palette.success}
+              label={t("palette.success")}
               code="#2E7D5B"
               dark
             />
-            <ColorToken colorClass="bg-calm-red" label={copy.palette.danger} code="#B64040" dark />
+            <ColorToken colorClass="bg-calm-red" label={t("palette.danger")} code="#B64040" dark />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <Type className="size-6 text-secondary" aria-hidden="true" />
-            <CardTitle>{copy.typography.title}</CardTitle>
-            <CardDescription>{copy.typography.description}</CardDescription>
+            <CardTitle>{t("typography.title")}</CardTitle>
+            <CardDescription>{t("typography.description")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="rounded-lg border bg-background/60 p-4">
               <p className="text-xs font-bold text-muted-foreground">
-                {copy.typography.interfaceLabel}
+                {t("typography.interfaceLabel")}
               </p>
               <p className="mt-2 text-2xl font-black text-primary">
-                {copy.typography.interfaceSample}
+                {t("typography.interfaceSample")}
               </p>
             </div>
             <div className="rounded-lg border bg-background/60 p-4">
               <p className="text-xs font-bold text-muted-foreground">
-                {copy.typography.quranLabel}
+                {t("typography.quranLabel")}
               </p>
               <p className="mt-2 font-quran text-2xl leading-10 font-bold text-primary">
-                {copy.typography.quranSample}
+                {t("typography.quranSample")}
               </p>
             </div>
           </CardContent>
@@ -138,17 +131,22 @@ export function ShowcasePanel({ copy, direction, language }: ShowcasePanelProps)
         <Card>
           <CardHeader>
             <ShieldCheck className="size-6 text-secondary" aria-hidden="true" />
-            <CardTitle>{copy.form.title}</CardTitle>
-            <CardDescription>{copy.form.description}</CardDescription>
+            <CardTitle>{t("form.title")}</CardTitle>
+            <CardDescription>{t("form.description")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor={`${language}-student-name`}>{copy.form.label}</Label>
-              <Input id={`${language}-student-name`} placeholder={copy.form.placeholder} />
-              <p className="text-xs leading-5 text-muted-foreground">{copy.form.helper}</p>
+              <Label htmlFor="student-name">{t("form.label")}</Label>
+              <Input
+                id="student-name"
+                name="studentName"
+                autoComplete="off"
+                placeholder={t("form.placeholder")}
+              />
+              <p className="text-xs leading-5 text-muted-foreground">{t("form.helper")}</p>
             </div>
             <Button type="button" className="w-full">
-              {copy.form.action}
+              {t("form.action")}
             </Button>
           </CardContent>
         </Card>
@@ -157,18 +155,18 @@ export function ShowcasePanel({ copy, direction, language }: ShowcasePanelProps)
       <div className="grid gap-4 md:grid-cols-3">
         <Alert variant="success">
           <CheckCircle2 aria-hidden="true" />
-          <AlertTitle>{copy.alerts.successTitle}</AlertTitle>
-          <AlertDescription>{copy.alerts.successBody}</AlertDescription>
+          <AlertTitle>{t("alerts.successTitle")}</AlertTitle>
+          <AlertDescription>{t("alerts.successBody")}</AlertDescription>
         </Alert>
         <Alert variant="warning">
           <Clock3 aria-hidden="true" />
-          <AlertTitle>{copy.alerts.warningTitle}</AlertTitle>
-          <AlertDescription>{copy.alerts.warningBody}</AlertDescription>
+          <AlertTitle>{t("alerts.warningTitle")}</AlertTitle>
+          <AlertDescription>{t("alerts.warningBody")}</AlertDescription>
         </Alert>
         <Alert>
           <ShieldCheck aria-hidden="true" />
-          <AlertTitle>{copy.alerts.infoTitle}</AlertTitle>
-          <AlertDescription>{copy.alerts.infoBody}</AlertDescription>
+          <AlertTitle>{t("alerts.infoTitle")}</AlertTitle>
+          <AlertDescription>{t("alerts.infoBody")}</AlertDescription>
         </Alert>
       </div>
     </section>

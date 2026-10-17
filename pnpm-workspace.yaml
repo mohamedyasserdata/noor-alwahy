@@ -1,6 +1,10 @@
 allowBuilds:
+  "@parcel/watcher": false
+  "@swc/core": true
   sharp: false
   unrs-resolver: false
+overrides:
+  "@swc/core": 1.15.33
 minimumReleaseAgeExclude:
   - lucide-react@1.59.0
   - eslint@10.13.0

@@ -7,7 +7,7 @@ type BrandMarkProps = {
 
 export function BrandMark({ label, className }: BrandMarkProps) {
   return (
-    <div className={cn("inline-flex items-center gap-3", className)}>
+    <div className={cn("inline-flex items-center gap-3", className)} translate="no">
       <span className="relative grid size-11 place-items-center rounded-xl bg-primary text-secondary shadow-card">
         <svg viewBox="0 0 48 48" className="size-7" aria-hidden="true">
           <path

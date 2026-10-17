@@ -6,7 +6,7 @@
   "uiShowcase": {
     "pageTitle": "Noor Al-Wahy interface system",
     "pageDescription": "A living reference for components, colors, and typography in both Arabic and English directions before the portals are built.",
-    "directionBadge": "P0-T02 · Design reference",
+    "directionBadge": "P0-T03 · English LTR interface",
     "brand": "Noor Al-Wahy Academy",
     "eyebrow": "Quran learning with clarity and care",
     "title": "An organized learning journey built around calm, respectful guidance",
@@ -20,7 +20,7 @@
       "percent": "72%",
       "valueLabel": "of the monthly goal",
       "ariaLabel": "Monthly goal progress percentage",
-      "sample": "Recite the Quran with measured recitation"
+      "sample": "A calm and organized learning journey"
     },
     "palette": {
       "title": "Color palette",
@@ -38,13 +38,13 @@
       "interfaceLabel": "Interface typeface",
       "interfaceSample": "Learning that leaves an impact",
       "quranLabel": "Quran typeface",
-      "quranSample": "Read, rise, and grow"
+      "quranSample": "Clear Arabic typography for learning and progress"
     },
     "form": {
       "title": "Form controls",
       "description": "Comfortable touch targets and properly connected labels.",
       "label": "Student name",
-      "placeholder": "Enter the full name",
+      "placeholder": "Example: Mary Ahmed…",
       "helper": "The name is used only in records authorized for each role.",
       "action": "Save draft"
     },
@@ -56,5 +56,14 @@
       "infoTitle": "Privacy first",
       "infoBody": "Each role sees only the data it is authorized to access."
     }
+  },
+  "localeSwitcher": {
+    "label": "Choose the interface language",
+    "ar": "العربية",
+    "en": "English",
+    "switchTo": "Switch to {language}"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content"
   }
 }

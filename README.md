@@ -11,14 +11,15 @@ pnpm install
 pnpm dev
 ```
 
-افتح <http://localhost:3000>. في المرحلة الحالية يعاد توجيه الجذر إلى `/dev/ui`، وهو مرجع
-نظام التصميم بالاتجاهين.
+افتح <http://localhost:3000>. يعاد توجيه الجذر إلى العربية ثم إلى `/ar/dev/ui`. ويمكن فتح
+مرجع نظام التصميم الإنجليزي مباشرة من `/en/dev/ui` أو عبر مبدّل اللغة.
 
 ## بوابة الجودة المتاحة الآن
 
 ```bash
 pnpm typecheck
 pnpm lint
+pnpm check:logical-css
 pnpm format:check
 pnpm build
 ```
@@ -31,4 +32,5 @@ pnpm build
 - `docs/PROJECT_STATUS.md`: سجل الاستمرار لأي مطوّر أو نموذج آخر.
 - `docs/adr/ADR-001-versions.md`: الإصدارات والقيود المتغيرة في Next.js.
 - `docs/adr/ADR-002-design-system.md`: قرارات الهوية والخطوط والمكوّنات.
-- `app/dev/ui/page.tsx`: مرجع التصميم الحي.
+- `docs/adr/ADR-003-i18n-routing.md`: قرار المسارات المحلية وتركيب proxy.
+- `app/[locale]/dev/ui/page.tsx`: مرجع التصميم الحي بالعربية والإنجليزية.

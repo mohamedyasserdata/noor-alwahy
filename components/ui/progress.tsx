@@ -21,7 +21,7 @@ function Progress({ className, value, ...props }: ProgressProps) {
     >
       <div
         data-slot="progress-indicator"
-        className="h-full rounded-full bg-secondary transition-[width]"
+        className="h-full rounded-full bg-secondary transition-[width] motion-reduce:transition-none"
         style={{ width: `${normalizedValue}%` }}
       />
     </div>

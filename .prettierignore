@@ -1,6 +1,8 @@
 .next
+.agents
 node_modules
 coverage
+output/playwright
 playwright-report
 test-results
 pnpm-lock.yaml

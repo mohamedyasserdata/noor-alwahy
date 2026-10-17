@@ -11,10 +11,11 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "pnpm check:logical-css && eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check:logical-css": "node scripts/check-logical-css.mjs",
     "prepare": "husky"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "clsx": "2.1.1",
     "lucide-react": "1.59.0",
     "next": "16.4.2",
+    "next-intl": "4.14.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwind-merge": "3.7.0"
