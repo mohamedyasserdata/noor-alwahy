@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.vitest/
 /output/playwright/
 
 # next.js

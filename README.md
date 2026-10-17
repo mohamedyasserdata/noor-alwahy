@@ -27,9 +27,15 @@ pnpm typecheck
 pnpm lint
 pnpm check:logical-css
 pnpm format:check
+pnpm test
+pnpm db:reset
+pnpm db:test
+pnpm check:rls
 pnpm build
+pnpm test:e2e
 ```
 
+يشغّل GitHub Actions البوابة نفسها على كل push وpull request، ويضيف فحص Gitleaks لتاريخ Git.
 Supabase CLI مثبت داخل المشروع، وDocker Desktop يعمل على جهاز التطوير. شُغّلت الحاويات،
 ووُلّد `types/database.types.ts` من المخطط المحلي، ونجح استعلام Server Component الحقيقي؛
 راجع `docs/PROJECT_STATUS.md` لأدلة التحقق ونقطة الاستئناف.

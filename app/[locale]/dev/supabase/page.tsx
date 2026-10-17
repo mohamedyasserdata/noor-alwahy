@@ -93,7 +93,12 @@ async function QueryResult({
         <dl className="grid gap-4 rounded-lg border bg-background/60 p-4 sm:grid-cols-2">
           <div className="grid gap-1">
             <dt className="text-sm font-bold text-muted-foreground">{openApiLabel}</dt>
-            <dd className="font-mono text-lg font-black text-primary">{result.openApiVersion}</dd>
+            <dd
+              className="font-mono text-lg font-black text-primary"
+              data-testid="supabase-api-version"
+            >
+              {result.openApiVersion}
+            </dd>
           </div>
           <div className="grid gap-1">
             <dt className="text-sm font-bold text-muted-foreground">{pathCountLabel}</dt>

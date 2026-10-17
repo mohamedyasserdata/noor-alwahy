@@ -2,7 +2,7 @@
 
 - **الحالة:** مقبول
 - **التاريخ:** 2026-10-17
-- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04
+- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05
 
 ## القرار
 
@@ -28,6 +28,9 @@
 | shadcn/ui             |                   مصدر مكوّنات محلي | لا توجد حزمة runtime؛ المكوّنات مملوكة للمشروع                         |
 | Prettier              |                            `3.9.10` | تنسيق موحّد مع إضافة Tailwind                                          |
 | Husky / lint-staged   |                  `9.1.7` / `17.6.0` | بوابة سريعة قبل الالتزام                                               |
+| Vitest                |                             `5.0.5` | اختبارات الوحدة على Node 22.12 فأعلى                                   |
+| Playwright Test       |                            `1.64.1` | smoke فعلي لـChromium مع webServer وتقارير الفشل                       |
+| Gitleaks              |                            `8.30.1` | صورة Docker رسمية مثبتة لفحص أسرار تاريخ Git                           |
 
 ## ملاحظات التوافق
 
@@ -58,6 +61,11 @@
 - <https://supabase.com/docs/guides/local-development/cli/getting-started>
 - <https://supabase.com/docs/guides/api/rest/generating-types>
 - <https://supabase.com/docs/guides/getting-started/api-keys>
+- <https://supabase.com/docs/guides/database/testing>
+- <https://vitest.dev/guide/>
+- <https://playwright.dev/docs/ci-intro>
+- <https://playwright.dev/docs/test-webserver>
+- <https://github.com/gitleaks/gitleaks>
 - <https://github.com/swc-project/swc/issues/12442>
 
 كما روجعت النسخ المحلية المطابقة داخل `node_modules/next/dist/docs/` قبل كتابة الكود.
