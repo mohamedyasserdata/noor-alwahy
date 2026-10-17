@@ -6,8 +6,13 @@
 
 ## التشغيل المحلي
 
+يتطلب تشغيل التطبيق الآن Docker Desktop أو Podman لإقلاع Supabase المحلي. انسخ
+`.env.example` إلى `.env.local` واملأ قيم Supabase من ناتج CLI بعد الإقلاع، ثم نفّذ:
+
 ```bash
 pnpm install
+pnpm supabase:start
+pnpm db:types
 pnpm dev
 ```
 
@@ -24,8 +29,9 @@ pnpm format:check
 pnpm build
 ```
 
-يتطلب تشغيل مراحل Supabase اللاحقة Docker وSupabase CLI؛ راجع
-`docs/PROJECT_STATUS.md` للحالة الدقيقة والأوامر التي تم التحقق منها.
+Supabase CLI مثبت داخل المشروع. Docker/Podman غير متاح حاليًا على جهاز التطوير، لذلك لم
+يُولّد ملف أنواع قاعدة البيانات ولم يُثبت الاستعلام الحقيقي بعد؛ راجع `docs/PROJECT_STATUS.md`
+لنقطة الاستئناف الدقيقة.
 
 ## أهم الملفات
 
