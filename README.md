@@ -1,34 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# نظام أكاديمية نور الوحي
 
-## Getting Started
+تطبيق إدارة الأكاديمية المبني بأسلوب Spec-Driven Development. المصدر التنفيذي داخل
+`specs/001-noor-alwahy`، والقواعد غير القابلة للتفاوض داخل
+`.specify/memory/constitution.md`.
 
-First, run the development server:
+## التشغيل المحلي
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+افتح <http://localhost:3000>. في المرحلة الحالية يعاد توجيه الجذر إلى `/dev/ui`، وهو مرجع
+نظام التصميم بالاتجاهين.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## بوابة الجودة المتاحة الآن
 
-## Learn More
+```bash
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm build
+```
 
-To learn more about Next.js, take a look at the following resources:
+يتطلب تشغيل مراحل Supabase اللاحقة Docker وSupabase CLI؛ راجع
+`docs/PROJECT_STATUS.md` للحالة الدقيقة والأوامر التي تم التحقق منها.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## أهم الملفات
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `docs/PROJECT_STATUS.md`: سجل الاستمرار لأي مطوّر أو نموذج آخر.
+- `docs/adr/ADR-001-versions.md`: الإصدارات والقيود المتغيرة في Next.js.
+- `docs/adr/ADR-002-design-system.md`: قرارات الهوية والخطوط والمكوّنات.
+- `app/dev/ui/page.tsx`: مرجع التصميم الحي.

@@ -1,1 +1,155 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #faf6ec;
+  --foreground: #0f2547;
+  --card: #fffdf8;
+  --card-foreground: #0f2547;
+  --popover: #fffdf8;
+  --popover-foreground: #0f2547;
+  --primary: #0f2547;
+  --primary-foreground: #fffdf8;
+  --secondary: #c9a24b;
+  --secondary-foreground: #0f2547;
+  --muted: #f2eadb;
+  --muted-foreground: #546a86;
+  --accent: #e8d5a6;
+  --accent-foreground: #0f2547;
+  --destructive: #b64040;
+  --border: #d7cdb9;
+  --input: #d7cdb9;
+  --ring: #c9a24b;
+  --success: #2e7d5b;
+  --warning: #d9922b;
+  --info: #6b7f99;
+  --radius: 0.875rem;
+}
+
+.dark {
+  --background: #091a33;
+  --foreground: #fffdf8;
+  --card: #102b50;
+  --card-foreground: #fffdf8;
+  --popover: #102b50;
+  --popover-foreground: #fffdf8;
+  --primary: #fffdf8;
+  --primary-foreground: #0f2547;
+  --secondary: #d8b968;
+  --secondary-foreground: #091a33;
+  --muted: #17365f;
+  --muted-foreground: #b7c5d5;
+  --accent: #27486f;
+  --accent-foreground: #fffdf8;
+  --destructive: #e07a7a;
+  --border: #335477;
+  --input: #335477;
+  --ring: #d8b968;
+  --success: #67b391;
+  --warning: #e3ae5f;
+  --info: #9bb0c7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-ivory: #faf6ec;
+  --color-warm-white: #fffdf8;
+  --color-navy: #0f2547;
+  --color-gold: #c9a24b;
+  --color-slate-blue: #6b7f99;
+  --color-calm-green: #2e7d5b;
+  --color-calm-red: #b64040;
+  --color-amber: #d9922b;
+  --font-sans:
+    var(--font-cairo-arabic), var(--font-cairo-latin), ui-sans-serif, system-ui, sans-serif;
+  --font-quran: var(--font-amiri-arabic), var(--font-amiri-latin), serif;
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+  --shadow-soft: 0 1.25rem 3.75rem -2rem rgb(15 37 71 / 0.28);
+  --shadow-card: 0 0.75rem 2.25rem -1.5rem rgb(15 37 71 / 0.22);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 15% 15%, rgb(201 162 75 / 0.09), transparent 25rem),
+      radial-gradient(circle at 85% 80%, rgb(15 37 71 / 0.06), transparent 28rem);
+  }
+
+  ::selection {
+    background: rgb(201 162 75 / 0.35);
+    color: #0f2547;
+  }
+}
+
+@layer utilities {
+  .islamic-pattern {
+    background-image:
+      linear-gradient(
+        30deg,
+        rgb(201 162 75 / 0.09) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgb(201 162 75 / 0.09) 87.5%
+      ),
+      linear-gradient(
+        150deg,
+        rgb(201 162 75 / 0.09) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgb(201 162 75 / 0.09) 87.5%
+      ),
+      linear-gradient(
+        30deg,
+        rgb(201 162 75 / 0.09) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgb(201 162 75 / 0.09) 87.5%
+      ),
+      linear-gradient(
+        150deg,
+        rgb(201 162 75 / 0.09) 12%,
+        transparent 12.5%,
+        transparent 87%,
+        rgb(201 162 75 / 0.09) 87.5%
+      );
+    background-position:
+      0 0,
+      0 0,
+      2rem 3.5rem,
+      2rem 3.5rem;
+    background-size: 4rem 7rem;
+  }
+}

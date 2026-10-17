@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "title": "Noor Al-Wahy Academy",
+    "description": "An integrated management system for Noor Al-Wahy Quran Academy"
+  },
+  "uiShowcase": {
+    "pageTitle": "Noor Al-Wahy interface system",
+    "pageDescription": "A living reference for components, colors, and typography in both Arabic and English directions before the portals are built.",
+    "directionBadge": "P0-T02 · Design reference",
+    "brand": "Noor Al-Wahy Academy",
+    "eyebrow": "Quran learning with clarity and care",
+    "title": "An organized learning journey built around calm, respectful guidance",
+    "intro": "A warm, mobile-first visual system balancing simple daily use with precise session and progress tracking.",
+    "primaryAction": "Explore the interface",
+    "secondaryAction": "View details",
+    "progress": {
+      "badge": "Card sample",
+      "title": "This month’s progress",
+      "description": "A focused view of meaningful indicators without public student rankings.",
+      "percent": "72%",
+      "valueLabel": "of the monthly goal",
+      "ariaLabel": "Monthly goal progress percentage",
+      "sample": "Recite the Quran with measured recitation"
+    },
+    "palette": {
+      "title": "Color palette",
+      "description": "The approved identity colors and calm system states.",
+      "ivory": "Ivory",
+      "warmWhite": "Warm white",
+      "navy": "Navy",
+      "gold": "Gold",
+      "success": "Success",
+      "danger": "Error"
+    },
+    "typography": {
+      "title": "Self-hosted fonts",
+      "description": "Cairo for the interface and Amiri for Quran text and certificates.",
+      "interfaceLabel": "Interface typeface",
+      "interfaceSample": "Learning that leaves an impact",
+      "quranLabel": "Quran typeface",
+      "quranSample": "Read, rise, and grow"
+    },
+    "form": {
+      "title": "Form controls",
+      "description": "Comfortable touch targets and properly connected labels.",
+      "label": "Student name",
+      "placeholder": "Enter the full name",
+      "helper": "The name is used only in records authorized for each role.",
+      "action": "Save draft"
+    },
+    "alerts": {
+      "successTitle": "Saved",
+      "successBody": "Your changes were saved successfully.",
+      "warningTitle": "Awaiting review",
+      "warningBody": "This step requires administrator approval.",
+      "infoTitle": "Privacy first",
+      "infoBody": "Each role sees only the data it is authorized to access."
+    }
+  }
+}
