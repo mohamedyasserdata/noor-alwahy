@@ -1,0 +1,2 @@
+-- Intentionally empty during foundation setup.
+-- Product fixtures will be added only with their owning schema tasks.

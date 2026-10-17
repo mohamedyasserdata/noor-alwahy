@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
 
 import { getPublicSupabaseEnv } from "@/lib/env";
+import type { Database } from "@/types/database.types";
 
 export async function updateSession(request: NextRequest, createResponse: () => NextResponse) {
   const env = getPublicSupabaseEnv();
@@ -11,7 +12,7 @@ export async function updateSession(request: NextRequest, createResponse: () => 
     options: CookieOptions;
   }> = [];
   const pendingHeaders = new Headers();
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {

@@ -57,6 +57,17 @@
       "infoBody": "Each role sees only the data it is authorized to access."
     }
   },
+  "supabaseCheck": {
+    "pageTitle": "Database connection check",
+    "pageDescription": "An internal page that runs a real Server Component query against the local Supabase Data API.",
+    "eyebrow": "P0-T04 · Local verification",
+    "checking": "Checking the connection…",
+    "connected": "Connected",
+    "resultTitle": "The database description responded successfully",
+    "resultDescription": "The Data API response was verified without creating a placeholder table or bypassing access policies.",
+    "openApiLabel": "API description version",
+    "pathCountLabel": "Currently exposed paths"
+  },
   "localeSwitcher": {
     "label": "Choose the interface language",
     "ar": "العربية",

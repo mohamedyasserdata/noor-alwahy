@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { format, resolveConfig } from "prettier";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = resolve(projectRoot, "types/database.types.ts");
@@ -14,6 +15,10 @@ const result = spawnSync(
   {
     cwd: projectRoot,
     encoding: "utf8",
+    env: {
+      ...process.env,
+      DO_NOT_TRACK: process.env.DO_NOT_TRACK ?? "1",
+    },
   },
 );
 
@@ -36,6 +41,11 @@ if (result.status !== 0 || !result.stdout.trim()) {
 }
 
 mkdirSync(dirname(outputPath), { recursive: true });
-writeFileSync(temporaryPath, result.stdout, "utf8");
+const prettierConfig = await resolveConfig(outputPath);
+const formattedTypes = await format(result.stdout, {
+  ...prettierConfig,
+  filepath: outputPath,
+});
+writeFileSync(temporaryPath, formattedTypes, "utf8");
 renameSync(temporaryPath, outputPath);
 process.stdout.write(`Generated ${outputPath}\n`);

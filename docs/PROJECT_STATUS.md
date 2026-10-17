@@ -8,10 +8,10 @@
 - **آخر تحديث:** 2026-10-17 — Africa/Cairo
 - **المشروع:** `D:\احدث نسخه من دار\noor-alwahy`
 - **الفرع:** `main`
-- **التقدم الكلي:** 3 من 80 مهمة مكتملة (3.75%)
+- **التقدم الكلي:** 4 من 80 مهمة مكتملة (5%)
 - **المرحلة الحالية:** المرحلة 0 — الأساس
 - **بوابة المرحلة 0:** غير مجتازة بعد
-- **المهمة النشطة التالية غير المكتملة:** **P0-T04 — تأسيس Supabase والعملاء والبيئة والأنواع**
+- **المهمة النشطة التالية غير المكتملة:** **P0-T05 — بوابة CI والاختبارات والأمان**
 - **قاعدة الجلسة:** تنفيذ مهمة أو مهمتين فقط، ثم التحقق والتوثيق والالتزام في Git.
 
 ## 2. ما تم إنجازه فعليًا
@@ -67,46 +67,43 @@
   أصغر هدف تفاعلي ظاهر 44px، query المتكرر محفوظ، واللغة غير المدعومة تعيد 404.
 - سجل المتصفح للمسارات الصحيحة: 0 أخطاء و0 تحذيرات.
 
+### ✅ P0-T04 — تأسيس Supabase والعملاء والبيئة والأنواع
+
+- روجع changelog ووثائق Supabase الحالية وواجهات الإصدارات المثبتة قبل كتابة الكود.
+- ثُبتت إصدارات دقيقة لـ`@supabase/ssr`, `@supabase/supabase-js`, `zod`, `server-only`
+  وSupabase CLI، ورُفع حد Node إلى 22 لتوافق SDK.
+- نجح `supabase init` وأنشأ `supabase/config.toml`؛ عُطل التسجيل الذاتي وكشف الجداول الجديدة
+  تلقائيًا للـData API.
+- أُنشئت عملاء browser/server/admin/middleware، وحُصر مفتاح الخدمة في `admin.ts` الذي يبدأ
+  بـ`server-only`، ورُكب تحديث الجلسة مع next-intl.
+- شُغّل Supabase المحلي على Docker Desktop بنجاح، ووُلّد `types/database.types.ts` من
+  PostgreSQL 17.11، وربط بكل العملاء كـgeneric.
+- أُنشئت صفحة `/[locale]/dev/supabase`؛ نفذ Server Component استعلامًا حقيقيًا إلى وصف Data
+  API وتحقق من الرد بـZod دون اختراع جدول مؤقت.
+- صار `pnpm db:types` يحافظ على الملف عند الفشل وينسق الناتج تلقائيًا؛ تشغيلان متتاليان أعطيا
+  SHA-256 متطابقًا.
+- Playwright عند 360px أثبت `rtl`، وعدم overflow، وظهور حالة الاتصال وSwagger 2.0، وسجل
+  المتصفح 0 أخطاء و0 تحذيرات.
+
 ## 3. المهمة الحالية غير المكتملة
 
-### ⏭ P0-T04 — تأسيس Supabase والعملاء والبيئة والأنواع
+### ⏭ P0-T05 — بوابة CI والاختبارات والأمان
 
-**الحالة:** قيد التنفيذ. أُنجز الهيكل البرمجي الآمن، لكن المهمة لم تحقق DoD بعد لأن حاويات
-Supabase لا تعمل من دون Docker أو Podman.
+**الحالة:** لم يبدأ تنفيذها بعد. تبعيتها P0-T04 مغلقة الآن.
 
-**ما أُنجز داخل المهمة:**
+**النطاق الملزم:**
 
-1. روجع changelog ووثائق Supabase الحالية وواجهات الإصدارات المثبتة قبل كتابة الكود.
-2. ثُبتت إصدارات دقيقة لـ`@supabase/ssr`, `@supabase/supabase-js`, `zod`, `server-only`
-   وSupabase CLI، ورُفع حد Node إلى 22 لتوافق SDK.
-3. نجح `supabase init` وأنشأ `supabase/config.toml`؛ عُطّل التسجيل الذاتي وكشف الجداول
-   الجديدة تلقائيًا للـData API.
-4. أُنشئت `lib/supabase/{client,server,admin,middleware}.ts`؛ قراءة مفتاح
-   `SUPABASE_SERVICE_ROLE_KEY` محصورة في `admin.ts` الذي يبدأ بـ`server-only`.
-5. أُنشئت `.env.example` و`lib/env.ts`. يقبل المفتاح العام صيغة publishable أو legacy anon
-   فقط، ويرفض secret/service-role قبل وصوله إلى حزمة المتصفح.
-6. رُكّب تحديث الجلسة قبل إنشاء استجابة next-intl، ثم تُنقل cookies وترويسات منع التخزين؛
-   وتشمل المطابقة `/api` دون تمريره إلى موجه اللغات.
-7. أُضيف `pnpm db:types`؛ لا يستبدل ملف الأنواع السابق إلا بعد نجاح التوليد كاملًا.
-
-**المتبقي قبل وضع علامة الإنجاز:**
-
-1. تثبيت/تشغيل Docker Desktop أو Podman، ثم نجاح `pnpm supabase:start`.
-2. تعبئة `.env.local` بالقيم المحلية الحقيقية والتحقق الصريح من نقص البيئة عند البناء.
-3. نجاح `pnpm db:types` وإضافة `types/database.types.ts` المولّد، ثم تمريره كـgeneric
-   للعملاء بدل الأنواع الافتراضية.
-4. تنفيذ استعلام حقيقي من Server Component ضد قاعدة Supabase المحلية وإثبات نتيجته.
-5. إعادة بوابة الجودة بعد الاتصال الفعلي، ثم فقط رفع العداد إلى 4/80.
-
-**العائق المثبت:** أعاد CLI الخطأ `ContainerRuntimeNotFoundError`: الأمر `docker` غير موجود
-و`podman` غير موجود أيضًا. لم يُنشأ ملف أنواع فارغ ولم تُخترع أنواع أو جداول بديلة.
+1. CI يشغّل typecheck وlint وVitest وPlaywright smoke.
+2. `supabase db reset && supabase test db` يعملان داخل البوابة.
+3. `check-rls` يفشل عند وجود أي جدول `public` بلا RLS.
+4. فحص gitleaks ضمن البوابة.
 
 ## 4. قيود البيئة والعوائق المعروفة
 
-- Docker وPodman غير مثبتين/غير متاحين في PATH؛ يمنعان `supabase start/db reset` وتوليد
-  الأنواع من المخطط المحلي.
-- Supabase CLI 2.121.0 مثبت الآن كاعتماد تطوير ويعمل؛ العائق هو محرك الحاويات فقط.
-- لا تُعد P0-T04 أو P0-T05 مكتملة قبل تشغيل التحقق الحقيقي، حتى لو أُنشئت ملفاتها.
+- Docker Desktop 4.95.0 ومحرك 29.8.2 يعملان؛ تثبيت المستخدم موجود خارج `PATH` القديم لجلسة
+  Codex، لذلك تستعمل أوامر الجلسة مساره الكامل. الطرفية الجديدة بعد إعادة الفتح يفترض أن تلتقطه.
+- Supabase CLI 2.121.0 مثبت كاعتماد تطوير، والحزمة المحلية تعمل حاليًا.
+- P0-T05 لا تعد مكتملة قبل تشغيل CI المحلي المكافئ و`db reset/test db` فعليًا.
 - `pnpm peers check` يحذر لأن بعض إضافات ESLint تعلن دعمًا حتى ESLint 9 فقط. وثائق Next.js
   16.4 تنص على دعم ESLint 10 واحتمال هذه التحذيرات؛ `pnpm lint` الفعلي ناجح.
 - محمّل `@tailwindcss/turbopack` الذي ولّده create-next-app انهار على Windows. استُبدل
@@ -119,24 +116,30 @@ Supabase لا تعمل من دون Docker أو Podman.
 
 ## 5. سجل أوامر هذه الجلسة
 
-| الأمر/الفحص                       | النتيجة                                                                               |
-| --------------------------------- | ------------------------------------------------------------------------------------- |
-| `node --version`                  | `v24.20.0`                                                                            |
-| `pnpm --version`                  | `11.25.0`                                                                             |
-| `pnpm exec supabase init --yes`   | ناجح؛ أنشأ الإعداد المحلي                                                             |
-| `pnpm exec supabase start`        | فشل متوقع ومثبت: لا Docker ولا Podman                                                 |
-| `pnpm db:types`                   | فشل للسبب نفسه؛ حافظ السكربت على ملف الأنواع السابق ولم ينشئ ملفًا فارغًا             |
-| `pnpm typecheck`                  | ناجح بعد دمج Supabase                                                                 |
-| `pnpm lint`                       | ناجح؛ logical CSS وESLint بلا تحذيرات، وفُحص 21 ملفًا                                 |
-| `pnpm format:check`               | ناجح                                                                                  |
-| اختبار حدود مفاتيح البيئة         | 5/5: publishable وanon مقبولان؛ secret وservice-role وبروتوكول URL غير آمن مرفوضة     |
-| اختبار تمرير cookie بعد التحديث   | نجح؛ `NextResponse` حمل القيمة الجديدة في `x-middleware-request-cookie`               |
-| `pnpm build`                      | ناجح نهائيًا؛ Turbopack 3.1s، TypeScript 2.6s، وتوليد 9 صفحات/أصول                    |
-| فحص HTTP لنسخة الإنتاج            | `/`→307 `/ar`، ومسارا AR/EN يعيدان 200، و`/api/does-not-exist` يعيد 404 بلا تحويل لغة |
-| عينة `check:logical-css`          | فشل متوقعًا على خمس مخالفات، ثم نجح على المصدر الحقيقي                                |
-| Playwright P0-T03 valid routes    | `/`→`/ar/dev/ui`، وتحويل اللغة حفظ query، وسجل المتصفح 0 أخطاء/تحذيرات                |
-| Playwright P0-T03 عند 360px       | بلا overflow؛ أصغر هدف تفاعلي ظاهر 44px؛ لقطتا AR/EN راجعهما النموذج                  |
-| Playwright P0-T03 للغة غير مدعومة | `/fr` انتهى بصفحة 404 فعلية                                                           |
+| الأمر/الفحص                        | النتيجة                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------- |
+| `node --version`                   | `v24.20.0`                                                                            |
+| `pnpm --version`                   | `11.25.0`                                                                             |
+| `pnpm exec supabase init --yes`    | ناجح؛ أنشأ الإعداد المحلي                                                             |
+| `pnpm exec supabase start`         | فشل سابقًا قبل Docker؛ نجح الآن وشغّل الحزمة المحلية كاملة                            |
+| `pnpm db:types`                    | فشل سابقًا بلا Docker؛ نجح الآن وولّد الأنواع الحقيقية                                |
+| `pnpm typecheck`                   | ناجح بعد دمج Supabase                                                                 |
+| `pnpm lint`                        | ناجح؛ logical CSS وESLint بلا تحذيرات، وفُحص 21 ملفًا                                 |
+| `pnpm format:check`                | ناجح                                                                                  |
+| اختبار حدود مفاتيح البيئة          | 5/5: publishable وanon مقبولان؛ secret وservice-role وبروتوكول URL غير آمن مرفوضة     |
+| اختبار تمرير cookie بعد التحديث    | نجح؛ `NextResponse` حمل القيمة الجديدة في `x-middleware-request-cookie`               |
+| `pnpm build`                       | ناجح نهائيًا؛ Turbopack 3.1s، TypeScript 2.6s، وتوليد 9 صفحات/أصول                    |
+| فحص HTTP لنسخة الإنتاج             | `/`→307 `/ar`، ومسارا AR/EN يعيدان 200، و`/api/does-not-exist` يعيد 404 بلا تحويل لغة |
+| عينة `check:logical-css`           | فشل متوقعًا على خمس مخالفات، ثم نجح على المصدر الحقيقي                                |
+| Playwright P0-T03 valid routes     | `/`→`/ar/dev/ui`، وتحويل اللغة حفظ query، وسجل المتصفح 0 أخطاء/تحذيرات                |
+| Playwright P0-T03 عند 360px        | بلا overflow؛ أصغر هدف تفاعلي ظاهر 44px؛ لقطتا AR/EN راجعهما النموذج                  |
+| Playwright P0-T03 للغة غير مدعومة  | `/fr` انتهى بصفحة 404 فعلية                                                           |
+| Docker/Supabase المحلي             | Docker 29.8.2؛ PostgreSQL 17.11 وAuth/REST/Realtime/Storage/Studio سليمة              |
+| `pnpm db:types`                    | ناجح من المخطط المحلي؛ تشغيلان متتاليان أعطيا SHA-256 متطابقًا                        |
+| استعلام Server Component           | AR/EN يعيدان 200 وتظهر حالة الاتصال وSwagger 2.0 ومسار واحد مكشوف                     |
+| `pnpm typecheck/lint/format:check` | ناجحة بعد ربط الأنواع؛ فحص logical CSS شمل 23 ملفًا                                   |
+| `pnpm build`                       | ناجح خارج عزل Windows؛ تجميع 0.815s وTypeScript 2.2s وتوليد 12 صفحة/أصل               |
+| Playwright P0-T04 عند 360px        | RTL وبلا overflow؛ النتيجة ظاهرة؛ console فيه 0 خطأ و0 تحذير                          |
 
 > ملاحظة تحقق: تعطل عامل PostCSS/Turbopack داخل الصندوق المعزول ثم علق مرة؛ بعد التأكد من
 > عدم وجود بناء متوازٍ وتنظيف كاش `.next` المولّد، نجح البناء نفسه خارج قيد الصندوق. لم تتغير
@@ -144,13 +147,13 @@ Supabase لا تعمل من دون Docker أو Podman.
 
 ## 6. قائمة التنفيذ الكاملة
 
-### المرحلة 0 — الأساس (3/9)
+### المرحلة 0 — الأساس (4/9)
 
 - [x] P0-T01 — إنشاء Next.js + TypeScript strict + pnpm + ESLint/Prettier/Husky.
 - [x] P0-T02 — Tailwind + shadcn/ui + رموز الألوان + الخطوط المحلية + `/dev/ui`.
 - [x] P0-T03 — next-intl والمسارات المحلية وRTL/LTR وفحص CSS المنطقي.
-- [ ] **P0-T04 — Supabase init والعملاء وenv وأنواع قاعدة البيانات. (الحالي)**
-- [ ] P0-T05 — CI وVitest وPlaywright وpgTAP وcheck-rls وgitleaks.
+- [x] P0-T04 — Supabase init والعملاء وenv وأنواع قاعدة البيانات.
+- [ ] **P0-T05 — CI وVitest وPlaywright وpgTAP وcheck-rls وgitleaks. (الحالي)**
 - [ ] P0-T06 — Spike PDF عربي وقرار Chromium/الاستضافة.
 - [ ] P0-T07 — مكتبة الوقت Luxon واختبارات DST.
 - [ ] P0-T08 — decimal.js وResult وsafeAction.
@@ -287,8 +290,7 @@ Supabase لا تعمل من دون Docker أو Podman.
 
 ### برومبت استئناف مقترح
 
-> تابع مشروع نور الوحي من `docs/PROJECT_STATUS.md`. نفّذ P0-T04 فقط وفق الدستور والمواصفات
-> ومهارات Supabase والأمان. الهيكل والعملاء والـproxy موجودة؛ لا تعِدها. ثبّت أو شغّل Docker
-> Desktop/Podman، ثم نفّذ `pnpm supabase:start` واملأ `.env.local` من القيم المحلية، وشغّل
-> `pnpm db:types`، واربط الأنواع المولّدة، وأثبت استعلام Server Component حقيقي. بعد بوابة
-> الجودة حدّث العداد إلى 4/80 والتزم المهمة، ولا تبدأ P0-T05 قبل إغلاقها.
+> تابع مشروع نور الوحي من `docs/PROJECT_STATUS.md`. P0-T04 مكتملة وSupabase المحلي يعمل؛
+> نفّذ P0-T05 فقط وفق الدستور والمواصفات: أضف CI وVitest وPlaywright smoke وpgTAP، ونفّذ
+> `supabase db reset && supabase test db`، وأنشئ `check-rls` الرافض لأي جدول public بلا RLS،
+> وأضف gitleaks. شغّل البوابة فعليًا وحدّث هذا الملف قبل الالتزام، ولا تبدأ P0-T06 في الجلسة.
