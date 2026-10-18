@@ -2,7 +2,7 @@
 
 - **الحالة:** مقبول
 - **التاريخ:** 2026-10-17
-- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05 وP0-T06 وP0-T07
+- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05 وP0-T06 وP0-T07 وP0-T08
 
 ## القرار
 
@@ -36,6 +36,7 @@
 | jsQR / pngjs          |                   `1.4.0` / `7.0.0` | فك QR من PNG المطبوع آليًا وفحص المرجع البصري                          |
 | Luxon                 |                             `3.7.2` | مكتبة الوقت الوحيدة وتحويل IANA/UTC مع كشف حالات DST                   |
 | @types/luxon          |                             `3.7.6` | تعريفات TypeScript المطابقة لواجهة Luxon المستخدمة                     |
+| decimal.js            |                            `10.6.0` | حساب المال عشريًا بلا اعتماد على `number` أو IEEE-754                  |
 
 ## ملاحظات التوافق
 
@@ -77,5 +78,6 @@
 - <https://vercel.com/kb/guide/deploying-puppeteer-with-nextjs-on-vercel>
 - <https://moment.github.io/luxon/api-docs/index.html>
 - <https://github.com/moment/luxon/blob/master/docs/zones.md>
+- <https://mikemcl.github.io/decimal.js/>
 
 كما روجعت النسخ المحلية المطابقة داخل `node_modules/next/dist/docs/` قبل كتابة الكود.
