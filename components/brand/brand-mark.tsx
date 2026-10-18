@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 type BrandMarkProps = {
   label: string;
   className?: string;
+  labelClassName?: string;
 };
 
-export function BrandMark({ label, className }: BrandMarkProps) {
+export function BrandMark({ label, className, labelClassName }: BrandMarkProps) {
   return (
     <div className={cn("inline-flex items-center gap-3", className)} translate="no">
       <span className="relative grid size-11 place-items-center rounded-xl bg-primary text-secondary shadow-card">
@@ -23,7 +24,9 @@ export function BrandMark({ label, className }: BrandMarkProps) {
           />
         </svg>
       </span>
-      <span className="text-lg font-black tracking-tight text-primary">{label}</span>
+      <span className={cn("text-lg font-black tracking-tight text-primary", labelClassName)}>
+        {label}
+      </span>
     </div>
   );
 }

@@ -74,6 +74,122 @@
     "en": "English",
     "switchTo": "Switch to {language}"
   },
+  "portals": {
+    "brand": "Noor Al-Wahy Academy",
+    "workspaceLabel": "Portal workspace",
+    "theme": {
+      "enableDark": "Enable dark mode",
+      "enableLight": "Enable light mode"
+    },
+    "emptyState": {
+      "title": "Your workspace is ready",
+      "description": "Content authorized for this role will appear here as each workflow is activated. Placeholder records are never shown in place of the academy’s real data."
+    },
+    "privacy": {
+      "title": "Privacy by role",
+      "description": "Each portal is designed to show only what its account holder is allowed to access. Authentication and database policies will enforce this in the next phase."
+    },
+    "responsiveNote": "The same sections remain clear and reachable on phones and larger screens.",
+    "admin": {
+      "roleName": "Administration portal",
+      "navigationLabel": "Administration portal sections",
+      "sections": {
+        "dashboard": {
+          "label": "Overview",
+          "title": "Academy overview",
+          "description": "A central starting point for academy operations and indicators once approved data is connected."
+        },
+        "applications": {
+          "label": "Applications",
+          "title": "Enrollment applications",
+          "description": "Review applications, follow their status, and convert accepted applicants with the right permissions."
+        },
+        "students": {
+          "label": "Students",
+          "title": "Student records",
+          "description": "Organized access to student profiles, assignments, and academic status."
+        },
+        "settings": {
+          "label": "Settings",
+          "title": "Academy settings",
+          "description": "Configure the policies and shared values that govern the system once admin access is enabled."
+        }
+      }
+    },
+    "teacher": {
+      "roleName": "Teacher portal",
+      "navigationLabel": "Teacher portal sections",
+      "sections": {
+        "today": {
+          "label": "Today",
+          "title": "Your teaching day",
+          "description": "A clear starting point for today’s sessions and tasks for students assigned to you."
+        },
+        "students": {
+          "label": "My students",
+          "title": "Assigned students",
+          "description": "Follow only the students you are authorized to teach, without exposing records outside your scope."
+        },
+        "reports": {
+          "label": "Reports",
+          "title": "Progress reports",
+          "description": "Prepare and review progress reports before approval and release to authorized viewers."
+        },
+        "availability": {
+          "label": "Availability",
+          "title": "Teaching availability",
+          "description": "Manage available teaching times so the administration can build a suitable schedule."
+        }
+      }
+    },
+    "student": {
+      "roleName": "Student portal",
+      "navigationLabel": "Student portal sections",
+      "sections": {
+        "home": {
+          "label": "Home",
+          "title": "Your learning journey",
+          "description": "A calm home for the essentials that support daily learning and follow-up."
+        },
+        "progress": {
+          "label": "Progress",
+          "title": "Learning progress",
+          "description": "A personal view of progress and the evaluations approved for you to see."
+        },
+        "schedule": {
+          "label": "Schedule",
+          "title": "Session schedule",
+          "description": "Session times will be shown in the appropriate time zone once scheduling is connected."
+        },
+        "certificates": {
+          "label": "Certificates",
+          "title": "Certificates and milestones",
+          "description": "A safe place to access approved certificates and learning milestones."
+        }
+      }
+    },
+    "parent": {
+      "roleName": "Parent portal",
+      "navigationLabel": "Parent portal sections",
+      "sections": {
+        "children": {
+          "label": "Children",
+          "title": "Follow your children",
+          "description": "Follow only the children connected to your account from one clear workspace."
+        },
+        "billing": {
+          "label": "Billing",
+          "title": "Invoices and subscriptions",
+          "description": "Follow invoices and payments for your children’s subscriptions once finance is activated."
+        },
+        "contact": {
+          "label": "Contact",
+          "title": "Contact the academy",
+          "description": "Reach the academy’s approved contact channels without creating an internal messaging system."
+        }
+      }
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

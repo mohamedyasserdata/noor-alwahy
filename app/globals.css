@@ -100,6 +100,12 @@
 
   html {
     text-rendering: optimizeLegibility;
+    color-scheme: light;
+    scroll-padding-block-end: 6rem;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -108,13 +114,33 @@
       radial-gradient(circle at 85% 80%, rgb(15 37 71 / 0.06), transparent 28rem);
   }
 
+  .dark body {
+    background-image:
+      radial-gradient(circle at 15% 15%, rgb(216 185 104 / 0.09), transparent 25rem),
+      radial-gradient(circle at 85% 80%, rgb(107 127 153 / 0.08), transparent 28rem);
+  }
+
   ::selection {
     background: rgb(201 162 75 / 0.35);
     color: #0f2547;
   }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: rgb(201 162 75 / 0.2);
+  }
 }
 
 @layer utilities {
+  .safe-header {
+    padding-block-start: max(0rem, env(safe-area-inset-top));
+    padding-inline: 0.75rem;
+  }
+
+  .safe-bottom {
+    padding-block-end: max(0.25rem, env(safe-area-inset-bottom));
+  }
+
   .islamic-pattern {
     background-image:
       linear-gradient(

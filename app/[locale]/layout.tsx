@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -11,6 +12,10 @@ import "../globals.css";
 type LocaleLayoutProps = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
+};
+
+export const viewport: Viewport = {
+  themeColor: "#faf6ec",
 };
 
 export function generateStaticParams() {
@@ -51,6 +56,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       lang={locale}
       dir={locale === "ar" ? "rtl" : "ltr"}
       className={`${cairoArabic.variable} ${cairoLatin.variable} ${amiriArabic.variable} ${amiriLatin.variable}`}
+      suppressHydrationWarning
     >
       <body className="min-h-svh bg-background font-sans text-foreground antialiased">
         <NextIntlClientProvider>
@@ -62,6 +68,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           </a>
           {children}
         </NextIntlClientProvider>
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </body>
     </html>
   );

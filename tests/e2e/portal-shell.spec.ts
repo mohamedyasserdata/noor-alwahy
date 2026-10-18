@@ -1,0 +1,148 @@
+import { expect, test, type Page } from "@playwright/test";
+
+const portals = [
+  {
+    id: "admin",
+    section: "dashboard",
+    title: { ar: "نظرة الإدارة الشاملة", en: "Academy overview" },
+  },
+  {
+    id: "teacher",
+    section: "today",
+    title: { ar: "يومك التعليمي", en: "Your teaching day" },
+  },
+  {
+    id: "student",
+    section: "home",
+    title: { ar: "رحلتك التعليمية", en: "Your learning journey" },
+  },
+  {
+    id: "parent",
+    section: "children",
+    title: { ar: "متابعة الأبناء", en: "Follow your children" },
+  },
+] as const;
+
+for (const locale of [
+  { code: "ar", direction: "rtl" },
+  { code: "en", direction: "ltr" },
+] as const) {
+  test(`${locale.code} portal shells use the bottom navigation through 768px`, async ({ page }) => {
+    const consoleProblems = captureConsoleProblems(page);
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 360, height: 800 });
+
+    for (const portal of portals) {
+      await page.goto(`/${locale.code}/${portal.id}`);
+      await expect(page).toHaveURL(
+        new RegExp(`/${locale.code}/${portal.id}/${portal.section}(?:\\?.*)?$`),
+      );
+      await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(portal.title[locale.code]);
+      await expect(page.getByTestId("portal-sidebar")).toBeHidden();
+      await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+      await expect(
+        page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
+      ).toHaveCount(1);
+
+      await expectNoHorizontalOverflow(page);
+      await expectTouchTargets(page);
+    }
+
+    await page.setViewportSize({ width: 768, height: 900 });
+    await expect(page.getByTestId("portal-sidebar")).toBeHidden();
+    await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    expect(consoleProblems).toEqual([]);
+  });
+
+  test(`${locale.code} portal shells use the sidebar above 768px`, async ({ page }) => {
+    const consoleProblems = captureConsoleProblems(page);
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    for (const portal of portals) {
+      await page.goto(`/${locale.code}/${portal.id}/${portal.section}`);
+      await expect(page.getByTestId("portal-sidebar")).toBeVisible();
+      await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+      await expect(
+        page.getByTestId("portal-navigation-sidebar").locator('a[aria-current="page"]'),
+      ).toHaveCount(1);
+      await expectNoHorizontalOverflow(page);
+      await expectTouchTargets(page);
+    }
+
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await expect(page.getByTestId("portal-sidebar")).toBeVisible();
+    await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+    expect(consoleProblems).toEqual([]);
+  });
+}
+
+test("dark theme is accessible and persists across reloads", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/ar/student/home");
+  await page.evaluate(() => {
+    localStorage.removeItem("noor-theme");
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = "light";
+  });
+  await page.reload();
+
+  const toggle = page.getByTestId("theme-toggle").filter({ visible: true });
+  await expect(toggle).toHaveAttribute("aria-label", "تفعيل الوضع الداكن");
+  await toggle.click();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(toggle).toHaveAttribute("aria-label", "تفعيل الوضع الفاتح");
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#091a33");
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("noor-theme"))).toBe("dark");
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.getByTestId("theme-toggle").filter({ visible: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
+function captureConsoleProblems(page: Page) {
+  const problems: string[] = [];
+
+  page.on("console", (message) => {
+    if (message.type() === "error" || message.type() === "warning") {
+      problems.push(`${message.type()}: ${message.text()}`);
+    }
+  });
+
+  return problems;
+}
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const viewport = await page.evaluate(() => ({
+    innerWidth: window.innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+
+  expect(viewport.scrollWidth).toBe(viewport.innerWidth);
+}
+
+async function expectTouchTargets(page: Page) {
+  const undersizedTargets = await page
+    .getByTestId(/portal-shell-/)
+    .locator("a:visible, button:visible")
+    .evaluateAll((elements) =>
+      elements
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            label: element.getAttribute("aria-label") ?? element.textContent?.trim(),
+            width: rect.width,
+            height: rect.height,
+          };
+        })
+        .filter(({ width, height }) => width < 44 || height < 44),
+    );
+
+  expect(undersizedTargets).toEqual([]);
+}
