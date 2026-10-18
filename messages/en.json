@@ -109,6 +109,11 @@
           "title": "Student records",
           "description": "Organized access to student profiles, assignments, and academic status."
         },
+        "users": {
+          "label": "Accounts",
+          "title": "User accounts",
+          "description": "Create, invite, activate, and disable academy accounts from a protected server workflow."
+        },
         "audit": {
           "label": "Audit log",
           "title": "Audit log",
@@ -242,6 +247,63 @@
       "resetRequestFailed": "Recovery instructions could not be sent right now. Try again shortly.",
       "expiredLink": "This recovery link is invalid or has expired. Request a new one.",
       "invalidPassword": "Make sure both passwords match and contain at least 8 characters."
+    }
+  },
+  "userManagement": {
+    "eyebrow": "Protected account administration",
+    "title": "User accounts",
+    "description": "Create or invite approved academy users, then control access without deleting their records.",
+    "create": {
+      "title": "Add an account",
+      "description": "Choose an email invitation or set a temporary password.",
+      "action": "Create account",
+      "pending": "Creating account…"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "displayName": "Display name (optional)",
+      "email": "Email address",
+      "role": "Portal role",
+      "mode": "Activation method",
+      "temporaryPassword": "Temporary password",
+      "passwordHint": "Required only for direct creation; use at least 12 characters."
+    },
+    "roles": {
+      "admin": "Administrator",
+      "teacher": "Teacher",
+      "student": "Student",
+      "parent": "Parent"
+    },
+    "modes": {
+      "invite": "Send email invitation",
+      "password": "Set temporary password"
+    },
+    "list": {
+      "title": "Academy accounts",
+      "count": "{count, plural, =0 {No accounts} =1 {1 account} other {# accounts}}",
+      "noEmail": "No email recorded",
+      "createdAt": "Created {value}"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Disabled"
+    },
+    "actions": {
+      "activate": "Activate",
+      "disable": "Disable",
+      "pending": "Updating…"
+    },
+    "notices": {
+      "created": "The account was created and can sign in with its temporary password.",
+      "invited": "The invitation was sent and the account is ready for activation.",
+      "activated": "The account was activated.",
+      "disabled": "The account was disabled and its sessions were revoked."
+    },
+    "errors": {
+      "invalidFields": "Check the account details, role, and temporary password, then try again.",
+      "accountExists": "An account already uses this email address.",
+      "cannotDisableSelf": "You cannot disable the administrator account you are currently using.",
+      "requestFailed": "The account change could not be completed. No partial change was kept."
     }
   },
   "auditLog": {

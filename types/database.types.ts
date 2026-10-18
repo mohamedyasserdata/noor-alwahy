@@ -132,6 +132,10 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      set_account_active: {
+        Args: { p_is_active: boolean; p_profile_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       application_status:
