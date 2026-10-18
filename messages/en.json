@@ -109,6 +109,11 @@
           "title": "Student records",
           "description": "Organized access to student profiles, assignments, and academic status."
         },
+        "audit": {
+          "label": "Audit log",
+          "title": "Audit log",
+          "description": "A protected timeline showing who changed sensitive records, when it happened, and the values before and after."
+        },
         "settings": {
           "label": "Settings",
           "title": "Academy settings",
@@ -188,6 +193,64 @@
           "description": "Reach the academy’s approved contact channels without creating an internal messaging system."
         }
       }
+    }
+  },
+  "auditLog": {
+    "eyebrow": "Administrative oversight",
+    "filters": {
+      "title": "Filter the log",
+      "action": "Action",
+      "allActions": "All actions",
+      "table": "Table",
+      "tablePlaceholder": "Example: profiles…",
+      "record": "Record ID",
+      "recordPlaceholder": "Example: 22222222-…",
+      "apply": "Apply filters",
+      "clear": "Clear filters"
+    },
+    "actions": {
+      "INSERT": "Created",
+      "UPDATE": "Updated",
+      "DELETE": "Deleted"
+    },
+    "resultsCount": "Matching records: {count}",
+    "columns": {
+      "time": "Time",
+      "actor": "Actor",
+      "event": "Event",
+      "changes": "Changes"
+    },
+    "changes": "View changes ({count})",
+    "before": "Before",
+    "after": "After",
+    "systemActor": "System operation",
+    "unknownRecord": "No identifier",
+    "empty": {
+      "title": "No matching changes",
+      "description": "Adjust the filters or wait for the first sensitive operation to be recorded."
+    },
+    "forbidden": {
+      "title": "Administrators only",
+      "description": "Events appear here after an authorized administrator signs in. No details are exposed to other roles."
+    },
+    "error": {
+      "title": "The log could not be loaded",
+      "description": "Check the database connection and try again."
+    },
+    "loading": "Loading the audit log…",
+    "pagination": {
+      "page": "Page {page}",
+      "previous": "Previous page",
+      "next": "Next page"
+    },
+    "fields": {
+      "role": "Role",
+      "is_active": "Account status"
+    },
+    "values": {
+      "true": "Active",
+      "false": "Inactive",
+      "empty": "—"
     }
   },
   "accessibility": {

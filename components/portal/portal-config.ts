@@ -5,7 +5,7 @@ export type PortalId = (typeof portalIds)[number];
 export const portalConfig = {
   admin: {
     defaultSection: "dashboard",
-    sections: ["dashboard", "applications", "students", "settings"],
+    sections: ["dashboard", "applications", "students", "audit", "settings"],
   },
   teacher: {
     defaultSection: "today",

@@ -11,6 +11,7 @@ import {
   FileChartColumn,
   House,
   Mail,
+  ScrollText,
   Settings,
   Sparkles,
   Users,
@@ -26,6 +27,7 @@ const sectionIcons = {
   dashboard: ChartNoAxesCombined,
   applications: ClipboardList,
   students: Users,
+  audit: ScrollText,
   settings: Settings,
   today: Clock3,
   reports: FileChartColumn,
@@ -56,7 +58,9 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       data-testid={`portal-navigation-${variant}`}
       className={cn(
         isSidebar ? "grid gap-1.5 px-4" : "grid h-full items-stretch",
-        !isSidebar && (sections.length === 3 ? "grid-cols-3" : "grid-cols-4"),
+        !isSidebar && sections.length === 3 && "grid-cols-3",
+        !isSidebar && sections.length === 4 && "grid-cols-4",
+        !isSidebar && sections.length === 5 && "grid-cols-5",
       )}
     >
       {sections.map((section) => {
