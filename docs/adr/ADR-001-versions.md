@@ -2,7 +2,7 @@
 
 - **الحالة:** مقبول
 - **التاريخ:** 2026-10-17
-- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05 وP0-T06
+- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05 وP0-T06 وP0-T07
 
 ## القرار
 
@@ -34,6 +34,8 @@
 | @react-pdf/renderer   |                             `4.9.0` | اعتماد تطوير لمقارنة Spike؛ ليس محرك PDF المعتمد                       |
 | qrcode                |                             `1.5.4` | إنشاء QR نفسه في محركي Spike                                           |
 | jsQR / pngjs          |                   `1.4.0` / `7.0.0` | فك QR من PNG المطبوع آليًا وفحص المرجع البصري                          |
+| Luxon                 |                             `3.7.2` | مكتبة الوقت الوحيدة وتحويل IANA/UTC مع كشف حالات DST                   |
+| @types/luxon          |                             `3.7.6` | تعريفات TypeScript المطابقة لواجهة Luxon المستخدمة                     |
 
 ## ملاحظات التوافق
 
@@ -73,5 +75,7 @@
 - <https://playwright.dev/docs/api/class-page#page-pdf>
 - <https://react-pdf.org/fonts>
 - <https://vercel.com/kb/guide/deploying-puppeteer-with-nextjs-on-vercel>
+- <https://moment.github.io/luxon/api-docs/index.html>
+- <https://github.com/moment/luxon/blob/master/docs/zones.md>
 
 كما روجعت النسخ المحلية المطابقة داخل `node_modules/next/dist/docs/` قبل كتابة الكود.
