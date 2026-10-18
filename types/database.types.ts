@@ -3,6 +3,39 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          created_at: string;
+          key: string;
+          updated_at: string;
+          updated_by: string | null;
+          value: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          key: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: NonNullable<Json>;
+        };
+        Update: {
+          created_at?: string;
+          key?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_logs: {
         Row: {
           action: string;
@@ -171,6 +204,10 @@ export type Database = {
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
+        Returns: undefined;
+      };
+      update_public_app_settings: {
+        Args: { p_academy_profile: Json; p_support_hours: Json };
         Returns: undefined;
       };
     };

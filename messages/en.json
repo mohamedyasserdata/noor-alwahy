@@ -465,6 +465,44 @@
       }
     }
   },
+  "appSettings": {
+    "eyebrow": "Public academy identity",
+    "title": "Academy settings",
+    "description": "Manage the bilingual identity and support information shown across the academy portals. Every change is recorded in the audit log.",
+    "profile": {
+      "title": "Academy profile",
+      "description": "Set the public name, description, and optional logo for both languages."
+    },
+    "support": {
+      "title": "Support hours",
+      "description": "This message appears with the official contact channels."
+    },
+    "languages": {
+      "ar": "Arabic content",
+      "en": "English content"
+    },
+    "fields": {
+      "nameAr": "Academy name in Arabic",
+      "nameEn": "Academy name in English",
+      "descriptionAr": "Academy description in Arabic",
+      "descriptionEn": "Academy description in English",
+      "logoPath": "Logo path (optional)",
+      "logoPathHint": "Use a same-site path beginning with /, such as /images/academy-logo.png. Leave blank to use the built-in mark.",
+      "supportHoursAr": "Support hours in Arabic",
+      "supportHoursEn": "Support hours in English"
+    },
+    "action": {
+      "save": "Save public settings",
+      "saving": "Saving…"
+    },
+    "notices": {
+      "updated": "The public academy settings were updated."
+    },
+    "errors": {
+      "invalidFields": "Check the names, descriptions, logo path, and support hours, then try again.",
+      "requestFailed": "The academy settings could not be updated. No partial change was kept."
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

@@ -6,10 +6,12 @@ export default defineConfig({
   testDir: "./tests/e2e",
   globalSetup: "./tests/e2e/global-setup.ts",
   outputDir: "output/playwright/test-results",
-  fullyParallel: true,
+  // The suite intentionally exercises shared seeded identities and MFA state.
+  // Serial execution keeps those stateful journeys isolated and deterministic.
+  fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   globalTimeout: 10 * 60 * 1000,
   reporter: [
     [process.env.CI ? "line" : "list"],

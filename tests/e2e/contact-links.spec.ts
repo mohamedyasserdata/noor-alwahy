@@ -13,7 +13,7 @@ test("US-153 admin manages audited official links visible to students and parent
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/settings");
-  await expect(page.getByRole("heading", { level: 1, name: "Contact channels" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Contact channels" })).toBeVisible();
 
   const createForm = page.locator("form").filter({ has: page.locator("#contact-url-new") });
   await createForm.locator("#contact-type-new").selectOption("telegram");

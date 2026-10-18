@@ -7,6 +7,7 @@ import type { PortalId } from "@/components/portal/portal-config";
 import { PortalNavigation } from "@/components/portal/portal-navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { AppLocale } from "@/i18n/routing";
+import { getPublicAppSettings } from "@/lib/settings/public-settings";
 
 type PortalShellProps = {
   children: React.ReactNode;
@@ -15,7 +16,12 @@ type PortalShellProps = {
 };
 
 export async function PortalShell({ children, locale, portal }: PortalShellProps) {
-  const t = await getTranslations({ locale, namespace: "portals" });
+  const [t, settings] = await Promise.all([
+    getTranslations({ locale, namespace: "portals" }),
+    getPublicAppSettings(),
+  ]);
+  const academyName =
+    locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
 
   return (
     <div className="min-h-svh" data-testid={`portal-shell-${portal}`}>
@@ -24,7 +30,7 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
         data-testid="portal-sidebar"
       >
         <div className="border-b px-5 py-5">
-          <BrandMark label={t("brand")} />
+          <BrandMark label={academyName} logoPath={settings.academyProfile.logoPath} />
         </div>
 
         <div className="relative mx-5 my-6 overflow-hidden rounded-t-[7rem] rounded-b-2xl border border-secondary/35 bg-background px-5 pt-9 pb-5 text-center">
@@ -58,7 +64,8 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
       <div className="min-h-svh min-[769px]:ps-72">
         <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 backdrop-blur min-[769px]:hidden">
           <BrandMark
-            label={t("brand")}
+            label={academyName}
+            logoPath={settings.academyProfile.logoPath}
             className="shrink-0"
             labelClassName="sr-only min-[440px]:not-sr-only min-[440px]:text-base"
           />

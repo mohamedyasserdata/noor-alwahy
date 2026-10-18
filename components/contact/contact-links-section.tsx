@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import type { AppLocale } from "@/i18n/routing";
 import { getContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
+import { getPublicAppSettings } from "@/lib/settings/public-settings";
 
 type ContactLinksSectionProps = {
   locale: AppLocale;
@@ -20,10 +21,12 @@ function localizedLabel(link: ContactLink, locale: AppLocale) {
 }
 
 export async function ContactLinksSection({ locale }: ContactLinksSectionProps) {
-  const [links, t] = await Promise.all([
+  const [links, settings, t] = await Promise.all([
     getContactLinks(),
+    getPublicAppSettings(),
     getTranslations({ locale, namespace: "contactLinks.public" }),
   ]);
+  const supportHours = locale === "ar" ? settings.supportHours.ar : settings.supportHours.en;
 
   return (
     <section className="mx-auto w-full max-w-5xl" aria-labelledby="contact-links-title">
@@ -85,7 +88,7 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
 
       <aside className="mt-6 rounded-2xl border border-secondary/25 bg-secondary/10 p-5">
         <h2 className="font-black text-primary">{t("support.title")}</h2>
-        <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("support.description")}</p>
+        <p className="mt-2 text-sm leading-7 text-muted-foreground">{supportHours}</p>
       </aside>
     </section>
   );

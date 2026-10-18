@@ -18,6 +18,7 @@ import { contactLinkTypes } from "@/lib/validators/contact-links";
 type ContactLinksAdminSectionProps = {
   locale: AppLocale;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+  embedded?: boolean;
 };
 
 const selectClassName =
@@ -26,6 +27,7 @@ const selectClassName =
 export async function ContactLinksAdminSection({
   locale,
   searchParams,
+  embedded = false,
 }: ContactLinksAdminSectionProps) {
   const [query, links, t] = await Promise.all([
     searchParams,
@@ -40,12 +42,21 @@ export async function ContactLinksAdminSection({
         <p className="mb-3 inline-flex min-h-8 items-center rounded-full border border-secondary/30 bg-secondary/12 px-3 text-xs font-extrabold tracking-wide text-primary">
           {t("eyebrow")}
         </p>
-        <h1
-          id="contact-admin-title"
-          className="text-3xl font-black text-balance text-primary sm:text-4xl"
-        >
-          {t("title")}
-        </h1>
+        {embedded ? (
+          <h2
+            id="contact-admin-title"
+            className="text-2xl font-black text-balance text-primary sm:text-3xl"
+          >
+            {t("title")}
+          </h2>
+        ) : (
+          <h1
+            id="contact-admin-title"
+            className="text-3xl font-black text-balance text-primary sm:text-4xl"
+          >
+            {t("title")}
+          </h1>
+        )}
         <p className="mt-4 leading-8 text-pretty text-muted-foreground">{t("description")}</p>
       </header>
 
