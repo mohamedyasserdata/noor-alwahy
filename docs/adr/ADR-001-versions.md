@@ -2,7 +2,7 @@
 
 - **الحالة:** مقبول
 - **التاريخ:** 2026-10-17
-- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05
+- **المهمة:** P0-T01، محدث في P0-T03 وP0-T04 وP0-T05 وP0-T06
 
 ## القرار
 
@@ -31,6 +31,9 @@
 | Vitest                |                             `5.0.5` | اختبارات الوحدة على Node 22.12 فأعلى                                   |
 | Playwright Test       |                            `1.64.1` | smoke فعلي لـChromium مع webServer وتقارير الفشل                       |
 | Gitleaks              |                            `8.30.1` | صورة Docker رسمية مثبتة لفحص أسرار تاريخ Git                           |
+| @react-pdf/renderer   |                             `4.9.0` | اعتماد تطوير لمقارنة Spike؛ ليس محرك PDF المعتمد                       |
+| qrcode                |                             `1.5.4` | إنشاء QR نفسه في محركي Spike                                           |
+| jsQR / pngjs          |                   `1.4.0` / `7.0.0` | فك QR من PNG المطبوع آليًا وفحص المرجع البصري                          |
 
 ## ملاحظات التوافق
 
@@ -67,5 +70,8 @@
 - <https://playwright.dev/docs/test-webserver>
 - <https://github.com/gitleaks/gitleaks>
 - <https://github.com/swc-project/swc/issues/12442>
+- <https://playwright.dev/docs/api/class-page#page-pdf>
+- <https://react-pdf.org/fonts>
+- <https://vercel.com/kb/guide/deploying-puppeteer-with-nextjs-on-vercel>
 
 كما روجعت النسخ المحلية المطابقة داخل `node_modules/next/dist/docs/` قبل كتابة الكود.

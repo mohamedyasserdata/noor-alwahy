@@ -1,0 +1,30 @@
+{
+  "source": {
+    "name": "Tanzil Project",
+    "sourcePage": "https://tanzil.net/download/",
+    "downloadUrl": "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&marks=true&sajdah=true&tatweel=true&agree=true",
+    "textType": "Uthmani",
+    "version": "1.1",
+    "snapshotDate": "2026-10-17",
+    "archiveSha256": "6933e133dd56db778c801bf738848454e43648105a151e8d84d86a7cae39ec5f",
+    "verseCount": 6236
+  },
+  "chapter": 1,
+  "verses": [
+    {
+      "key": "1:1",
+      "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+      "sha256": "1ad501ee473ec3953c6d669513e2ae2550ad333577aef0f156926b52f6972b61"
+    },
+    {
+      "key": "1:2",
+      "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
+      "sha256": "463f13295bc7d90e0ea221942d7b39359a137da8686420b58f63d0774eebda09"
+    },
+    {
+      "key": "1:3",
+      "text": "ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+      "sha256": "29fdcd850fbbaf0e4b6bb93077b4fb2c6cdbcc2d8d1826a3b8f24131bc7621c5"
+    }
+  ]
+}

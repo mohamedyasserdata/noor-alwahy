@@ -40,12 +40,25 @@ Supabase CLI مثبت داخل المشروع، وDocker Desktop يعمل على
 ووُلّد `types/database.types.ts` من المخطط المحلي، ونجح استعلام Server Component الحقيقي؛
 راجع `docs/PROJECT_STATUS.md` لأدلة التحقق ونقطة الاستئناف.
 
+## إعادة إنتاج Spike PDF العربي
+
+```bash
+pnpm pdf:spike:fixture
+pnpm pdf:spike:generate
+pnpm pdf:spike:verify
+```
+
+الأمر الأول يجلب عينة Tanzil الموثقة ويتحقق من بصمتها، والثاني يولّد نسختي Chromium وReact-PDF
+في `output/pdf/`، والثالث يفحص A4 والنص والخطوط وQR والمرجع البصري. يحتاج الفحص Poppler وPython
+مع `pypdf`. قرار المحرك والاستضافة موثق في `docs/adr/ADR-004-pdf-engine.md`.
+
 ## أهم الملفات
 
 - `docs/PROJECT_STATUS.md`: سجل الاستمرار لأي مطوّر أو نموذج آخر.
 - `docs/adr/ADR-001-versions.md`: الإصدارات والقيود المتغيرة في Next.js.
 - `docs/adr/ADR-002-design-system.md`: قرارات الهوية والخطوط والمكوّنات.
 - `docs/adr/ADR-003-i18n-routing.md`: قرار المسارات المحلية وتركيب proxy.
+- `docs/adr/ADR-004-pdf-engine.md`: مقارنة PDF العربية وقرار Chromium والاستضافة.
 - `app/[locale]/dev/ui/page.tsx`: مرجع التصميم الحي بالعربية والإنجليزية.
 - `app/[locale]/dev/supabase/page.tsx`: فحص اتصال Data API من Server Component.
 - `types/database.types.ts`: الأنواع المولّدة من مخطط PostgreSQL المحلي.

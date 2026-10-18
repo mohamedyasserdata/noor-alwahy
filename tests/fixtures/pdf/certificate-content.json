@@ -1,0 +1,18 @@
+{
+  "academyName": "أكاديمية نور الوحي للقرآن الكريم",
+  "title": "شهادة تقدير تجريبية",
+  "recipientLabel": "تُمنح هذه الشهادة التقنية إلى",
+  "recipientName": "عبد الرحمن محمد عبد الله مصطفى محمود الحسيني",
+  "body": "تقديرًا لاجتياز اختبار جودة المستندات العربية بنجاح",
+  "quranLabel": "عينة التشكيل من السورة الأولى الآيات الأولى إلى الثالثة",
+  "serialLabel": "رقم الشهادة",
+  "serial": "NWA-2026-00123",
+  "dateLabel": "تاريخ الاختبار",
+  "date": "17/10/2026",
+  "verificationLabel": "رمز التحقق التجريبي",
+  "qrValue": "https://nooralwahy.example/ar/verify/pdf-spike-2026-00123",
+  "watermark": "نسخة تقنية تجريبية غير صالحة للإصدار",
+  "sourceLabel": "مصدر النص القرآني",
+  "sourceName": "Tanzil Project",
+  "sourceUrl": "tanzil.net"
+}
