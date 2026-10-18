@@ -3,16 +3,123 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never;
+      profile_private: {
+        Row: {
+          address: string | null;
+          contact_email: string | null;
+          created_at: string;
+          phone: string | null;
+          profile_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          address?: string | null;
+          contact_email?: string | null;
+          created_at?: string;
+          phone?: string | null;
+          profile_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          address?: string | null;
+          contact_email?: string | null;
+          created_at?: string;
+          phone?: string | null;
+          profile_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_private_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          country_code: string | null;
+          created_at: string;
+          display_name: string | null;
+          full_name: string;
+          id: string;
+          is_active: boolean;
+          preferred_locale: string;
+          role: Database["public"]["Enums"]["user_role"];
+          timezone: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          avatar_url?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          full_name: string;
+          id: string;
+          is_active?: boolean;
+          preferred_locale?: string;
+          role: Database["public"]["Enums"]["user_role"];
+          timezone?: string;
+          updated_at?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          display_name?: string | null;
+          full_name?: string;
+          id?: string;
+          is_active?: boolean;
+          preferred_locale?: string;
+          role?: Database["public"]["Enums"]["user_role"];
+          timezone?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      auth_role: {
+        Args: Record<PropertyKey, never>;
+        Returns: Database["public"]["Enums"]["user_role"];
+      };
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
     };
     Enums: {
-      [_ in never]: never;
+      application_status:
+        "new" | "contacted" | "trial_booked" | "accepted" | "rejected" | "postponed";
+      assignment_status: "active" | "paused" | "ended";
+      attendance_status:
+        | "present"
+        | "late"
+        | "student_absent"
+        | "student_excused"
+        | "teacher_absent"
+        | "cancelled_teacher"
+        | "cancelled_admin";
+      billing_period: "monthly" | "quarterly" | "yearly";
+      gender_t: "male" | "female";
+      invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "overdue" | "void";
+      payment_kind: "payment" | "refund";
+      payment_status: "pending_confirmation" | "confirmed" | "rejected";
+      payout_status: "accruing" | "due" | "approved" | "paid";
+      progress_status: "not_started" | "in_progress" | "mastered" | "needs_review";
+      report_status: "draft" | "approved" | "admin_review" | "visible";
+      session_kind: "regular" | "trial" | "makeup" | "extra";
+      session_status: "scheduled" | "held" | "missed" | "cancelled" | "rescheduled";
+      session_type_t:
+        "new_memo" | "near_review" | "far_review" | "recitation" | "noorani" | "matn_theory";
+      student_status: "active" | "dropped" | "graduated" | "suspended" | "archived";
+      subscription_status: "trial" | "active" | "paused" | "expired" | "cancelled";
+      user_role: "admin" | "teacher" | "student" | "parent";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -123,6 +230,39 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      application_status: ["new", "contacted", "trial_booked", "accepted", "rejected", "postponed"],
+      assignment_status: ["active", "paused", "ended"],
+      attendance_status: [
+        "present",
+        "late",
+        "student_absent",
+        "student_excused",
+        "teacher_absent",
+        "cancelled_teacher",
+        "cancelled_admin",
+      ],
+      billing_period: ["monthly", "quarterly", "yearly"],
+      gender_t: ["male", "female"],
+      invoice_status: ["draft", "issued", "partially_paid", "paid", "overdue", "void"],
+      payment_kind: ["payment", "refund"],
+      payment_status: ["pending_confirmation", "confirmed", "rejected"],
+      payout_status: ["accruing", "due", "approved", "paid"],
+      progress_status: ["not_started", "in_progress", "mastered", "needs_review"],
+      report_status: ["draft", "approved", "admin_review", "visible"],
+      session_kind: ["regular", "trial", "makeup", "extra"],
+      session_status: ["scheduled", "held", "missed", "cancelled", "rescheduled"],
+      session_type_t: [
+        "new_memo",
+        "near_review",
+        "far_review",
+        "recitation",
+        "noorani",
+        "matn_theory",
+      ],
+      student_status: ["active", "dropped", "graduated", "suspended", "archived"],
+      subscription_status: ["trial", "active", "paused", "expired", "cancelled"],
+      user_role: ["admin", "teacher", "student", "parent"],
+    },
   },
 } as const;
