@@ -32,10 +32,13 @@ test("US-153 admin manages audited official links visible to students and parent
   const id = await card.locator('input[name="id"]').first().inputValue();
 
   await signInAs(page, "en", "student");
+  await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/en/student/contact");
   const studentLink = page.getByRole("link", { name: new RegExp(labelEn) });
   await expect(studentLink).toHaveAttribute("href", destination);
   await expect(studentLink).toHaveAttribute("target", "_blank");
+  await expect(page.getByTestId("portal-navigation-bottom").getByRole("link")).toHaveCount(5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
 
   await signInAs(page, "ar", "parent");
   await page.goto("/ar/parent/contact");
@@ -58,8 +61,9 @@ test("US-153 admin manages audited official links visible to students and parent
   await signInAs(page, "en", "admin");
   await page.goto(`/en/admin/audit?table=contact_links&record=${id}`);
   await expect(page.getByRole("status")).toHaveText("Matching records: 2");
-  await expect(page.getByRole("row", { name: /Created/ })).toBeVisible();
-  await expect(page.getByRole("row", { name: /Updated/ })).toBeVisible();
+  const mobileAuditTimeline = page.locator("ol");
+  await expect(mobileAuditTimeline.getByText("Created", { exact: true })).toBeVisible();
+  await expect(mobileAuditTimeline.getByText("Updated", { exact: true })).toBeVisible();
 
   await page.goto("/en/admin/settings");
   await page
@@ -72,5 +76,5 @@ test("US-153 admin manages audited official links visible to students and parent
   await expect(page.getByText(labelEn, { exact: true })).toHaveCount(0);
 
   await page.goto(`/en/admin/audit?table=contact_links&record=${id}`);
-  await expect(page.getByRole("row", { name: /Deleted/ })).toBeVisible();
+  await expect(page.locator("ol").getByText("Deleted", { exact: true })).toBeVisible();
 });

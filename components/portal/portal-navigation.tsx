@@ -62,6 +62,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
         isSidebar ? "grid gap-1.5 px-4" : "grid h-full items-stretch",
         !isSidebar && sections.length === 3 && "grid-cols-3",
         !isSidebar && sections.length === 4 && "grid-cols-4",
+        !isSidebar && sections.length === 5 && "grid-cols-5",
         !isSidebar && sections.length === 6 && "grid-cols-6",
       )}
     >
