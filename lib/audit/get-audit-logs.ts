@@ -1,5 +1,7 @@
 import "server-only";
 
+import { connection } from "next/server";
+
 import type { AuditLogFilters, AuditLogRow } from "@/lib/audit/audit-log";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +18,7 @@ export type AuditLogQueryResult =
     };
 
 export async function getAuditLogs(filters: AuditLogFilters): Promise<AuditLogQueryResult> {
+  await connection();
   const supabase = await createClient();
   const { data: isAdmin, error: authorizationError } = await supabase.rpc("is_admin");
 

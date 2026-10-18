@@ -4,7 +4,15 @@ import type { NextRequest, NextResponse } from "next/server";
 import { getPublicSupabaseEnv } from "@/lib/env";
 import type { Database } from "@/types/database.types";
 
-export async function updateSession(request: NextRequest, createResponse: () => NextResponse) {
+export type VerifiedAuthClaims = {
+  app_metadata?: Record<string, unknown>;
+  sub: string;
+};
+
+export async function updateSession(
+  request: NextRequest,
+  createResponse: (claims: VerifiedAuthClaims | null) => NextResponse,
+) {
   const env = getPublicSupabaseEnv();
   const pendingCookies: Array<{
     name: string;
@@ -35,11 +43,11 @@ export async function updateSession(request: NextRequest, createResponse: () => 
 
   // This verified call also refreshes an expired token before the response is
   // committed. Authorization checks still use getUser() per the constitution.
-  await supabase.auth.getClaims();
+  const { data, error } = await supabase.auth.getClaims();
 
   // Build the routing response after a possible refresh so next-intl forwards
   // the updated request cookies to the Server Component in this same request.
-  const response = createResponse();
+  const response = createResponse(error ? null : (data?.claims ?? null));
   pendingCookies.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
   });

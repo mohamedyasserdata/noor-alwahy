@@ -64,13 +64,21 @@ set is_active = false
 where id = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 
 select is(
-  (select count(*)::integer from public.profiles),
+  (
+    select count(*)::integer
+    from public.profiles
+    where id::text like '%aaaa%' or id::text like '%bbbb%' or id::text like '%cccc%' or id::text like '%dddd%'
+  ),
   4,
   'auth.users inserts provision one profile per user'
 );
 
 select is(
-  (select count(*)::integer from public.profile_private),
+  (
+    select count(*)::integer
+    from public.profile_private
+    where profile_id::text like '%aaaa%' or profile_id::text like '%bbbb%' or profile_id::text like '%cccc%' or profile_id::text like '%dddd%'
+  ),
   4,
   'auth.users inserts provision one private profile per user'
 );
@@ -258,8 +266,24 @@ select set_config(
 set local role authenticated;
 
 select is((select public.is_admin()), true, 'is_admin accepts an active administrator');
-select is((select count(*)::integer from public.profiles), 4, 'an administrator reads every profile');
-select is((select count(*)::integer from public.profile_private), 4, 'an administrator reads every private profile');
+select is(
+  (
+    select count(*)::integer
+    from public.profiles
+    where id::text like '%aaaa%' or id::text like '%bbbb%' or id::text like '%cccc%' or id::text like '%dddd%'
+  ),
+  4,
+  'an administrator reads every profile in this isolation fixture'
+);
+select is(
+  (
+    select count(*)::integer
+    from public.profile_private
+    where profile_id::text like '%aaaa%' or profile_id::text like '%bbbb%' or profile_id::text like '%cccc%' or profile_id::text like '%dddd%'
+  ),
+  4,
+  'an administrator reads every private profile in this isolation fixture'
+);
 
 update public.profiles
 set display_name = 'Updated Student'

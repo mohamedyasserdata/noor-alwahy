@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { signInAs } from "./helpers/auth";
+
 const portals = [
   {
     id: "admin",
@@ -33,6 +35,7 @@ for (const locale of [
     await page.setViewportSize({ width: 360, height: 800 });
 
     for (const portal of portals) {
+      await signInAs(page, locale.code, portal.id);
       await page.goto(`/${locale.code}/${portal.id}`);
       await expect(page).toHaveURL(
         new RegExp(`/${locale.code}/${portal.id}/${portal.section}(?:\\?.*)?$`),
@@ -62,6 +65,7 @@ for (const locale of [
     await page.setViewportSize({ width: 1280, height: 900 });
 
     for (const portal of portals) {
+      await signInAs(page, locale.code, portal.id);
       await page.goto(`/${locale.code}/${portal.id}/${portal.section}`);
       await expect(page.getByTestId("portal-sidebar")).toBeVisible();
       await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
@@ -82,6 +86,7 @@ for (const locale of [
 test("dark theme is accessible and persists across reloads", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.setViewportSize({ width: 360, height: 800 });
+  await signInAs(page, "ar", "student");
   await page.goto("/ar/student/home");
   await page.evaluate(() => {
     localStorage.removeItem("noor-theme");

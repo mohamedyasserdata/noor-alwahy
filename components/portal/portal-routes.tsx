@@ -6,6 +6,7 @@ import { PortalSection } from "@/components/portal/portal-section";
 import { PortalShell } from "@/components/portal/portal-shell";
 import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { requireRole } from "@/lib/auth/require-role";
 
 type PortalLayoutRouteProps = {
   children: React.ReactNode;
@@ -24,6 +25,8 @@ export async function PortalLayoutRoute({ children, params, portal }: PortalLayo
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  await requireRole(portal, locale);
 
   return (
     <PortalShell locale={locale} portal={portal}>

@@ -195,6 +195,55 @@
       }
     }
   },
+  "auth": {
+    "shell": {
+      "eyebrow": "Secure access to your academy workspace",
+      "title": "Every role reaches what it needs, with clarity and privacy",
+      "description": "Sign in with your approved account to go straight to your portal without exposing data outside your role.",
+      "principle": "Identity is verified on the server, and permissions are enforced again inside the database."
+    },
+    "fields": {
+      "email": "Email address",
+      "password": "Password",
+      "newPassword": "New password",
+      "passwordConfirm": "Confirm new password"
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Use the email connected to your academy account.",
+      "forgotPassword": "Forgot your password?",
+      "action": "Open my portal",
+      "pending": "Signing in…"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "description": "Enter your email and we will send recovery instructions if it belongs to an active account.",
+      "action": "Send recovery link",
+      "pending": "Sending recovery link…"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "description": "Set a new password for the account that opened the recovery link.",
+      "passwordHint": "Use at least 8 characters and avoid easy-to-guess words.",
+      "action": "Save new password",
+      "pending": "Saving new password…",
+      "requestNewLink": "Request a new recovery link"
+    },
+    "backToLogin": "Back to sign in",
+    "status": {
+      "resetSent": "If the email belongs to an account, recovery instructions will arrive shortly. Check the junk folder too.",
+      "passwordUpdated": "Your password was changed. You can now sign in with the new password."
+    },
+    "errors": {
+      "invalidFields": "Check the email and password, then try again.",
+      "invalidCredentials": "The sign-in details are incorrect.",
+      "authenticationRequired": "Sign in before opening this portal.",
+      "accountUnavailable": "This account is currently unavailable. Contact the academy administration.",
+      "resetRequestFailed": "Recovery instructions could not be sent right now. Try again shortly.",
+      "expiredLink": "This recovery link is invalid or has expired. Request a new one.",
+      "invalidPassword": "Make sure both passwords match and contain at least 8 characters."
+    }
+  },
   "auditLog": {
     "eyebrow": "Administrative oversight",
     "filters": {

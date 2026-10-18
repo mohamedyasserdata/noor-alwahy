@@ -1,31 +1,36 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { signInAs } from "./helpers/auth";
+
 for (const locale of [
   {
     code: "ar",
     direction: "rtl",
-    restrictedTitle: "سجل مخصص للإدارة",
+    loginTitle: "تسجيل الدخول",
     title: "سجل التدقيق",
   },
   {
     code: "en",
     direction: "ltr",
-    restrictedTitle: "Administrators only",
+    loginTitle: "Sign in",
     title: "Audit log",
   },
 ] as const) {
-  test(`${locale.code} audit log keeps unauthenticated data private`, async ({ page }) => {
+  test(`${locale.code} audit log requires admin authentication`, async ({ page }) => {
     const consoleProblems = captureConsoleProblems(page);
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(`/${locale.code}/admin/audit`);
 
+    await expect(page).toHaveURL(new RegExp(`/${locale.code}/auth/login`));
     await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
-    await expect(page.getByRole("heading", { level: 1, name: locale.title })).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 2, name: locale.restrictedTitle }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: locale.loginTitle })).toBeVisible();
     await expect(page.getByTestId("audit-log-filters")).toHaveCount(0);
+
+    await signInAs(page, locale.code, "admin");
+    await page.goto(`/${locale.code}/admin/audit`);
+    await expect(page.getByRole("heading", { level: 1, name: locale.title })).toBeVisible();
+    await expect(page.getByTestId("audit-log-filters")).toBeVisible();
     await expect(
       page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
     ).toHaveCount(1);
