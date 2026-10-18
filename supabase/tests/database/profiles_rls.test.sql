@@ -260,7 +260,7 @@ select is((select count(*)::integer from public.profile_private), 0, 'an inactiv
 reset role;
 select set_config(
   'request.jwt.claims',
-  '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","role":"authenticated"}',
+  '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","role":"authenticated","aal":"aal2"}',
   true
 );
 set local role authenticated;

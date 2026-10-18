@@ -29,9 +29,19 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL(getRoleHome(role, protectedPortal.locale), request.url));
     }
 
+    if (protectedPortal?.role === "admin" && role === "admin" && claims?.aal !== "aal2") {
+      const mfaUrl = new URL(`/${protectedPortal.locale}/auth/mfa`, request.url);
+      mfaUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+      return NextResponse.redirect(mfaUrl);
+    }
+
     const loginMatch = pathname.match(/^\/(ar|en)\/auth\/login\/?$/);
 
     if (loginMatch && role) {
+      if (role === "admin" && claims?.aal !== "aal2") {
+        return NextResponse.redirect(new URL(`/${loginMatch[1]}/auth/mfa`, request.url));
+      }
+
       return NextResponse.redirect(
         new URL(getRoleHome(role, loginMatch[1] as (typeof routing.locales)[number]), request.url),
       );

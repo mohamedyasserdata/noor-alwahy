@@ -59,6 +59,10 @@ export async function loginAction(localeValue: string, formData: FormData): Prom
     redirectToAuth(locale, "login", "reason", "account_unavailable");
   }
 
+  if (role === "admin") {
+    redirect(`/${locale}/auth/mfa` as Route);
+  }
+
   redirect(getRoleHome(role, locale) as Route);
 }
 

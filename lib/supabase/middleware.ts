@@ -5,6 +5,7 @@ import { getPublicSupabaseEnv } from "@/lib/env";
 import type { Database } from "@/types/database.types";
 
 export type VerifiedAuthClaims = {
+  aal?: string;
   app_metadata?: Record<string, unknown>;
   sub: string;
 };

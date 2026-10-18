@@ -234,6 +234,24 @@
       "pending": "Saving new password…",
       "requestNewLink": "Request a new recovery link"
     },
+    "mfa": {
+      "eyebrow": "Administrator security check",
+      "title": "Protect administration with an authenticator app",
+      "description": "A time-based code is required before any administration page or action can open.",
+      "principle": "Your password remains the first factor. The rotating code proves that the approved authenticator is also with you.",
+      "enrollDescription": "Start setup, then scan the QR code with an authenticator app such as Google Authenticator, Microsoft Authenticator, or 1Password.",
+      "enrollAction": "Start secure setup",
+      "enrollPending": "Preparing authenticator…",
+      "qrAlt": "QR code for adding Noor Al-Wahy Academy to an authenticator app",
+      "manualCode": "Cannot scan? Enter this setup key manually",
+      "verifyDescription": "Enter the current six-digit code from your authenticator app.",
+      "code": "Authentication code",
+      "verifyAction": "Verify and open administration",
+      "verifyPending": "Verifying code…",
+      "error": "The code or setup could not be verified. Check the current code and try again.",
+      "recovery": "Lost access to your authenticator? Sign out and ask the authorized system owner to reset the factor after verifying your identity.",
+      "signOut": "Sign out and return to login"
+    },
     "backToLogin": "Back to sign in",
     "status": {
       "resetSent": "If the email belongs to an account, recovery instructions will arrive shortly. Check the junk folder too.",
