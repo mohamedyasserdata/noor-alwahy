@@ -113,6 +113,78 @@ export type Database = {
         };
         Relationships: [];
       };
+      guardians: {
+        Row: {
+          created_at: string;
+          id: string;
+          profile_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          profile_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          profile_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guardians_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      levels: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          name_ar: string;
+          name_en: string | null;
+          sort_order: number;
+          track_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar: string;
+          name_en?: string | null;
+          sort_order?: number;
+          track_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar?: string;
+          name_en?: string | null;
+          sort_order?: number;
+          track_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "levels_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profile_private: {
         Row: {
           address: string | null;
@@ -192,6 +264,316 @@ export type Database = {
         };
         Relationships: [];
       };
+      student_guardians: {
+        Row: {
+          created_at: string;
+          guardian_id: string;
+          is_payer: boolean;
+          is_primary: boolean;
+          relation: string | null;
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          guardian_id: string;
+          is_payer?: boolean;
+          is_primary?: boolean;
+          relation?: string | null;
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          guardian_id?: string;
+          is_payer?: boolean;
+          is_primary?: boolean;
+          relation?: string | null;
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_guardians_guardian_id_fkey";
+            columns: ["guardian_id"];
+            isOneToOne: false;
+            referencedRelation: "guardians";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_guardians_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      student_private_notes: {
+        Row: {
+          created_at: string;
+          health_notes: string | null;
+          share_with_teacher: boolean;
+          special_notes: string | null;
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          health_notes?: string | null;
+          share_with_teacher?: boolean;
+          special_notes?: string | null;
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          health_notes?: string | null;
+          share_with_teacher?: boolean;
+          special_notes?: string | null;
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_private_notes_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      students: {
+        Row: {
+          birth_date: string | null;
+          country_code: string | null;
+          created_at: string;
+          full_name: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id: string;
+          joined_at: string;
+          level_id: string | null;
+          profile_id: string | null;
+          status: Database["public"]["Enums"]["student_status"];
+          student_no: string;
+          timezone: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          birth_date?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          full_name: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          joined_at?: string;
+          level_id?: string | null;
+          profile_id?: string | null;
+          status?: Database["public"]["Enums"]["student_status"];
+          student_no?: string;
+          timezone?: string;
+          updated_at?: string;
+        };
+        Update: {
+          birth_date?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          full_name?: string;
+          gender?: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          joined_at?: string;
+          level_id?: string | null;
+          profile_id?: string | null;
+          status?: Database["public"]["Enums"]["student_status"];
+          student_no?: string;
+          timezone?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "students_level_id_fkey";
+            columns: ["level_id"];
+            isOneToOne: false;
+            referencedRelation: "levels";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "students_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_availability: {
+        Row: {
+          created_at: string;
+          end_time: string;
+          id: string;
+          start_time: string;
+          status: string;
+          teacher_id: string;
+          updated_at: string;
+          weekday: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          end_time: string;
+          id?: string;
+          start_time: string;
+          status?: string;
+          teacher_id: string;
+          updated_at?: string;
+          weekday: number;
+        };
+        Update: {
+          created_at?: string;
+          end_time?: string;
+          id?: string;
+          start_time?: string;
+          status?: string;
+          teacher_id?: string;
+          updated_at?: string;
+          weekday?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_availability_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_tracks: {
+        Row: {
+          created_at: string;
+          teacher_id: string;
+          track_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          teacher_id: string;
+          track_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          teacher_id?: string;
+          track_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_tracks_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_tracks_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teachers: {
+        Row: {
+          code_of_conduct_accepted_at: string | null;
+          created_at: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id: string;
+          identity_verified_at: string | null;
+          ijazah_info: NonNullable<Json>;
+          max_students: number;
+          profile_id: string;
+          specialization: string | null;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          code_of_conduct_accepted_at?: string | null;
+          created_at?: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          identity_verified_at?: string | null;
+          ijazah_info?: NonNullable<Json>;
+          max_students?: number;
+          profile_id: string;
+          specialization?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          code_of_conduct_accepted_at?: string | null;
+          created_at?: string;
+          gender?: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          identity_verified_at?: string | null;
+          ijazah_info?: NonNullable<Json>;
+          max_students?: number;
+          profile_id?: string;
+          specialization?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teachers_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracks: {
+        Row: {
+          code: string;
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          name_ar: string;
+          name_en: string | null;
+          sort_order: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          code: string;
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar: string;
+          name_en?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar?: string;
+          name_en?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -200,6 +582,15 @@ export type Database = {
       auth_role: {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
+      };
+      get_student_private_notes: {
+        Args: { p_student: string };
+        Returns: {
+          health_notes: string;
+          share_with_teacher: boolean;
+          special_notes: string;
+          student_id: string;
+        }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       set_account_active: {
