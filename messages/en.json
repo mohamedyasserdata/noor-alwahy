@@ -175,6 +175,11 @@
           "label": "Certificates",
           "title": "Certificates and milestones",
           "description": "A safe place to access approved certificates and learning milestones."
+        },
+        "contact": {
+          "label": "Contact",
+          "title": "Contact the academy",
+          "description": "Reach the academy through its approved official channels."
         }
       }
     },
@@ -380,6 +385,84 @@
       "true": "Active",
       "false": "Inactive",
       "empty": "—"
+    }
+  },
+  "contactLinks": {
+    "public": {
+      "eyebrow": "Official academy channels",
+      "title": "Contact Noor Al-Wahy Academy",
+      "description": "Choose an approved channel below. External services open in a new tab while phone and email links open on your device.",
+      "empty": {
+        "title": "Contact channels are being prepared",
+        "description": "The academy will publish its approved contact details here soon."
+      },
+      "support": {
+        "title": "Support hours",
+        "description": "Response times follow the academy's announced working hours. Please use one official channel and avoid sending sensitive account details."
+      },
+      "types": {
+        "whatsapp": "WhatsApp",
+        "phone": "Phone",
+        "email": "Email",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "telegram": "Telegram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok",
+        "other": "Official link"
+      }
+    },
+    "admin": {
+      "eyebrow": "Official communication settings",
+      "title": "Contact channels",
+      "description": "Publish, order, hide, or remove the official links shown to students and parents. Every change is recorded in the audit log.",
+      "create": {
+        "title": "Add a contact channel",
+        "description": "Use only an academy-owned destination.",
+        "action": "Add channel",
+        "pending": "Adding…"
+      },
+      "list": {
+        "title": "Published channel list",
+        "count": "{count, plural, =0 {No channels} =1 {1 channel} other {# channels}}",
+        "empty": "No contact channels have been added yet."
+      },
+      "fields": {
+        "type": "Channel type",
+        "sortOrder": "Display order",
+        "labelAr": "Arabic label",
+        "labelEn": "English label (optional)",
+        "url": "Destination",
+        "urlHint": "Allowed: secure https:// links, mailto: email links, and tel: phone links.",
+        "isVisible": "Visible to students and parents"
+      },
+      "visibility": { "visible": "Visible", "hidden": "Hidden" },
+      "actions": {
+        "update": "Save changes",
+        "updating": "Saving…",
+        "delete": "Delete channel",
+        "deleting": "Deleting…"
+      },
+      "notices": {
+        "created": "The contact channel was added.",
+        "updated": "The contact channel was updated.",
+        "deleted": "The contact channel was deleted."
+      },
+      "errors": {
+        "invalidFields": "Check the labels, destination, and display order, then try again.",
+        "requestFailed": "The contact channel change could not be completed."
+      },
+      "types": {
+        "whatsapp": "WhatsApp",
+        "phone": "Phone",
+        "email": "Email",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "telegram": "Telegram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok",
+        "other": "Other"
+      }
     }
   },
   "accessibility": {

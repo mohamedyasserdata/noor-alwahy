@@ -43,6 +43,43 @@ export type Database = {
         };
         Relationships: [];
       };
+      contact_links: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_visible: boolean;
+          label_ar: string;
+          label_en: string | null;
+          sort_order: number;
+          type: string;
+          updated_at: string;
+          url: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          label_ar: string;
+          label_en?: string | null;
+          sort_order?: number;
+          type: string;
+          updated_at?: string;
+          url: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          label_ar?: string;
+          label_en?: string | null;
+          sort_order?: number;
+          type?: string;
+          updated_at?: string;
+          url?: string;
+        };
+        Relationships: [];
+      };
       profile_private: {
         Row: {
           address: string | null;

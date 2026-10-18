@@ -13,7 +13,7 @@ export const portalConfig = {
   },
   student: {
     defaultSection: "home",
-    sections: ["home", "progress", "schedule", "certificates"],
+    sections: ["home", "progress", "schedule", "certificates", "contact"],
   },
   parent: {
     defaultSection: "children",
