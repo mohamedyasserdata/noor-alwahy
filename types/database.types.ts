@@ -309,6 +309,116 @@ export type Database = {
           },
         ];
       };
+      sessions: {
+        Row: {
+          assignment_id: string | null;
+          created_at: string;
+          duration_min: number;
+          ended_at: string | null;
+          ends_at: string;
+          id: string;
+          kind: Database["public"]["Enums"]["session_kind"];
+          makeup_of: string | null;
+          original_teacher_id: string | null;
+          scheduled_at: string;
+          slot_id: string | null;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["session_status"];
+          student_id: string;
+          teacher_id: string;
+          updated_at: string;
+          zoom_meeting_id: string | null;
+          zoom_override_url: string | null;
+          zoom_passcode: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          assignment_id?: string | null;
+          created_at?: string;
+          duration_min: number;
+          ended_at?: string | null;
+          ends_at: string;
+          id?: string;
+          kind?: Database["public"]["Enums"]["session_kind"];
+          makeup_of?: string | null;
+          original_teacher_id?: string | null;
+          scheduled_at: string;
+          slot_id?: string | null;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["session_status"];
+          student_id: string;
+          teacher_id: string;
+          updated_at?: string;
+          zoom_meeting_id?: string | null;
+          zoom_override_url?: string | null;
+          zoom_passcode?: string | null;
+        };
+        Update: {
+          assignment_id?: string | null;
+          created_at?: string;
+          duration_min?: number;
+          ended_at?: string | null;
+          ends_at?: string;
+          id?: string;
+          kind?: Database["public"]["Enums"]["session_kind"];
+          makeup_of?: string | null;
+          original_teacher_id?: string | null;
+          scheduled_at?: string;
+          slot_id?: string | null;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["session_status"];
+          student_id?: string;
+          teacher_id?: string;
+          updated_at?: string;
+          zoom_meeting_id?: string | null;
+          zoom_override_url?: string | null;
+          zoom_passcode?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sessions_assignment_id_fkey";
+            columns: ["assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_makeup_of_fkey";
+            columns: ["makeup_of"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_original_teacher_id_fkey";
+            columns: ["original_teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_slot_id_fkey";
+            columns: ["slot_id"];
+            isOneToOne: false;
+            referencedRelation: "schedule_slots";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       student_guardians: {
         Row: {
           created_at: string;

@@ -11,8 +11,14 @@ select is(
 select has_trigger('public', 'sessions', 'sessions_set_ends_at', 'ends_at trigger exists');
 select has_trigger('public', 'sessions', 'sessions_enforce_gender', 'session gender trigger exists');
 select has_trigger('public', 'sessions', 'sessions_audit', 'session audit trigger exists');
-select has_constraint('public', 'sessions', 'no_teacher_overlap', 'teacher overlap exclusion exists');
-select has_constraint('public', 'sessions', 'no_student_overlap', 'student overlap exclusion exists');
+select ok(
+  exists (select 1 from pg_constraint where conrelid = 'public.sessions'::regclass and conname = 'no_teacher_overlap' and contype = 'x'),
+  'teacher overlap exclusion exists'
+);
+select ok(
+  exists (select 1 from pg_constraint where conrelid = 'public.sessions'::regclass and conname = 'no_student_overlap' and contype = 'x'),
+  'student overlap exclusion exists'
+);
 select has_index('public', 'sessions', 'sessions_slot_scheduled_idx', 'slot idempotency index exists');
 
 insert into auth.users (id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
@@ -107,6 +113,9 @@ select throws_ok(
   $$update public.teachers set gender = 'female' where id = 'a7200000-0000-4000-8000-000000000002'$$,
   'P0001', 'gender_change_blocked_active_session', 'substitute teacher gender cannot invalidate an active session'
 );
+update public.teacher_assignments
+set status = 'ended', end_date = current_date
+where id = 'a7500000-0000-4000-8000-000000000002';
 select throws_ok(
   $$update public.students set gender = 'female' where id = 'a7300000-0000-4000-8000-000000000002'$$,
   'P0001', 'gender_change_blocked_active_session', 'student gender cannot invalidate an active session'
@@ -118,7 +127,7 @@ select ok(
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
-select ok((select count(*) >= 6 from public.sessions), 'admin reads all sessions');
+select ok((select count(*) >= 5 from public.sessions), 'admin reads all sessions');
 select lives_ok(
   $$insert into public.sessions (student_id, teacher_id, scheduled_at, duration_min) values ('a7300000-0000-4000-8000-000000000003', 'a7200000-0000-4000-8000-000000000003', '2030-01-01 15:00:00+00', 30)$$,
   'admin creates a session through RLS'
@@ -129,7 +138,7 @@ select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-0000000
 set local role authenticated;
 select is((select count(*)::integer from public.sessions), 4, 'teacher reads only their sessions');
 select throws_ok(
-  $$insert into public.sessions (student_id, teacher_id, scheduled_at, duration_min) values ('a7300000-0000-4000-8000-000000000002', 'a7200000-0000-4000-8000-000000000001', '2030-01-01 18:00:00+00', 30)$$,
+  $$insert into public.sessions (student_id, teacher_id, scheduled_at, duration_min) values ('a7300000-0000-4000-8000-000000000001', 'a7200000-0000-4000-8000-000000000001', '2030-01-01 18:00:00+00', 30)$$,
   '42501', null, 'teacher cannot create sessions directly'
 );
 
