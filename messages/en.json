@@ -934,6 +934,22 @@
     "durationValue": "{count} minutes",
     "anchorNote": "Anchored to {timezone}: {day} at {time}",
     "empty": "No active weekly lessons are available.",
+    "exports": {
+      "title": "Calendar export",
+      "description": "Download your upcoming sessions or create a private subscription link for your calendar app.",
+      "download": "Download iCal",
+      "generate": "Create private link",
+      "generating": "Creating…",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "revoke": "Revoke link",
+      "revoking": "Revoking…",
+      "generated": "A new private link was created. Any previous link stopped working.",
+      "revoked": "The private calendar link was revoked.",
+      "error": "The calendar link could not be updated. Try again.",
+      "privacy": "Treat this link like a password. It contains no Zoom link or meeting credentials, and you can revoke it at any time.",
+      "urlLabel": "Private subscription URL"
+    },
     "weekdays": {
       "0": "Sunday",
       "1": "Monday",

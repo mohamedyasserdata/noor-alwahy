@@ -2,6 +2,7 @@ import { CalendarClock, Clock3, Globe2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { CalendarExports } from "@/components/schedule/calendar-exports";
 import { SessionAdjustmentsSection } from "@/components/schedule/session-adjustments-section";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -124,6 +125,24 @@ export async function ScheduleSection({
           </div>
         </form>
       ) : null}
+      <CalendarExports
+        labels={{
+          title: t("exports.title"),
+          description: t("exports.description"),
+          download: t("exports.download"),
+          generate: t("exports.generate"),
+          generating: t("exports.generating"),
+          copy: t("exports.copy"),
+          copied: t("exports.copied"),
+          revoke: t("exports.revoke"),
+          revoking: t("exports.revoking"),
+          generated: t("exports.generated"),
+          revoked: t("exports.revoked"),
+          error: t("exports.error"),
+          privacy: t("exports.privacy"),
+          urlLabel: t("exports.urlLabel"),
+        }}
+      />
       <div className="mt-9 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {data.slots.length ? (
           data.slots.map((slot) => (
