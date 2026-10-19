@@ -624,6 +624,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_teacher_code_of_conduct: { Args: Record<PropertyKey, never>; Returns: string };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
       auth_role: {
         Args: Record<PropertyKey, never>;
@@ -664,6 +665,7 @@ export type Database = {
         };
         Returns: string;
       };
+      upsert_teacher: { Args: { p_payload: Json }; Returns: string };
     };
     Enums: {
       application_status:

@@ -33,10 +33,10 @@ values
   ('94000000-0000-4000-8000-000000000001', '95000000-0000-4000-8000-000000000001', 'parent', true),
   ('94000000-0000-4000-8000-000000000002', '95000000-0000-4000-8000-000000000001', 'parent', true),
   ('94000000-0000-4000-8000-000000000003', '95000000-0000-4000-8000-000000000002', 'parent', true);
-insert into public.teachers (id, profile_id, gender, status)
+insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
 values
-  ('96000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active'),
-  ('96000000-0000-4000-8000-000000000002', '91000000-0000-4000-8000-000000000001', 'male', 'active');
+  ('96000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now()),
+  ('96000000-0000-4000-8000-000000000002', '91000000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
 insert into public.teacher_tracks (teacher_id, track_id)
 values ('96000000-0000-4000-8000-000000000001', '92000000-0000-4000-8000-000000000001');
 insert into public.teacher_availability (id, teacher_id, weekday, start_time, end_time, status)

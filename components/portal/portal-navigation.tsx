@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Clock3,
   FileChartColumn,
+  GraduationCap,
   House,
   Mail,
   ScrollText,
@@ -28,6 +29,7 @@ const sectionIcons = {
   dashboard: ChartNoAxesCombined,
   applications: ClipboardList,
   students: Users,
+  teachers: GraduationCap,
   users: UserRoundCog,
   audit: ScrollText,
   settings: Settings,
@@ -63,7 +65,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
         !isSidebar && sections.length === 3 && "grid-cols-3",
         !isSidebar && sections.length === 4 && "grid-cols-4",
         !isSidebar && sections.length === 5 && "grid-cols-5",
-        !isSidebar && sections.length === 6 && "grid-cols-6",
+        !isSidebar && sections.length === 7 && "grid-cols-7",
       )}
     >
       {sections.map((section) => {

@@ -109,6 +109,11 @@
           "title": "Student records",
           "description": "Organized access to student profiles, assignments, and academic status."
         },
+        "teachers": {
+          "label": "Teachers",
+          "title": "Teacher records",
+          "description": "Manage qualifications, capacity, teaching tracks, verification, and availability."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",
@@ -661,6 +666,107 @@
     "errors": {
       "invalidFields": "Review the student details and try again.",
       "requestFailed": "The student record could not be saved. No partial change was kept."
+    }
+  },
+  "teacherManagement": {
+    "eyebrow": "Teaching team",
+    "title": "Teacher management",
+    "description": "Keep qualifications, Ijazah details, tracks, capacity, identity verification, conduct acceptance, and weekly availability in one protected workspace.",
+    "directory": "Teacher directory",
+    "addTitle": "Add a teacher profile",
+    "empty": "No teacher profiles yet.",
+    "noProfiles": "Create or activate a teacher account first. Every eligible account already has a teacher profile.",
+    "unknown": "Unknown teacher",
+    "create": "Create teacher profile",
+    "save": "Save teacher profile",
+    "saving": "Saving…",
+    "conductManagedByTeacher": "The teacher accepts the conduct code from their own portal.",
+    "fields": {
+      "profile": "Teacher account",
+      "gender": "Gender",
+      "maxStudents": "Maximum students",
+      "specialization": "Specialization",
+      "riwaya": "Ijazah narration",
+      "sanad": "Sanad / verification note",
+      "tracks": "Teaching tracks",
+      "status": "Work status",
+      "identityVerified": "Identity verified"
+    },
+    "genders": { "male": "Male", "female": "Female" },
+    "statuses": {
+      "pending": "Pending",
+      "active": "Active",
+      "on_leave": "On leave",
+      "inactive": "Inactive"
+    },
+    "availability": {
+      "title": "Availability reviews",
+      "approved": "Approve",
+      "rejected": "Reject",
+      "statuses": { "proposed": "Proposed", "approved": "Approved", "rejected": "Rejected" }
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "notices": {
+      "created": "Teacher profile created.",
+      "updated": "Teacher profile updated.",
+      "approved": "Availability approved.",
+      "rejected": "Availability rejected."
+    },
+    "errors": {
+      "invalidFields": "Review the teacher details.",
+      "activationRequirements": "Verify identity and wait for the teacher to accept the conduct code before activation.",
+      "requestFailed": "The teacher change could not be saved."
+    }
+  },
+  "teacherAvailability": {
+    "eyebrow": "Teacher profile",
+    "title": "Weekly availability",
+    "description": "Propose times in your own time zone. The administration reviews each proposal before using it for assignments.",
+    "saving": "Saving…",
+    "conduct": {
+      "title": "Conduct code",
+      "description": "Acceptance is recorded once and is required, with identity verification, before your profile can be activated.",
+      "accept": "Accept conduct code",
+      "accepted": "Accepted"
+    },
+    "form": {
+      "title": "Propose a time",
+      "weekday": "Day",
+      "start": "Starts",
+      "end": "Ends",
+      "submit": "Send proposal"
+    },
+    "listTitle": "Your proposed and approved times",
+    "timezone": "Times use your profile zone: {zone}",
+    "empty": "No availability has been submitted.",
+    "delete": "Delete proposal",
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "statuses": { "proposed": "Awaiting review", "approved": "Approved", "rejected": "Rejected" },
+    "notices": {
+      "proposed": "Availability proposal sent.",
+      "deleted": "Proposal deleted.",
+      "conduct_accepted": "Conduct acceptance recorded."
+    },
+    "errors": {
+      "invalid_fields": "Choose a valid day and time range.",
+      "profile_missing": "Your teacher profile has not been created yet.",
+      "request_failed": "The change could not be saved."
     }
   },
   "accessibility": {
