@@ -1,10 +1,10 @@
 begin;
 
-select plan(28);
+select plan(27);
 
 select ok(to_regprocedure('public.get_session_join(uuid)') is not null, 'get_session_join(uuid) exists');
 select is((select prosecdef from pg_proc where oid = 'public.get_session_join(uuid)'::regprocedure), true, 'join RPC is security definer');
-select is((select proconfig::text from pg_proc where oid = 'public.get_session_join(uuid)'::regprocedure), '{search_path=""}', 'join RPC pins an empty search path');
+select is((select array_to_string(proconfig, ',') from pg_proc where oid = 'public.get_session_join(uuid)'::regprocedure), 'search_path=""', 'join RPC pins an empty search path');
 select is(has_function_privilege('public', 'public.get_session_join(uuid)', 'EXECUTE'), false, 'public cannot execute join RPC');
 select is(has_function_privilege('anon', 'public.get_session_join(uuid)', 'EXECUTE'), false, 'anonymous cannot execute join RPC');
 select is(has_function_privilege('authenticated', 'public.get_session_join(uuid)', 'EXECUTE'), true, 'authenticated users can execute join RPC');

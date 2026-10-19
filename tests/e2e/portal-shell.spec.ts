@@ -16,12 +16,12 @@ const portals = [
   {
     id: "student",
     section: "home",
-    title: { ar: "رحلتك التعليمية", en: "Your learning journey" },
+    title: { ar: "حصتك القادمة", en: "Your next session" },
   },
   {
     id: "parent",
     section: "children",
-    title: { ar: "متابعة الأبناء", en: "Follow your children" },
+    title: { ar: "حصتك القادمة", en: "Your next session" },
   },
 ] as const;
 

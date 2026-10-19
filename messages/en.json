@@ -887,6 +887,29 @@
       "request_failed": "The weekly time could not be saved."
     }
   },
+  "nextSession": {
+    "eyebrow": "Your nearest appointment",
+    "title": "Your next session",
+    "description": "Track the session time. The protected Zoom link appears when the join window opens.",
+    "cardTitle": "Next session",
+    "student": "Student",
+    "teacher": "Teacher",
+    "meetingId": "Meeting ID",
+    "passcode": "Passcode",
+    "opensIn": "Join opens in",
+    "windowOpen": "Join window is open",
+    "windowClosed": "Join window has closed",
+    "join": "Join session",
+    "preparing": "Preparing link…",
+    "privacy": "The server releases meeting details only to session participants during the approved window.",
+    "emptyTitle": "No upcoming session",
+    "emptyDescription": "Your nearest scheduled session will appear here once it is added.",
+    "states": {
+      "before": "Upcoming",
+      "open": "Available now",
+      "closed": "Closed"
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

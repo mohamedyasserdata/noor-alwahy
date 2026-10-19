@@ -1051,6 +1051,17 @@ export type Database = {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
       };
+      get_session_join: {
+        Args: { p_session_id: string };
+        Returns: {
+          ends_at: string;
+          join_url: string;
+          meeting_id: string;
+          passcode: string;
+          scheduled_at: string;
+          session_id: string;
+        }[];
+      };
       get_shared_student_notes: {
         Args: { p_student: string };
         Returns: {
