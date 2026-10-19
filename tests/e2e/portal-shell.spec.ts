@@ -114,6 +114,10 @@ test("dark theme is accessible and persists across reloads", async ({ page }) =>
 function captureConsoleProblems(page: Page) {
   const problems: string[] = [];
 
+  page.on("response", (response) => {
+    if (response.status() === 401) problems.push(`response: 401 ${response.url()}`);
+  });
+
   page.on("console", (message) => {
     if (message.type() === "error" || message.type() === "warning") {
       problems.push(`${message.type()}: ${message.text()}`);

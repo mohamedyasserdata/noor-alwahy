@@ -56,24 +56,40 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
   }, [supabase]);
 
   useEffect(() => {
-    const channel = supabase
-      .channel(`notifications:${initialData.userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${initialData.userId}`,
-        },
-        () => void refreshItems(),
-      )
-      .subscribe((nextStatus) => {
-        setRealtimeStatus(nextStatus.toLowerCase());
-        if (nextStatus === "SUBSCRIBED") void refreshItems();
-      });
+    let active = true;
+    let channel: ReturnType<typeof supabase.channel> | undefined;
+
+    async function subscribe() {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      if (!data.session) {
+        setRealtimeStatus("signed_out");
+        return;
+      }
+
+      supabase.realtime.setAuth(data.session.access_token);
+      channel = supabase
+        .channel(`notifications:${initialData.userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${initialData.userId}`,
+          },
+          () => void refreshItems(),
+        )
+        .subscribe((nextStatus) => {
+          if (!active) return;
+          setRealtimeStatus(nextStatus.toLowerCase());
+        });
+    }
+
+    void subscribe();
     return () => {
-      void supabase.removeChannel(channel);
+      active = false;
+      if (channel) void supabase.removeChannel(channel);
     };
   }, [initialData.userId, refreshItems, supabase]);
 
