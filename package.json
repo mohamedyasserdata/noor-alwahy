@@ -79,12 +79,5 @@
     "typescript": "5.9.3",
     "vitest": "5.0.5"
   },
-  "packageManager": "pnpm@11.25.0",
-  "lint-staged": {
-    "*.{js,mjs,cjs,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{css,json,jsonc,md,yml,yaml}": "prettier --write"
-  }
+  "packageManager": "pnpm@11.25.0"
 }

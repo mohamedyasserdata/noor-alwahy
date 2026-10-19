@@ -1,0 +1,16 @@
+* text=auto eol=lf
+
+# Preserve vendored project skills byte-for-byte so lock hashes remain stable.
+.agents/** -text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.xlsx binary
+*.zip binary

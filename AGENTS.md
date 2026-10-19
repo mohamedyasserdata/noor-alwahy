@@ -1,3 +1,44 @@
+## Noor Al-Wahy shared project rules
+
+This repository is the shared source of truth for every developer and Codex session.
+
+### Start and resume
+
+1. Read `.specify/memory/constitution.md` and `docs/PROJECT_STATUS.md` first.
+2. Read only the active task and its directly relevant spec sections; do not repeat completed work.
+3. Preserve all existing work. Never discard, reset, or rewrite user changes.
+4. Update `docs/PROJECT_STATUS.md` with the active task, checkpoint, real test evidence, blockers,
+   and next step before every meaningful checkpoint.
+
+### Quality and security
+
+- Follow the task order and acceptance criteria in `specs/001-noor-alwahy/`.
+- Run focused tests for each change and the full quality/database/RLS gate at phase boundaries.
+- Never mark a test or task complete unless it actually passed.
+- Do not weaken RLS, authentication, financial controls, audit trails, or sensitive-data checks to
+  save time or tokens.
+- Keep credentials only in ignored local environment files. Commit placeholders only in
+  `.env.example`; never commit personal Codex settings, tokens, or machine-specific paths.
+- Project-local skills are versioned under `.agents/skills/` with `skills-lock.json`. Use only the
+  skill relevant to the current task; do not copy global or account-specific Codex configuration.
+
+### Git and multi-device workflow
+
+- `main` contains completed, tested checkpoints. Incomplete feature work must live on a branch named
+  `work/<task-id>-<short-name>` and be checkpointed there.
+- Before starting work, run `git fetch --prune`, update `main` with `git pull --ff-only`, and confirm
+  in `docs/PROJECT_STATUS.md` that another device is not already editing the same task.
+- Use one active writer per task branch. Different devices must use different task branches and
+  integrate through a pull request or an explicit, reviewed merge.
+- Create an independent commit for each completed task. Create descriptive checkpoint commits for
+  meaningful unfinished progress, and record the exact continuation point in `PROJECT_STATUS.md`.
+- Never use force push, history rewriting, or destructive Git commands. Resolve divergence by
+  fetching, reviewing, and merging/rebasing only with the repository owner's approval.
+- The first push to a newly connected remote requires explicit owner approval. Once that approval is
+  recorded, push meaningful completed and in-progress checkpoints automatically to their matching
+  remote branches.
+- Full setup and handoff instructions are in `docs/MULTI_DEVICE_GIT.md`.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
