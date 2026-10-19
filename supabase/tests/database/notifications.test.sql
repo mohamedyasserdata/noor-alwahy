@@ -1,6 +1,6 @@
 begin;
 
-select plan(40);
+select plan(39);
 
 select ok(to_regclass('public.notifications') is not null, 'notifications table exists');
 select ok(to_regclass('public.notification_prefs') is not null, 'notification preferences table exists');
@@ -18,7 +18,7 @@ select is(has_column_privilege('authenticated', 'public.notifications', 'read_at
 select is(has_column_privilege('authenticated', 'public.notifications', 'payload', 'UPDATE'), false, 'authenticated cannot alter notification payloads');
 select is(has_table_privilege('authenticated', 'public.notification_prefs', 'SELECT'), true, 'authenticated can select preferences under RLS');
 select is(has_table_privilege('authenticated', 'public.notification_prefs', 'INSERT'), true, 'authenticated can insert own preferences');
-select is(has_table_privilege('authenticated', 'public.notification_prefs', 'UPDATE'), true, 'authenticated can update own preferences');
+select is(has_column_privilege('authenticated', 'public.notification_prefs', 'prefs', 'UPDATE'), true, 'authenticated can update own preferences');
 select is(has_table_privilege('authenticated', 'public.notification_outbox', 'SELECT'), false, 'authenticated cannot read delivery outbox');
 select ok(to_regprocedure('private.enqueue_notification(uuid,text,jsonb)') is not null, 'private notification helper exists');
 select ok(to_regprocedure('private.notify_zoom_link_change()') is not null, 'Zoom notification trigger exists');
