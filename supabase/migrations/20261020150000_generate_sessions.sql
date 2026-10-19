@@ -63,6 +63,67 @@ create table public.job_runs (
 
 create index job_runs_name_started_idx on public.job_runs (job_name, started_at desc);
 
+alter table public.schedule_slots
+add column ambiguous_time_resolution text
+check (ambiguous_time_resolution in ('earlier', 'later'));
+
+create or replace function private.resolve_schedule_wall_clock(
+  p_local_date date,
+  p_local_time time,
+  p_timezone text,
+  p_ambiguous_resolution text default null
+)
+returns timestamptz
+language plpgsql
+stable
+set search_path = ''
+as $$
+declare
+  local_timestamp timestamp := p_local_date + p_local_time;
+  postgres_choice timestamptz := (p_local_date + p_local_time) at time zone p_timezone;
+  possible_instants timestamptz[];
+begin
+  if p_ambiguous_resolution is not null and p_ambiguous_resolution not in ('earlier', 'later') then
+    raise exception using errcode = '22023', message = 'invalid_ambiguous_time_resolution';
+  end if;
+
+  select array_agg(candidate.instant order by candidate.instant)
+  into possible_instants
+  from (
+    select distinct
+      (
+        local_timestamp
+        - pg_catalog.make_interval(
+          secs => extract(epoch from ((probe.instant at time zone p_timezone) - (probe.instant at time zone 'UTC')))::integer
+        )
+      ) at time zone 'UTC' as instant
+    from (
+      values
+        (postgres_choice - interval '2 days'),
+        (postgres_choice),
+        (postgres_choice + interval '2 days')
+    ) as probe(instant)
+  ) as candidate
+  where candidate.instant at time zone p_timezone = local_timestamp;
+
+  if coalesce(array_length(possible_instants, 1), 0) = 0 then
+    raise exception using errcode = '22023', message = 'nonexistent_local_time';
+  end if;
+
+  if array_length(possible_instants, 1) > 1 then
+    if p_ambiguous_resolution is null then
+      raise exception using errcode = '22023', message = 'ambiguous_local_time';
+    end if;
+    if p_ambiguous_resolution = 'later' then
+      return possible_instants[array_length(possible_instants, 1)];
+    end if;
+  end if;
+
+  return possible_instants[1];
+end;
+$$;
+revoke execute on function private.resolve_schedule_wall_clock(date, time, text, text) from public, anon, authenticated, service_role;
+
 create trigger subscriptions_set_updated_at
 before update on public.subscriptions
 for each row execute function public.set_updated_at();
@@ -194,7 +255,12 @@ begin
       slot.id as slot_id,
       slot.duration_min,
       occurrence.local_date,
-      (occurrence.local_date + slot.local_start_time) at time zone slot.anchor_timezone as scheduled_at,
+      private.resolve_schedule_wall_clock(
+        occurrence.local_date,
+        slot.local_start_time,
+        slot.anchor_timezone,
+        slot.ambiguous_time_resolution
+      ) as scheduled_at,
       greatest(subscription.credit_balance - subscription.reserved_sessions, 0) as available_credits
     from public.schedule_slots as slot
     join public.teacher_assignments as assignment on assignment.id = slot.assignment_id
@@ -212,6 +278,7 @@ begin
       and occurrence.local_date between assignment.start_date and coalesce(assignment.end_date, 'infinity'::date)
       and occurrence.local_date between subscription.current_period_start and subscription.current_period_end
       and extract(dow from occurrence.local_date)::smallint = slot.weekday
+      and subscription.credit_balance > subscription.reserved_sessions
   ),
   missing_occurrences as (
     select

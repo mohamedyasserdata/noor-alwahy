@@ -297,6 +297,7 @@ export type Database = {
       };
       schedule_slots: {
         Row: {
+          ambiguous_time_resolution: string | null;
           anchor_timezone: string;
           assignment_id: string;
           created_at: string;
@@ -309,6 +310,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          ambiguous_time_resolution?: string | null;
           anchor_timezone: string;
           assignment_id: string;
           created_at?: string;
@@ -320,6 +322,7 @@ export type Database = {
           weekday: number;
         };
         Update: {
+          ambiguous_time_resolution?: string | null;
           anchor_timezone?: string;
           assignment_id?: string;
           created_at?: string;

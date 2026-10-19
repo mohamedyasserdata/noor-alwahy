@@ -1,6 +1,6 @@
 begin;
 
-select plan(38);
+select plan(43);
 
 select has_table('public', 'subscriptions', 'minimal subscriptions table exists');
 select has_table('public', 'session_credit_ledger', 'session credit ledger exists');
@@ -8,6 +8,7 @@ select has_table('public', 'job_runs', 'job run ledger exists');
 select is((select relrowsecurity from pg_class where oid = 'public.subscriptions'::regclass), true, 'subscriptions RLS is enabled');
 select is((select relrowsecurity from pg_class where oid = 'public.session_credit_ledger'::regclass), true, 'credit ledger RLS is enabled');
 select is((select relrowsecurity from pg_class where oid = 'public.job_runs'::regclass), true, 'job runs RLS is enabled');
+select has_column('public', 'schedule_slots', 'ambiguous_time_resolution', 'slots can store an explicit DST overlap choice');
 select ok(to_regprocedure('public.generate_sessions(date,integer)') is not null, 'generate_sessions(date, integer) exists');
 select is(has_function_privilege('public', 'public.generate_sessions(date,integer)', 'EXECUTE'), false, 'public cannot execute generator');
 select is(has_function_privilege('anon', 'public.generate_sessions(date,integer)', 'EXECUTE'), false, 'anonymous cannot execute generator');
@@ -90,9 +91,36 @@ select ok((select count(*) >= 3 and bool_and(result = 'succeeded') from public.j
 select throws_ok($$select public.generate_sessions('2026-04-17', 0)$$, '22023', 'invalid_generation_window', 'invalid generation horizon is rejected');
 select throws_ok($$update public.session_credit_ledger set delta = 99 where subscription_id = 'b8600000-0000-4000-8000-000000000001'$$, 'P0001', 'credit_ledger_immutable', 'credit ledger rows are immutable');
 
+insert into public.students (id, full_name, gender, timezone)
+values
+  ('b8300000-0000-4000-8000-000000000005', 'Ambiguous Time Student', 'male', 'Africa/Cairo'),
+  ('b8300000-0000-4000-8000-000000000006', 'Missing Time Student', 'male', 'Africa/Cairo');
+insert into public.teacher_assignments (id, student_id, teacher_id, track_id, start_date, assigned_by, reason)
+values
+  ('b8400000-0000-4000-8000-000000000005', 'b8300000-0000-4000-8000-000000000005', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'Ambiguous DST'),
+  ('b8400000-0000-4000-8000-000000000006', 'b8300000-0000-4000-8000-000000000006', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'Missing DST');
+insert into public.schedule_slots (id, assignment_id, weekday, local_start_time, duration_min, anchor_timezone)
+values
+  ('b8500000-0000-4000-8000-000000000005', 'b8400000-0000-4000-8000-000000000005', 4, '23:30', 30, 'Africa/Cairo'),
+  ('b8500000-0000-4000-8000-000000000006', 'b8400000-0000-4000-8000-000000000006', 5, '00:30', 30, 'Africa/Cairo');
+insert into public.subscriptions (id, student_id, status, start_date, current_period_start, current_period_end, sessions_per_period)
+values
+  ('b8600000-0000-4000-8000-000000000005', 'b8300000-0000-4000-8000-000000000005', 'active', '2026-10-01', '2026-10-01', '2026-10-31', 1),
+  ('b8600000-0000-4000-8000-000000000006', 'b8300000-0000-4000-8000-000000000006', 'active', '2026-04-01', '2026-04-01', '2026-04-30', 1);
+insert into public.session_credit_ledger (subscription_id, delta, reason, note)
+values
+  ('b8600000-0000-4000-8000-000000000005', 1, 'grant', 'ambiguous time fixture'),
+  ('b8600000-0000-4000-8000-000000000006', 1, 'grant', 'missing time fixture');
+
+select throws_ok($$select public.generate_sessions('2026-10-29', 1)$$, '22023', 'ambiguous_local_time', 'ambiguous Cairo wall-clock requires an explicit choice');
+update public.schedule_slots set ambiguous_time_resolution = 'earlier' where id = 'b8500000-0000-4000-8000-000000000005';
+select is(public.generate_sessions('2026-10-29', 1), 1, 'explicit earlier choice generates the repeated wall-clock');
+select is((select scheduled_at from public.sessions where slot_id = 'b8500000-0000-4000-8000-000000000005'), '2026-10-29 20:30:00+00'::timestamptz, 'earlier repeated Cairo instant matches ADR-007');
+select throws_ok($$select public.generate_sessions('2026-04-24', 1)$$, '22023', 'nonexistent_local_time', 'nonexistent Cairo wall-clock is rejected instead of shifted');
+
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
-select is((select count(*)::integer from public.subscriptions), 4, 'AAL2 administrator reads all subscriptions');
+select is((select count(*)::integer from public.subscriptions), 6, 'AAL2 administrator reads all subscriptions');
 
 reset role;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
