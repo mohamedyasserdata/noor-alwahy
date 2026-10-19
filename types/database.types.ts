@@ -143,6 +143,37 @@ export type Database = {
           },
         ];
       };
+      job_runs: {
+        Row: {
+          affected_rows: number | null;
+          details: NonNullable<Json>;
+          finished_at: string | null;
+          id: number;
+          job_name: string;
+          result: string;
+          started_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          affected_rows?: number | null;
+          details?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: never;
+          job_name: string;
+          result?: string;
+          started_at?: string;
+        };
+        Update: {
+          affected_rows?: number | null;
+          details?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: never;
+          job_name?: string;
+          result?: string;
+          started_at?: string;
+        };
+        Relationships: [];
+      };
       levels: {
         Row: {
           created_at: string;
@@ -305,6 +336,62 @@ export type Database = {
             columns: ["assignment_id"];
             isOneToOne: false;
             referencedRelation: "teacher_assignments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      session_credit_ledger: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          delta: number;
+          id: string;
+          note: string | null;
+          reason: Database["public"]["Enums"]["credit_reason"];
+          session_id: string | null;
+          subscription_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          delta: number;
+          id?: string;
+          note?: string | null;
+          reason: Database["public"]["Enums"]["credit_reason"];
+          session_id?: string | null;
+          subscription_id: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          delta?: number;
+          id?: string;
+          note?: string | null;
+          reason?: Database["public"]["Enums"]["credit_reason"];
+          session_id?: string | null;
+          subscription_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "session_credit_ledger_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_credit_ledger_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_credit_ledger_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
             referencedColumns: ["id"];
           },
         ];
@@ -610,6 +697,54 @@ export type Database = {
           },
         ];
       };
+      subscriptions: {
+        Row: {
+          created_at: string;
+          current_period_end: string;
+          current_period_start: string;
+          id: string;
+          paused_until: string | null;
+          sessions_per_period: number;
+          start_date: string;
+          status: Database["public"]["Enums"]["subscription_status"];
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          current_period_end: string;
+          current_period_start: string;
+          id?: string;
+          paused_until?: string | null;
+          sessions_per_period: number;
+          start_date: string;
+          status?: Database["public"]["Enums"]["subscription_status"];
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          current_period_end?: string;
+          current_period_start?: string;
+          id?: string;
+          paused_until?: string | null;
+          sessions_per_period?: number;
+          start_date?: string;
+          status?: Database["public"]["Enums"]["subscription_status"];
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teacher_assignments: {
         Row: {
           assigned_by: string;
@@ -884,7 +1019,22 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      subscription_balance: {
+        Row: {
+          sessions_remaining: number | null;
+          subscription_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "session_credit_ledger_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       accept_teacher_code_of_conduct: { Args: Record<PropertyKey, never>; Returns: string };
@@ -894,6 +1044,10 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"];
       };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
+      generate_sessions: {
+        Args: { p_horizon_days?: number; p_window_start?: string };
+        Returns: number;
+      };
       get_shared_student_notes: {
         Args: { p_student: string };
         Returns: {
@@ -990,6 +1144,7 @@ export type Database = {
         | "cancelled_teacher"
         | "cancelled_admin";
       billing_period: "monthly" | "quarterly" | "yearly";
+      credit_reason: "grant" | "consume" | "refund" | "adjust" | "expire" | "proration";
       gender_t: "male" | "female";
       invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "overdue" | "void";
       payment_kind: "payment" | "refund";
@@ -1127,6 +1282,7 @@ export const Constants = {
         "cancelled_admin",
       ],
       billing_period: ["monthly", "quarterly", "yearly"],
+      credit_reason: ["grant", "consume", "refund", "adjust", "expire", "proration"],
       gender_t: ["male", "female"],
       invoice_status: ["draft", "issued", "partially_paid", "paid", "overdue", "void"],
       payment_kind: ["payment", "refund"],

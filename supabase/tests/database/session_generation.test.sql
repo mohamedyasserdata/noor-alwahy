@@ -1,6 +1,6 @@
 begin;
 
-select plan(30);
+select plan(38);
 
 select has_table('public', 'subscriptions', 'minimal subscriptions table exists');
 select has_table('public', 'session_credit_ledger', 'session credit ledger exists');
@@ -16,28 +16,33 @@ select is(has_function_privilege('service_role', 'public.generate_sessions(date,
 select ok(exists(select 1 from pg_extension where extname = 'pg_cron'), 'pg_cron is installed');
 select is((select count(*)::integer from cron.job where jobname = 'generate-sessions-daily'), 1, 'one named generation job exists');
 select is((select schedule from cron.job where jobname = 'generate-sessions-daily'), '0 2 * * *', 'generation runs daily at 02:00 UTC');
-select like((select command from cron.job where jobname = 'generate-sessions-daily'), '%generate_sessions()%','cron calls the no-argument generator');
+select ok((select command like '%generate_sessions()%' from cron.job where jobname = 'generate-sessions-daily'), 'cron calls the no-argument generator');
 
 insert into public.tracks (id, code, name_ar, name_en)
 values ('b8100000-0000-4000-8000-000000000001', 'generation-test', 'توليد', 'Generation');
 
-insert into public.teachers (id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
-values ('b8200000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
+insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
+values ('b8200000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now());
 
 insert into public.teacher_tracks (teacher_id, track_id)
 values ('b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001');
 
-insert into public.students (id, full_name, gender, timezone)
+insert into public.students (id, profile_id, full_name, gender, timezone)
 values
-  ('b8300000-0000-4000-8000-000000000001', 'DST Student', 'male', 'Africa/Cairo'),
-  ('b8300000-0000-4000-8000-000000000002', 'Paused Student', 'male', 'Africa/Cairo'),
-  ('b8300000-0000-4000-8000-000000000003', 'Inactive Subscription Student', 'male', 'Africa/Cairo'),
-  ('b8300000-0000-4000-8000-000000000004', 'No Credit Student', 'male', 'Africa/Cairo');
+  ('b8300000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'DST Student', 'male', 'Africa/Cairo'),
+  ('b8300000-0000-4000-8000-000000000002', null, 'Paused Student', 'male', 'Africa/Cairo'),
+  ('b8300000-0000-4000-8000-000000000003', null, 'Inactive Subscription Student', 'male', 'Africa/Cairo'),
+  ('b8300000-0000-4000-8000-000000000004', null, 'No Credit Student', 'male', 'Africa/Cairo');
+
+insert into public.guardians (id, profile_id)
+values ('b8350000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000004');
+insert into public.student_guardians (student_id, guardian_id, is_primary)
+values ('b8300000-0000-4000-8000-000000000001', 'b8350000-0000-4000-8000-000000000001', true);
 
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, status, start_date, assigned_by, reason)
 values
   ('b8400000-0000-4000-8000-000000000001', 'b8300000-0000-4000-8000-000000000001', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', 'active', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'DST generation'),
-  ('b8400000-0000-4000-8000-000000000002', 'b8300000-0000-4000-8000-000000000002', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', 'paused', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'Paused generation'),
+  ('b8400000-0000-4000-8000-000000000002', 'b8300000-0000-4000-8000-000000000002', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', 'active', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'Paused generation'),
   ('b8400000-0000-4000-8000-000000000003', 'b8300000-0000-4000-8000-000000000003', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', 'active', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'Inactive subscription'),
   ('b8400000-0000-4000-8000-000000000004', 'b8300000-0000-4000-8000-000000000004', 'b8200000-0000-4000-8000-000000000001', 'b8100000-0000-4000-8000-000000000001', 'active', '2026-01-01', '10000000-0000-4000-8000-000000000001', 'No credit');
 
@@ -47,6 +52,10 @@ values
   ('b8500000-0000-4000-8000-000000000002', 'b8400000-0000-4000-8000-000000000002', 5, '11:00', 30, 'Africa/Cairo'),
   ('b8500000-0000-4000-8000-000000000003', 'b8400000-0000-4000-8000-000000000003', 5, '12:00', 30, 'Africa/Cairo'),
   ('b8500000-0000-4000-8000-000000000004', 'b8400000-0000-4000-8000-000000000004', 5, '13:00', 30, 'Africa/Cairo');
+
+update public.teacher_assignments
+set status = 'paused'
+where id = 'b8400000-0000-4000-8000-000000000002';
 
 insert into public.subscriptions (id, student_id, status, start_date, current_period_start, current_period_end, sessions_per_period)
 values
@@ -78,6 +87,29 @@ values ('b8600000-0000-4000-8000-000000000001', 1, 'adjust', 'one added credit')
 select is(public.generate_sessions('2026-04-17', 28), 1, 'one added credit generates exactly one additional occurrence');
 select is((select count(*)::integer from public.sessions where assignment_id = 'b8400000-0000-4000-8000-000000000001'), 4, 'all four weekly occurrences exist after adding credit');
 select ok((select count(*) >= 3 and bool_and(result = 'succeeded') from public.job_runs where job_name = 'generate_sessions'), 'each successful generator invocation is recorded');
+select throws_ok($$select public.generate_sessions('2026-04-17', 0)$$, '22023', 'invalid_generation_window', 'invalid generation horizon is rejected');
+select throws_ok($$update public.session_credit_ledger set delta = 99 where subscription_id = 'b8600000-0000-4000-8000-000000000001'$$, 'P0001', 'credit_ledger_immutable', 'credit ledger rows are immutable');
+
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+set local role authenticated;
+select is((select count(*)::integer from public.subscriptions), 4, 'AAL2 administrator reads all subscriptions');
+
+reset role;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
+set local role authenticated;
+select is((select count(*)::integer from public.subscriptions), 1, 'student reads only their subscription');
+select is((select sessions_remaining from public.subscription_balance), 4, 'student balance view exposes only their balance');
+select throws_ok($$insert into public.session_credit_ledger (subscription_id, delta, reason) values ('b8600000-0000-4000-8000-000000000001', 50, 'adjust')$$, '42501', null, 'student cannot grant credits');
+
+reset role;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+set local role authenticated;
+select is((select count(*)::integer from public.subscriptions), 0, 'teacher cannot read student subscriptions');
+
+reset role;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004","role":"authenticated","aal":"aal1"}', true);
+set local role authenticated;
+select is((select count(*)::integer from public.subscriptions), 1, 'parent reads only their child subscription');
 
 reset role;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
