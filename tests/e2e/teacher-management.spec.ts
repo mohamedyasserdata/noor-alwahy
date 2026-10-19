@@ -14,7 +14,10 @@ test("US-060 and US-061 teacher verification, conduct and availability workflow"
   await page.locator("#riwaya-new").fill("Hafs");
   await page.locator("#sanad-new").fill("Identity checked against academy records");
   await page.locator("#capacity-new").fill("12");
-  await page.locator('input[name="identityVerified"]').check();
+  const createForm = page
+    .locator("form")
+    .filter({ has: page.getByRole("button", { name: "Create teacher profile" }) });
+  await createForm.locator('input[name="identityVerified"]').check();
   await page.getByRole("button", { name: "Create teacher profile" }).click();
   await expect(page).toHaveURL(/teacherStatus=created$/);
   await expect(page.getByText("Teacher profile created.")).toBeVisible();

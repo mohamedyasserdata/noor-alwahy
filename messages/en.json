@@ -169,6 +169,11 @@
           "label": "Schedule",
           "title": "Teaching schedule",
           "description": "See assigned weekly lessons in your local time zone."
+        },
+        "zoom": {
+          "label": "My link",
+          "title": "My Zoom link",
+          "description": "Keep your permanent approved meeting link ready for assigned lessons."
         }
       }
     },
@@ -830,6 +835,24 @@
       "invalid_fields": "Choose a valid day and time range.",
       "profile_missing": "Your teacher profile has not been created yet.",
       "request_failed": "The change could not be saved."
+    }
+  },
+  "teacherZoom": {
+    "eyebrow": "Teacher meeting settings",
+    "title": "My Zoom link",
+    "description": "Paste your permanent lesson link and save it in one step.",
+    "formTitle": "Permanent meeting link",
+    "urlLabel": "Zoom join URL",
+    "allowedHosts": "HTTPS only. Allowed hosts: zoom.us and its subdomains, zoom.com, and zoomgov.com subdomains.",
+    "save": "Save link",
+    "saving": "Saving…",
+    "saved": "Zoom link saved.",
+    "privacyTitle": "Protected by role",
+    "privacyDescription": "Students and parents cannot read this table directly. The server will release the link only during the approved join window in the sessions stage.",
+    "errors": {
+      "invalid_url": "Enter an HTTPS URL on an approved Zoom host.",
+      "profile_missing": "Your teacher profile has not been created yet.",
+      "request_failed": "The Zoom link could not be saved."
     }
   },
   "schedules": {

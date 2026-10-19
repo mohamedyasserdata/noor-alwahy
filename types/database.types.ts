@@ -651,6 +651,42 @@ export type Database = {
           },
         ];
       };
+      teacher_zoom_settings: {
+        Row: {
+          created_at: string;
+          join_url: string;
+          meeting_id: string | null;
+          passcode: string | null;
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          join_url: string;
+          meeting_id?: string | null;
+          passcode?: string | null;
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          join_url?: string;
+          meeting_id?: string | null;
+          passcode?: string | null;
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_zoom_settings_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: true;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teachers: {
         Row: {
           code_of_conduct_accepted_at: string | null;

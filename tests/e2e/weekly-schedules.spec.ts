@@ -1,6 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 
+import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
 
 test("US-070 and US-076 weekly schedules render in every role's local time", async ({ page }) => {
@@ -36,7 +37,7 @@ test("US-070 and US-076 weekly schedules render in every role's local time", asy
 });
 
 async function createFixture() {
-  const db = createClient(
+  const db = createClient<Database>(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),
     {
@@ -44,11 +45,11 @@ async function createFixture() {
     },
   );
   const trackId = crypto.randomUUID();
-  const studentId = crypto.randomUUID();
-  const teacherId = crypto.randomUUID();
-  const guardianId = crypto.randomUUID();
   const assignmentId = crypto.randomUUID();
   const now = new Date().toISOString();
+  const studentId = await findOrCreateStudent(db);
+  const teacherId = await findOrCreateTeacher(db, now);
+  const guardianId = await findOrCreateGuardian(db);
   const writes = [
     db
       .from("profiles")
@@ -62,46 +63,15 @@ async function createFixture() {
       .from("profiles")
       .update({ timezone: "Europe/London" })
       .eq("id", "10000000-0000-4000-8000-000000000004"),
-    db
-      .from("tracks")
-      .insert({
-        id: trackId,
-        code: `schedule-${trackId.slice(0, 8)}`,
-        name_ar: "جدول",
-        name_en: "Schedule",
-      }),
+    db.from("tracks").insert({
+      id: trackId,
+      code: `schedule-${trackId.slice(0, 8)}`,
+      name_ar: "جدول",
+      name_en: "Schedule",
+    }),
   ];
   for (const write of writes) {
     const { error } = await write;
-    if (error) throw error;
-  }
-  const inserts = [
-    db
-      .from("teachers")
-      .insert({
-        id: teacherId,
-        profile_id: "10000000-0000-4000-8000-000000000002",
-        gender: "male",
-        max_students: 5,
-        status: "active",
-        identity_verified_at: now,
-        code_of_conduct_accepted_at: now,
-      }),
-    db
-      .from("students")
-      .insert({
-        id: studentId,
-        profile_id: "10000000-0000-4000-8000-000000000003",
-        full_name: "Schedule Student",
-        gender: "male",
-        timezone: "Africa/Cairo",
-      }),
-    db
-      .from("guardians")
-      .insert({ id: guardianId, profile_id: "10000000-0000-4000-8000-000000000004" }),
-  ];
-  for (const insert of inserts) {
-    const { error } = await insert;
     if (error) throw error;
   }
   const { error: linksError } = await db
@@ -110,20 +80,95 @@ async function createFixture() {
   if (linksError) throw linksError;
   const { error: guardianError } = await db
     .from("student_guardians")
-    .insert({ student_id: studentId, guardian_id: guardianId, is_primary: true });
+    .upsert(
+      { student_id: studentId, guardian_id: guardianId, is_primary: true },
+      { onConflict: "student_id,guardian_id" },
+    );
   if (guardianError) throw guardianError;
-  const { error: assignmentError } = await db
-    .from("teacher_assignments")
-    .insert({
-      id: assignmentId,
-      student_id: studentId,
-      teacher_id: teacherId,
-      track_id: trackId,
-      assigned_by: "10000000-0000-4000-8000-000000000001",
-      reason: "Weekly schedule test",
-    });
+  const { error: assignmentError } = await db.from("teacher_assignments").insert({
+    id: assignmentId,
+    student_id: studentId,
+    teacher_id: teacherId,
+    track_id: trackId,
+    assigned_by: "10000000-0000-4000-8000-000000000001",
+    reason: "Weekly schedule test",
+  });
   if (assignmentError) throw assignmentError;
   return { assignmentId };
+}
+
+type FixtureClient = SupabaseClient<Database>;
+
+async function findOrCreateTeacher(db: FixtureClient, now: string) {
+  const profileId = "10000000-0000-4000-8000-000000000002";
+  const { data } = await db.from("teachers").select("id").eq("profile_id", profileId).maybeSingle();
+  if (data) {
+    const { error } = await db
+      .from("teachers")
+      .update({
+        status: "active",
+        max_students: 5,
+        identity_verified_at: now,
+        code_of_conduct_accepted_at: now,
+      })
+      .eq("id", data.id);
+    if (error) throw error;
+    return data.id;
+  }
+  const id = crypto.randomUUID();
+  const { error } = await db.from("teachers").insert({
+    id,
+    profile_id: profileId,
+    gender: "male",
+    max_students: 5,
+    status: "active",
+    identity_verified_at: now,
+    code_of_conduct_accepted_at: now,
+  });
+  if (error) throw error;
+  return id;
+}
+
+async function findOrCreateStudent(db: FixtureClient) {
+  const profileId = "10000000-0000-4000-8000-000000000003";
+  const { data } = await db.from("students").select("id").eq("profile_id", profileId).maybeSingle();
+  if (data) {
+    const { error } = await db
+      .from("students")
+      .update({
+        full_name: "Schedule Student",
+        gender: "male",
+        timezone: "Africa/Cairo",
+        status: "active",
+      })
+      .eq("id", data.id);
+    if (error) throw error;
+    return data.id;
+  }
+  const id = crypto.randomUUID();
+  const { error } = await db.from("students").insert({
+    id,
+    profile_id: profileId,
+    full_name: "Schedule Student",
+    gender: "male",
+    timezone: "Africa/Cairo",
+  });
+  if (error) throw error;
+  return id;
+}
+
+async function findOrCreateGuardian(db: FixtureClient) {
+  const profileId = "10000000-0000-4000-8000-000000000004";
+  const { data } = await db
+    .from("guardians")
+    .select("id")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  if (data) return data.id;
+  const id = crypto.randomUUID();
+  const { error } = await db.from("guardians").insert({ id, profile_id: profileId });
+  if (error) throw error;
+  return id;
 }
 
 function required(name: string) {
