@@ -1,7 +1,6 @@
 import "server-only";
 
 import { connection } from "next/server";
-import { DateTime } from "luxon";
 
 import type { AppLocale } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
@@ -79,7 +78,6 @@ export async function getStudentDirectory(
     })),
     pageCount: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)),
     total: count ?? 0,
-    today: DateTime.now().setZone("Africa/Cairo").toFormat("yyyy-LL-dd"),
   };
 }
 

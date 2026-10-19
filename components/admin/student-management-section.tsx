@@ -1,4 +1,4 @@
-import { Archive, Download, GraduationCap, Search, UserRoundPlus } from "lucide-react";
+import { Archive, Download, GraduationCap, Search, UserRoundPlus, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -9,6 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
 import { archiveStudentAction, saveStudentAction } from "@/lib/students/actions";
+import {
+  createFamilyAccountAction,
+  removeGuardianLinkAction,
+  saveGuardianLinkAction,
+} from "@/lib/students/family-actions";
+import { getStudentFamily, type StudentFamily } from "@/lib/students/student-family";
 import {
   getStudentDirectory,
   getStudentForEditing,
@@ -26,9 +32,10 @@ const textareaClass =
 export async function StudentManagementSection({ locale, searchParams }: Props) {
   const query = await searchParams;
   const selectedId = typeof query.student === "string" ? query.student : null;
-  const [directory, selected, t] = await Promise.all([
+  const [directory, selected, family, t] = await Promise.all([
     getStudentDirectory(query, locale),
     selectedId ? getStudentForEditing(selectedId, locale) : Promise.resolve(null),
+    selectedId ? getStudentFamily(selectedId) : Promise.resolve(null),
     getTranslations({ locale, namespace: "studentManagement" }),
   ]);
   const notice = getNotice(query, t);
@@ -170,16 +177,17 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
           </nav>
         </article>
 
-        <StudentForm
-          locale={locale}
-          student={selected}
-          levels={directory.levels}
-          today={directory.today}
-          t={t}
-        />
+        <StudentForm locale={locale} student={selected} levels={directory.levels} t={t} />
       </div>
 
-      {selected ? <ProfileSkeleton student={selected} t={t} /> : null}
+      {selected ? (
+        <div className="mt-6 grid gap-6">
+          <ProfileSkeleton student={selected} t={t} />
+          {family ? (
+            <FamilyManagement locale={locale} student={selected} family={family} t={t} />
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -230,13 +238,11 @@ function StudentForm({
   locale,
   student,
   levels,
-  today,
   t,
 }: {
   locale: AppLocale;
   student: Awaited<ReturnType<typeof getStudentForEditing>>;
   levels: { id: string; label: string; track: string | null }[];
-  today: string;
   t: Translation;
 }) {
   return (
@@ -312,7 +318,7 @@ function StudentForm({
             name="joinedAt"
             type="date"
             label={t("fields.joinedAt")}
-            defaultValue={student?.joinedAt ?? today}
+            defaultValue={student?.joinedAt ?? ""}
             required
           />
         </div>
@@ -414,6 +420,214 @@ function ProfileSkeleton({
   );
 }
 
+function FamilyManagement({
+  locale,
+  student,
+  family,
+  t,
+}: {
+  locale: AppLocale;
+  student: NonNullable<Awaited<ReturnType<typeof getStudentForEditing>>>;
+  family: StudentFamily;
+  t: Translation;
+}) {
+  const linkedProfiles = new Set(family.guardianLinks.map(({ profileId }) => profileId));
+  const availableParents = family.parentOptions.filter(
+    ({ profileId }) => !linkedProfiles.has(profileId),
+  );
+  return (
+    <article
+      className="rounded-3xl border bg-card p-6 shadow-card sm:p-7"
+      aria-labelledby="student-family-title"
+    >
+      <div className="flex items-center gap-3">
+        <span className="grid size-11 place-items-center rounded-xl bg-accent text-primary">
+          <UsersRound aria-hidden="true" />
+        </span>
+        <div>
+          <h2 id="student-family-title" className="text-xl font-black text-primary">
+            {t("family.title")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("family.description")}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <section className="rounded-2xl border bg-background/55 p-5">
+          <h3 className="font-black text-primary">{t("family.studentAccount")}</h3>
+          {family.studentAccount ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              {family.studentAccount.email ?? t("family.accountLinked")}
+            </p>
+          ) : (
+            <AccountForm
+              locale={locale}
+              studentId={student.id}
+              fullName={student.fullName}
+              role="student"
+              t={t}
+            />
+          )}
+        </section>
+
+        <section className="rounded-2xl border bg-background/55 p-5">
+          <h3 className="font-black text-primary">{t("family.createParent")}</h3>
+          <AccountForm locale={locale} studentId={student.id} fullName="" role="parent" t={t} />
+        </section>
+      </div>
+
+      <section className="mt-6 rounded-2xl border bg-background/55 p-5">
+        <h3 className="font-black text-primary">{t("family.guardians")}</h3>
+        {family.guardianLinks.length ? (
+          <ul className="mt-4 grid gap-3">
+            {family.guardianLinks.map((link) => (
+              <li
+                key={link.guardianId}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4"
+              >
+                <div>
+                  <p className="font-bold text-primary">{link.fullName}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {link.email ?? t("family.noEmail")} · {link.relation ?? t("family.noRelation")}
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    {link.isPrimary ? (
+                      <Badge variant="secondary">{t("family.primary")}</Badge>
+                    ) : null}
+                    {link.isPayer ? <Badge variant="outline">{t("family.payer")}</Badge> : null}
+                  </div>
+                </div>
+                <form action={removeGuardianLinkAction.bind(null, locale)}>
+                  <input type="hidden" name="studentId" value={student.id} />
+                  <input type="hidden" name="guardianId" value={link.guardianId} />
+                  <AdminSubmitButton
+                    label={t("family.unlink")}
+                    pendingLabel={t("family.unlinking")}
+                    variant="destructive"
+                  />
+                </form>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t("family.empty")}</p>
+        )}
+
+        {availableParents.length ? (
+          <form
+            action={saveGuardianLinkAction.bind(null, locale)}
+            className="mt-5 grid gap-4 border-t pt-5 sm:grid-cols-2"
+          >
+            <input type="hidden" name="studentId" value={student.id} />
+            <FilterSelect
+              id="existing-parent"
+              name="parentProfileId"
+              label={t("family.existingParent")}
+            >
+              <option value="">{t("family.chooseParent")}</option>
+              {availableParents.map((parent) => (
+                <option key={parent.profileId} value={parent.profileId}>
+                  {parent.fullName}
+                  {parent.email ? ` — ${parent.email}` : ""}
+                </option>
+              ))}
+            </FilterSelect>
+            <Field
+              id="existing-relation"
+              name="relation"
+              label={t("family.relation")}
+              maxLength={80}
+            />
+            <FamilyFlags t={t} />
+            <AdminSubmitButton label={t("family.link")} pendingLabel={t("family.linking")} />
+          </form>
+        ) : null}
+      </section>
+    </article>
+  );
+}
+
+function AccountForm({
+  locale,
+  studentId,
+  fullName,
+  role,
+  t,
+}: {
+  locale: AppLocale;
+  studentId: string;
+  fullName: string;
+  role: "student" | "parent";
+  t: Translation;
+}) {
+  return (
+    <form action={createFamilyAccountAction.bind(null, locale)} className="mt-4 grid gap-3">
+      <input type="hidden" name="studentId" value={studentId} />
+      <input type="hidden" name="role" value={role} />
+      <Field
+        id={`${role}-account-name`}
+        name="fullName"
+        label={t("fields.fullName")}
+        defaultValue={fullName}
+        required
+      />
+      <Field
+        id={`${role}-account-email`}
+        name="email"
+        type="email"
+        inputMode="email"
+        autoComplete="off"
+        label={t("family.email")}
+        required
+      />
+      <Field
+        id={`${role}-account-password`}
+        name="temporaryPassword"
+        type="password"
+        autoComplete="new-password"
+        minLength={12}
+        label={t("family.password")}
+        required
+      />
+      {role === "parent" ? (
+        <>
+          <Field
+            id="new-parent-relation"
+            name="relation"
+            label={t("family.relation")}
+            maxLength={80}
+          />
+          <FamilyFlags t={t} />
+        </>
+      ) : (
+        <>
+          <input type="hidden" name="isPrimary" value="false" />
+          <input type="hidden" name="isPayer" value="false" />
+        </>
+      )}
+      <AdminSubmitButton
+        label={role === "parent" ? t("family.createParentAction") : t("family.createStudentAction")}
+        pendingLabel={t("family.creating")}
+      />
+    </form>
+  );
+}
+
+function FamilyFlags({ t }: { t: Translation }) {
+  return (
+    <div className="flex flex-wrap gap-5 sm:col-span-2">
+      <label className="flex min-h-11 items-center gap-2 text-sm font-bold">
+        <input type="checkbox" name="isPrimary" className="size-5 accent-primary" />
+        {t("family.primary")}
+      </label>
+      <label className="flex min-h-11 items-center gap-2 text-sm font-bold">
+        <input type="checkbox" name="isPayer" className="size-5 accent-primary" />
+        {t("family.payer")}
+      </label>
+    </div>
+  );
+}
+
 function FilterSelect({
   id,
   name,
@@ -481,6 +695,25 @@ function PageLink({
 
 type Translation = Awaited<ReturnType<typeof getTranslations<"studentManagement">>>;
 function getNotice(query: Record<string, string | string[] | undefined>, t: Translation) {
+  const familyStatus = typeof query.familyStatus === "string" ? query.familyStatus : "";
+  const familyError = typeof query.familyError === "string" ? query.familyError : "";
+  const familyStatuses = ["linked", "unlinked", "parent_created", "student_created"] as const;
+  if (familyStatuses.includes(familyStatus as (typeof familyStatuses)[number]))
+    return {
+      message: t(`family.notices.${familyStatus}` as "family.notices.linked"),
+      success: true,
+    };
+  if (familyError)
+    return {
+      message: t(
+        familyError === "invalid_fields"
+          ? "family.errors.invalidFields"
+          : familyError === "account_exists"
+            ? "family.errors.accountExists"
+            : "family.errors.requestFailed",
+      ),
+      success: false,
+    };
   const status = typeof query.studentStatus === "string" ? query.studentStatus : "";
   const error = typeof query.studentError === "string" ? query.studentError : "";
   if (["created", "updated", "archived"].includes(status))

@@ -5,6 +5,7 @@ const commonAccountFields = {
   displayName: z.string().trim().max(80).optional(),
   email: z.email().trim().max(254),
   fullName: z.string().trim().min(2).max(160),
+  gender: z.enum(["male", "female"]).default("male"),
   role: managedRoleSchema,
 };
 

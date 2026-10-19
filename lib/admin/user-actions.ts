@@ -33,6 +33,7 @@ export async function createManagedAccountAction(
     displayName: formData.get("displayName") || undefined,
     email: formData.get("email"),
     fullName: formData.get("fullName"),
+    gender: formData.get("gender") || undefined,
     mode: formData.get("mode"),
     role: formData.get("role"),
     temporaryPassword: formData.get("temporaryPassword") || undefined,
@@ -48,6 +49,7 @@ export async function createManagedAccountAction(
     created_by: user.id,
     display_name: parsed.data.displayName,
     full_name: parsed.data.fullName,
+    gender: parsed.data.gender,
   };
 
   let error: { message: string } | null;
@@ -68,7 +70,7 @@ export async function createManagedAccountAction(
     }));
   } else {
     ({ error } = await admin.auth.admin.createUser({
-      app_metadata: { role: parsed.data.role },
+      app_metadata: { created_by: user.id, role: parsed.data.role },
       email: parsed.data.email,
       email_confirm: true,
       password: parsed.data.temporaryPassword,

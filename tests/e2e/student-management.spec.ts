@@ -14,6 +14,7 @@ test("US-011 to US-013 admin manages and exports an audited student record", asy
   await page.locator("#student-name").fill(name);
   await page.locator("#student-gender").selectOption("female");
   await page.locator("#student-birth").fill("2014-05-10");
+  await page.locator("#student-joined").fill("2026-10-19");
   await page.locator("#student-country-edit").fill("EG");
   await page.locator("#student-health").fill("Private E2E health note");
   await page.locator("#student-special").fill("Private E2E special note");

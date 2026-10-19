@@ -1,5 +1,6 @@
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
@@ -24,6 +25,8 @@ export default async function AdminSectionPage({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  await connection();
 
   if (section === "audit") {
     return <AuditLogSection locale={locale} searchParams={searchParams} />;

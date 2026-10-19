@@ -286,11 +286,13 @@
       "fullName": "Full name",
       "displayName": "Display name (optional)",
       "email": "Email address",
+      "gender": "Gender for the student or teacher record",
       "role": "Portal role",
       "mode": "Activation method",
       "temporaryPassword": "Temporary password",
       "passwordHint": "Required only for direct creation; use at least 12 characters."
     },
+    "genders": { "male": "Male", "female": "Female" },
     "roles": {
       "admin": "Administrator",
       "teacher": "Teacher",
@@ -577,6 +579,42 @@
         "grades": "Grades",
         "finance": "Finance",
         "certificates": "Certificates"
+      }
+    },
+    "family": {
+      "title": "Family and accounts",
+      "description": "Link more than one parent, identify the primary contact and payer, and create protected portal accounts.",
+      "studentAccount": "Student portal account",
+      "accountLinked": "A portal account is linked.",
+      "createParent": "Create and link a parent account",
+      "guardians": "Linked parents",
+      "empty": "No parent is linked yet.",
+      "noEmail": "No email recorded",
+      "noRelation": "Relationship not specified",
+      "primary": "Primary contact",
+      "payer": "Payer",
+      "existingParent": "Existing parent account",
+      "chooseParent": "Choose a parent",
+      "relation": "Relationship",
+      "email": "Email address",
+      "password": "Temporary password",
+      "link": "Link parent",
+      "linking": "Linking…",
+      "unlink": "Remove link",
+      "unlinking": "Removing…",
+      "createParentAction": "Create parent account",
+      "createStudentAction": "Create student account",
+      "creating": "Creating account…",
+      "notices": {
+        "linked": "The parent was linked to this student.",
+        "unlinked": "The parent link was removed.",
+        "parent_created": "The parent account was created and linked.",
+        "student_created": "The student account was created and linked."
+      },
+      "errors": {
+        "invalidFields": "Review the family and account details, then try again.",
+        "accountExists": "An account already uses this email address.",
+        "requestFailed": "The family change could not be completed. No partial account was kept."
       }
     },
     "notices": {

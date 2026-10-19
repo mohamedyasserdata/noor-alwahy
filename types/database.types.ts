@@ -595,6 +595,10 @@ export type Database = {
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       record_student_export: { Args: { p_count: number }; Returns: undefined };
+      remove_student_guardian: {
+        Args: { p_guardian_id: string; p_student_id: string };
+        Returns: undefined;
+      };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;
@@ -604,6 +608,16 @@ export type Database = {
         Returns: undefined;
       };
       upsert_student: { Args: { p_payload: Json }; Returns: string };
+      upsert_student_guardian: {
+        Args: {
+          p_is_payer: boolean;
+          p_is_primary: boolean;
+          p_parent_profile_id: string;
+          p_relation: string;
+          p_student_id: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       application_status:

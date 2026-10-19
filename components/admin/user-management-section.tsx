@@ -101,6 +101,18 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
               </div>
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="accountGender">{t("fields.gender")}</Label>
+              <select
+                id="accountGender"
+                name="gender"
+                className="h-11 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/25"
+                defaultValue="male"
+              >
+                <option value="male">{t("genders.male")}</option>
+                <option value="female">{t("genders.female")}</option>
+              </select>
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="temporaryPassword">{t("fields.temporaryPassword")}</Label>
               <Input
                 id="temporaryPassword"
