@@ -855,6 +855,42 @@
       "request_failed": "تعذر حفظ رابط Zoom."
     }
   },
+  "teacherToday": {
+    "eyebrow": "دفتر الحضور اليومي",
+    "title": "حصصي اليوم",
+    "description": "سجّل نتيجة كل حصة بنقرة واحدة؛ يطبّق النظام الرصيد والأجر وسياسة التعويض تلقائيًا.",
+    "dayTitle": "جدول اليوم",
+    "sessionCount": "{count} حصة",
+    "duration": "{count} دقيقة",
+    "timezone": "المواعيد معروضة حسب منطقتك الزمنية: {timezone}",
+    "emptyTitle": "لا توجد حصص اليوم",
+    "emptyDescription": "ستظهر الحصص المعيّنة لك هنا بمجرد توليدها في الجدول.",
+    "awaitingAttendance": "بانتظار التسجيل",
+    "chooseResult": "اختر نتيجة الحصة",
+    "recorded": "تم تثبيت النتيجة وتطبيق أثرها على الرصيد والأجر.",
+    "saving": "جارٍ التسجيل…",
+    "statuses": {
+      "present": "حاضر",
+      "late": "متأخر",
+      "student_absent": "غياب الطالب",
+      "student_excused": "غياب بعذر",
+      "teacher_absent": "غياب المدرس",
+      "cancelled_teacher": "إلغاء المدرس",
+      "cancelled_admin": "إلغاء الإدارة"
+    },
+    "notices": {
+      "saved": "تم تسجيل الحضور وتطبيق الرصيد والأجر بنجاح."
+    },
+    "errors": {
+      "invalid_fields": "تعذر التحقق من الحصة أو النتيجة.",
+      "attendance_forbidden": "لا تملك صلاحية تسجيل الحضور لهذه الحصة.",
+      "attendance_conflict": "سُجلت نتيجة مختلفة لهذه الحصة بالفعل.",
+      "teacher_rate_missing": "لم تحدد الإدارة سعرًا ساريًا لهذه الحصة.",
+      "active_subscription_required": "لا يوجد اشتراك فعّال يغطي هذه الحصة.",
+      "profile_missing": "لم يُنشأ ملف المدرس الخاص بك بعد.",
+      "request_failed": "تعذر تسجيل الحضور. لم يُحفظ أي أثر جزئي."
+    }
+  },
   "schedules": {
     "eyebrow": "الحصص الأسبوعية الثابتة",
     "title": "الجدول الأسبوعي",
