@@ -264,6 +264,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      schedule_slots: {
+        Row: {
+          anchor_timezone: string;
+          assignment_id: string;
+          created_at: string;
+          duration_min: number;
+          id: string;
+          is_active: boolean;
+          local_start_time: string;
+          updated_at: string;
+          weekday: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          anchor_timezone: string;
+          assignment_id: string;
+          created_at?: string;
+          duration_min: number;
+          id?: string;
+          is_active?: boolean;
+          local_start_time: string;
+          updated_at?: string;
+          weekday: number;
+        };
+        Update: {
+          anchor_timezone?: string;
+          assignment_id?: string;
+          created_at?: string;
+          duration_min?: number;
+          id?: string;
+          is_active?: boolean;
+          local_start_time?: string;
+          updated_at?: string;
+          weekday?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "schedule_slots_assignment_id_fkey";
+            columns: ["assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_assignments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       student_guardians: {
         Row: {
           created_at: string;
@@ -455,6 +500,78 @@ export type Database = {
           },
         ];
       };
+      teacher_assignments: {
+        Row: {
+          assigned_by: string;
+          created_at: string;
+          end_date: string | null;
+          id: string;
+          reason: string;
+          start_date: string;
+          status: Database["public"]["Enums"]["assignment_status"];
+          student_id: string;
+          teacher_id: string;
+          track_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          assigned_by: string;
+          created_at?: string;
+          end_date?: string | null;
+          id?: string;
+          reason: string;
+          start_date?: string;
+          status?: Database["public"]["Enums"]["assignment_status"];
+          student_id: string;
+          teacher_id: string;
+          track_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          assigned_by?: string;
+          created_at?: string;
+          end_date?: string | null;
+          id?: string;
+          reason?: string;
+          start_date?: string;
+          status?: Database["public"]["Enums"]["assignment_status"];
+          student_id?: string;
+          teacher_id?: string;
+          track_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_assignments_assigned_by_fkey";
+            columns: ["assigned_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_assignments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_assignments_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_assignments_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teacher_availability: {
         Row: {
           created_at: string;
@@ -631,6 +748,14 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"];
       };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
+      get_shared_student_notes: {
+        Args: { p_student: string };
+        Returns: {
+          health_notes: string;
+          special_notes: string;
+          student_id: string;
+        }[];
+      };
       get_student_private_notes: {
         Args: { p_student: string };
         Returns: {
