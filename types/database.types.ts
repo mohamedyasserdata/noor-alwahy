@@ -36,6 +36,61 @@ export type Database = {
           },
         ];
       };
+      attendance: {
+        Row: {
+          locked_at: string | null;
+          minutes: number | null;
+          recorded_at: string;
+          recorded_by: string;
+          session_id: string;
+          status: Database["public"]["Enums"]["attendance_status"];
+          student_joined_at: string | null;
+          student_notice_at: string | null;
+          teacher_joined_at: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          locked_at?: string | null;
+          minutes?: number | null;
+          recorded_at?: string;
+          recorded_by: string;
+          session_id: string;
+          status: Database["public"]["Enums"]["attendance_status"];
+          student_joined_at?: string | null;
+          student_notice_at?: string | null;
+          teacher_joined_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          locked_at?: string | null;
+          minutes?: number | null;
+          recorded_at?: string;
+          recorded_by?: string;
+          session_id?: string;
+          status?: Database["public"]["Enums"]["attendance_status"];
+          student_joined_at?: string | null;
+          student_notice_at?: string | null;
+          teacher_joined_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendance_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "attendance_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_logs: {
         Row: {
           action: string;
@@ -212,6 +267,72 @@ export type Database = {
             columns: ["track_id"];
             isOneToOne: false;
             referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      makeup_entitlements: {
+        Row: {
+          created_at: string;
+          expires_at: string;
+          id: string;
+          outside_period_cap: boolean;
+          source_session_id: string;
+          student_id: string;
+          subscription_id: string;
+          updated_at: string;
+          used_by_session_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          expires_at: string;
+          id?: string;
+          outside_period_cap?: boolean;
+          source_session_id: string;
+          student_id: string;
+          subscription_id: string;
+          updated_at?: string;
+          used_by_session_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          outside_period_cap?: boolean;
+          source_session_id?: string;
+          student_id?: string;
+          subscription_id?: string;
+          updated_at?: string;
+          used_by_session_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "makeup_entitlements_source_session_id_fkey";
+            columns: ["source_session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_used_by_session_id_fkey";
+            columns: ["used_by_session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
         ];
@@ -815,6 +936,7 @@ export type Database = {
           current_period_start: string;
           id: string;
           paused_until: string | null;
+          policy_snapshot: NonNullable<Json>;
           sessions_per_period: number;
           start_date: string;
           status: Database["public"]["Enums"]["subscription_status"];
@@ -828,6 +950,7 @@ export type Database = {
           current_period_start: string;
           id?: string;
           paused_until?: string | null;
+          policy_snapshot?: NonNullable<Json>;
           sessions_per_period: number;
           start_date: string;
           status?: Database["public"]["Enums"]["subscription_status"];
@@ -840,6 +963,7 @@ export type Database = {
           current_period_start?: string;
           id?: string;
           paused_until?: string | null;
+          policy_snapshot?: NonNullable<Json>;
           sessions_per_period?: number;
           start_date?: string;
           status?: Database["public"]["Enums"]["subscription_status"];
@@ -966,6 +1090,120 @@ export type Database = {
             columns: ["teacher_id"];
             isOneToOne: false;
             referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_payout_items: {
+        Row: {
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          kind: string;
+          rate_snapshot: number;
+          session_id: string;
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          currency: string;
+          id?: string;
+          kind: string;
+          rate_snapshot: number;
+          session_id: string;
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          kind?: string;
+          rate_snapshot?: number;
+          session_id?: string;
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_payout_items_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_payout_items_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_rates: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          duration_min: number | null;
+          id: string;
+          rate_per_session: number;
+          teacher_id: string;
+          track_id: string | null;
+          updated_at: string;
+          valid_from: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          currency: string;
+          duration_min?: number | null;
+          id?: string;
+          rate_per_session: number;
+          teacher_id: string;
+          track_id?: string | null;
+          updated_at?: string;
+          valid_from: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          duration_min?: number | null;
+          id?: string;
+          rate_per_session?: number;
+          teacher_id?: string;
+          track_id?: string | null;
+          updated_at?: string;
+          valid_from?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_rates_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_rates_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_rates_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
             referencedColumns: ["id"];
           },
         ];
@@ -1213,6 +1451,34 @@ export type Database = {
           p_track: string;
         };
         Returns: string;
+      };
+      record_attendance: {
+        Args: {
+          p_minutes?: number;
+          p_session_id: string;
+          p_status: Database["public"]["Enums"]["attendance_status"];
+          p_student_joined_at?: string;
+          p_student_notice_at?: string;
+          p_teacher_joined_at?: string;
+        };
+        Returns: {
+          locked_at: string | null;
+          minutes: number | null;
+          recorded_at: string;
+          recorded_by: string;
+          session_id: string;
+          status: Database["public"]["Enums"]["attendance_status"];
+          student_joined_at: string | null;
+          student_notice_at: string | null;
+          teacher_joined_at: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "attendance";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       record_student_export: { Args: { p_count: number }; Returns: undefined };
       remove_student_guardian: {
