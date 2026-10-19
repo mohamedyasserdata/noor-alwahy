@@ -181,7 +181,8 @@ select is(
 );
 
 -- R-22: every application SECURITY DEFINER function must pin its resolution
--- context and must not be directly callable by anonymous clients.
+-- context. The sole anonymous exception is the opaque, revocable calendar-feed
+-- capability introduced by P3-T08 and tested exhaustively in its own suite.
 select is(
   (
     select count(*)::integer
@@ -203,9 +204,10 @@ select is(
     where namespace.nspname = 'public'
       and function.prosecdef
       and has_function_privilege('anon', function.oid, 'EXECUTE')
+      and function.oid <> 'public.get_calendar_feed(text)'::regprocedure
   ),
   0,
-  'R-22: anonymous callers cannot execute any public SECURITY DEFINER function'
+  'R-22: anonymous callers reach only the reviewed calendar capability'
 );
 
 select is(
@@ -232,7 +234,7 @@ select is(
       and function.prorettype <> 'pg_catalog.trigger'::regtype
       and has_function_privilege('authenticated', function.oid, 'EXECUTE')
   ),
-  array['accept_teacher_code_of_conduct', 'auth_role', 'confirm_student_import', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_student_export', 'remove_student_guardian', 'set_account_active', 'suggest_teachers', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
+  array['accept_teacher_code_of_conduct', 'auth_role', 'confirm_student_import', 'get_calendar_feed', 'get_my_calendar_feed', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_student_export', 'remove_student_guardian', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'set_account_active', 'suggest_teachers', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
   'R-22: authenticated callers reach only the guarded SECURITY DEFINER API'
 );
 
