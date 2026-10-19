@@ -3,11 +3,13 @@ import { Suspense } from "react";
 
 import { BrandMark } from "@/components/brand/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { NotificationCenter } from "@/components/notifications/notification-center";
 import type { PortalId } from "@/components/portal/portal-config";
 import { PortalNavigation } from "@/components/portal/portal-navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
+import { getNotificationCenter } from "@/lib/notifications/queries";
 
 type PortalShellProps = {
   children: React.ReactNode;
@@ -16,15 +18,19 @@ type PortalShellProps = {
 };
 
 export async function PortalShell({ children, locale, portal }: PortalShellProps) {
-  const [t, settings] = await Promise.all([
+  const [t, settings, notificationCenter] = await Promise.all([
     getTranslations({ locale, namespace: "portals" }),
     getPublicAppSettings(),
+    getNotificationCenter(),
   ]);
   const academyName =
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
 
   return (
     <div className="min-h-svh" data-testid={`portal-shell-${portal}`}>
+      {notificationCenter ? (
+        <NotificationCenter initialData={notificationCenter} portal={portal} />
+      ) : null}
       <aside
         className="inset-block-0 fixed start-0 z-30 hidden w-72 flex-col border-e bg-card/95 shadow-card backdrop-blur min-[769px]:flex"
         data-testid="portal-sidebar"
@@ -62,7 +68,7 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
       </aside>
 
       <div className="min-h-svh min-[769px]:ps-72">
-        <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 backdrop-blur min-[769px]:hidden">
+        <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 pe-14 backdrop-blur min-[769px]:hidden">
           <BrandMark
             label={academyName}
             logoPath={settings.academyProfile.logoPath}

@@ -910,6 +910,27 @@
       "closed": "Closed"
     }
   },
+  "notifications": {
+    "open": "Open notifications",
+    "title": "Notifications",
+    "unreadCount": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
+    "markAllRead": "Mark all as read",
+    "preferences": "Notification preferences",
+    "empty": "You are all caught up.",
+    "preferencesDescription": "Choose which in-app updates you want to receive. Additional channels will be added later.",
+    "inApp": "In-app notifications",
+    "scheduleChanged": "Schedule changes",
+    "zoomLinkChanged": "Zoom link changes",
+    "save": "Save preferences",
+    "saving": "Saving…",
+    "saved": "Preferences saved.",
+    "error": "The change could not be saved. Try again.",
+    "types": {
+      "scheduleChanged": "A session time has changed",
+      "zoomLinkChanged": "A session link has changed",
+      "generic": "You have a new academy update"
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }
