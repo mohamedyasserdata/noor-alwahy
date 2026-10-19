@@ -131,6 +131,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      calendar_feed_tokens: {
+        Row: {
+          created_at: string;
+          revoked_at: string | null;
+          token_hash: string;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          revoked_at?: string | null;
+          token_hash: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          revoked_at?: string | null;
+          token_hash?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_feed_tokens_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       contact_links: {
         Row: {
           created_at: string;
@@ -1486,6 +1519,38 @@ export type Database = {
           scheduled_count: number;
         }[];
       };
+      get_calendar_feed: {
+        Args: { p_token_hash: string };
+        Returns: {
+          ends_at: string;
+          owner_locale: string;
+          owner_name: string;
+          owner_timezone: string;
+          scheduled_at: string;
+          session_id: string;
+          status: string;
+          student_name: string;
+          teacher_name: string;
+          track_name_ar: string;
+          track_name_en: string;
+        }[];
+      };
+      get_my_calendar_feed: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          ends_at: string;
+          owner_locale: string;
+          owner_name: string;
+          owner_timezone: string;
+          scheduled_at: string;
+          session_id: string;
+          status: string;
+          student_name: string;
+          teacher_name: string;
+          track_name_ar: string;
+          track_name_en: string;
+        }[];
+      };
       get_session_join: {
         Args: { p_session_id: string };
         Returns: {
@@ -1578,6 +1643,8 @@ export type Database = {
         Args: { p_scheduled_at: string; p_session_id: string };
         Returns: string;
       };
+      revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
+      rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;
