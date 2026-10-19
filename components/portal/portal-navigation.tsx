@@ -64,10 +64,9 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       data-testid={`portal-navigation-${variant}`}
       className={cn(
         isSidebar ? "grid gap-1.5 px-4" : "grid h-full items-stretch",
-        !isSidebar && sections.length === 3 && "grid-cols-3",
         !isSidebar && sections.length === 4 && "grid-cols-4",
         !isSidebar && sections.length === 5 && "grid-cols-5",
-        !isSidebar && sections.length === 8 && "grid-cols-8",
+        !isSidebar && sections.length > 5 && "flex overflow-x-auto",
       )}
     >
       {sections.map((section) => {
@@ -87,7 +86,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
                 !isActive &&
                 "text-muted-foreground hover:bg-accent/55 hover:text-foreground",
               !isSidebar &&
-                "min-w-0 flex-col justify-center gap-1 px-1 py-2 text-center text-xs leading-tight",
+                "min-w-18 flex-1 flex-col justify-center gap-1 px-1 py-2 text-center text-xs leading-tight",
               !isSidebar && isActive && "text-primary",
               !isSidebar && !isActive && "text-muted-foreground hover:text-foreground",
             )}

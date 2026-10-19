@@ -10,6 +10,7 @@ import { StudentManagementSection } from "@/components/admin/student-management-
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
+import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { routing } from "@/i18n/routing";
 
 export const instant = false;
@@ -48,6 +49,10 @@ export default async function AdminSectionPage({
 
   if (section === "assignments") {
     return <AssignmentManagementSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "schedule") {
+    return <ScheduleSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

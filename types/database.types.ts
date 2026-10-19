@@ -765,6 +765,22 @@ export type Database = {
           student_id: string;
         }[];
       };
+      get_visible_schedule: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          anchor_timezone: string;
+          assignment_id: string;
+          duration_min: number;
+          is_active: boolean;
+          local_start_time: string;
+          slot_id: string;
+          student_name: string;
+          teacher_name: string;
+          track_name_ar: string;
+          track_name_en: string;
+          weekday: number;
+        }[];
+      };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       manage_teacher_assignment: {
         Args: {

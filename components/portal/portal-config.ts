@@ -11,6 +11,7 @@ export const portalConfig = {
       "students",
       "teachers",
       "assignments",
+      "schedule",
       "users",
       "audit",
       "settings",
@@ -18,7 +19,7 @@ export const portalConfig = {
   },
   teacher: {
     defaultSection: "today",
-    sections: ["today", "students", "reports", "availability"],
+    sections: ["today", "students", "reports", "availability", "schedule"],
   },
   student: {
     defaultSection: "home",
@@ -26,7 +27,7 @@ export const portalConfig = {
   },
   parent: {
     defaultSection: "children",
-    sections: ["children", "billing", "contact"],
+    sections: ["children", "schedule", "billing", "contact"],
   },
 } as const satisfies Record<
   PortalId,

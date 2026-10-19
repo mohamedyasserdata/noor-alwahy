@@ -119,6 +119,11 @@
           "title": "Teacher assignments",
           "description": "Match students with eligible teachers and retain the complete assignment history."
         },
+        "schedule": {
+          "label": "Schedule",
+          "title": "Weekly schedule",
+          "description": "Set fixed weekly lesson times and review them in each viewer’s local time."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",
@@ -159,6 +164,11 @@
           "label": "Availability",
           "title": "Teaching availability",
           "description": "Manage available teaching times so the administration can build a suitable schedule."
+        },
+        "schedule": {
+          "label": "Schedule",
+          "title": "Teaching schedule",
+          "description": "See assigned weekly lessons in your local time zone."
         }
       }
     },
@@ -201,6 +211,11 @@
           "label": "Children",
           "title": "Follow your children",
           "description": "Follow only the children connected to your account from one clear workspace."
+        },
+        "schedule": {
+          "label": "Schedule",
+          "title": "Children’s schedule",
+          "description": "See authorized children’s weekly lessons in your local time zone."
         },
         "billing": {
           "label": "Billing",
@@ -815,6 +830,38 @@
       "invalid_fields": "Choose a valid day and time range.",
       "profile_missing": "Your teacher profile has not been created yet.",
       "request_failed": "The change could not be saved."
+    }
+  },
+  "schedules": {
+    "eyebrow": "Fixed weekly lessons",
+    "title": "Weekly schedule",
+    "description": "Times are converted from the schedule’s anchor zone to the signed-in user’s local zone.",
+    "assignment": "Active assignment",
+    "chooseAssignment": "Choose student and teacher",
+    "weekday": "Day",
+    "time": "Start time",
+    "duration": "Duration in minutes",
+    "anchorTimezone": "Anchor time zone",
+    "save": "Add weekly time",
+    "saving": "Saving…",
+    "saved": "Weekly time saved.",
+    "weekly": "Weekly",
+    "durationValue": "{count} minutes",
+    "anchorNote": "Anchored to {timezone}: {day} at {time}",
+    "empty": "No active weekly lessons are available.",
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "errors": {
+      "invalid_fields": "Review the day, time, duration and IANA time zone.",
+      "duplicate": "This weekly time already exists.",
+      "request_failed": "The weekly time could not be saved."
     }
   },
   "accessibility": {
