@@ -2,6 +2,7 @@ import { Archive, Download, GraduationCap, Search, UserRoundPlus, UsersRound } f
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { StudentImportPanel } from "@/components/admin/student-import-panel";
 import { AuthNotice } from "@/components/auth/auth-notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,44 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
       <div className="mt-7">
         <AuthNotice message={notice.message} success={notice.success} />
       </div>
+
+      <StudentImportPanel
+        locale={locale}
+        copy={{
+          title: t("import.title"),
+          description: t("import.description"),
+          template: t("import.template"),
+          file: t("import.file"),
+          preview: t("import.preview"),
+          previewing: t("import.previewing"),
+          confirm: t("import.confirm"),
+          confirming: t("import.confirming"),
+          ready: t("import.ready"),
+          errorTitle: t("import.errorTitle"),
+          columns: {
+            row: t("import.columns.row"),
+            name: t("import.columns.name"),
+            gender: t("import.columns.gender"),
+            joined: t("import.columns.joined"),
+            notes: t("import.columns.notes"),
+          },
+          yes: t("import.yes"),
+          no: t("import.no"),
+          errors: {
+            invalid_file: t("import.errors.invalidFile"),
+            unsafe_workbook: t("import.errors.unsafeWorkbook"),
+            missing_students_sheet: t("import.errors.missingSheet"),
+            formulas_not_allowed: t("import.errors.formulasNotAllowed"),
+            invalid_headers: t("import.errors.invalidHeaders"),
+            invalid_row_count: t("import.errors.invalidRowCount"),
+            unknown_level: t("import.errors.unknownLevel"),
+            invalid_boolean: t("import.errors.invalidBoolean"),
+            duplicate_student: t("import.errors.duplicateStudent"),
+            invalid_fields: t("import.errors.invalidFields"),
+            request_failed: t("import.errors.requestFailed"),
+          },
+        }}
+      />
 
       <form
         method="get"
@@ -695,6 +734,24 @@ function PageLink({
 
 type Translation = Awaited<ReturnType<typeof getTranslations<"studentManagement">>>;
 function getNotice(query: Record<string, string | string[] | undefined>, t: Translation) {
+  const importStatus = typeof query.importStatus === "string" ? query.importStatus : "";
+  const importError = typeof query.importError === "string" ? query.importError : "";
+  if (importStatus === "confirmed")
+    return {
+      message: t("import.notices.confirmed", { count: Number(query.count) || 0 }),
+      success: true,
+    };
+  if (importError)
+    return {
+      message: t(
+        importError === "invalid_batch"
+          ? "import.errors.invalidBatch"
+          : importError === "duplicate_student"
+            ? "import.errors.duplicateStudent"
+            : "import.errors.requestFailed",
+      ),
+      success: false,
+    };
   const familyStatus = typeof query.familyStatus === "string" ? query.familyStatus : "";
   const familyError = typeof query.familyError === "string" ? query.familyError : "";
   const familyStatuses = ["linked", "unlinked", "parent_created", "student_created"] as const;

@@ -232,7 +232,7 @@ select is(
       and function.prorettype <> 'pg_catalog.trigger'::regtype
       and has_function_privilege('authenticated', function.oid, 'EXECUTE')
   ),
-  array['auth_role', 'get_student_private_notes', 'is_admin', 'record_student_export', 'remove_student_guardian', 'set_account_active', 'upsert_student', 'upsert_student_guardian']::name[],
+  array['auth_role', 'confirm_student_import', 'get_student_private_notes', 'is_admin', 'record_student_export', 'remove_student_guardian', 'set_account_active', 'upsert_student', 'upsert_student_guardian']::name[],
   'R-22: authenticated callers reach only the guarded SECURITY DEFINER API'
 );
 

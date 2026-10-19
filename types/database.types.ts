@@ -310,6 +310,51 @@ export type Database = {
           },
         ];
       };
+      student_import_batches: {
+        Row: {
+          confirmed_at: string | null;
+          created_at: string;
+          created_by: string;
+          id: string;
+          payload: NonNullable<Json>;
+          row_count: number;
+          source_name: string;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          confirmed_at?: string | null;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          payload: NonNullable<Json>;
+          row_count: number;
+          source_name: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          confirmed_at?: string | null;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          payload?: NonNullable<Json>;
+          row_count?: number;
+          source_name?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_import_batches_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       student_private_notes: {
         Row: {
           created_at: string;
@@ -584,6 +629,7 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
       };
+      confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
       get_student_private_notes: {
         Args: { p_student: string };
         Returns: {

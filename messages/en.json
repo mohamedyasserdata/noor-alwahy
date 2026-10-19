@@ -617,6 +617,42 @@
         "requestFailed": "The family change could not be completed. No partial account was kept."
       }
     },
+    "import": {
+      "title": "Import students from Excel",
+      "description": "Download the fixed template, upload up to 200 rows, review every validation result, then confirm one atomic import.",
+      "template": "Download Excel template",
+      "file": "Completed .xlsx file",
+      "preview": "Validate and preview",
+      "previewing": "Validating…",
+      "confirm": "Confirm import",
+      "confirming": "Importing…",
+      "ready": "Rows ready for confirmation",
+      "errorTitle": "Fix these rows and upload the workbook again",
+      "columns": {
+        "row": "Row",
+        "name": "Student",
+        "gender": "Gender",
+        "joined": "Joined",
+        "notes": "Private notes"
+      },
+      "yes": "Yes",
+      "no": "No",
+      "notices": { "confirmed": "Imported {count} students successfully." },
+      "errors": {
+        "invalidFile": "Choose a valid .xlsx file no larger than 2 MB.",
+        "unsafeWorkbook": "The workbook is too large or contains unsupported external or macro content.",
+        "missingSheet": "The workbook must contain the Students sheet from the official template.",
+        "formulasNotAllowed": "Formulas are not allowed in the import sheet.",
+        "invalidHeaders": "The column headers do not match the official template.",
+        "invalidRowCount": "Add between 1 and 200 student rows.",
+        "unknownLevel": "The track code and level name do not match an active level.",
+        "invalidBoolean": "Use true or false for share_with_teacher.",
+        "duplicateStudent": "This student is duplicated in the file or already exists.",
+        "invalidFields": "One or more values are invalid.",
+        "requestFailed": "The workbook could not be prepared or imported. No student was saved.",
+        "invalidBatch": "The preview is no longer valid. Upload the workbook again."
+      }
+    },
     "notices": {
       "created": "The student was added successfully.",
       "updated": "The student was updated successfully.",
