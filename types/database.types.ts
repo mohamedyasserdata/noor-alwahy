@@ -579,6 +579,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      archive_student: { Args: { p_student_id: string }; Returns: undefined };
       auth_role: {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
@@ -593,6 +594,7 @@ export type Database = {
         }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      record_student_export: { Args: { p_count: number }; Returns: undefined };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;
@@ -601,6 +603,7 @@ export type Database = {
         Args: { p_academy_profile: Json; p_support_hours: Json };
         Returns: undefined;
       };
+      upsert_student: { Args: { p_payload: Json }; Returns: string };
     };
     Enums: {
       application_status:

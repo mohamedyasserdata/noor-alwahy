@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
+import { StudentManagementSection } from "@/components/admin/student-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { routing } from "@/i18n/routing";
@@ -30,6 +31,10 @@ export default async function AdminSectionPage({
 
   if (section === "users") {
     return <UserManagementSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "students") {
+    return <StudentManagementSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

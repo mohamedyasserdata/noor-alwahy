@@ -503,6 +503,92 @@
       "requestFailed": "تعذر تحديث إعدادات الأكاديمية، ولم يُحتفظ بأي تغيير جزئي."
     }
   },
+  "studentManagement": {
+    "eyebrow": "دليل الطلاب",
+    "title": "الطلاب",
+    "description": "إدارة سجلات الطلاب والملاحظات الخاصة وحالة القيد والوصول إلى الملف الشامل من مساحة عمل محمية.",
+    "export": "تصدير النتائج CSV",
+    "filters": {
+      "search": "البحث",
+      "searchPlaceholder": "الاسم أو رقم الطالب",
+      "status": "الحالة",
+      "level": "المستوى",
+      "country": "رمز الدولة",
+      "all": "الكل",
+      "apply": "تطبيق الفلاتر"
+    },
+    "statuses": {
+      "active": "نشط",
+      "dropped": "منسحب",
+      "graduated": "متخرج",
+      "suspended": "موقوف",
+      "archived": "مؤرشف"
+    },
+    "genders": { "male": "ذكر", "female": "أنثى" },
+    "list": {
+      "title": "سجلات الطلاب",
+      "count": "{count} سجل",
+      "empty": "لا يوجد طلاب مطابقون لهذه الفلاتر.",
+      "noLevel": "لم يُحدَّد مستوى"
+    },
+    "pagination": {
+      "label": "صفحات الطلاب",
+      "previous": "السابق",
+      "next": "التالي",
+      "current": "صفحة {page} من {pages}"
+    },
+    "actions": {
+      "open": "فتح الملف",
+      "archive": "أرشفة",
+      "archiving": "جارٍ الأرشفة…",
+      "save": "حفظ التغييرات",
+      "create": "إضافة الطالب",
+      "saving": "جارٍ الحفظ…"
+    },
+    "form": {
+      "createTitle": "إضافة طالب",
+      "editTitle": "تعديل الطالب",
+      "description": "تُحفظ البيانات الأساسية والملاحظات الحساسة معًا دون تغييرات جزئية."
+    },
+    "fields": {
+      "fullName": "الاسم الكامل",
+      "gender": "النوع",
+      "status": "الحالة",
+      "level": "المستوى",
+      "birthDate": "تاريخ الميلاد",
+      "joinedAt": "تاريخ الانضمام",
+      "country": "رمز الدولة",
+      "timezone": "المنطقة الزمنية",
+      "healthNotes": "ملاحظات صحية",
+      "specialNotes": "ملاحظات خاصة",
+      "shareWithTeacher": "السماح للمعلم المعيّن برؤية هذه الملاحظات"
+    },
+    "profile": {
+      "title": "ملف: {name}",
+      "description": "الملف جاهز للوحدات التي ستُضاف في المراحل التالية.",
+      "available": "متاح الآن",
+      "later": "سيُفعّل في مهمة لاحقة مخططة",
+      "tabs": {
+        "data": "بيانات الطالب",
+        "assignments": "الإسنادات",
+        "schedule": "الجدول",
+        "attendance": "الحضور",
+        "progress": "التقدم",
+        "grades": "الدرجات",
+        "finance": "المالية",
+        "certificates": "الشهادات"
+      }
+    },
+    "notices": {
+      "created": "تمت إضافة الطالب بنجاح.",
+      "updated": "تم تحديث بيانات الطالب بنجاح.",
+      "archived": "تمت أرشفة الطالب بنجاح."
+    },
+    "errors": {
+      "invalidFields": "راجع بيانات الطالب ثم أعد المحاولة.",
+      "requestFailed": "تعذر حفظ سجل الطالب، ولم يُحتفظ بأي تغيير جزئي."
+    }
+  },
   "accessibility": {
     "skipToContent": "تخطَّ إلى المحتوى الرئيسي"
   }

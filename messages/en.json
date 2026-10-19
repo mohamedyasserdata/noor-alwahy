@@ -503,6 +503,92 @@
       "requestFailed": "The academy settings could not be updated. No partial change was kept."
     }
   },
+  "studentManagement": {
+    "eyebrow": "Student directory",
+    "title": "Students",
+    "description": "Manage student records, private notes, enrollment status, and profile access from one protected workspace.",
+    "export": "Export filtered CSV",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Name or student number",
+      "status": "Status",
+      "level": "Level",
+      "country": "Country code",
+      "all": "All",
+      "apply": "Apply filters"
+    },
+    "statuses": {
+      "active": "Active",
+      "dropped": "Dropped",
+      "graduated": "Graduated",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    },
+    "genders": { "male": "Male", "female": "Female" },
+    "list": {
+      "title": "Student records",
+      "count": "{count, plural, =0 {No records} =1 {One record} other {# records}}",
+      "empty": "No students match these filters.",
+      "noLevel": "No level assigned"
+    },
+    "pagination": {
+      "label": "Student pages",
+      "previous": "Previous",
+      "next": "Next",
+      "current": "Page {page} of {pages}"
+    },
+    "actions": {
+      "open": "Open profile",
+      "archive": "Archive",
+      "archiving": "Archiving…",
+      "save": "Save changes",
+      "create": "Add student",
+      "saving": "Saving…"
+    },
+    "form": {
+      "createTitle": "Add a student",
+      "editTitle": "Edit student",
+      "description": "Core details and sensitive notes are saved atomically."
+    },
+    "fields": {
+      "fullName": "Full name",
+      "gender": "Gender",
+      "status": "Status",
+      "level": "Level",
+      "birthDate": "Birth date",
+      "joinedAt": "Joined on",
+      "country": "Country code",
+      "timezone": "Time zone",
+      "healthNotes": "Health notes",
+      "specialNotes": "Special notes",
+      "shareWithTeacher": "Allow the assigned teacher to view these notes"
+    },
+    "profile": {
+      "title": "Profile: {name}",
+      "description": "The profile is ready for the modules introduced in the next phases.",
+      "available": "Available now",
+      "later": "Enabled by a later planned task",
+      "tabs": {
+        "data": "Student data",
+        "assignments": "Assignments",
+        "schedule": "Schedule",
+        "attendance": "Attendance",
+        "progress": "Progress",
+        "grades": "Grades",
+        "finance": "Finance",
+        "certificates": "Certificates"
+      }
+    },
+    "notices": {
+      "created": "The student was added successfully.",
+      "updated": "The student was updated successfully.",
+      "archived": "The student was archived successfully."
+    },
+    "errors": {
+      "invalidFields": "Review the student details and try again.",
+      "requestFailed": "The student record could not be saved. No partial change was kept."
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }
