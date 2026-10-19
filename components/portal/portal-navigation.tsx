@@ -15,6 +15,7 @@ import {
   ScrollText,
   Settings,
   Sparkles,
+  UserRoundCheck,
   UserRoundCog,
   Users,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import { cn } from "@/lib/utils";
 const sectionIcons = {
   dashboard: ChartNoAxesCombined,
   applications: ClipboardList,
+  assignments: UserRoundCheck,
   students: Users,
   teachers: GraduationCap,
   users: UserRoundCog,
@@ -65,7 +67,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
         !isSidebar && sections.length === 3 && "grid-cols-3",
         !isSidebar && sections.length === 4 && "grid-cols-4",
         !isSidebar && sections.length === 5 && "grid-cols-5",
-        !isSidebar && sections.length === 7 && "grid-cols-7",
+        !isSidebar && sections.length === 8 && "grid-cols-8",
       )}
     >
       {sections.map((section) => {

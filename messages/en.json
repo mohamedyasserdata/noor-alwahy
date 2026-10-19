@@ -114,6 +114,11 @@
           "title": "Teacher records",
           "description": "Manage qualifications, capacity, teaching tracks, verification, and availability."
         },
+        "assignments": {
+          "label": "Assignments",
+          "title": "Teacher assignments",
+          "description": "Match students with eligible teachers and retain the complete assignment history."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",
@@ -666,6 +671,49 @@
     "errors": {
       "invalidFields": "Review the student details and try again.",
       "requestFailed": "The student record could not be saved. No partial change was kept."
+    }
+  },
+  "assignmentManagement": {
+    "eyebrow": "Student and teacher matching",
+    "title": "Smart teacher assignments",
+    "description": "Choose a student and track to see only same-gender, track-qualified teachers with remaining capacity, ranked by approved availability and workload.",
+    "student": "Student",
+    "track": "Track",
+    "chooseStudent": "Choose a student",
+    "chooseTrack": "Choose a track",
+    "suggest": "Show candidates",
+    "candidateTitle": "Suggested teachers",
+    "changeTitle": "Change the current teacher",
+    "candidateDescription": "Opposite-gender teachers and teachers at full capacity are excluded by the database.",
+    "nearCapacity": "At least 85% full",
+    "available": "Capacity available",
+    "load": "Current load",
+    "approvedSlots": "Approved time blocks",
+    "reason": "Required reason",
+    "assign": "Assign teacher",
+    "change": "Change teacher",
+    "pause": "Pause assignment",
+    "resume": "Resume assignment",
+    "end": "End assignment",
+    "saving": "Saving…",
+    "noCandidates": "No eligible teacher currently has remaining capacity.",
+    "currentTitle": "Current assignment",
+    "noCurrent": "No current assignment for this student and track.",
+    "historyTitle": "Complete assignment history",
+    "genders": { "male": "Male", "female": "Female" },
+    "statuses": { "active": "Active", "paused": "Paused", "ended": "Ended" },
+    "notices": {
+      "assign": "Teacher assigned.",
+      "change": "Teacher changed and prior history retained.",
+      "pause": "Assignment paused.",
+      "resume": "Assignment resumed.",
+      "end": "Assignment ended."
+    },
+    "errors": {
+      "invalid_fields": "Choose valid records and enter a reason.",
+      "gender_mismatch": "Student and teacher gender must match.",
+      "capacity_reached": "This teacher has reached capacity.",
+      "request_failed": "The assignment change could not be saved."
     }
   },
   "teacherManagement": {

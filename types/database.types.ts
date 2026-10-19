@@ -766,6 +766,16 @@ export type Database = {
         }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      manage_teacher_assignment: {
+        Args: {
+          p_action?: string;
+          p_reason: string;
+          p_student: string;
+          p_teacher: string;
+          p_track: string;
+        };
+        Returns: string;
+      };
       record_student_export: { Args: { p_count: number }; Returns: undefined };
       remove_student_guardian: {
         Args: { p_guardian_id: string; p_student_id: string };
@@ -774,6 +784,19 @@ export type Database = {
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;
+      };
+      suggest_teachers: {
+        Args: { p_student: string; p_track: string };
+        Returns: {
+          approved_slots: number;
+          current_load: number;
+          max_students: number;
+          near_capacity: boolean;
+          remaining_capacity: number;
+          teacher_id: string;
+          teacher_name: string;
+          timezone: string;
+        }[];
       };
       update_public_app_settings: {
         Args: { p_academy_profile: Json; p_support_hours: Json };

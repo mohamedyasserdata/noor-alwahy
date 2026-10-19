@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 import { AuditLogSection } from "@/components/admin/audit-log-section";
+import { AssignmentManagementSection } from "@/components/admin/assignment-management-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
 import { StudentManagementSection } from "@/components/admin/student-management-section";
@@ -43,6 +44,10 @@ export default async function AdminSectionPage({
 
   if (section === "teachers") {
     return <TeacherManagementSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "assignments") {
+    return <AssignmentManagementSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {
