@@ -30,6 +30,12 @@ This repository is the shared source of truth for every developer and Codex sess
   in `docs/PROJECT_STATUS.md` that another device is not already editing the same task.
 - Use one active writer per task branch. Different devices must use different task branches and
   integrate through a pull request or an explicit, reviewed merge.
+- Treat a task completed and pushed by the other device as an accepted handoff when its focused
+  tests and exact results are recorded in `docs/PROJECT_STATUS.md`. Continue with the next task;
+  do not re-review its implementation or rerun its focused tests. Re-test only code changed by the
+  current device and run the shared full quality/database/RLS gate once at the phase boundary.
+- Fetching remote refs and checking task ownership is still required to avoid duplicate work; it is
+  coordination, not a second implementation review.
 - Create an independent commit for each completed task. Create descriptive checkpoint commits for
   meaningful unfinished progress, and record the exact continuation point in `PROJECT_STATUS.md`.
 - Never use force push, history rewriting, or destructive Git commands. Resolve divergence by
