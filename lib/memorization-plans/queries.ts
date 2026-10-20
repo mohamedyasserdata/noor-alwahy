@@ -88,7 +88,9 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
     .sort((left, right) => left.studentName.localeCompare(right.studentName));
 }
 
-export async function getStudentMemorizationPlan(): Promise<PlanAdherence | null> {
+export async function getStudentMemorizationPlan(
+  requestedStudentId?: string,
+): Promise<PlanAdherence | null> {
   await connection();
   const supabase = await createClient();
   const {
@@ -96,11 +98,10 @@ export async function getStudentMemorizationPlan(): Promise<PlanAdherence | null
   } = await supabase.auth.getUser();
   if (!user) throw new Error("memorization_plan_auth_required");
 
-  const { data: student, error: studentError } = await supabase
-    .from("students")
-    .select("id")
-    .eq("profile_id", user.id)
-    .single();
+  const studentQuery = supabase.from("students").select("id");
+  const { data: student, error: studentError } = requestedStudentId
+    ? await studentQuery.eq("id", requestedStudentId).single()
+    : await studentQuery.eq("profile_id", user.id).single();
   if (studentError) throw new Error("memorization_plan_student_unavailable");
 
   const { data, error } = await supabase

@@ -30,7 +30,7 @@ function one<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-export async function getStudentQuranMap() {
+export async function getStudentQuranMap(requestedStudentId?: string) {
   await connection();
   const supabase = await createClient();
   const {
@@ -38,11 +38,10 @@ export async function getStudentQuranMap() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("quran_map_auth_required");
 
-  const { data: student, error: studentError } = await supabase
-    .from("students")
-    .select("id,full_name")
-    .eq("profile_id", user.id)
-    .single();
+  const studentQuery = supabase.from("students").select("id,full_name");
+  const { data: student, error: studentError } = requestedStudentId
+    ? await studentQuery.eq("id", requestedStudentId).single()
+    : await studentQuery.eq("profile_id", user.id).single();
   if (studentError) throw new Error("quran_map_student_unavailable");
 
   const [pagesResult, surahsResult, progressResult] = await Promise.all([
