@@ -7,7 +7,8 @@
 ## التشغيل المحلي
 
 يتطلب تشغيل التطبيق Docker Desktop أو Podman لإقلاع Supabase المحلي. انسخ `.env.example`
-إلى `.env.local` واملأ URL والمفتاح العام من ناتج CLI بعد الإقلاع، ثم نفّذ:
+إلى `.env.local` واملأ URL والمفتاح العام و`SUPABASE_SERVICE_ROLE_KEY` من ناتج CLI بعد
+الإقلاع. يبقى مفتاح الخدمة داخل `.env.local` المتجاهل من Git ويُستخدم على الخادم فقط، ثم نفّذ:
 
 ```bash
 pnpm install
