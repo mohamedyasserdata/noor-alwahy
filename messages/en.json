@@ -535,6 +535,44 @@
       "requestFailed": "The academy settings could not be updated. No partial change was kept."
     }
   },
+  "evaluationSettings": {
+    "eyebrow": "Evaluation criteria",
+    "title": "Evaluation weights and deductions",
+    "description": "Configure score calculation for each session type. Changes are saved atomically and recorded for review.",
+    "cardDescription": "{count, plural, =1 {One applicable criterion} other {# applicable criteria}}",
+    "sessions": {
+      "new_memo": "New memorization",
+      "near_review": "Near review",
+      "far_review": "Far review",
+      "recitation": "Recitation",
+      "noorani": "Noorani",
+      "matn_theory": "Matn and theory"
+    },
+    "groups": {
+      "weights": "Criterion weights",
+      "deductions": "Deduction per error",
+      "thresholds": "Rating thresholds"
+    },
+    "fields": {
+      "major": "Major error",
+      "minor": "Minor error",
+      "prompt": "Prompt",
+      "forgot": "Forgotten passage"
+    },
+    "thresholdHint": "Thresholds must increase from the lowest rating without duplicates.",
+    "rating": "Rating {rating}",
+    "action": {
+      "save": "Save session settings",
+      "saving": "Saving…"
+    },
+    "notices": {
+      "updated": "The settings for {session} were updated."
+    },
+    "errors": {
+      "invalidFields": "Check the weights, deductions, and threshold order, then try again.",
+      "requestFailed": "The evaluation settings could not be updated. No partial change was kept."
+    }
+  },
   "studentManagement": {
     "eyebrow": "Student directory",
     "title": "Students",

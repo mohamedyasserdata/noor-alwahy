@@ -6,6 +6,7 @@ import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AssignmentManagementSection } from "@/components/admin/assignment-management-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
+import { EvaluationSettingsSection } from "@/components/admin/evaluation-settings-section";
 import { StudentManagementSection } from "@/components/admin/student-management-section";
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
@@ -64,6 +65,7 @@ export default async function AdminSectionPage({
     return (
       <div className="grid gap-16">
         <AppSettingsSection locale={locale} searchParams={searchParams} />
+        <EvaluationSettingsSection locale={locale} searchParams={searchParams} />
         <ContactLinksAdminSection locale={locale} searchParams={searchParams} embedded />
       </div>
     );
