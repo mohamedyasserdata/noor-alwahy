@@ -130,6 +130,7 @@ export async function ScheduleSection({
           title: t("exports.title"),
           description: t("exports.description"),
           download: t("exports.download"),
+          downloadPdf: t("exports.downloadPdf"),
           generate: t("exports.generate"),
           generating: t("exports.generating"),
           copy: t("exports.copy"),

@@ -6,6 +6,7 @@ import {
   foldICalLine,
   type CalendarFeedRow,
 } from "../../lib/calendar/ical";
+import { createScheduleHtml } from "../../lib/calendar/pdf";
 
 const event: CalendarFeedRow = {
   owner_name: "طالب الاختبار",
@@ -82,6 +83,25 @@ describe("iCalendar export", () => {
     expect(() => render([{ ...event, scheduled_at: "not-a-time" }])).toThrow(
       "invalid_calendar_timestamp",
     );
+  });
+});
+
+describe("schedule PDF template", () => {
+  it("renders localized safe schedule content without meeting secrets", async () => {
+    const html = await createScheduleHtml({
+      ownerName: "طالب الاختبار الطويل",
+      ownerTimezone: "Africa/Cairo",
+      ownerLocale: "ar",
+      rows: [event],
+      generatedAt: "2026-10-20T12:00:00Z",
+    });
+
+    expect(html).toContain("جدول الحصص");
+    expect(html).toContain("طالب الاختبار الطويل");
+    expect(html).toContain("أحمد, علي; الطويل");
+    expect(html).toContain("Africa/Cairo");
+    expect(html).not.toMatch(/zoom|meeting-secret|passcode-secret/i);
+    expect(html).not.toContain("<script");
   });
 });
 

@@ -16,6 +16,7 @@ type Labels = {
   title: string;
   description: string;
   download: string;
+  downloadPdf: string;
   generate: string;
   generating: string;
   copy: string;
@@ -107,6 +108,11 @@ export function CalendarExports({ labels }: { labels: Labels }) {
         <Button asChild variant="gold">
           <Link href="/api/calendar/download" prefetch={false} download>
             <Download aria-hidden="true" /> {labels.download}
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/api/calendar/pdf" prefetch={false} download>
+            <Download aria-hidden="true" /> {labels.downloadPdf}
           </Link>
         </Button>
         <Button type="button" variant="outline" onClick={generate} disabled={isPending}>

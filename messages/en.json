@@ -938,6 +938,7 @@
       "title": "Calendar export",
       "description": "Download your upcoming sessions or create a private subscription link for your calendar app.",
       "download": "Download iCal",
+      "downloadPdf": "Download PDF",
       "generate": "Create private link",
       "generating": "Creating…",
       "copy": "Copy link",

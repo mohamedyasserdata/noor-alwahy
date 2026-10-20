@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
@@ -27,6 +29,15 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
   expect(authenticatedCalendar).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
   expect(authenticatedCalendar).toContain("X-WR-TIMEZONE:Africa/Cairo");
   expect(authenticatedCalendar).not.toMatch(/calendar-zoom-secret|meeting-secret|passcode-secret/i);
+
+  const pdfDownload = await page.request.get("/api/calendar/pdf");
+  expect(pdfDownload.status()).toBe(200);
+  expect(pdfDownload.headers()["content-type"]).toContain("application/pdf");
+  const pdf = await pdfDownload.body();
+  expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
+  const pdfDir = resolve("output/pdf");
+  await mkdir(pdfDir, { recursive: true });
+  await writeFile(resolve(pdfDir, "schedule-e2e.pdf"), pdf);
 
   await page.getByRole("button", { name: "Create private link" }).click();
   await expect(page.getByText(/A new private link was created/)).toBeVisible();
@@ -99,7 +110,7 @@ async function createFixture() {
   });
   if (assignmentError) throw assignmentError;
 
-  const scheduledAt = DateTime.utc().plus({ days: 24 }).startOf("hour").plus({ minutes: 7 });
+  const scheduledAt = await findAvailableSlot(db, teacherId, studentId);
   const { error: sessionError } = await db.from("sessions").insert({
     id: sessionId,
     assignment_id: assignmentId,
@@ -115,6 +126,34 @@ async function createFixture() {
   if (sessionError) throw sessionError;
 
   return { sessionId };
+}
+
+async function findAvailableSlot(db: FixtureClient, teacherId: string, studentId: string) {
+  const windowStart = DateTime.utc().plus({ days: 23 }).startOf("day").plus({ hours: 1 });
+  const windowEnd = DateTime.utc().plus({ days: 27 }).endOf("day");
+  const { data, error } = await db
+    .from("sessions")
+    .select("scheduled_at,ends_at")
+    .or(`teacher_id.eq.${teacherId},student_id.eq.${studentId}`)
+    .gte("scheduled_at", windowStart.toISO())
+    .lt("scheduled_at", windowEnd.toISO());
+  if (error) throw error;
+
+  for (
+    let candidate = windowStart;
+    candidate < windowEnd;
+    candidate = candidate.plus({ minutes: 30 })
+  ) {
+    const candidateEnd = candidate.plus({ minutes: 20 });
+    const overlaps = data.some((session) => {
+      const start = DateTime.fromISO(session.scheduled_at, { setZone: true });
+      const end = DateTime.fromISO(session.ends_at, { setZone: true });
+      return candidate < end && candidateEnd > start;
+    });
+    if (!overlaps) return candidate;
+  }
+
+  throw new Error("No available calendar export test slot.");
 }
 
 async function findOrCreateTeacher(db: FixtureClient) {

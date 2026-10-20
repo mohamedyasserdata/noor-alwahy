@@ -21,6 +21,10 @@ pnpm dev
 مرجع نظام التصميم الإنجليزي مباشرة من `/en/dev/ui` أو عبر مبدّل اللغة. صفحة التحقق من اتصال
 Supabase متاحة محليًا في `/ar/dev/supabase` و`/en/dev/supabase`.
 
+يستخدم `pnpm dev` متصفح Playwright المحلي تلقائيًا لتوليد PDF. في بيئة الإنتاج فقط، اضبط
+`CHROMIUM_PACK_URL` على رابط HTTPS لحزمة Chromium المتوافقة مع إصدار
+`@sparticuz/chromium-min` المثبت؛ يبقى المتغير على الخادم ولا يصل إلى المتصفح.
+
 ## بوابة الجودة المتاحة الآن
 
 ```bash
