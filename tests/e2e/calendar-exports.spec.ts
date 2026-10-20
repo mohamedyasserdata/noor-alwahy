@@ -15,74 +15,82 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     if (message.type() === "error") consoleErrors.push(message.text());
   });
 
-  await signInAs(page, "en", "student");
-  await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/en/student/schedule");
-  await expect(page.getByRole("heading", { name: "Calendar export" })).toBeVisible();
-  await expect(page.getByText("Africa/Cairo", { exact: true }).first()).toBeVisible();
+  try {
+    await signInAs(page, "en", "student");
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto("/en/student/schedule");
+    await expect(page.getByRole("heading", { name: "Calendar export" })).toBeVisible();
+    await expect(page.getByText("Africa/Cairo", { exact: true }).first()).toBeVisible();
 
-  const download = await page.request.get("/api/calendar/download");
-  expect(download.status()).toBe(200);
-  expect(download.headers()["content-type"]).toContain("text/calendar");
-  expect(download.headers()["content-disposition"]).toContain("attachment");
-  const authenticatedCalendar = await download.text();
-  expect(authenticatedCalendar).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
-  expect(authenticatedCalendar).toContain("X-WR-TIMEZONE:Africa/Cairo");
-  expect(authenticatedCalendar).not.toMatch(/calendar-zoom-secret|meeting-secret|passcode-secret/i);
+    const download = await page.request.get("/api/calendar/download");
+    expect(download.status()).toBe(200);
+    expect(download.headers()["content-type"]).toContain("text/calendar");
+    expect(download.headers()["content-disposition"]).toContain("attachment");
+    const authenticatedCalendar = await download.text();
+    expect(authenticatedCalendar).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
+    expect(authenticatedCalendar).toContain("X-WR-TIMEZONE:Africa/Cairo");
+    expect(authenticatedCalendar).not.toMatch(
+      /calendar-zoom-secret|meeting-secret|passcode-secret/i,
+    );
 
-  const pdfDownload = await page.request.get("/api/calendar/pdf");
-  expect(pdfDownload.status()).toBe(200);
-  expect(pdfDownload.headers()["content-type"]).toContain("application/pdf");
-  const pdf = await pdfDownload.body();
-  expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
-  const pdfDir = resolve("output/pdf");
-  await mkdir(pdfDir, { recursive: true });
-  await writeFile(resolve(pdfDir, "schedule-e2e.pdf"), pdf);
+    const pdfDownload = await page.request.get("/api/calendar/pdf");
+    expect(pdfDownload.status()).toBe(200);
+    expect(pdfDownload.headers()["content-type"]).toContain("application/pdf");
+    const pdf = await pdfDownload.body();
+    expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
+    const pdfDir = resolve("output/pdf");
+    await mkdir(pdfDir, { recursive: true });
+    await writeFile(resolve(pdfDir, "schedule-e2e.pdf"), pdf);
 
-  await page.getByRole("button", { name: "Create private link" }).click();
-  await expect(page.getByText(/A new private link was created/)).toBeVisible();
-  const input = page.locator("#calendar-subscription-url");
-  const firstUrl = await input.inputValue();
-  expect(firstUrl).toMatch(/\/api\/calendar\/[A-Za-z0-9_-]{43}$/);
+    await page.getByRole("button", { name: "Create private link" }).click();
+    await expect(page.getByText(/A new private link was created/)).toBeVisible();
+    const input = page.locator("#calendar-subscription-url");
+    const firstUrl = await input.inputValue();
+    expect(firstUrl).toMatch(/\/api\/calendar\/[A-Za-z0-9_-]{43}$/);
 
-  const firstFeed = await page.request.get(firstUrl);
-  expect(firstFeed.status()).toBe(200);
-  expect(firstFeed.headers()["cache-control"]).toContain("no-store");
-  expect(await firstFeed.text()).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
+    const firstFeed = await page.request.get(firstUrl);
+    expect(firstFeed.status()).toBe(200);
+    expect(firstFeed.headers()["cache-control"]).toContain("no-store");
+    expect(await firstFeed.text()).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
 
-  await page.getByRole("button", { name: "Create private link" }).click();
-  await expect(input).not.toHaveValue(firstUrl);
-  const secondUrl = await input.inputValue();
-  expect(secondUrl).not.toBe(firstUrl);
-  expect((await page.request.get(firstUrl)).status()).toBe(404);
-  expect((await page.request.get(secondUrl)).status()).toBe(200);
+    await page.getByRole("button", { name: "Create private link" }).click();
+    await expect(input).not.toHaveValue(firstUrl);
+    const secondUrl = await input.inputValue();
+    expect(secondUrl).not.toBe(firstUrl);
+    expect((await page.request.get(firstUrl)).status()).toBe(404);
+    expect((await page.request.get(secondUrl)).status()).toBe(200);
 
-  const rawToken = new URL(secondUrl).pathname.split("/").at(-1);
-  const db = serviceClient();
-  const { data: storedToken, error: tokenError } = await db
-    .from("calendar_feed_tokens")
-    .select("token_hash")
-    .eq("user_id", "10000000-0000-4000-8000-000000000003")
-    .single();
-  if (tokenError) throw tokenError;
-  expect(storedToken.token_hash).toMatch(/^[0-9a-f]{64}$/);
-  expect(storedToken.token_hash).not.toBe(rawToken);
+    const rawToken = new URL(secondUrl).pathname.split("/").at(-1);
+    const db = serviceClient();
+    const { data: storedToken, error: tokenError } = await db
+      .from("calendar_feed_tokens")
+      .select("token_hash")
+      .eq("user_id", "10000000-0000-4000-8000-000000000003")
+      .single();
+    if (tokenError) throw tokenError;
+    expect(storedToken.token_hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(storedToken.token_hash).not.toBe(rawToken);
 
-  await page.getByRole("button", { name: "Revoke link" }).click();
-  await expect(page.getByText("The private calendar link was revoked.")).toBeVisible();
-  expect((await page.request.get(secondUrl)).status()).toBe(404);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
-  expect(consoleErrors).toEqual([]);
+    await page.getByRole("button", { name: "Revoke link" }).click();
+    await expect(page.getByText("The private calendar link was revoked.")).toBeVisible();
+    expect((await page.request.get(secondUrl)).status()).toBe(404);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    expect(consoleErrors).toEqual([]);
+  } finally {
+    await cleanupFixture(fixture);
+  }
 });
 
 type FixtureClient = SupabaseClient<Database>;
 
 async function createFixture() {
   const db = serviceClient();
-  const teacherId = await findOrCreateTeacher(db);
-  const studentId = await findOrCreateStudent(db);
+  const teacher = await findOrCreateTeacher(db);
+  const student = await findOrCreateStudent(db);
+  const teacherId = teacher.id;
+  const studentId = student.id;
   const trackId = crypto.randomUUID();
   const assignmentId = crypto.randomUUID();
   const sessionId = crypto.randomUUID();
@@ -125,7 +133,42 @@ async function createFixture() {
   });
   if (sessionError) throw sessionError;
 
-  return { sessionId };
+  return {
+    assignmentId,
+    sessionId,
+    studentCreated: student.created,
+    studentId,
+    teacherCreated: teacher.created,
+    teacherId,
+    trackId,
+  };
+}
+
+async function cleanupFixture(fixture: Awaited<ReturnType<typeof createFixture>>) {
+  const db = serviceClient();
+  const operations = [
+    db.from("calendar_feed_tokens").delete().eq("user_id", "10000000-0000-4000-8000-000000000003"),
+    db.from("sessions").delete().eq("id", fixture.sessionId),
+    db.from("teacher_assignments").delete().eq("id", fixture.assignmentId),
+    db
+      .from("teacher_tracks")
+      .delete()
+      .eq("teacher_id", fixture.teacherId)
+      .eq("track_id", fixture.trackId),
+    db.from("tracks").delete().eq("id", fixture.trackId),
+  ];
+  for (const operation of operations) {
+    const { error } = await operation;
+    if (error) throw error;
+  }
+  if (fixture.teacherCreated) {
+    const { error } = await db.from("teachers").delete().eq("id", fixture.teacherId);
+    if (error) throw error;
+  }
+  if (fixture.studentCreated) {
+    const { error } = await db.from("students").delete().eq("id", fixture.studentId);
+    if (error) throw error;
+  }
 }
 
 async function findAvailableSlot(db: FixtureClient, teacherId: string, studentId: string) {
@@ -159,7 +202,7 @@ async function findAvailableSlot(db: FixtureClient, teacherId: string, studentId
 async function findOrCreateTeacher(db: FixtureClient) {
   const profileId = "10000000-0000-4000-8000-000000000002";
   const { data } = await db.from("teachers").select("id").eq("profile_id", profileId).maybeSingle();
-  if (data) return data.id;
+  if (data) return { created: false, id: data.id };
   const id = crypto.randomUUID();
   const now = DateTime.utc().toISO();
   const { error } = await db.from("teachers").insert({
@@ -171,13 +214,13 @@ async function findOrCreateTeacher(db: FixtureClient) {
     code_of_conduct_accepted_at: now,
   });
   if (error) throw error;
-  return id;
+  return { created: true, id };
 }
 
 async function findOrCreateStudent(db: FixtureClient) {
   const profileId = "10000000-0000-4000-8000-000000000003";
   const { data } = await db.from("students").select("id").eq("profile_id", profileId).maybeSingle();
-  if (data) return data.id;
+  if (data) return { created: false, id: data.id };
   const id = crypto.randomUUID();
   const { error } = await db.from("students").insert({
     id,
@@ -187,7 +230,7 @@ async function findOrCreateStudent(db: FixtureClient) {
     timezone: "Africa/Cairo",
   });
   if (error) throw error;
-  return id;
+  return { created: true, id };
 }
 
 function serviceClient() {
