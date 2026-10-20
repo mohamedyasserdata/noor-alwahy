@@ -2,6 +2,7 @@ import { CalendarClock, Clock3, Globe2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { SessionAdjustmentsSection } from "@/components/schedule/session-adjustments-section";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,8 @@ export async function ScheduleSection({
   ]);
   const status = typeof query.scheduleStatus === "string" ? query.scheduleStatus : "";
   const error = typeof query.scheduleError === "string" ? query.scheduleError : "";
+  const adjustmentStatus = typeof query.adjustmentStatus === "string" ? query.adjustmentStatus : "";
+  const adjustmentError = typeof query.adjustmentError === "string" ? query.adjustmentError : "";
   return (
     <section className="mx-auto w-full max-w-7xl" aria-labelledby="schedule-title">
       <header className="max-w-3xl">
@@ -51,15 +54,15 @@ export async function ScheduleSection({
       {data.role === "admin" ? (
         <form
           action={saveScheduleSlotAction.bind(null, locale)}
-          className="mt-8 grid gap-4 rounded-3xl border bg-card p-5 shadow-card lg:grid-cols-5 lg:items-end"
+          className="mt-8 grid min-w-0 gap-4 rounded-3xl border bg-card p-5 shadow-card lg:grid-cols-5 lg:items-end"
         >
-          <div className="grid gap-2 lg:col-span-2">
+          <div className="grid min-w-0 gap-2 lg:col-span-2">
             <Label htmlFor="schedule-assignment">{t("assignment")}</Label>
             <select
               id="schedule-assignment"
               name="assignmentId"
               required
-              className="min-h-11 rounded-xl border bg-background px-3"
+              className="min-h-11 w-full min-w-0 rounded-xl border bg-background px-3"
             >
               <option value="">{t("chooseAssignment")}</option>
               {data.assignments.map((assignment) => {
@@ -82,7 +85,7 @@ export async function ScheduleSection({
               id="schedule-weekday"
               name="weekday"
               required
-              className="min-h-11 rounded-xl border bg-background px-3"
+              className="min-h-11 w-full min-w-0 rounded-xl border bg-background px-3"
             >
               {[0, 1, 2, 3, 4, 5, 6].map((day) => (
                 <option value={day} key={day}>
@@ -160,6 +163,15 @@ export async function ScheduleSection({
           </p>
         )}
       </div>
+      {data.adjustments ? (
+        <SessionAdjustmentsSection
+          locale={locale}
+          timezone={data.timezone}
+          data={data.adjustments}
+          status={adjustmentStatus}
+          error={adjustmentError}
+        />
+      ) : null}
     </section>
   );
 }

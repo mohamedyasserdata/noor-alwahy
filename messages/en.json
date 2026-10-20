@@ -921,6 +921,58 @@
       "invalid_fields": "Review the day, time, duration and IANA time zone.",
       "duplicate": "This weekly time already exists.",
       "request_failed": "The weekly time could not be saved."
+    },
+    "adjustments": {
+      "title": "Upcoming session approvals",
+      "description": "Assign cover, move a session, or use a makeup entitlement while preserving the source of every change.",
+      "approvalBadge": "Administration approval with MFA",
+      "currentTeacher": "Current teacher: {name}",
+      "unknown": "Unavailable",
+      "duration": "Session length: {count} minutes",
+      "substituteTitle": "Substitute teacher",
+      "substituteTeacher": "Eligible teacher",
+      "chooseTeacher": "Choose a matching teacher",
+      "scope": "Cover period",
+      "scopeSession": "This session only",
+      "scopeWeek": "This session and the next 7 days",
+      "saveSubstitute": "Approve substitute",
+      "noEligibleTeacher": "No other teacher currently matches the student and track.",
+      "rescheduleTitle": "Reschedule",
+      "newTime": "New date and time",
+      "timezoneNote": "Time is read in your zone: {timezone}",
+      "saveReschedule": "Approve new time",
+      "saving": "Approving…",
+      "emptySessions": "There are no upcoming sessions to manage.",
+      "makeupTitle": "Available makeup entitlements",
+      "makeupDescription": "Each entitlement creates one makeup session before its expiry date.",
+      "expires": "Available until {date}",
+      "availableMakeup": "Makeup available",
+      "makeupTime": "Makeup date and time",
+      "makeupTeacher": "Session teacher",
+      "defaultTeacher": "Use the original teacher",
+      "createMakeup": "Create makeup session",
+      "emptyMakeups": "There are no available makeup entitlements.",
+      "kinds": {
+        "regular": "Regular session",
+        "trial": "Trial session",
+        "makeup": "Makeup session",
+        "extra": "Extra session"
+      },
+      "statuses": {
+        "substitute_saved": "The substitute was approved and session participants were notified.",
+        "makeup_saved": "The makeup session was created and linked to its entitlement.",
+        "rescheduled": "The replacement time was created and linked to the original session."
+      },
+      "errors": {
+        "invalid_fields": "Review the selected session, teacher, and time.",
+        "invalid_time": "This time is invalid in your time zone or falls in a repeated daylight-saving hour.",
+        "gender_mismatch": "The teacher does not match the student's gender.",
+        "teacher_not_eligible": "The teacher is inactive or is not eligible for this track.",
+        "conflict": "The teacher or student already has another session at that time.",
+        "entitlement_unavailable": "The makeup entitlement has expired or was already used.",
+        "session_not_adjustable": "The session is no longer scheduled or already has a replacement.",
+        "request_failed": "The change could not be approved. No partial changes were saved."
+      }
     }
   },
   "nextSession": {
