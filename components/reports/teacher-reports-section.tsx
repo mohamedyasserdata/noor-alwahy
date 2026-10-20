@@ -1,4 +1,5 @@
-import { BarChart3, CheckCircle2, FilePenLine, ShieldCheck } from "lucide-react";
+import { BarChart3, CheckCircle2, Download, FilePenLine, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Alert } from "@/components/ui/alert";
@@ -47,6 +48,7 @@ const copy = {
     attendance: "الحضور",
     evaluation: "متوسط التقييم",
     noData: "لا بيانات",
+    download: "تنزيل PDF",
     status: {
       draft: "مسودة",
       approved: "معتمد",
@@ -88,6 +90,7 @@ const copy = {
     attendance: "Attendance",
     evaluation: "Evaluation average",
     noData: "No data",
+    download: "Download PDF",
     status: {
       draft: "Draft",
       approved: "Approved",
@@ -172,17 +175,25 @@ export async function TeacherReportsSection({
                         {report.period_start} — {report.period_end}
                       </p>
                     </div>
-                    <Badge
-                      variant={
-                        report.status === "visible"
-                          ? "success"
-                          : report.status === "draft"
-                            ? "outline"
-                            : "secondary"
-                      }
-                    >
-                      {t.status[report.status]}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant={
+                          report.status === "visible"
+                            ? "success"
+                            : report.status === "draft"
+                              ? "outline"
+                              : "secondary"
+                        }
+                      >
+                        {t.status[report.status]}
+                      </Badge>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/api/pdf/reports/${report.id}?locale=${locale}`}>
+                          <Download className="size-4" aria-hidden="true" />
+                          {t.download}
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-3 divide-x border-b text-center divide-x-reverse">
                     <Metric label={t.pages} value={String(report.body.metrics.mastered_pages)} />

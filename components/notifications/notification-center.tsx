@@ -323,5 +323,6 @@ function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"n
   if (type === "zoom_link_changed") return t("types.zoomLinkChanged");
   if (type === "teacher_late") return t("types.teacherLate");
   if (type === "teacher_absence_threshold") return t("types.teacherAbsenceThreshold");
+  if (type === "report_approved") return t("types.reportApproved");
   return t("types.generic");
 }

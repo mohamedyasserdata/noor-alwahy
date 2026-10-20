@@ -1150,6 +1150,7 @@
       "zoomLinkChanged": "تغيّر رابط إحدى الحصص",
       "teacherLate": "تأخر مدرس عن موعد إحدى الحصص",
       "teacherAbsenceThreshold": "بلغ مدرس عتبة تنبيه الغياب",
+      "reportApproved": "تم اعتماد تقرير الطالب",
       "generic": "لديك تحديث جديد من الأكاديمية"
     }
   },

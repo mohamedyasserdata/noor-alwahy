@@ -1150,6 +1150,7 @@
       "zoomLinkChanged": "A session link has changed",
       "teacherLate": "A teacher is late for a session",
       "teacherAbsenceThreshold": "A teacher reached the absence alert threshold",
+      "reportApproved": "Student report approved",
       "generic": "You have a new academy update"
     }
   },
