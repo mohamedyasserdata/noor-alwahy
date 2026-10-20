@@ -123,10 +123,12 @@ export async function ScheduleSection({
         </form>
       ) : null}
       <CalendarExports
+        locale={locale}
         labels={{
           title: t("exports.title"),
           description: t("exports.description"),
           download: t("exports.download"),
+          downloadPdf: t("exports.downloadPdf"),
           generate: t("exports.generate"),
           generating: t("exports.generating"),
           copy: t("exports.copy"),

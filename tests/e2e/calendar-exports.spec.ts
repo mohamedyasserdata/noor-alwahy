@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
@@ -27,6 +29,17 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
   expect(authenticatedCalendar).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
   expect(authenticatedCalendar).toContain("X-WR-TIMEZONE:Africa/Cairo");
   expect(authenticatedCalendar).not.toMatch(/calendar-zoom-secret|meeting-secret|passcode-secret/i);
+
+  const pdfResponse = await page.request.get("/api/schedule/pdf?locale=ar");
+  expect(pdfResponse.status()).toBe(200);
+  expect(pdfResponse.headers()["content-type"]).toContain("application/pdf");
+  expect(pdfResponse.headers()["content-disposition"]).toContain("attachment");
+  const pdf = await pdfResponse.body();
+  expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
+  expect(pdf.byteLength).toBeLessThan(2_000_000);
+  const pdfOutput = resolve(process.cwd(), "output", "pdf");
+  await mkdir(pdfOutput, { recursive: true });
+  await writeFile(resolve(pdfOutput, "weekly-schedule-ar.pdf"), pdf);
 
   await page.getByRole("button", { name: "Create private link" }).click();
   await expect(page.getByText(/A new private link was created/)).toBeVisible();
@@ -98,6 +111,16 @@ async function createFixture() {
     reason: "Calendar export test",
   });
   if (assignmentError) throw assignmentError;
+
+  const cairoNow = DateTime.now().setZone("Africa/Cairo");
+  const { error: slotError } = await db.from("schedule_slots").insert({
+    assignment_id: assignmentId,
+    weekday: cairoNow.weekday % 7,
+    local_start_time: "18:30",
+    duration_min: 45,
+    anchor_timezone: "Africa/Cairo",
+  });
+  if (slotError) throw slotError;
 
   const scheduledAt = DateTime.utc().plus({ days: 24 }).startOf("hour").plus({ minutes: 7 });
   const { error: sessionError } = await db.from("sessions").insert({

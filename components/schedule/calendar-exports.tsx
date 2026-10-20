@@ -16,6 +16,7 @@ type Labels = {
   title: string;
   description: string;
   download: string;
+  downloadPdf: string;
   generate: string;
   generating: string;
   copy: string;
@@ -29,7 +30,7 @@ type Labels = {
   urlLabel: string;
 };
 
-export function CalendarExports({ labels }: { labels: Labels }) {
+export function CalendarExports({ labels, locale }: { labels: Labels; locale: "ar" | "en" }) {
   const [subscriptionUrl, setSubscriptionUrl] = useState("");
   const [notice, setNotice] = useState<"generated" | "revoked" | "error" | "copied" | null>(null);
   const [pendingAction, setPendingAction] = useState<"generate" | "revoke" | null>(null);
@@ -107,6 +108,11 @@ export function CalendarExports({ labels }: { labels: Labels }) {
         <Button asChild variant="gold">
           <Link href="/api/calendar/download" prefetch={false} download>
             <Download aria-hidden="true" /> {labels.download}
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href={`/api/schedule/pdf?locale=${locale}`} prefetch={false} download>
+            <Download aria-hidden="true" /> {labels.downloadPdf}
           </Link>
         </Button>
         <Button type="button" variant="outline" onClick={generate} disabled={isPending}>

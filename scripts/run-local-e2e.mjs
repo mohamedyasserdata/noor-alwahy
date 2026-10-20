@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import { chromium } from "@playwright/test";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const cliPath = resolve(projectRoot, "node_modules/supabase/dist/supabase.js");
@@ -32,6 +33,7 @@ const testResult = spawnSync(process.execPath, [playwrightCliPath, ...playwright
     NEXT_PUBLIC_SUPABASE_ANON_KEY: status.PUBLISHABLE_KEY,
     NEXT_PUBLIC_SUPABASE_URL: status.API_URL,
     SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,
+    CHROMIUM_EXECUTABLE_PATH: chromium.executablePath(),
   },
 });
 
