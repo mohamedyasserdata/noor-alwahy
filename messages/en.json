@@ -1153,6 +1153,52 @@
       "generic": "You have a new academy update"
     }
   },
+  "memorizationPlan": {
+    "weekly": "Weekly target",
+    "monthly": "Monthly target",
+    "studentCount": "{count} students",
+    "progressLabel": "{percent}% of the target is complete",
+    "pagesOfTarget": "{achieved} of {target} pages",
+    "teacher": {
+      "eyebrow": "A personal plan for every student",
+      "title": "Memorization plans and adherence",
+      "description": "Set realistic targets for your assigned students and follow mastered-page achievement automatically without manual totals.",
+      "studentsTitle": "Assigned students",
+      "studentsDescription": "Every change is saved within your current assignment scope.",
+      "emptyTitle": "No students are currently assigned",
+      "emptyDescription": "Memorization plans will appear after an active student is assigned to you.",
+      "newDescription": "Create the first weekly and monthly target for this student.",
+      "editDescription": "Adjust the target or plan dates; achievement comes from locked evaluations.",
+      "configured": "Active plan",
+      "notConfigured": "Not configured",
+      "dateHint": "Leave the end date empty for an ongoing plan."
+    },
+    "student": {
+      "title": "Your memorization plan",
+      "description": "Achievement is based on pages that became mastered during the current period.",
+      "active": "Active plan",
+      "emptyTitle": "Your memorization plan is being prepared",
+      "emptyDescription": "Your weekly and monthly targets will appear here after your teacher sets them."
+    },
+    "fields": {
+      "weekly": "Pages per week",
+      "monthly": "Pages per month",
+      "startsOn": "Starts on",
+      "endsOn": "Ends on (optional)"
+    },
+    "actions": {
+      "create": "Create plan",
+      "update": "Save changes",
+      "saving": "Saving plan…"
+    },
+    "notices": {
+      "saved": "The memorization plan was saved and adherence was refreshed."
+    },
+    "errors": {
+      "invalid_fields": "Review the targets and dates; the monthly target must be at least the weekly target.",
+      "request_failed": "The memorization plan could not be saved. No partial change was kept."
+    }
+  },
   "quranMap": {
     "eyebrow": "Your memorization at a glance",
     "title": "Quran progress map",

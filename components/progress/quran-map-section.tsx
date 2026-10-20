@@ -1,13 +1,16 @@
 import { getTranslations } from "next-intl/server";
 
 import { QuranMap } from "@/components/progress/quran-map";
+import { StudentPlanCard } from "@/components/progress/student-plan-card";
 import type { AppLocale } from "@/i18n/routing";
 import { getStudentQuranMap } from "@/lib/progress/quran-map";
+import { getStudentMemorizationPlan } from "@/lib/memorization-plans/queries";
 
 export async function QuranMapSection({ locale }: { locale: AppLocale }) {
-  const [t, data] = await Promise.all([
+  const [t, data, plan] = await Promise.all([
     getTranslations({ locale, namespace: "quranMap" }),
     getStudentQuranMap(),
+    getStudentMemorizationPlan(),
   ]);
 
   return (
@@ -24,6 +27,8 @@ export async function QuranMapSection({ locale }: { locale: AppLocale }) {
           {t("description", { name: data.studentName })}
         </p>
       </header>
+
+      <StudentPlanCard locale={locale} plan={plan} />
 
       <QuranMap
         locale={locale}
