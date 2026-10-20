@@ -9,6 +9,7 @@ import { ContactLinksAdminSection } from "@/components/admin/contact-links-secti
 import { StudentManagementSection } from "@/components/admin/student-management-section";
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
+import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { routing } from "@/i18n/routing";
@@ -53,6 +54,10 @@ export default async function AdminSectionPage({
 
   if (section === "schedule") {
     return <ScheduleSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "attendance") {
+    return <AttendanceReportSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

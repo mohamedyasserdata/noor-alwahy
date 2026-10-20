@@ -26,6 +26,12 @@ select is((select array_to_string(proconfig, ',') from pg_proc where oid = 'priv
 select has_column('public', 'subscriptions', 'policy_snapshot', 'subscriptions snapshot attendance policy');
 select ok(exists(select 1 from pg_constraint where conrelid = 'public.subscriptions'::regclass and conname = 'subscriptions_policy_snapshot_valid'), 'policy snapshot is database validated');
 
+-- This suite validates attendance effects against fixed historical timestamps. The dedicated
+-- attendance_controls suite verifies the production 48-hour default and lock enforcement.
+update public.app_settings
+set value = jsonb_set(value, '{attendance_lock_hours}', '87600'::jsonb)
+where key = 'attendance_policy';
+
 insert into auth.users (id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
   ('e7000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'attendance.substitute@test.local', '{"role":"teacher"}', '{"full_name":"Substitute Teacher"}', now(), now()),

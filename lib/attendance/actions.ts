@@ -34,6 +34,7 @@ export async function recordAttendanceAction(
     const knownCode = [
       "attendance_forbidden",
       "attendance_conflict",
+      "attendance_locked",
       "teacher_rate_missing",
       "active_subscription_required",
     ].find((code) => error.message.includes(code));

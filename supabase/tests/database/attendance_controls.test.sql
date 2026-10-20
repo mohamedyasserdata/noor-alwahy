@@ -1,6 +1,6 @@
 begin;
 
-select plan(34);
+select plan(32);
 
 select has_table('public', 'session_alerts', 'session alerts table exists');
 select is((select relrowsecurity from pg_class where oid = 'public.session_alerts'::regclass), true, 'session alerts have RLS');

@@ -885,11 +885,37 @@
       "invalid_fields": "The session or result could not be validated.",
       "attendance_forbidden": "You cannot record attendance for this session.",
       "attendance_conflict": "A different result is already recorded for this session.",
+      "attendance_locked": "The attendance deadline has passed. Contact administration if a result is still required.",
       "teacher_rate_missing": "Administration has not configured an applicable rate for this session.",
       "active_subscription_required": "No active subscription covers this session.",
       "profile_missing": "Your teacher profile has not been created yet.",
       "request_failed": "Attendance could not be recorded. No partial effects were saved."
     }
+  },
+  "attendanceReports": {
+    "eyebrow": "Attendance oversight",
+    "title": "Attendance reports",
+    "description": "Review daily, weekly, or monthly adherence for students and teachers from one protected view.",
+    "protected": "Administration · MFA protected",
+    "filters": { "period": "Report period", "anchor": "Date", "apply": "View report" },
+    "periods": { "daily": "Daily", "weekly": "Weekly", "monthly": "Monthly" },
+    "metrics": {
+      "scheduled": "Scheduled entries",
+      "attended": "Attended entries",
+      "teachers": "Teachers",
+      "students": "Students"
+    },
+    "groups": { "teachers": "Teacher adherence", "students": "Student adherence" },
+    "table": {
+      "name": "Name",
+      "scheduled": "Counted sessions",
+      "attended": "Attended",
+      "absent": "Absent",
+      "adherence": "Adherence"
+    },
+    "percentage": "{value}%",
+    "empty": "No attendance activity falls within this period.",
+    "error": "The attendance report could not be loaded. Verify your MFA session and try again."
   },
   "schedules": {
     "eyebrow": "Fixed weekly lessons",
@@ -1016,6 +1042,8 @@
     "types": {
       "scheduleChanged": "A session time has changed",
       "zoomLinkChanged": "A session link has changed",
+      "teacherLate": "A teacher is late for a session",
+      "teacherAbsenceThreshold": "A teacher reached the absence alert threshold",
       "generic": "You have a new academy update"
     }
   },

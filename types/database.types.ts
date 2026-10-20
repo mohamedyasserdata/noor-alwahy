@@ -572,6 +572,65 @@ export type Database = {
           },
         ];
       };
+      session_alerts: {
+        Row: {
+          created_at: string;
+          dedupe_key: string;
+          detected_at: string;
+          id: string;
+          metadata: NonNullable<Json>;
+          session_id: string;
+          student_id: string;
+          teacher_id: string;
+          type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          dedupe_key: string;
+          detected_at?: string;
+          id?: string;
+          metadata?: NonNullable<Json>;
+          session_id: string;
+          student_id: string;
+          teacher_id: string;
+          type: string;
+        };
+        Update: {
+          created_at?: string;
+          dedupe_key?: string;
+          detected_at?: string;
+          id?: string;
+          metadata?: NonNullable<Json>;
+          session_id?: string;
+          student_id?: string;
+          teacher_id?: string;
+          type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "session_alerts_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_alerts_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_alerts_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       session_credit_ledger: {
         Row: {
           created_at: string;
@@ -1414,6 +1473,18 @@ export type Database = {
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
+      };
+      get_attendance_report: {
+        Args: { p_anchor?: string; p_period: string };
+        Returns: {
+          absent_count: number;
+          adherence_percent: number;
+          attended_count: number;
+          entity_id: string;
+          entity_name: string;
+          entity_type: string;
+          scheduled_count: number;
+        }[];
       };
       get_session_join: {
         Args: { p_session_id: string };

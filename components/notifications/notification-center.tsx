@@ -321,5 +321,7 @@ function Preferences({
 function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"notifications">>) {
   if (type === "schedule_changed") return t("types.scheduleChanged");
   if (type === "zoom_link_changed") return t("types.zoomLinkChanged");
+  if (type === "teacher_late") return t("types.teacherLate");
+  if (type === "teacher_absence_threshold") return t("types.teacherAbsenceThreshold");
   return t("types.generic");
 }
