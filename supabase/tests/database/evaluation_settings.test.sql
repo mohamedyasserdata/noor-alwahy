@@ -80,7 +80,7 @@ set local role authenticated;
 select lives_ok($$update public.eval_weights set weight = 2 where session_type = 'new_memo' and criterion_code = 'memorization'$$, 'an AAL2 administrator changes a weight');
 reset role;
 select is((select weight from public.eval_weights where session_type = 'new_memo' and criterion_code = 'memorization'), 2::numeric, 'the administrator weight change persists');
-select is((select count(*)::integer from public.audit_logs where table_name = 'eval_weights' and operation = 'UPDATE' and user_id = '10000000-0000-4000-8000-000000000001'), 1, 'the administrator change is audited');
+select is((select count(*)::integer from public.audit_logs where table_name = 'eval_weights' and action = 'UPDATE' and user_id = '10000000-0000-4000-8000-000000000001'), 1, 'the administrator change is audited');
 
 select * from finish();
 

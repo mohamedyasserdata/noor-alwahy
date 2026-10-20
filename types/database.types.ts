@@ -201,6 +201,86 @@ export type Database = {
         };
         Relationships: [];
       };
+      eval_criteria: {
+        Row: {
+          applies_to: Database["public"]["Enums"]["session_type_t"][];
+          code: string;
+          name_ar: string;
+          name_en: string;
+          sort_order: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          applies_to: Database["public"]["Enums"]["session_type_t"][];
+          code: string;
+          name_ar: string;
+          name_en: string;
+          sort_order?: number;
+        };
+        Update: {
+          applies_to?: Database["public"]["Enums"]["session_type_t"][];
+          code?: string;
+          name_ar?: string;
+          name_en?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      eval_settings: {
+        Row: {
+          d_forgot: number;
+          d_major: number;
+          d_minor: number;
+          d_prompt: number;
+          rating_thresholds: NonNullable<Json>;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+        };
+        ComputedFields: never;
+        Insert: {
+          d_forgot?: number;
+          d_major?: number;
+          d_minor?: number;
+          d_prompt?: number;
+          rating_thresholds?: NonNullable<Json>;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+        };
+        Update: {
+          d_forgot?: number;
+          d_major?: number;
+          d_minor?: number;
+          d_prompt?: number;
+          rating_thresholds?: NonNullable<Json>;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+        };
+        Relationships: [];
+      };
+      eval_weights: {
+        Row: {
+          criterion_code: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          weight: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          criterion_code: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          weight: number;
+        };
+        Update: {
+          criterion_code?: string;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "eval_weights_criterion_code_fkey";
+            columns: ["criterion_code"];
+            isOneToOne: false;
+            referencedRelation: "eval_criteria";
+            referencedColumns: ["code"];
+          },
+        ];
+      };
       guardians: {
         Row: {
           created_at: string;
