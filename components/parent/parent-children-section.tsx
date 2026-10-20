@@ -1,11 +1,11 @@
 import { Baby, ChevronLeft, ChevronRight, Eye } from "lucide-react";
-import Link from "next/link";
 
 import { QuranMap } from "@/components/progress/quran-map";
 import { StudentPlanCard } from "@/components/progress/student-plan-card";
 import { StudentProgressDashboard } from "@/components/progress/student-progress-dashboard";
 import { Alert } from "@/components/ui/alert";
 import type { AppLocale } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { getStudentMemorizationPlan } from "@/lib/memorization-plans/queries";
 import { getGuardianChildren } from "@/lib/parent/children";
 import { getStudentProgressDashboard } from "@/lib/progress/dashboard";
@@ -47,12 +47,12 @@ export async function ParentChildrenSection({
           <Eye className="size-4" aria-hidden="true" />
           {ar ? "عرض ولي الأمر · قراءة فقط" : "Guardian view · Read only"}
         </p>
-        <h1
+        <h2
           id="parent-children-title"
           className="text-3xl font-black text-balance text-primary sm:text-4xl"
         >
           {ar ? `متابعة ${selected.name}` : `Following ${selected.name}`}
-        </h1>
+        </h2>
         <p className="mt-4 leading-8 text-muted-foreground">
           {ar
             ? "كل المؤشرات مأخوذة من سجلات الأكاديمية، ولا يمكن تعديلها من بوابة ولي الأمر."
@@ -67,7 +67,7 @@ export async function ParentChildrenSection({
         {children.map((child) => (
           <Link
             key={child.id}
-            href={`/parent/children?student=${child.id}`}
+            href={{ pathname: "/parent/children", query: { student: child.id } }}
             className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${child.id === selected.id ? "border-primary bg-primary text-primary-foreground" : "bg-card text-primary hover:border-secondary"}`}
             aria-current={child.id === selected.id ? "page" : undefined}
           >

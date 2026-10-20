@@ -129,6 +129,11 @@
           "title": "Evaluation settings",
           "description": "Calibrate criteria weights, deductions, and rating thresholds for every session type."
         },
+        "reports": {
+          "label": "Reports",
+          "title": "Report review",
+          "description": "Review student reports and publish them to families after approval."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",

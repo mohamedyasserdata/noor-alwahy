@@ -324,7 +324,7 @@ function ReportForm({
         </Field>
       ))}
       <div className="flex justify-end">
-        <Button type="submit" variant={report ? "default" : "secondary"}>
+        <Button type="submit" variant={report ? "default" : "gold"}>
           {report ? t.save : t.save}
         </Button>
       </div>

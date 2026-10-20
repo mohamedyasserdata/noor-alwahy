@@ -1,6 +1,6 @@
 begin;
 
-select plan(35);
+select plan(38);
 
 select has_table('public', 'reports', 'reports table exists');
 select has_column('public', 'reports', 'body', 'report body is stored');
@@ -85,6 +85,9 @@ reset role;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select is((select count(*)::integer from public.reports), 0, 'guardian cannot read an approved report');
+select is((select count(*)::integer from public.notifications where type = 'report_approved'), 1, 'guardian receives one approval notification');
+select ok((select payload ? 'report_id' and payload ? 'student_id' from public.notifications where type = 'report_approved'), 'approval notification contains safe report references');
+select is((select count(*)::integer from public.notifications where type = 'report_approved' and user_id <> '10000000-0000-4000-8000-000000000004'), 0, 'guardian cannot read another users notification');
 reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);

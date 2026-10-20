@@ -13,6 +13,7 @@ import { UserManagementSection } from "@/components/admin/user-management-sectio
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
+import { AdminReportsSection } from "@/components/reports/admin-reports-section";
 import { routing } from "@/i18n/routing";
 
 export const instant = false;
@@ -63,6 +64,10 @@ export default async function AdminSectionPage({
 
   if (section === "evaluation") {
     return <EvaluationSettingsSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "reports") {
+    return <AdminReportsSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

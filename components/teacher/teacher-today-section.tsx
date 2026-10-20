@@ -8,7 +8,6 @@ import {
   ListChecks,
   UserRoundCheck,
 } from "lucide-react";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -16,6 +15,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AppLocale } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { recordAttendanceAction } from "@/lib/attendance/actions";
 import { getTeacherTodaySessions } from "@/lib/attendance/queries";
 import { attendanceStatuses, type AttendanceStatus } from "@/lib/validators/attendance";
@@ -123,7 +123,7 @@ export async function TeacherTodaySection({
                 day.overview.reportReminders.map((item) => item.studentName).join("، ") ||
                 t("overview.none")
               }
-              href={`/${locale}/teacher/reports`}
+              href="/teacher/reports"
             />
           </div>
 
@@ -271,7 +271,7 @@ function OverviewCard({
   label: string;
   value: number;
   detail: string;
-  href?: string;
+  href?: "/teacher/reports";
 }) {
   const content = (
     <>

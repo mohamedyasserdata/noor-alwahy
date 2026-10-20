@@ -13,8 +13,9 @@ export async function getGuardianChildren() {
     .from("guardians")
     .select("id")
     .eq("profile_id", auth.user.id)
-    .single();
+    .maybeSingle();
   if (guardianError) throw new Error("guardian_unavailable");
+  if (!guardian) return [];
   const { data, error } = await supabase
     .from("student_guardians")
     .select("student_id,is_primary,students!student_guardians_student_id_fkey(full_name)")
