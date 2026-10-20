@@ -929,6 +929,14 @@
     "chooseResult": "Choose the session result",
     "recorded": "The result is fixed and its credit and pay effects have been applied.",
     "saving": "Recording…",
+    "overview": {
+      "absent": "Absent today",
+      "late": "Late today",
+      "tasks": "Pending tasks",
+      "reports": "Reports to write",
+      "tasksDetail": "{attendance} attendance · {evaluations} evaluations",
+      "none": "No cases"
+    },
     "reviewQueue": {
       "title": "Pre-session review queue",
       "description": "Start with the oldest due pages, then follow the queue order.",

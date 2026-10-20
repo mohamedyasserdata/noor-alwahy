@@ -1,4 +1,14 @@
-import { BookOpenCheck, CalendarDays, CheckCircle2, Clock3, UserRoundCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpenCheck,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  FileClock,
+  ListChecks,
+  UserRoundCheck,
+} from "lucide-react";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -83,6 +93,40 @@ export async function TeacherTodaySection({
         </Alert>
       ) : (
         <div className="mt-8">
+          <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <OverviewCard
+              icon={<AlertTriangle />}
+              label={t("overview.absent")}
+              value={day.overview.absentStudents.length}
+              detail={day.overview.absentStudents.join("، ") || t("overview.none")}
+            />
+            <OverviewCard
+              icon={<Clock3 />}
+              label={t("overview.late")}
+              value={day.overview.lateStudents.length}
+              detail={day.overview.lateStudents.join("، ") || t("overview.none")}
+            />
+            <OverviewCard
+              icon={<ListChecks />}
+              label={t("overview.tasks")}
+              value={day.overview.pendingAttendance + day.overview.pendingEvaluations.length}
+              detail={t("overview.tasksDetail", {
+                attendance: day.overview.pendingAttendance,
+                evaluations: day.overview.pendingEvaluations.length,
+              })}
+            />
+            <OverviewCard
+              icon={<FileClock />}
+              label={t("overview.reports")}
+              value={day.overview.reportReminders.length}
+              detail={
+                day.overview.reportReminders.map((item) => item.studentName).join("، ") ||
+                t("overview.none")
+              }
+              href={`/${locale}/teacher/reports`}
+            />
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-5">
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary text-secondary">
@@ -213,6 +257,44 @@ export async function TeacherTodaySection({
         </div>
       )}
     </section>
+  );
+}
+
+function OverviewCard({
+  icon,
+  label,
+  value,
+  detail,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  detail: string;
+  href?: string;
+}) {
+  const content = (
+    <>
+      <span className="grid size-10 place-items-center rounded-xl bg-secondary/15 text-secondary [&>svg]:size-5">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-bold text-muted-foreground">{label}</p>
+        <strong className="mt-1 block text-2xl font-black text-primary tabular-nums">
+          {value}
+        </strong>
+        <p className="mt-1 truncate text-xs text-muted-foreground">{detail}</p>
+      </div>
+    </>
+  );
+  const className =
+    "flex min-h-32 gap-3 rounded-2xl border bg-card p-4 transition hover:border-secondary/60";
+  return href ? (
+    <Link href={href} className={className}>
+      {content}
+    </Link>
+  ) : (
+    <div className={className}>{content}</div>
   );
 }
 
