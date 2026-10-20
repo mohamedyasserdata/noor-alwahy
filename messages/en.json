@@ -1153,6 +1153,37 @@
       "generic": "You have a new academy update"
     }
   },
+  "quranMap": {
+    "eyebrow": "Your memorization at a glance",
+    "title": "Quran progress map",
+    "description": "Follow {name}'s 604-page journey. Every locked evaluation updates this map automatically.",
+    "mapTitle": "Madinah Mushaf pages",
+    "pageCount": "{count} pages",
+    "surahLabel": "Go to surah",
+    "keyboardHint": "Use arrow keys to move page by page; Home and End jump to the edges.",
+    "gridLabel": "Quran pages progress grid",
+    "pageLabel": "Page {page}: {status}",
+    "legendLabel": "Progress status legend",
+    "summaryLabel": "Page status totals",
+    "juzTitle": "Jump to a juz",
+    "juzLabel": "Juz {juz}",
+    "score": "{score}%",
+    "statuses": {
+      "mastered": "Mastered",
+      "needs_review": "Needs review",
+      "in_progress": "In progress",
+      "not_started": "Not started"
+    },
+    "details": {
+      "title": "Page {page}",
+      "surah": "Surah",
+      "juz": "Juz",
+      "status": "Status",
+      "firstMemorized": "First memorized",
+      "lastReviewed": "Last reviewed",
+      "average": "Review average"
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

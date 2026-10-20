@@ -1153,6 +1153,37 @@
       "generic": "لديك تحديث جديد من الأكاديمية"
     }
   },
+  "quranMap": {
+    "eyebrow": "حفظك في نظرة واحدة",
+    "title": "خريطة تقدّم المصحف",
+    "description": "تابع رحلة {name} عبر 604 صفحات؛ كل تقييم مقفل يحدّث الخريطة تلقائيًا.",
+    "mapTitle": "صفحات مصحف المدينة",
+    "pageCount": "{count} صفحة",
+    "surahLabel": "الانتقال إلى سورة",
+    "keyboardHint": "استخدم الأسهم للتنقل صفحة بصفحة، وHome وEnd للانتقال إلى الطرفين.",
+    "gridLabel": "شبكة تقدّم صفحات المصحف",
+    "pageLabel": "الصفحة {page}: {status}",
+    "legendLabel": "دليل حالات التقدّم",
+    "summaryLabel": "إجمالي حالات الصفحات",
+    "juzTitle": "الانتقال إلى جزء",
+    "juzLabel": "الجزء {juz}",
+    "score": "{score}٪",
+    "statuses": {
+      "mastered": "متقن",
+      "needs_review": "يحتاج مراجعة",
+      "in_progress": "جارٍ",
+      "not_started": "لم يبدأ"
+    },
+    "details": {
+      "title": "الصفحة {page}",
+      "surah": "السورة",
+      "juz": "الجزء",
+      "status": "الحالة",
+      "firstMemorized": "أول حفظ",
+      "lastReviewed": "آخر مراجعة",
+      "average": "متوسط المراجعة"
+    }
+  },
   "accessibility": {
     "skipToContent": "تخطَّ إلى المحتوى الرئيسي"
   }
