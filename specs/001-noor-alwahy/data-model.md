@@ -518,7 +518,7 @@ create table reports (
   period_type text not null check (period_type in ('weekly','monthly')), period_start date not null, period_end date not null,
   body jsonb not null,                              -- {metrics:{...auto}, summary, strengths, improve, plan, recommendation}
   status report_status not null default 'draft', approved_at timestamptz, made_visible_at timestamptz,
-  ai_drafted boolean not null default false, pdf_path text,
+  content_template_version_id uuid, pdf_path text,
   unique (student_id, teacher_id, period_type, period_start)
 );
 create table exams (id uuid primary key default gen_random_uuid(), title_ar text not null, title_en text,
@@ -527,14 +527,40 @@ create table exams (id uuid primary key default gen_random_uuid(), title_ar text
 create table exam_results (id uuid primary key default gen_random_uuid(), exam_id uuid references exams(id), student_id uuid references students(id),
   scores jsonb not null, errors jsonb, total numeric(6,2), grade text, entered_by uuid references profiles(id),
   is_locked boolean default false, unique (exam_id, student_id));
-create table certificate_templates (id uuid primary key default gen_random_uuid(), kind text not null, name_ar text not null, name_en text,
-  layout jsonb not null, is_active boolean default true);
+create table certificate_templates (
+  id uuid primary key default gen_random_uuid(), kind text not null, name_ar text not null, name_en text,
+  status text not null default 'draft' check (status in ('draft','published','archived')),
+  created_by uuid not null references profiles(id), created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create table certificate_template_versions (
+  id uuid primary key default gen_random_uuid(), template_id uuid not null references certificate_templates(id),
+  version_no int not null check (version_no > 0), locale text not null check (locale in ('ar','en')),
+  layout jsonb not null, -- schema ثابت: ألوان/إطار/زخرفة/مناطق النص والصور؛ لا HTML/CSS تنفيذي
+  content jsonb not null, -- نصوص + متغيرات من allowlist فقط
+  assets_snapshot jsonb not null, -- logo/seal/signatures: paths + hashes وقت النشر
+  published_by uuid references profiles(id), published_at timestamptz,
+  created_at timestamptz not null default now(), unique (template_id, version_no, locale)
+); -- النسخة المنشورة immutable بTrigger؛ التعديل ينشئ version_no جديداً
+create table certificate_batches (
+  id uuid primary key default gen_random_uuid(), template_version_id uuid not null references certificate_template_versions(id),
+  requested_by uuid not null references profiles(id), idempotency_key text not null unique,
+  status text not null check (status in ('queued','processing','partial','completed','failed')),
+  total_count int not null check (total_count > 0), success_count int not null default 0,
+  failure_count int not null default 0, created_at timestamptz not null default now(), finished_at timestamptz
+);
 create table certificates (
-  id uuid primary key default gen_random_uuid(), template_id uuid references certificate_templates(id),
+  id uuid primary key default gen_random_uuid(), template_id uuid not null references certificate_templates(id),
+  template_version_id uuid not null references certificate_template_versions(id),
+  batch_id uuid references certificate_batches(id),
   student_id uuid not null references students(id), kind text not null,
   serial_no text unique not null, verify_code text unique not null,      -- عشوائي ≥ 16 محرفاً
   issued_by uuid references profiles(id), issued_at timestamptz default now(),
-  pdf_path text, locale text default 'ar', revoked_at timestamptz, revoke_reason text, payload jsonb
+  pdf_path text not null, pdf_sha256 text not null, locale text default 'ar',
+  payload_snapshot jsonb not null, template_snapshot jsonb not null,
+  revoked_at timestamptz, revoked_by uuid references profiles(id), revoke_reason text,
+  check ((revoked_at is null and revoked_by is null and revoke_reason is null)
+      or (revoked_at is not null and revoked_by is not null and length(trim(revoke_reason)) >= 5))
 );
 
 create table notifications (
@@ -550,12 +576,50 @@ create table contact_links (id uuid primary key default gen_random_uuid(),
   type text not null check (type in ('whatsapp','phone','email','facebook','instagram','telegram','youtube','tiktok','other')),
   label_ar text not null, label_en text, url text not null, sort_order int default 0, is_visible boolean default true);
 create table app_settings (key text primary key, value jsonb not null, updated_by uuid references profiles(id), updated_at timestamptz default now());
+create table intervention_rules (
+  id uuid primary key default gen_random_uuid(), rule_type text not null unique,
+  is_enabled boolean not null default true, priority smallint not null check (priority between 1 and 5),
+  thresholds jsonb not null, window_interval interval not null, cooldown_interval interval not null,
+  updated_by uuid not null references profiles(id), updated_at timestamptz not null default now()
+); -- rule_type من registry ثابت؛ trigger/validator يرفض مفاتيح وحدوداً غير معروفة
+create table intervention_cases (
+  id uuid primary key default gen_random_uuid(), rule_id uuid not null references intervention_rules(id),
+  subject_type text not null, subject_id uuid not null, dedupe_key text not null,
+  status text not null default 'open' check (status in ('open','acknowledged','resolved','dismissed')),
+  priority smallint not null check (priority between 1 and 5), reason_code text not null,
+  evidence jsonb not null, first_detected_at timestamptz not null, last_detected_at timestamptz not null,
+  acknowledged_by uuid references profiles(id), acknowledged_at timestamptz,
+  resolved_by uuid references profiles(id), resolved_at timestamptz,
+  disposition_reason text, created_at timestamptz not null default now()
+);
+create unique index intervention_cases_one_active on intervention_cases (dedupe_key)
+  where status in ('open','acknowledged');
+create table content_templates (
+  id uuid primary key default gen_random_uuid(), kind text not null check (kind in ('student_report','admin_message','announcement')),
+  name_ar text not null, name_en text, status text not null default 'draft' check (status in ('draft','published','archived')),
+  created_by uuid not null references profiles(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+create table content_template_versions (
+  id uuid primary key default gen_random_uuid(), template_id uuid not null references content_templates(id),
+  version_no int not null check (version_no > 0), locale text not null check (locale in ('ar','en')),
+  subject_template text, body_template text not null, variables_schema jsonb not null,
+  published_by uuid references profiles(id), published_at timestamptz, created_at timestamptz not null default now(),
+  unique (template_id, version_no, locale)
+); -- النسخة المنشورة immutable ولا تقبل إلا allowlist الخاصة بنوع القالب
+create table export_jobs (
+  id uuid primary key default gen_random_uuid(), requested_by uuid not null references profiles(id),
+  report_type text not null, format text not null check (format in ('pdf','xlsx')),
+  filters_snapshot jsonb not null, locale text not null, timezone text not null,
+  status text not null default 'queued' check (status in ('queued','processing','completed','failed','expired')),
+  storage_path text, file_sha256 text, row_count int, error_code text,
+  created_at timestamptz not null default now(), started_at timestamptz, finished_at timestamptz, expires_at timestamptz
+);
 create table job_runs (id bigserial primary key, job text not null, started_at timestamptz default now(), finished_at timestamptz, ok boolean, details jsonb);
 create table audit_logs (id bigserial primary key, user_id uuid, action text not null, table_name text, record_id text,
   before jsonb, after jsonb, ip inet, created_at timestamptz not null default now());
 create index on audit_logs (table_name, record_id, created_at desc);
 ```
-`audit_row()` trigger عام (security definer) يُرفق على: `package_prices`, `payments`, `invoices`, `teacher_assignments`, `session_evaluations`, `exam_results`, `teacher_rates`, `teacher_payouts`, `profiles` (تغيّر الدور/التفعيل)، `app_settings`، `eval_*`. لا أحد يملك UPDATE/DELETE على `audit_logs` (admin قراءة فقط).
+`audit_row()` trigger عام (security definer) يُرفق على: `package_prices`, `payments`, `invoices`, `teacher_assignments`, `session_evaluations`, `exam_results`, `teacher_rates`, `teacher_payouts`, `profiles` (تغيّر الدور/التفعيل)، `app_settings`، `eval_*`, `certificate_templates`, `certificate_template_versions`, `certificates`, `intervention_rules`, `intervention_cases`, `content_templates`, `content_template_versions`, `export_jobs`. لا أحد يملك UPDATE/DELETE على `audit_logs` (admin قراءة فقط). لا تحفظ سجلات التدقيق رابط signed أو محتوى ملف؛ تحفظ المسار/المعرّف والحدث فقط.
 
 ## 9. الدوال المساعدة لـ RLS
 
@@ -608,7 +672,12 @@ $$ select exists (select 1 from students s where s.id = p_student and s.profile_
 | teacher_rates, teacher_payouts, teacher_payout_items, teacher_adjustments | — | CRUD | R **own فقط** (View `my_earnings`) | — | — |
 | expenses | — | CRUD | — | — | — |
 | exams, exam_results | — | CRUD | C/U نتائج asg | R own | R kids |
-| certificates | R عبر RPC `verify_certificate(code)` فقط | CRUD | R asg | R own | R kids |
+| certificate_templates, certificate_template_versions | — | CRUD (النسخة المنشورة لا تعدّل/تحذف) | — | — | — |
+| certificate_batches | — | CRU (لا حذف) | — | — | — |
+| certificates | R عبر RPC `verify_certificate(code)` فقط | CR + revoke RPC (لا UPDATE عام/DELETE) | R asg | R own | R kids |
+| intervention_rules, intervention_cases | — | CRUD عبر RPCs انتقال محددة | — | — | — |
+| content_templates, content_template_versions | — | CRUD (النسخة المنشورة لا تعدّل/تحذف) | R لقوالب تقرير مسموحة فقط | — | — |
+| export_jobs | — | CRU own/admin workers؛ لا مسار Storage مباشر | — | — | — |
 | notifications | — | R own + C | R/U(read_at) own | R/U(read_at) own | R/U(read_at) own |
 | audit_logs | — | R | — | — | — |
 | app_settings | R مفاتيح عامة محددة | CRUD | — | — | — |

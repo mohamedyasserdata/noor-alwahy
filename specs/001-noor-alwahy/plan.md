@@ -18,7 +18,7 @@
 | الملفات | Supabase Storage | حاويات: `avatars` (عام للقراءة)، `proofs` (خاص)، `certificates` (خاص)، `reports` (خاص)، `imports` (خاص مؤقت). |
 | PDF | **Chromium/Puppeteer (HTML→PDF)** أساسي — انظر ADR-04 | حل بديل: `@react-pdf/renderer` إن اجتاز اختبار العربية. |
 | البريد | Resend + قوالب React Email ثنائية اللغة | |
-| الذكاء الاصطناعي | Anthropic API من Route Handlers فقط | اسم النموذج من متغير بيئة `ANTHROPIC_MODEL` (لا يُكتب ثابتاً)؛ راجع §9. |
+| مركز الإدارة | Postgres Views/RPCs + وظائف قواعد حتمية + Outbox | بلا مزود أو نموذج ذكاء اصطناعي؛ يعيد استخدام منطق الأعمال والدفاتر المعتمدة؛ راجع §9. |
 | الاختبار | Vitest · Playwright · **pgTAP** (`supabase test db`) | |
 | الجودة | ESLint + Prettier + Husky + lint-staged + gitleaks | |
 | الوقت | **Luxon** (أو date-fns-tz) — ADR-07 | |
@@ -51,18 +51,18 @@ noor-alwahy/
 │  ├─ (public)/  page, packages/, apply/, contact/, order-status/, faq/
 │  ├─ (auth)/    login/, forgot-password/, reset-password/, mfa/
 │  ├─ (admin)/   dashboard/ applications/ students/ teachers/ assignments/ schedule/
-│  │             packages/ subscriptions/ finance/ exams/ certificates/ reports/ ai-assistant/ settings/
+│  │             packages/ subscriptions/ finance/ exams/ certificates/ reports/ interventions/ analytics/ exports/ templates/ settings/
 │  ├─ (teacher)/ today/ students/ sessions/[id]/evaluate/ reports/ availability/ zoom/ earnings/
 │  ├─ (student)/ home/ progress/ schedule/ certificates/ contact/
 │  ├─ (parent)/  children/ billing/ contact/
 │  └─ verify/[code]/
-├─ app/api/      applications/ ai/ pdf/ ics/[token]/ cron/ webhooks/
+├─ app/api/      applications/ pdf/ exports/ ics/[token]/ cron/ webhooks/
 ├─ components/   ui/ (shadcn) · charts/ · forms/ · quran-map/ · layout/ · domain/
 ├─ lib/
 │  ├─ supabase/  client.ts server.ts admin.ts(server-only) middleware.ts
-│  ├─ domain/    scoring/ credits/ pricing/ review-queue/ payouts/ scheduling/   ← منطق نقي + اختبارات
+│  ├─ domain/    scoring/ credits/ pricing/ review-queue/ payouts/ scheduling/ interventions/ templates/ ← منطق نقي + اختبارات
 │  ├─ validators/  ← Zod
-│  ├─ time/ money/ i18n/ pdf/ email/ ai/ excel/ authz/
+│  ├─ time/ money/ i18n/ pdf/ email/ excel/ exports/ authz/
 │  └─ utils/
 ├─ messages/     ar.json en.json (+ مقسّمة بحسب البوابة)
 ├─ supabase/     migrations/ seed.sql config.toml tests/ (pgTAP) functions/
@@ -112,13 +112,14 @@ noor-alwahy/
 
 كل وظيفة idempotent، ولها سجل تشغيل `job_runs` (الاسم، البدء/الانتهاء، النتيجة).
 
-## 9. الذكاء الاصطناعي
-- **مكان الاستدعاء:** `app/api/ai/*` فقط، بعد `requireRole`. المفتاح `ANTHROPIC_API_KEY` خادمي.
-- **مساعد المدير (AI-01):** نمط **tool use** بأدوات مُعرَّفة مسبقاً (مثل `top_absent_students(period, limit)`, `revenue_by_country(period)`) تنفَّذ كـ RPC/Views قراءة فقط (`ai_*` views) عبر دور Postgres `ai_readonly` له SELECT على هذه الـ Views فقط، مع `statement_timeout` و`LIMIT` إجباري. **ممنوع** إعطاء النموذج أداة تنفّذ SQL حراً.
-- **إخفاء الهوية:** طبقة `lib/ai/redact.ts` تستبدل الأسماء/الهواتف/البريد بمعرّفات مستعارة قبل الإرسال وتعيدها بعد الاستلام؛ مع اختبار وحدة يفشل إن تسرّب نمط بريد/هاتف.
-- **المسودات:** ترجع كنص لا يُحفظ كمنشور؛ زر «اعتماد» بشري إلزامي.
-- **حدود:** حد معدل لكل مستخدم، سقف توكنات، مهلة، وتعامل أنيق مع الفشل (الميزة اختيارية، ولا تُعطّل أي مسار أساسي).
-- **تنبيه التعثر:** قواعد SQL حتمية في المرحلة 10 (مثال: ≥3 غيابات/30 يوماً، أو انخفاض متوسط التقييم ≥ 1 نقطة عن الشهر السابق، أو لا حصص مكتملة 14 يوماً).
+## 9. مركز الإدارة والمتابعة
+- **لا تكامل AI:** لا `app/api/ai` ولا `lib/ai` ولا مفاتيح أو SDK أو Prompt أو vector store. يمنع CI الأنماط والتبعيات المعروفة، وتبقى بيانات الأكاديمية داخل حدود الخدمات المعتمدة.
+- **مصدر واحد للحقيقة:** كل KPI أو حالة تدخل تقرأ من Views/RPCs فوق الجداول والدفاتر الحالية؛ لا تُعاد صياغة BR-07/09/11/15 أو حسابات المال في React. المال يرجع صفًا لكل عملة، والفترة تُحوّل في الخادم وفق IANA ثم تُنفذ على `timestamptz`.
+- **قواعد التدخل:** registry معروف للأنواع يربط كل نوع باستعلام أدلة وإجراء مسموح. العتبات والنوافذ والأولوية وcooldown بيانات مضبوطة بقيود؛ evaluator مجدول يقفل نطاق تشغيله، ويستخدم مفتاح dedupe حتميًا، ويدعم open/resolve/reopen دون حذف التاريخ.
+- **الواجهة:** Server Component للملخص الأولي، وفلاتر/ترقيم خادمي للصفوف؛ Realtime إشارة لإعادة الجلب فقط. كل بطاقة تحمل تعريفًا، وقت حداثة، وحالة unavailable مستقلة حتى لا يُعرض صفر كاذب.
+- **التصدير:** الطلب يحفظ snapshot للفلاتر والأعمدة واللغة والمنطقة والعملات. النتائج الصغيرة آنية، والكبيرة `export_jobs` خلفية محدودة التوازي، تكتب إلى bucket خاص بمسار UUID ورابط signed قصير، ثم تنظفها وظيفة احتفاظ. Chromium المعتمد للـPDF و`exceljs` للـExcel.
+- **القوالب:** schema ثابت ذو نسخ immutable ومتغيرات allowlist typed وfallbacks؛ renderer نقي مشترك للمعاينة والإخراج. تعقم النصوص والروابط، ولا يسمح CSS/HTML أو تعبيرات قابلة للتنفيذ، ولا نشر/إرسال دون اعتماد بشري.
+- **الأمان:** كل RPC إداري يتحقق من `is_admin()` وAAL2، يثبت `search_path` ويضع `statement_timeout` و`LIMIT`. RLS deny-by-default على القواعد والحالات والقوالب والتصديرات، وتدقيق للتغييرات والانتقالات والتنزيلات الحساسة.
 
 ## 10. الملفات والتخزين
 - المسارات: `{bucket}/{owner_profile_id}/{uuid}-{filename}`. سياسات Storage تربط المسار بالمالك والدور. أنواع/أحجام مسموحة محددة (إثبات التحويل: صور/PDF ≤ 5MB).
@@ -137,8 +138,6 @@ NEXT_PUBLIC_RECAPTCHA_SITE_KEY=
 RECAPTCHA_SECRET_KEY=
 RESEND_API_KEY=
 EMAIL_FROM=
-ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=
 CRON_SECRET=
 ICS_TOKEN_PEPPER=
 ```
