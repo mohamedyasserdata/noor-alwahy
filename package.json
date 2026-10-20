@@ -27,6 +27,7 @@
     "db:test": "supabase test db --local",
     "db:types": "node scripts/generate-database-types.mjs",
     "check:rls": "node scripts/check-rls.mjs",
+    "quran:import": "node --no-warnings scripts/import-quran.ts",
     "pdf:spike:fixture": "node scripts/pdf-spike/fetch-quran-fixture.mjs",
     "pdf:spike:generate": "node scripts/pdf-spike/generate.mjs",
     "pdf:spike:verify": "node scripts/pdf-spike/verify.mjs",

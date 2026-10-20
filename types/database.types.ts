@@ -201,6 +201,86 @@ export type Database = {
         };
         Relationships: [];
       };
+      eval_criteria: {
+        Row: {
+          applies_to: Database["public"]["Enums"]["session_type_t"][];
+          code: string;
+          name_ar: string;
+          name_en: string;
+          sort_order: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          applies_to: Database["public"]["Enums"]["session_type_t"][];
+          code: string;
+          name_ar: string;
+          name_en: string;
+          sort_order?: number;
+        };
+        Update: {
+          applies_to?: Database["public"]["Enums"]["session_type_t"][];
+          code?: string;
+          name_ar?: string;
+          name_en?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      eval_settings: {
+        Row: {
+          d_forgot: number;
+          d_major: number;
+          d_minor: number;
+          d_prompt: number;
+          rating_thresholds: NonNullable<Json>;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+        };
+        ComputedFields: never;
+        Insert: {
+          d_forgot?: number;
+          d_major?: number;
+          d_minor?: number;
+          d_prompt?: number;
+          rating_thresholds?: NonNullable<Json>;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+        };
+        Update: {
+          d_forgot?: number;
+          d_major?: number;
+          d_minor?: number;
+          d_prompt?: number;
+          rating_thresholds?: NonNullable<Json>;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+        };
+        Relationships: [];
+      };
+      eval_weights: {
+        Row: {
+          criterion_code: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          weight: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          criterion_code: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          weight: number;
+        };
+        Update: {
+          criterion_code?: string;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "eval_weights_criterion_code_fkey";
+            columns: ["criterion_code"];
+            isOneToOne: false;
+            referencedRelation: "eval_criteria";
+            referencedColumns: ["code"];
+          },
+        ];
+      };
       guardians: {
         Row: {
           created_at: string;
@@ -554,6 +634,147 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"];
           timezone?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      quran_ayahs: {
+        Row: {
+          ayah_no: number;
+          hizb_quarter: number;
+          id: number;
+          juz: number;
+          page: number;
+          surah_id: number;
+          text_uthmani: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          ayah_no: number;
+          hizb_quarter: number;
+          id: number;
+          juz: number;
+          page: number;
+          surah_id: number;
+          text_uthmani: string;
+        };
+        Update: {
+          ayah_no?: number;
+          hizb_quarter?: number;
+          id?: number;
+          juz?: number;
+          page?: number;
+          surah_id?: number;
+          text_uthmani?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quran_ayahs_surah_id_fkey";
+            columns: ["surah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_surahs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quran_dataset_meta: {
+        Row: {
+          checksum_sha256: string;
+          id: number;
+          imported_at: string;
+          license: string;
+          metadata_checksum_sha256: string;
+          metadata_version: string;
+          source: string;
+          source_url: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          checksum_sha256: string;
+          id?: number;
+          imported_at?: string;
+          license: string;
+          metadata_checksum_sha256: string;
+          metadata_version: string;
+          source: string;
+          source_url: string;
+          version: string;
+        };
+        Update: {
+          checksum_sha256?: string;
+          id?: number;
+          imported_at?: string;
+          license?: string;
+          metadata_checksum_sha256?: string;
+          metadata_version?: string;
+          source?: string;
+          source_url?: string;
+          version?: string;
+        };
+        Relationships: [];
+      };
+      quran_pages: {
+        Row: {
+          first_ayah_id: number;
+          juz: number;
+          last_ayah_id: number;
+          lines_count: number | null;
+          page: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          first_ayah_id: number;
+          juz: number;
+          last_ayah_id: number;
+          lines_count?: number | null;
+          page: number;
+        };
+        Update: {
+          first_ayah_id?: number;
+          juz?: number;
+          last_ayah_id?: number;
+          lines_count?: number | null;
+          page?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quran_pages_first_ayah_id_fkey";
+            columns: ["first_ayah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_ayahs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quran_pages_last_ayah_id_fkey";
+            columns: ["last_ayah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_ayahs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quran_surahs: {
+        Row: {
+          ayah_count: number;
+          id: number;
+          name_ar: string;
+          name_en: string;
+          revelation: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          ayah_count: number;
+          id: number;
+          name_ar: string;
+          name_en: string;
+          revelation: string;
+        };
+        Update: {
+          ayah_count?: number;
+          id?: number;
+          name_ar?: string;
+          name_en?: string;
+          revelation?: string;
         };
         Relationships: [];
       };
