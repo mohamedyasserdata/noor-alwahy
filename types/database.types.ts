@@ -450,6 +450,64 @@ export type Database = {
           },
         ];
       };
+      memorization_progress: {
+        Row: {
+          avg_score: number | null;
+          created_at: string;
+          first_memorized_at: string | null;
+          last_reviewed_at: string | null;
+          next_review_due: string | null;
+          page: number;
+          review_count: number;
+          review_stage: number;
+          status: Database["public"]["Enums"]["progress_status"];
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          avg_score?: number | null;
+          created_at?: string;
+          first_memorized_at?: string | null;
+          last_reviewed_at?: string | null;
+          next_review_due?: string | null;
+          page: number;
+          review_count?: number;
+          review_stage?: number;
+          status?: Database["public"]["Enums"]["progress_status"];
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          avg_score?: number | null;
+          created_at?: string;
+          first_memorized_at?: string | null;
+          last_reviewed_at?: string | null;
+          next_review_due?: string | null;
+          page?: number;
+          review_count?: number;
+          review_stage?: number;
+          status?: Database["public"]["Enums"]["progress_status"];
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "memorization_progress_page_fkey";
+            columns: ["page"];
+            isOneToOne: false;
+            referencedRelation: "quran_pages";
+            referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notification_outbox: {
         Row: {
           attempts: number;
@@ -1814,6 +1872,57 @@ export type Database = {
             columns: ["subscription_id"];
             isOneToOne: false;
             referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      v_juz_progress: {
+        Row: {
+          avg_score: number | null;
+          in_progress_pages: number | null;
+          juz: number | null;
+          last_reviewed_at: string | null;
+          mastered_pages: number | null;
+          needs_review_pages: number | null;
+          student_id: string | null;
+          tracked_pages: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      v_surah_progress: {
+        Row: {
+          avg_score: number | null;
+          in_progress_pages: number | null;
+          last_reviewed_at: string | null;
+          mastered_pages: number | null;
+          needs_review_pages: number | null;
+          student_id: string | null;
+          surah_id: number | null;
+          tracked_pages: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quran_ayahs_surah_id_fkey";
+            columns: ["surah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_surahs";
             referencedColumns: ["id"];
           },
         ];
