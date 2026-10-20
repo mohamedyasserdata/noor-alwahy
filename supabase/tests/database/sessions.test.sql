@@ -128,9 +128,9 @@ select ok(
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
 select ok((select count(*) >= 5 from public.sessions), 'admin reads all sessions');
-select lives_ok(
+select throws_ok(
   $$insert into public.sessions (student_id, teacher_id, scheduled_at, duration_min) values ('a7300000-0000-4000-8000-000000000003', 'a7200000-0000-4000-8000-000000000003', '2030-01-01 15:00:00+00', 30)$$,
-  'admin creates a session through RLS'
+  '42501', null, 'admin uses guarded session RPCs instead of direct inserts'
 );
 
 reset role;

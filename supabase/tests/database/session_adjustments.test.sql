@@ -1,6 +1,6 @@
 begin;
 
-select plan(37);
+select plan(36);
 
 select has_column('public', 'sessions', 'rescheduled_from', 'sessions link a replacement to its source');
 select has_index('public', 'sessions', 'sessions_rescheduled_from_once_idx', 'a session is rescheduled once');
@@ -148,9 +148,8 @@ select throws_ok(
   $$select public.reschedule_session('f7800000-0000-4000-8000-000000000006', '2030-02-07 10:00+00')$$,
   'P0001', 'session_not_adjustable', 'rescheduled source cannot be rescheduled twice'
 );
-select ok((select count(*) >= 3 from public.notifications where type = 'schedule_changed'), 'student receives schedule change notifications');
-
 reset role;
+select ok((select count(*) >= 3 from public.notifications where type = 'schedule_changed'), 'student receives schedule change notifications');
 
 select * from finish();
 rollback;

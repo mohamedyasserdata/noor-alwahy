@@ -639,6 +639,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["session_kind"];
           makeup_of: string | null;
           original_teacher_id: string | null;
+          rescheduled_from: string | null;
           scheduled_at: string;
           slot_id: string | null;
           started_at: string | null;
@@ -661,6 +662,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["session_kind"];
           makeup_of?: string | null;
           original_teacher_id?: string | null;
+          rescheduled_from?: string | null;
           scheduled_at: string;
           slot_id?: string | null;
           started_at?: string | null;
@@ -682,6 +684,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["session_kind"];
           makeup_of?: string | null;
           original_teacher_id?: string | null;
+          rescheduled_from?: string | null;
           scheduled_at?: string;
           slot_id?: string | null;
           started_at?: string | null;
@@ -713,6 +716,13 @@ export type Database = {
             columns: ["original_teacher_id"];
             isOneToOne: false;
             referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_rescheduled_from_fkey";
+            columns: ["rescheduled_from"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
           {
@@ -1388,11 +1398,19 @@ export type Database = {
     Functions: {
       accept_teacher_code_of_conduct: { Args: Record<PropertyKey, never>; Returns: string };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
+      assign_session_substitute: {
+        Args: { p_scope: string; p_session_id: string; p_substitute_teacher_id: string };
+        Returns: number;
+      };
       auth_role: {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
       };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
+      create_makeup_session: {
+        Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
+        Returns: string;
+      };
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
@@ -1484,6 +1502,10 @@ export type Database = {
       remove_student_guardian: {
         Args: { p_guardian_id: string; p_student_id: string };
         Returns: undefined;
+      };
+      reschedule_session: {
+        Args: { p_scheduled_at: string; p_session_id: string };
+        Returns: string;
       };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
