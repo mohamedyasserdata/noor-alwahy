@@ -124,6 +124,11 @@
           "title": "Weekly schedule",
           "description": "Set fixed weekly lesson times and review them in each viewer’s local time."
         },
+        "evaluation": {
+          "label": "Evaluation setup",
+          "title": "Evaluation settings",
+          "description": "Calibrate criteria weights, deductions, and rating thresholds for every session type."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",
@@ -533,6 +538,56 @@
     "errors": {
       "invalidFields": "Check the names, descriptions, logo path, and support hours, then try again.",
       "requestFailed": "The academy settings could not be updated. No partial change was kept."
+    }
+  },
+  "evaluationSettings": {
+    "eyebrow": "Quran evaluation calibration",
+    "title": "Evaluation weights and deductions",
+    "description": "Configure scoring for each session type. Only applicable criteria appear, and the complete set is saved in one transaction.",
+    "snapshot": {
+      "title": "Past results stay fixed",
+      "description": "Changes apply to future evaluations only; every approved evaluation stores the settings used to calculate it."
+    },
+    "sessionTypes": {
+      "label": "Session types",
+      "new_memo": "New memorization",
+      "near_review": "Near review",
+      "far_review": "Far review",
+      "recitation": "Recitation and correction",
+      "noorani": "Noorani foundation",
+      "matn_theory": "Theory text"
+    },
+    "weights": {
+      "title": "Criteria weights",
+      "description": "A higher weight gives the criterion more influence on the base score. The total must be greater than zero.",
+      "currentTotal": "Current total: {total, number}"
+    },
+    "deductions": {
+      "title": "Deduction per error",
+      "description": "The number of percentage points deducted for each occurrence of an error type.",
+      "fields": {
+        "dMajor": "Major error",
+        "dMinor": "Minor error",
+        "dPrompt": "Teacher prompt",
+        "dForgot": "Forgotten passage"
+      }
+    },
+    "thresholds": {
+      "title": "Rating starting points",
+      "description": "Enter the minimum score for each rating in strictly increasing order from 0 to 100.",
+      "rating": "Rating {rating}"
+    },
+    "auditNotice": "This action requires administrator MFA, and every change is recorded in the audit log.",
+    "action": {
+      "save": "Save this session type",
+      "saving": "Saving evaluation settings…"
+    },
+    "notices": {
+      "updated": "The session type weights, deductions, and thresholds were saved."
+    },
+    "errors": {
+      "invalidFields": "Check the weights, deductions, and threshold order. Values must be between 0 and 100 and the weight total must be greater than zero.",
+      "requestFailed": "The evaluation settings could not be saved. No partial change was kept."
     }
   },
   "studentManagement": {

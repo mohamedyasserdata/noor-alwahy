@@ -12,6 +12,7 @@ export const portalConfig = {
       "teachers",
       "assignments",
       "schedule",
+      "evaluation",
       "users",
       "audit",
       "settings",
