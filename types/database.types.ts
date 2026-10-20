@@ -1883,6 +1883,18 @@ export type Database = {
           timezone: string;
         }[];
       };
+      update_evaluation_settings: {
+        Args: {
+          p_d_forgot: number;
+          p_d_major: number;
+          p_d_minor: number;
+          p_d_prompt: number;
+          p_rating_thresholds: Json;
+          p_session_type: Database["public"]["Enums"]["session_type_t"];
+          p_weights: Json;
+        };
+        Returns: undefined;
+      };
       update_public_app_settings: {
         Args: { p_academy_profile: Json; p_support_hours: Json };
         Returns: undefined;

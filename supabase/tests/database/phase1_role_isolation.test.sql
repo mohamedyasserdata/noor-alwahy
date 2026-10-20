@@ -234,7 +234,7 @@ select is(
       and function.prorettype <> 'pg_catalog.trigger'::regtype
       and has_function_privilege('authenticated', function.oid, 'EXECUTE')
   ),
-  array['accept_teacher_code_of_conduct', 'assign_session_substitute', 'auth_role', 'confirm_student_import', 'create_makeup_session', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reschedule_session', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'set_account_active', 'suggest_teachers', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
+  array['accept_teacher_code_of_conduct', 'assign_session_substitute', 'auth_role', 'confirm_student_import', 'create_makeup_session', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reschedule_session', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'set_account_active', 'suggest_teachers', 'update_evaluation_settings', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
   'R-22: authenticated callers reach only the guarded SECURITY DEFINER API'
 );
 
