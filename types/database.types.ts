@@ -450,6 +450,68 @@ export type Database = {
           },
         ];
       };
+      memorization_plans: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          ends_on: string | null;
+          id: string;
+          monthly_target_pages: number;
+          starts_on: string;
+          student_id: string;
+          updated_at: string;
+          updated_by: string;
+          weekly_target_pages: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string;
+          ends_on?: string | null;
+          id?: string;
+          monthly_target_pages: number;
+          starts_on?: string;
+          student_id: string;
+          updated_at?: string;
+          updated_by?: string;
+          weekly_target_pages: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          ends_on?: string | null;
+          id?: string;
+          monthly_target_pages?: number;
+          starts_on?: string;
+          student_id?: string;
+          updated_at?: string;
+          updated_by?: string;
+          weekly_target_pages?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "memorization_plans_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "memorization_plans_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "memorization_plans_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       memorization_progress: {
         Row: {
           avg_score: number | null;
@@ -1893,6 +1955,34 @@ export type Database = {
             foreignKeyName: "memorization_progress_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      v_memorization_plan_adherence: {
+        Row: {
+          ends_on: string | null;
+          local_today: string | null;
+          month_starts_on: string | null;
+          monthly_achieved_pages: number | null;
+          monthly_adherence_percent: number | null;
+          monthly_target_pages: number | null;
+          plan_id: string | null;
+          starts_on: string | null;
+          student_id: string | null;
+          updated_at: string | null;
+          week_starts_on: string | null;
+          weekly_achieved_pages: number | null;
+          weekly_adherence_percent: number | null;
+          weekly_target_pages: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "memorization_plans_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },

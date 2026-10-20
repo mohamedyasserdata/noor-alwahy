@@ -1,6 +1,6 @@
 begin;
 
-select plan(32);
+select plan(33);
 
 select has_table('public', 'memorization_plans', 'memorization plans table exists');
 select has_view('public', 'v_memorization_plan_adherence', 'memorization plan adherence view exists');
@@ -89,10 +89,11 @@ reset role;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select is((select count(*)::integer from public.memorization_plans), 1, 'the student reads their own plan');
-select throws_ok(
+select lives_ok(
   $$update public.memorization_plans set weekly_target_pages = 6, updated_by = '10000000-0000-4000-8000-000000000003'$$,
-  '42501', null, 'a student cannot change their plan'
+  'an unauthorized update reveals no writable plan rows'
 );
+select is((select weekly_target_pages from public.memorization_plans), 5::smallint, 'a student cannot change their plan');
 select is((select weekly_achieved_pages from public.v_memorization_plan_adherence), 2, 'weekly adherence counts mastered pages first memorized this week');
 select is((select monthly_achieved_pages from public.v_memorization_plan_adherence), 2, 'monthly adherence counts mastered pages first memorized this month');
 select is((select weekly_adherence_percent from public.v_memorization_plan_adherence), 40::numeric, 'weekly adherence is measured against the current target');
