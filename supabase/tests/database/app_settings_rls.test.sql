@@ -63,7 +63,7 @@ select set_config(
 );
 set local role authenticated;
 
-select is((select count(*)::integer from public.app_settings), 3, 'an AAL2 admin reads public and internal settings');
+select is((select count(*)::integer from public.app_settings), 4, 'an AAL2 admin reads public and internal settings');
 select lives_ok(
   $$insert into public.app_settings (key, value) values ('internal.audit_probe', '{"enabled":true}')$$,
   'an AAL2 admin creates a setting'

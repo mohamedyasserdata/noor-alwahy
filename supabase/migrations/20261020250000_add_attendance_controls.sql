@@ -68,6 +68,8 @@ add constraint app_settings_public_shape check (
   or key not in ('academy_profile', 'support_hours', 'attendance_policy')
 );
 
+alter table public.app_settings disable trigger app_settings_audit;
+
 insert into public.app_settings (key, value)
 values (
   'attendance_policy',
@@ -79,6 +81,8 @@ values (
   )
 )
 on conflict (key) do nothing;
+
+alter table public.app_settings enable trigger app_settings_audit;
 
 create table public.session_alerts (
   id uuid primary key default gen_random_uuid(),

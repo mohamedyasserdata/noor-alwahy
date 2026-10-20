@@ -34,7 +34,7 @@ test("P3-T07 administrator reviews daily attendance adherence", async ({ page })
       .slice(0, 8)
       .map((element) => ({
         className: element.className,
-        right: Math.round(element.getBoundingClientRect().right),
+        inlineEnd: Math.round(element.getBoundingClientRect().right),
         tag: element.tagName,
       })),
   }));
