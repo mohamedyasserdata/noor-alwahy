@@ -941,6 +941,117 @@ export type Database = {
           },
         ];
       };
+      session_evaluations: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          decision: string | null;
+          errors_major: number;
+          errors_minor: number;
+          family_note: string | null;
+          forgot_count: number;
+          from_ayah_id: number | null;
+          homework: Json | null;
+          id: string;
+          is_locked: boolean;
+          lines_count: number | null;
+          locked_at: string | null;
+          pages: number | null;
+          prompts_count: number;
+          rating: number;
+          scores: NonNullable<Json>;
+          session_id: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          settings_snapshot: NonNullable<Json>;
+          to_ayah_id: number | null;
+          total_score: number;
+          updated_at: string;
+          weak_tags: string[];
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          decision?: string | null;
+          errors_major?: number;
+          errors_minor?: number;
+          family_note?: string | null;
+          forgot_count?: number;
+          from_ayah_id?: number | null;
+          homework?: Json | null;
+          id?: string;
+          is_locked?: boolean;
+          lines_count?: number | null;
+          locked_at?: string | null;
+          pages?: number | null;
+          prompts_count?: number;
+          rating?: number;
+          scores: NonNullable<Json>;
+          session_id: string;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          settings_snapshot?: NonNullable<Json>;
+          to_ayah_id?: number | null;
+          total_score?: number;
+          updated_at?: string;
+          weak_tags?: string[];
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          decision?: string | null;
+          errors_major?: number;
+          errors_minor?: number;
+          family_note?: string | null;
+          forgot_count?: number;
+          from_ayah_id?: number | null;
+          homework?: Json | null;
+          id?: string;
+          is_locked?: boolean;
+          lines_count?: number | null;
+          locked_at?: string | null;
+          pages?: number | null;
+          prompts_count?: number;
+          rating?: number;
+          scores?: NonNullable<Json>;
+          session_id?: string;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+          settings_snapshot?: NonNullable<Json>;
+          to_ayah_id?: number | null;
+          total_score?: number;
+          updated_at?: string;
+          weak_tags?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "session_evaluations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_evaluations_from_ayah_id_fkey";
+            columns: ["from_ayah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_ayahs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_evaluations_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_evaluations_to_ayah_id_fkey";
+            columns: ["to_ayah_id"];
+            isOneToOne: false;
+            referencedRelation: "quran_ayahs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sessions: {
         Row: {
           assignment_id: string | null;
