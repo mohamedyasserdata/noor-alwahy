@@ -898,6 +898,73 @@ export type Database = {
         };
         Relationships: [];
       };
+      reports: {
+        Row: {
+          approved_at: string | null;
+          body: NonNullable<Json>;
+          content_template_version_id: string | null;
+          created_at: string;
+          id: string;
+          made_visible_at: string | null;
+          pdf_path: string | null;
+          period_end: string;
+          period_start: string;
+          period_type: string;
+          status: Database["public"]["Enums"]["report_status"];
+          student_id: string;
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_at?: string | null;
+          body: NonNullable<Json>;
+          content_template_version_id?: string | null;
+          created_at?: string;
+          id?: string;
+          made_visible_at?: string | null;
+          pdf_path?: string | null;
+          period_end: string;
+          period_start: string;
+          period_type: string;
+          status?: Database["public"]["Enums"]["report_status"];
+          student_id: string;
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          approved_at?: string | null;
+          body?: NonNullable<Json>;
+          content_template_version_id?: string | null;
+          created_at?: string;
+          id?: string;
+          made_visible_at?: string | null;
+          pdf_path?: string | null;
+          period_end?: string;
+          period_start?: string;
+          period_type?: string;
+          status?: Database["public"]["Enums"]["report_status"];
+          student_id?: string;
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reports_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       schedule_slots: {
         Row: {
           ambiguous_time_resolution: string | null;

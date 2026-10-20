@@ -6,6 +6,7 @@ import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/p
 import { SessionEvaluationsSection } from "@/components/evaluation/session-evaluations-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { TeacherMemorizationPlansSection } from "@/components/progress/teacher-memorization-plans-section";
+import { TeacherReportsSection } from "@/components/reports/teacher-reports-section";
 import { TeacherAvailabilitySection } from "@/components/teacher/teacher-availability-section";
 import { TeacherTodaySection } from "@/components/teacher/teacher-today-section";
 import { TeacherZoomSection } from "@/components/teacher/teacher-zoom-section";
@@ -32,6 +33,9 @@ export default async function TeacherSectionPage({
   }
   if (section === "students") {
     return <TeacherMemorizationPlansSection locale={locale} searchParams={searchParams} />;
+  }
+  if (section === "reports") {
+    return <TeacherReportsSection locale={locale} searchParams={searchParams} />;
   }
   if (section === "availability") {
     return <TeacherAvailabilitySection locale={locale} searchParams={searchParams} />;
