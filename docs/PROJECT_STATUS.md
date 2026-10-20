@@ -61,7 +61,7 @@
   أضيفت مهارات Anthropic `frontend-design` وVercel `find-skills` و
   `vercel-react-best-practices` و`web-design-guidelines` داخل المشروع من المصادر التي أعادها
   فهرس skills.sh، وحُدّث `skills-lock.json`. الخطوة التالية بناء خريطة المصحف وفق US-100.
-- **مزامنة GitHub:** مرتبطة بالمستودع العام
+- **مزامنة GitHub:** مرتبطة بالمستودع الخاص
   `https://github.com/mohamedyasserdata/noor-alwahy.git`؛ نجح أول Push لـ`main` في
   2026-10-19 وأصبح الفرع يتتبع `origin/main`. فحص Gitleaks النهائي للتاريخ (29 commit عند
   الفحص) وللملفات الحالية نظيف، ويُدفع كل checkpoint مهم تلقائيًا بعد المراجعة.
