@@ -1898,6 +1898,36 @@ export type Database = {
           },
         ];
       };
+      v_review_queue: {
+        Row: {
+          days_overdue: number | null;
+          interval_days: number | null;
+          is_overdue: boolean | null;
+          next_review_due: string | null;
+          page: number | null;
+          queue_position: number | null;
+          review_stage: number | null;
+          status: Database["public"]["Enums"]["progress_status"] | null;
+          student_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "memorization_progress_page_fkey";
+            columns: ["page"];
+            isOneToOne: false;
+            referencedRelation: "quran_pages";
+            referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       v_surah_progress: {
         Row: {
           avg_score: number | null;

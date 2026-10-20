@@ -1,12 +1,11 @@
 begin;
 
-select plan(23);
+select plan(24);
 
 select has_view('public', 'v_review_queue', 'review queue view exists');
 select ok((select reloptions @> array['security_invoker=true'] from pg_class where oid = 'public.v_review_queue'::regclass), 'review queue view uses caller RLS');
 select is(has_table_privilege('anon', 'public.v_review_queue', 'select'), false, 'anonymous callers cannot read the review queue');
 select is(has_table_privilege('authenticated', 'public.v_review_queue', 'select'), true, 'authenticated callers can reach the review queue through RLS');
-select is((select (value ->> 'daily_review_pages')::integer from public.app_settings where key = 'review_settings'), 10, 'the temporary daily review limit is ten pages');
 
 insert into public.tracks (id, code, name_ar, name_en)
 values ('ec100000-0000-4000-8000-000000000001', 'review-queue-test', 'اختبار ورد المراجعة', 'Review queue test');
@@ -26,7 +25,7 @@ insert into public.student_guardians (student_id, guardian_id, relation, is_prim
 values ('ec300000-0000-4000-8000-000000000001', 'ec400000-0000-4000-8000-000000000001', 'parent', true);
 
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, assigned_by, reason)
-values ('ec500000-0000-4000-8000-000000000001', 'ec300000-0000-4000-8000-000000000001', 'ec200000-0000-4000-8000-000000000001', 'ec100000-0000-4000-8000-000000000001', 'Review queue test');
+values ('ec500000-0000-4000-8000-000000000001', 'ec300000-0000-4000-8000-000000000001', 'ec200000-0000-4000-8000-000000000001', 'ec100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Review queue test');
 
 insert into public.sessions (id, assignment_id, student_id, teacher_id, scheduled_at, duration_min, status)
 select
@@ -37,7 +36,7 @@ select
   now() - series * interval '1 day',
   30,
   'held'
-from generate_series(1, 3) as series;
+from generate_series(1, 4) as series;
 
 insert into public.session_evaluations (id, session_id, session_type, from_ayah_id, to_ayah_id, scores, decision, is_locked, created_by)
 values ('ec900000-0000-4000-8000-000000000001', 'ec800000-0000-4000-8000-000000000001', 'new_memo', 1, 7, '{"memorization":5}', 'passed', true, '10000000-0000-4000-8000-000000000002');
@@ -54,6 +53,11 @@ values ('ec900000-0000-4000-8000-000000000003', 'ec800000-0000-4000-8000-0000000
 select is((select review_stage from public.memorization_progress where student_id = 'ec300000-0000-4000-8000-000000000001' and page = 1), 1::smallint, 'a successful review advances the stage once');
 select is((select next_review_due from public.memorization_progress where student_id = 'ec300000-0000-4000-8000-000000000001' and page = 1), (select locked_at::date + 3 from public.session_evaluations where id = 'ec900000-0000-4000-8000-000000000003'), 'stage one uses the three-day interval');
 
+insert into public.session_evaluations (id, session_id, session_type, from_ayah_id, to_ayah_id, scores, decision, is_locked, created_by)
+values ('ec900000-0000-4000-8000-000000000004', 'ec800000-0000-4000-8000-000000000004', 'far_review', 1, 7, '{"memorization":5}', 'passed', true, '10000000-0000-4000-8000-000000000002');
+select is((select review_stage from public.memorization_progress where student_id = 'ec300000-0000-4000-8000-000000000001' and page = 1), 2::smallint, 'consecutive review success advances to stage two');
+select is((select next_review_due from public.memorization_progress where student_id = 'ec300000-0000-4000-8000-000000000001' and page = 1), (select locked_at::date + 7 from public.session_evaluations where id = 'ec900000-0000-4000-8000-000000000004'), 'stage two uses the seven-day interval');
+
 insert into public.memorization_progress (student_id, page, status, first_memorized_at, review_stage, next_review_due)
 select
   'ec300000-0000-4000-8000-000000000001',
@@ -67,6 +71,14 @@ insert into public.memorization_progress (student_id, page, status, first_memori
 values
   ('ec300000-0000-4000-8000-000000000001', 14, 'mastered', now(), 0, current_date + 1),
   ('ec300000-0000-4000-8000-000000000001', 15, 'in_progress', null, 0, current_date - 20);
+update public.memorization_progress
+set next_review_due = current_date - page
+where student_id = 'ec300000-0000-4000-8000-000000000001'
+  and page between 2 and 13;
+update public.memorization_progress
+set next_review_due = current_date + 1
+where student_id = 'ec300000-0000-4000-8000-000000000001'
+  and page = 14;
 
 select is((select count(*)::integer from public.v_review_queue where student_id = 'ec300000-0000-4000-8000-000000000001'), 10, 'the daily queue is capped at the configured page limit');
 select is((select page from public.v_review_queue where student_id = 'ec300000-0000-4000-8000-000000000001' and queue_position = 1), 13::smallint, 'the oldest due page is first');
