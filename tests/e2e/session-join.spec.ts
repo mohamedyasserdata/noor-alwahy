@@ -58,11 +58,22 @@ async function createFixture() {
     );
   if (linkError) throw linkError;
 
-  const { error: cleanupError } = await db
+  const { data: existingSessions, error: existingSessionsError } = await db
     .from("sessions")
-    .delete()
+    .select("id,status")
     .or(`student_id.eq.${studentId},teacher_id.eq.${teacherId}`);
-  if (cleanupError) throw cleanupError;
+  if (existingSessionsError) throw existingSessionsError;
+  const priorSessions = existingSessions ?? [];
+  if (priorSessions.length) {
+    const { error: pauseError } = await db
+      .from("sessions")
+      .update({ status: "cancelled" })
+      .in(
+        "id",
+        priorSessions.map((session) => session.id),
+      );
+    if (pauseError) throw pauseError;
+  }
 
   const { error: sessionError } = await db.from("sessions").insert({
     id: sessionId,
@@ -80,6 +91,9 @@ async function createFixture() {
     joinUrl,
     async cleanup() {
       await db.from("sessions").delete().eq("id", sessionId);
+      for (const priorSession of priorSessions) {
+        await db.from("sessions").update({ status: priorSession.status }).eq("id", priorSession.id);
+      }
       await db
         .from("student_guardians")
         .delete()
