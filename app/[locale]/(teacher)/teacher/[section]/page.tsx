@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
+import { SessionEvaluationsSection } from "@/components/evaluation/session-evaluations-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { TeacherAvailabilitySection } from "@/components/teacher/teacher-availability-section";
 import { TeacherTodaySection } from "@/components/teacher/teacher-today-section";
@@ -24,6 +25,9 @@ export default async function TeacherSectionPage({
   await connection();
   if (section === "today") {
     return <TeacherTodaySection locale={locale} searchParams={searchParams} />;
+  }
+  if (section === "evaluations") {
+    return <SessionEvaluationsSection locale={locale} searchParams={searchParams} />;
   }
   if (section === "availability") {
     return <TeacherAvailabilitySection locale={locale} searchParams={searchParams} />;

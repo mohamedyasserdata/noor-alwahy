@@ -44,6 +44,7 @@ const sectionIcons = {
   progress: Sparkles,
   schedule: CalendarDays,
   evaluation: Scale,
+  evaluations: BookOpenCheck,
   zoom: Link2,
   certificates: BadgeCheck,
   children: Users,

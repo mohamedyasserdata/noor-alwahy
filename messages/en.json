@@ -155,6 +155,11 @@
           "title": "Your teaching day",
           "description": "A clear starting point for today’s sessions and tasks for students assigned to you."
         },
+        "evaluations": {
+          "label": "Evaluations",
+          "title": "Session evaluations",
+          "description": "Record student performance and homework after each session with a fast, protected form."
+        },
         "students": {
           "label": "My students",
           "title": "Assigned students",
@@ -1071,6 +1076,27 @@
         "session_not_adjustable": "The session is no longer scheduled or already has a replacement.",
         "request_failed": "The change could not be approved. No partial changes were saved."
       }
+    }
+  },
+  "sessionEvaluation": {
+    "eyebrow": "Memorization and recitation follow-up",
+    "title": "Session evaluation",
+    "description": "Choose a completed session and record its range, scores, errors, and homework. The draft stays on your device and the record locks on submission.",
+    "goal": "Under two minutes",
+    "goalDescription": "Large controls, automatically relevant criteria, and an authoritative database result.",
+    "sessionsTitle": "Completed sessions",
+    "locked": "Locked",
+    "evaluating": "Evaluating student",
+    "emptyTitle": "No session is waiting for evaluation",
+    "emptyDescription": "Completed sessions appear here after attendance is recorded.",
+    "saved": "The evaluation was saved and locked. Score: {score}%, rating: {rating}/5.",
+    "errors": {
+      "invalid_fields": "Review the fields and scores, then try again.",
+      "ayah_not_found": "The surah or ayah number is not present in the approved Quran dataset.",
+      "ayah_order": "The ending ayah must be the same as or after the starting ayah.",
+      "evaluation_locked": "This evaluation is locked and can only be reopened by an administrator.",
+      "criteria_invalid": "A score does not apply to the selected session type.",
+      "request_failed": "The evaluation could not be saved. No partial record was kept."
     }
   },
   "nextSession": {
