@@ -1,15 +1,14 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { DateTime } from "luxon";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import type { Database } from "../../types/database.types";
-import { signInAs } from "./helpers/auth";
 
 test("US-080/081 teacher records attendance in one click with atomic effects", async ({ page }) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
 
-  await signInAs(page, "en", "teacher");
+  await signIn(page, fixture.teacherEmail, fixture.teacherPassword);
   await expect(page.getByRole("heading", { name: "My sessions today" })).toBeVisible();
   const sessionCard = page.locator("li").filter({ hasText: fixture.studentName });
   await expect(sessionCard).toBeVisible();
@@ -50,15 +49,16 @@ test("US-080/081 teacher records attendance in one click with atomic effects", a
   expect(overflow).toBe(false);
 });
 
-type Db = SupabaseClient<Database>;
-
 async function createFixture() {
   const db = createClient<Database>(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),
     { auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false } },
   );
-  const teacherId = await findOrCreateTeacher(db);
+  const teacherPassword = "AcademyTest1!";
+  const teacherEmail = `attendance-${crypto.randomUUID()}@noor.local`;
+  const teacherProfileId = crypto.randomUUID();
+  const teacherId = crypto.randomUUID();
   const trackId = crypto.randomUUID();
   const studentId = crypto.randomUUID();
   const assignmentId = crypto.randomUUID();
@@ -72,6 +72,26 @@ async function createFixture() {
   const periodStart = requiredTime(localNow.startOf("month").toISODate());
   const periodEnd = requiredTime(localNow.endOf("month").toISODate());
   const validFrom = requiredTime(localNow.minus({ months: 1 }).toISODate());
+
+  const { error: userError } = await db.auth.admin.createUser({
+    id: teacherProfileId,
+    email: teacherEmail,
+    password: teacherPassword,
+    email_confirm: true,
+    app_metadata: { role: "teacher" },
+    user_metadata: { full_name: `Attendance Teacher ${teacherId.slice(0, 8)}`, role: "teacher" },
+  });
+  if (userError) throw userError;
+  const timestamp = requiredTime(DateTime.utc().toISO());
+  const { error: teacherError } = await db.from("teachers").insert({
+    id: teacherId,
+    profile_id: teacherProfileId,
+    gender: "male",
+    status: "active",
+    identity_verified_at: timestamp,
+    code_of_conduct_accepted_at: timestamp,
+  });
+  if (teacherError) throw teacherError;
 
   const { error: trackError } = await db.from("tracks").insert({
     id: trackId,
@@ -138,30 +158,16 @@ async function createFixture() {
   });
   if (sessionError) throw sessionError;
 
-  return { db, sessionId, studentName, teacherId };
+  return { db, sessionId, studentName, teacherEmail, teacherId, teacherPassword };
 }
 
-async function findOrCreateTeacher(db: Db) {
-  const profileId = "10000000-0000-4000-8000-000000000002";
-  const { data, error } = await db
-    .from("teachers")
-    .select("id")
-    .eq("profile_id", profileId)
-    .maybeSingle();
-  if (error) throw error;
-  if (data) return data.id;
-  const id = crypto.randomUUID();
-  const timestamp = requiredTime(DateTime.utc().toISO());
-  const { error: insertError } = await db.from("teachers").insert({
-    id,
-    profile_id: profileId,
-    gender: "male",
-    status: "active",
-    identity_verified_at: timestamp,
-    code_of_conduct_accepted_at: timestamp,
-  });
-  if (insertError) throw insertError;
-  return id;
+async function signIn(page: Page, email: string, password: string) {
+  await page.context().clearCookies();
+  await page.goto("/en/auth/login");
+  await page.locator("#email").fill(email);
+  await page.locator("#password").fill(password);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/en\/teacher\/today(?:\?.*)?$/);
 }
 
 function required(name: "NEXT_PUBLIC_SUPABASE_URL" | "SUPABASE_SERVICE_ROLE_KEY") {

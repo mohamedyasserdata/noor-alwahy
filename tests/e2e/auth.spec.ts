@@ -44,7 +44,7 @@ test("US-010 routes a teacher to the teacher portal and rejects the admin portal
   await page.goto("/en/admin/dashboard");
 
   await expect(page).toHaveURL(/\/en\/teacher\/today$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Your teaching day" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "My sessions today" })).toBeVisible();
 });
 
 test("US-011 completes password recovery without revealing account existence", async ({
