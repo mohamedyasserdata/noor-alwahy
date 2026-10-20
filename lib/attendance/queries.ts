@@ -11,12 +11,27 @@ type AttendanceRow = Pick<
   "status" | "minutes" | "recorded_at"
 >;
 
+type ReviewQueueRow = Omit<
+  Pick<
+    Database["public"]["Views"]["v_review_queue"]["Row"],
+    | "page"
+    | "status"
+    | "review_stage"
+    | "next_review_due"
+    | "days_overdue"
+    | "is_overdue"
+    | "queue_position"
+  >,
+  "page"
+> & { page: number };
+
 export type TeacherTodaySession = Pick<
   Database["public"]["Tables"]["sessions"]["Row"],
   "id" | "scheduled_at" | "duration_min" | "status"
 > & {
   studentName: string;
   attendance: AttendanceRow | null;
+  reviewQueue: ReviewQueueRow[];
 };
 
 export async function getTeacherTodaySessions() {
@@ -39,7 +54,7 @@ export async function getTeacherTodaySessions() {
   const { data, error } = await supabase
     .from("sessions")
     .select(
-      "id,scheduled_at,duration_min,status,students!sessions_student_id_fkey(full_name),attendance(status,minutes,recorded_at)",
+      "id,student_id,scheduled_at,duration_min,status,students!sessions_student_id_fkey(full_name),attendance(status,minutes,recorded_at)",
     )
     .eq("teacher_id", teacher.id)
     .gte("scheduled_at", start)
@@ -47,6 +62,36 @@ export async function getTeacherTodaySessions() {
     .order("scheduled_at");
 
   if (error) throw new Error("teacher_day_unavailable");
+
+  const studentIds = [...new Set((data ?? []).map((session) => session.student_id))];
+  const { data: reviewRows, error: reviewError } = studentIds.length
+    ? await supabase
+        .from("v_review_queue")
+        .select(
+          "student_id,page,status,review_stage,next_review_due,days_overdue,is_overdue,queue_position",
+        )
+        .in("student_id", studentIds)
+        .order("student_id")
+        .order("queue_position")
+    : { data: [], error: null };
+
+  if (reviewError) throw new Error("teacher_day_unavailable");
+
+  const queuesByStudent = new Map<string, ReviewQueueRow[]>();
+  for (const row of reviewRows ?? []) {
+    if (!row.student_id || row.page === null) continue;
+    const queue = queuesByStudent.get(row.student_id) ?? [];
+    queue.push({
+      page: row.page,
+      status: row.status,
+      review_stage: row.review_stage,
+      next_review_due: row.next_review_due,
+      days_overdue: row.days_overdue,
+      is_overdue: row.is_overdue,
+      queue_position: row.queue_position,
+    });
+    queuesByStudent.set(row.student_id, queue);
+  }
 
   return {
     dateInstant: localNow.toUTC().toISO(),
@@ -58,6 +103,7 @@ export async function getTeacherTodaySessions() {
       status: session.status,
       studentName: session.students.full_name,
       attendance: one(session.attendance),
+      reviewQueue: queuesByStudent.get(session.student_id) ?? [],
     })) satisfies TeacherTodaySession[],
   };
 }

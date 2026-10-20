@@ -43,7 +43,7 @@ export function SessionEvaluationForm({
   const storageKey = evaluationDraftStorageKey(sessionId);
   const [draft, setDraft] = useState<EvaluationDraft>(() => createInitialDraft(settings));
   const [restored, setRestored] = useState(false);
-  const storageReady = useRef(false);
+  const draftRef = useRef(draft);
   const activeSettings = settings.find((entry) => entry.sessionType === draft.sessionType)!;
   const fromSurah = surahs.find((surah) => surah.id === draft.fromSurah) ?? surahs[0]!;
   const toSurah = surahs.find((surah) => surah.id === draft.toSurah) ?? surahs[0]!;
@@ -51,24 +51,26 @@ export function SessionEvaluationForm({
   useEffect(() => {
     if (clearSavedDraft) {
       localStorage.removeItem(storageKey);
-      storageReady.current = true;
       return;
     }
     const saved = parseEvaluationDraft(localStorage.getItem(storageKey));
-    storageReady.current = true;
     if (!saved) return;
     const timeout = window.setTimeout(() => {
+      draftRef.current = saved;
       setDraft(saved);
       setRestored(true);
     }, 0);
     return () => window.clearTimeout(timeout);
   }, [clearSavedDraft, storageKey]);
 
-  useEffect(() => {
-    if (!clearSavedDraft && storageReady.current) {
-      localStorage.setItem(storageKey, JSON.stringify(draft));
+  function updateDraft(updater: (current: EvaluationDraft) => EvaluationDraft) {
+    const next = updater(draftRef.current);
+    draftRef.current = next;
+    setDraft(next);
+    if (!clearSavedDraft) {
+      localStorage.setItem(storageKey, JSON.stringify(next));
     }
-  }, [clearSavedDraft, draft, storageKey]);
+  }
 
   const preview = useMemo(() => {
     try {
@@ -155,7 +157,7 @@ export function SessionEvaluationForm({
 
   function changeType(sessionType: EvaluationSessionType) {
     const nextSettings = settings.find((entry) => entry.sessionType === sessionType)!;
-    setDraft((current) => ({
+    updateDraft((current) => ({
       ...current,
       sessionType,
       scores: Object.fromEntries(nextSettings.criteria.map((criterion) => [criterion.code, 3])),
@@ -201,7 +203,7 @@ export function SessionEvaluationForm({
                   name={`${side}Surah`}
                   value={selected.id}
                   onChange={(event) =>
-                    setDraft((current) => ({
+                    updateDraft((current) => ({
                       ...current,
                       [`${side}Surah`]: Number(event.target.value),
                       [`${side}Ayah`]: 1,
@@ -224,7 +226,7 @@ export function SessionEvaluationForm({
                   max={selected.ayahCount}
                   value={draft[`${side}Ayah`]}
                   onChange={(event) =>
-                    setDraft((current) => ({
+                    updateDraft((current) => ({
                       ...current,
                       [`${side}Ayah`]: Number(event.target.value),
                     }))
@@ -260,7 +262,7 @@ export function SessionEvaluationForm({
                     aria-checked={draft.scores[criterion.code] === score}
                     aria-label={`${score} - ${ratingLabels[locale][score - 1]}`}
                     onClick={() =>
-                      setDraft((current) => ({
+                      updateDraft((current) => ({
                         ...current,
                         scores: { ...current.scores, [criterion.code]: score },
                       }))
@@ -288,25 +290,25 @@ export function SessionEvaluationForm({
             label={text.major}
             name="errorsMajor"
             value={draft.errorsMajor}
-            onChange={(value) => setDraft((current) => ({ ...current, errorsMajor: value }))}
+            onChange={(value) => updateDraft((current) => ({ ...current, errorsMajor: value }))}
           />
           <Counter
             label={text.minor}
             name="errorsMinor"
             value={draft.errorsMinor}
-            onChange={(value) => setDraft((current) => ({ ...current, errorsMinor: value }))}
+            onChange={(value) => updateDraft((current) => ({ ...current, errorsMinor: value }))}
           />
           <Counter
             label={text.prompts}
             name="promptsCount"
             value={draft.promptsCount}
-            onChange={(value) => setDraft((current) => ({ ...current, promptsCount: value }))}
+            onChange={(value) => updateDraft((current) => ({ ...current, promptsCount: value }))}
           />
           <Counter
             label={text.forgot}
             name="forgotCount"
             value={draft.forgotCount}
-            onChange={(value) => setDraft((current) => ({ ...current, forgotCount: value }))}
+            onChange={(value) => updateDraft((current) => ({ ...current, forgotCount: value }))}
           />
         </div>
       </fieldset>
@@ -319,7 +321,7 @@ export function SessionEvaluationForm({
           name="weakTags"
           value={draft.weakTags}
           onChange={(event) =>
-            setDraft((current) => ({ ...current, weakTags: event.target.value }))
+            updateDraft((current) => ({ ...current, weakTags: event.target.value }))
           }
         />
         <Label htmlFor="decision">{text.decision}</Label>
@@ -328,7 +330,7 @@ export function SessionEvaluationForm({
           name="decision"
           value={draft.decision}
           onChange={(event) =>
-            setDraft((current) => ({
+            updateDraft((current) => ({
               ...current,
               decision: event.target.value as EvaluationDraft["decision"],
             }))
@@ -346,7 +348,7 @@ export function SessionEvaluationForm({
           rows={3}
           value={draft.homework}
           onChange={(event) =>
-            setDraft((current) => ({ ...current, homework: event.target.value }))
+            updateDraft((current) => ({ ...current, homework: event.target.value }))
           }
           className="rounded-xl border bg-card p-3"
         />
@@ -357,7 +359,7 @@ export function SessionEvaluationForm({
           rows={3}
           value={draft.familyNote}
           onChange={(event) =>
-            setDraft((current) => ({ ...current, familyNote: event.target.value }))
+            updateDraft((current) => ({ ...current, familyNote: event.target.value }))
           }
           className="rounded-xl border bg-card p-3"
         />

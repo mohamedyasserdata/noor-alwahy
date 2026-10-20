@@ -1,10 +1,10 @@
-import { CalendarDays, CheckCircle2, Clock3, UserRoundCheck } from "lucide-react";
+import { BookOpenCheck, CalendarDays, CheckCircle2, Clock3, UserRoundCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AppLocale } from "@/i18n/routing";
 import { recordAttendanceAction } from "@/lib/attendance/actions";
 import { getTeacherTodaySessions } from "@/lib/attendance/queries";
@@ -140,6 +140,39 @@ export async function TeacherTodaySection({
                             <Badge variant="outline">{t("awaitingAttendance")}</Badge>
                           )}
                         </div>
+
+                        <Card className="mt-5 shadow-none hover:shadow-none">
+                          <CardHeader className="flex-row items-start justify-between gap-3 pb-3">
+                            <div>
+                              <CardTitle className="flex items-center gap-2 text-base">
+                                <BookOpenCheck className="text-secondary" aria-hidden="true" />
+                                {t("reviewQueue.title")}
+                              </CardTitle>
+                              <CardDescription>{t("reviewQueue.description")}</CardDescription>
+                            </div>
+                            <Badge variant="secondary">
+                              {t("reviewQueue.count", { count: session.reviewQueue.length })}
+                            </Badge>
+                          </CardHeader>
+                          <CardContent>
+                            {session.reviewQueue.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">
+                                {t("reviewQueue.empty")}
+                              </p>
+                            ) : (
+                              <ol className="flex flex-wrap gap-2">
+                                {session.reviewQueue.map((item) => (
+                                  <li key={item.page}>
+                                    <Badge variant={item.is_overdue ? "warning" : "outline"}>
+                                      {t("reviewQueue.page", { page: item.page })}
+                                      {item.is_overdue ? ` · ${t("reviewQueue.overdue")}` : ""}
+                                    </Badge>
+                                  </li>
+                                ))}
+                              </ol>
+                            )}
+                          </CardContent>
+                        </Card>
 
                         {session.attendance ? (
                           <p className="mt-4 text-sm leading-6 text-muted-foreground">

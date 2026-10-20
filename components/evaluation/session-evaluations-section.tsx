@@ -46,7 +46,10 @@ export async function SessionEvaluationsSection({
   const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 
   return (
-    <section className="mx-auto w-full max-w-6xl" aria-labelledby="session-evaluation-title">
+    <section
+      className="mx-auto w-full max-w-6xl overflow-x-hidden"
+      aria-labelledby="session-evaluation-title"
+    >
       <header className="grid gap-5 border-b border-secondary/30 pb-7 lg:grid-cols-[1fr_17rem] lg:items-end">
         <div className="max-w-3xl">
           <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
@@ -76,8 +79,8 @@ export async function SessionEvaluationsSection({
         </Alert>
       ) : null}
 
-      <div className="mt-7 grid gap-7 lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <aside>
+      <div className="mt-7 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-7 lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <aside className="min-w-0">
           <h2 className="font-black text-primary">{t("sessionsTitle")}</h2>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible">
             {data.sessions.map((session) => (
