@@ -7,7 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
-import { createSubscriptionAction } from "@/lib/subscriptions/actions";
+import {
+  createSubscriptionAction,
+  pauseSubscriptionAction,
+  processRenewalsAction,
+  requestSubscriptionChangeAction,
+} from "@/lib/subscriptions/actions";
 import { getSubscriptionAdminData } from "@/lib/subscriptions/queries";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
@@ -26,22 +31,35 @@ export async function SubscriptionAdminSection({
   ]);
   const status = typeof query.subscriptionStatus === "string" ? query.subscriptionStatus : "";
   const error = typeof query.subscriptionError === "string" ? query.subscriptionError : "";
+  const alerts = typeof query.alerts === "string" ? query.alerts : "0";
+  const invoices = typeof query.invoices === "string" ? query.invoices : "0";
   const today = DateTime.utc().toISODate() ?? "";
   const localized = (value: { name_ar: string; name_en: string | null }) =>
     locale === "ar" ? value.name_ar : (value.name_en ?? value.name_ar);
 
   return (
     <section className="mx-auto w-full max-w-7xl" aria-labelledby="subscriptions-title">
-      <header className="max-w-3xl">
-        <p className="text-sm font-black text-secondary">{t("eyebrow")}</p>
-        <h1 id="subscriptions-title" className="mt-3 text-3xl font-black text-primary sm:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+      <header className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+        <div className="max-w-3xl">
+          <p className="text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1
+            id="subscriptions-title"
+            className="mt-3 text-3xl font-black text-primary sm:text-4xl"
+          >
+            {t("title")}
+          </h1>
+          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+        </div>
+        <form action={processRenewalsAction.bind(null, locale)}>
+          <input type="hidden" name="asOf" value={today} />
+          <AdminSubmitButton label={t("runRenewals")} pendingLabel={t("runningRenewals")} />
+        </form>
       </header>
       {status ? (
         <p className="mt-5 rounded-xl bg-success/10 p-4 font-bold text-success">
-          {t("notices.created")}
+          {status === "renewals_processed"
+            ? t("notices.renewals_processed", { alerts, invoices })
+            : t(`notices.${status}` as "notices.created")}
         </p>
       ) : null}
       {error ? (
@@ -117,6 +135,10 @@ export async function SubscriptionAdminSection({
             const packageData = Array.isArray(subscription.packages)
               ? subscription.packages[0]
               : subscription.packages;
+            const scheduledPackage = data.packages.find(
+              (item) => item.id === subscription.scheduled_package_id,
+            );
+            const canManage = subscription.status === "active" || subscription.status === "paused";
             return (
               <article
                 key={subscription.id}
@@ -135,31 +157,103 @@ export async function SubscriptionAdminSection({
                     {packageData ? localized(packageData) : t("legacyPackage")}
                   </p>
                 </div>
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm md:text-end">
-                  <div>
-                    <dt className="text-muted-foreground">{t("period")}</dt>
-                    <dd className="font-bold">
-                      {subscription.current_period_start} — {subscription.current_period_end}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">{t("fixedPrice")}</dt>
-                    <dd className="font-bold" dir="ltr">
-                      {subscription.price_amount ?? "—"} {subscription.price_currency ?? ""}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">{t("sessions")}</dt>
-                    <dd className="font-bold">{subscription.sessions_per_period}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">{t("renewal")}</dt>
-                    <dd className="flex items-center justify-end gap-1 font-bold">
-                      <CalendarClock className="size-4" aria-hidden="true" />
-                      {subscription.renew_date ?? "—"}
-                    </dd>
-                  </div>
-                </dl>
+                <div className="grid gap-4">
+                  <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm md:text-end">
+                    <div>
+                      <dt className="text-muted-foreground">{t("period")}</dt>
+                      <dd className="font-bold">
+                        {subscription.current_period_start} — {subscription.current_period_end}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("fixedPrice")}</dt>
+                      <dd className="font-bold" dir="ltr">
+                        {subscription.price_amount ?? "—"} {subscription.price_currency ?? ""}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("sessions")}</dt>
+                      <dd className="font-bold">{subscription.sessions_per_period}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("renewal")}</dt>
+                      <dd className="flex items-center justify-end gap-1 font-bold">
+                        <CalendarClock className="size-4" aria-hidden="true" />
+                        {subscription.renew_date ?? "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                  {scheduledPackage ? (
+                    <p className="rounded-xl bg-secondary/10 px-3 py-2 text-sm font-bold text-primary">
+                      {t("scheduledPackage", { package: localized(scheduledPackage) })}
+                    </p>
+                  ) : null}
+                  {subscription.paused_until ? (
+                    <p className="rounded-xl bg-warning/10 px-3 py-2 text-sm font-bold text-foreground">
+                      {t("pausedUntil", { date: subscription.paused_until })}
+                      {subscription.pause_reason ? ` · ${subscription.pause_reason}` : ""}
+                    </p>
+                  ) : null}
+                  {canManage ? (
+                    <div className="grid gap-3 border-t pt-4 lg:grid-cols-2">
+                      {subscription.status === "active" ? (
+                        <form
+                          action={pauseSubscriptionAction.bind(null, locale)}
+                          className="grid gap-2 rounded-xl border p-3"
+                        >
+                          <input type="hidden" name="subscriptionId" value={subscription.id} />
+                          <Label htmlFor={`pause-until-${subscription.id}`}>
+                            {t("pauseUntil")}
+                          </Label>
+                          <Input
+                            id={`pause-until-${subscription.id}`}
+                            name="pausedUntil"
+                            type="date"
+                            min={today}
+                            required
+                          />
+                          <Label htmlFor={`pause-reason-${subscription.id}`}>
+                            {t("pauseReason")}
+                          </Label>
+                          <Input
+                            id={`pause-reason-${subscription.id}`}
+                            name="reason"
+                            minLength={2}
+                            maxLength={500}
+                            required
+                          />
+                          <AdminSubmitButton label={t("pause")} pendingLabel={t("pausing")} />
+                        </form>
+                      ) : null}
+                      <form
+                        action={requestSubscriptionChangeAction.bind(null, locale)}
+                        className="grid gap-2 rounded-xl border p-3"
+                      >
+                        <input type="hidden" name="subscriptionId" value={subscription.id} />
+                        <FieldSelect
+                          id={`change-package-${subscription.id}`}
+                          name="targetPackageId"
+                          label={t("changePackage")}
+                          required
+                        >
+                          <option value="">{t("choosePackage")}</option>
+                          {data.packages
+                            .filter((item) => item.id !== subscription.package_id)
+                            .map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {localized(item)}
+                              </option>
+                            ))}
+                        </FieldSelect>
+                        <p className="text-xs leading-5 text-muted-foreground">{t("changeHint")}</p>
+                        <AdminSubmitButton
+                          label={t("applyChange")}
+                          pendingLabel={t("applyingChange")}
+                        />
+                      </form>
+                    </div>
+                  ) : null}
+                </div>
               </article>
             );
           })

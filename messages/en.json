@@ -1186,6 +1186,7 @@
       "reportApproved": "Student report approved",
       "paymentConfirmed": "Payment confirmed and receipt issued",
       "refundConfirmed": "Refund confirmed",
+      "subscriptionRenewalDue": "A subscription renewal is due soon",
       "generic": "You have a new academy update"
     }
   },
@@ -1918,6 +1919,18 @@
     "fixedPrice": "Fixed price",
     "sessions": "Period sessions",
     "renewal": "Renewal",
+    "runRenewals": "Run renewal follow-up",
+    "runningRenewals": "Checking renewals…",
+    "pauseUntil": "Pause until",
+    "pauseReason": "Pause reason",
+    "pause": "Pause subscription",
+    "pausing": "Pausing…",
+    "changePackage": "Change package",
+    "changeHint": "Upgrades create an immediate prorated difference invoice; downgrades start next period.",
+    "applyChange": "Apply package change",
+    "applyingChange": "Applying change…",
+    "scheduledPackage": "Package scheduled for the next period: {package}",
+    "pausedUntil": "Paused until {date}",
     "empty": "No subscriptions yet.",
     "states": {
       "trial": "Trial",
@@ -1927,14 +1940,24 @@
       "cancelled": "Cancelled"
     },
     "notices": {
-      "created": "The subscription and its package and price snapshots were created successfully."
+      "created": "The subscription and its package and price snapshots were created successfully.",
+      "paused": "The subscription was paused with its reason and resume date recorded.",
+      "upgrade_invoice": "The prorated upgrade invoice was created; the new package starts after payment confirmation.",
+      "downgrade_scheduled": "The new package is scheduled for the next renewal period.",
+      "renewals_processed": "Renewal follow-up completed: {alerts} alerts and {invoices} new renewal invoices."
     },
     "errors": {
       "invalid_fields": "Review the student, package, country, and start date.",
       "already_current": "This student already has a current subscription.",
       "price_missing": "No current country price or fallback price is available for this package.",
       "application_mismatch": "The application does not match the selected student or package.",
-      "create_failed": "The subscription could not be created. Review the data and try again."
+      "create_failed": "The subscription could not be created. Review the data and try again.",
+      "invalid_pause": "Choose a valid pause date and provide a reason.",
+      "pause_failed": "The subscription could not be paused.",
+      "invalid_change": "Choose a valid subscription and replacement package.",
+      "change_failed": "The package change could not be applied.",
+      "invalid_run": "The renewal processing date is invalid.",
+      "renewal_failed": "Renewal follow-up could not run. No partial operation was saved."
     }
   },
   "accessibility": {

@@ -326,5 +326,6 @@ function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"n
   if (type === "report_approved") return t("types.reportApproved");
   if (type === "payment_confirmed") return t("types.paymentConfirmed");
   if (type === "refund_confirmed") return t("types.refundConfirmed");
+  if (type === "subscription_renewal_due") return t("types.subscriptionRenewalDue");
   return t("types.generic");
 }

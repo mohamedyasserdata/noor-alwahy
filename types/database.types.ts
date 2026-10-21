@@ -586,6 +586,8 @@ export type Database = {
       };
       invoices: {
         Row: {
+          billing_period_end: string | null;
+          billing_period_start: string | null;
           created_at: string;
           created_by: string | null;
           currency: string;
@@ -595,7 +597,9 @@ export type Database = {
           invoice_no: string;
           issued_at: string | null;
           locale: string;
+          metadata: NonNullable<Json>;
           payer_profile_id: string | null;
+          purpose: string;
           status: Database["public"]["Enums"]["invoice_status"];
           student_id: string;
           subscription_id: string | null;
@@ -605,6 +609,8 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          billing_period_end?: string | null;
+          billing_period_start?: string | null;
           created_at?: string;
           created_by?: string | null;
           currency: string;
@@ -614,7 +620,9 @@ export type Database = {
           invoice_no?: string;
           issued_at?: string | null;
           locale?: string;
+          metadata?: NonNullable<Json>;
           payer_profile_id?: string | null;
+          purpose?: string;
           status?: Database["public"]["Enums"]["invoice_status"];
           student_id: string;
           subscription_id?: string | null;
@@ -623,6 +631,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          billing_period_end?: string | null;
+          billing_period_start?: string | null;
           created_at?: string;
           created_by?: string | null;
           currency?: string;
@@ -632,7 +642,9 @@ export type Database = {
           invoice_no?: string;
           issued_at?: string | null;
           locale?: string;
+          metadata?: NonNullable<Json>;
           payer_profile_id?: string | null;
+          purpose?: string;
           status?: Database["public"]["Enums"]["invoice_status"];
           student_id?: string;
           subscription_id?: string | null;
@@ -2358,6 +2370,39 @@ export type Database = {
           },
         ];
       };
+      subscription_renewal_alerts: {
+        Row: {
+          created_at: string;
+          days_before: number;
+          id: string;
+          period_end: string;
+          subscription_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          days_before: number;
+          id?: string;
+          period_end: string;
+          subscription_id: string;
+        };
+        Update: {
+          created_at?: string;
+          days_before?: number;
+          id?: string;
+          period_end?: string;
+          subscription_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscription_renewal_alerts_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       subscriptions: {
         Row: {
           auto_renew: boolean;
@@ -2369,12 +2414,14 @@ export type Database = {
           id: string;
           package_id: string | null;
           package_snapshot: Json | null;
+          pause_reason: string | null;
           paused_until: string | null;
           policy_snapshot: NonNullable<Json>;
           price_amount: number | null;
           price_country: string | null;
           price_currency: string | null;
           renew_date: string | null;
+          scheduled_package_id: string | null;
           sessions_per_period: number;
           source_application_id: string | null;
           start_date: string;
@@ -2393,12 +2440,14 @@ export type Database = {
           id?: string;
           package_id?: string | null;
           package_snapshot?: Json | null;
+          pause_reason?: string | null;
           paused_until?: string | null;
           policy_snapshot?: NonNullable<Json>;
           price_amount?: number | null;
           price_country?: string | null;
           price_currency?: string | null;
           renew_date?: string | null;
+          scheduled_package_id?: string | null;
           sessions_per_period: number;
           source_application_id?: string | null;
           start_date: string;
@@ -2416,12 +2465,14 @@ export type Database = {
           id?: string;
           package_id?: string | null;
           package_snapshot?: Json | null;
+          pause_reason?: string | null;
           paused_until?: string | null;
           policy_snapshot?: NonNullable<Json>;
           price_amount?: number | null;
           price_country?: string | null;
           price_currency?: string | null;
           renew_date?: string | null;
+          scheduled_package_id?: string | null;
           sessions_per_period?: number;
           source_application_id?: string | null;
           start_date?: string;
@@ -2457,6 +2508,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "countries";
             referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "subscriptions_scheduled_package_id_fkey";
+            columns: ["scheduled_package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
           },
           {
             foreignKeyName: "subscriptions_source_application_id_fkey";
@@ -3141,6 +3199,11 @@ export type Database = {
         };
         Returns: string;
       };
+      pause_subscription: {
+        Args: { p_reason: string; p_subscription: string; p_until: string };
+        Returns: undefined;
+      };
+      process_subscription_renewals: { Args: { p_as_of?: string }; Returns: Json };
       record_attendance: {
         Args: {
           p_minutes?: number;
@@ -3175,6 +3238,10 @@ export type Database = {
         Returns: undefined;
       };
       reorder_packages: { Args: { p_package_ids: string[] }; Returns: undefined };
+      request_subscription_change: {
+        Args: { p_subscription: string; p_target_package: string };
+        Returns: string;
+      };
       reschedule_session: {
         Args: { p_scheduled_at: string; p_session_id: string };
         Returns: string;
