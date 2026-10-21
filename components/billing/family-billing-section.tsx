@@ -22,6 +22,56 @@ export async function FamilyBillingSection({ locale }: { locale: AppLocale }) {
         </h1>
         <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
       </header>
+      {data.statement.length ? (
+        <section
+          className="mt-8 rounded-3xl border bg-card p-5 shadow-card sm:p-7"
+          aria-labelledby="statement-title"
+        >
+          <h2 id="statement-title" className="text-xl font-black text-primary">
+            {t("statementTitle")}
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">{t("statementHint")}</p>
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-[42rem] text-sm">
+              <thead>
+                <tr className="border-b text-start text-muted-foreground">
+                  <th className="p-3 text-start">{t("statementDate")}</th>
+                  <th className="p-3 text-start">{t("statementReference")}</th>
+                  <th className="p-3 text-end">{t("statementDebit")}</th>
+                  <th className="p-3 text-end">{t("statementCredit")}</th>
+                  <th className="p-3 text-end">{t("statementBalance")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.statement.map((entry, index) => (
+                  <tr
+                    key={`${entry.student_id}-${entry.reference}-${entry.entry_at}-${index}`}
+                    className="border-b last:border-0"
+                  >
+                    <td className="p-3">
+                      {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                        new Date(entry.entry_at!),
+                      )}
+                    </td>
+                    <td className="p-3 font-mono" dir="ltr">
+                      {entry.reference}
+                    </td>
+                    <td className="p-3 text-end" dir="ltr">
+                      {Number(entry.debit) ? money(entry.debit!, entry.currency!) : "—"}
+                    </td>
+                    <td className="p-3 text-end" dir="ltr">
+                      {Number(entry.credit) ? money(entry.credit!, entry.currency!) : "—"}
+                    </td>
+                    <td className="p-3 text-end font-black" dir="ltr">
+                      {money(entry.running_balance!, entry.currency!)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
       <div className="mt-8 grid gap-5">
         {data.invoices.length ? (
           data.invoices.map((invoice) => {

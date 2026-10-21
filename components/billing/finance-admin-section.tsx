@@ -10,6 +10,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { decidePaymentAction, recordPaymentAction } from "@/lib/billing/actions";
 import { getFinanceAdminData } from "@/lib/billing/queries";
 import { PaymentMethodsAdmin } from "@/components/billing/payment-methods-admin";
+import { FinancialReportsAdmin } from "@/components/billing/financial-reports-admin";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 
@@ -50,6 +51,7 @@ export async function FinanceAdminSection({
           {t(`errors.${error}` as "errors.record_failed")}
         </p>
       ) : null}
+      <FinancialReportsAdmin locale={locale} data={data} />
       <div className="mt-8 grid gap-5">
         {data.invoices.length ? (
           data.invoices.map((invoice) => {

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function getFinanceAdminData() {
   await connection();
   const supabase = await createClient();
-  const [invoices, balances, payments, methods, countries] = await Promise.all([
+  const [invoices, balances, payments, methods, countries, expenses, summary] = await Promise.all([
     supabase
       .from("invoices")
       .select(
@@ -30,8 +30,24 @@ export async function getFinanceAdminData() {
       )
       .order("sort_order"),
     supabase.from("countries").select("code,name_ar,name_en").eq("is_enabled", true).order("code"),
+    supabase
+      .from("expenses")
+      .select(
+        "id,expense_no,category,description,amount,currency,incurred_on,payee,reference,status,void_reason,created_at",
+      )
+      .order("incurred_on", { ascending: false })
+      .limit(200),
+    supabase.from("financial_currency_summary").select("*").order("currency"),
   ]);
-  if (invoices.error || balances.error || payments.error || methods.error || countries.error) {
+  if (
+    invoices.error ||
+    balances.error ||
+    payments.error ||
+    methods.error ||
+    countries.error ||
+    expenses.error ||
+    summary.error
+  ) {
     throw new Error("finance_management_unavailable");
   }
   return {
@@ -40,5 +56,7 @@ export async function getFinanceAdminData() {
     payments: payments.data ?? [],
     methods: methods.data ?? [],
     countries: countries.data ?? [],
+    expenses: expenses.data ?? [],
+    summary: summary.data ?? [],
   };
 }

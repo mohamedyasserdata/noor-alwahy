@@ -55,3 +55,30 @@ export const paymentMethodToggleSchema = z.object({
   id: z.uuid(),
   isActive: z.enum(["true", "false"]),
 });
+
+export const expenseSchema = z.object({
+  category: z.enum([
+    "teacher_payout",
+    "marketing",
+    "software",
+    "bank_fees",
+    "rent",
+    "equipment",
+    "other",
+  ]),
+  description: z.string().trim().min(2).max(500),
+  amount,
+  currency: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{3}$/),
+  incurredOn: z.iso.date(),
+  payee: z.string().trim().max(200).optional().default(""),
+  reference: z.string().trim().max(200).optional().default(""),
+});
+
+export const voidExpenseSchema = z.object({
+  expenseId: z.uuid(),
+  reason: z.string().trim().min(2).max(500),
+});

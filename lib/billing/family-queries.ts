@@ -16,7 +16,8 @@ export async function getFamilyBillingData() {
     .limit(100);
   if (invoices.error) throw new Error("family_billing_unavailable");
   const ids = (invoices.data ?? []).map((item) => item.id);
-  const [items, balances, payments, methods] = await Promise.all([
+  const studentIds = [...new Set((invoices.data ?? []).map((item) => item.student_id))];
+  const [items, balances, payments, methods, statement] = await Promise.all([
     ids.length
       ? supabase
           .from("invoice_items")
@@ -40,8 +41,16 @@ export async function getFamilyBillingData() {
       )
       .eq("is_active", true)
       .order("sort_order"),
+    studentIds.length
+      ? supabase
+          .from("student_account_statement")
+          .select("student_id,currency,entry_at,entry_type,reference,debit,credit,running_balance")
+          .in("student_id", studentIds)
+          .order("entry_at", { ascending: false })
+          .limit(300)
+      : Promise.resolve({ data: [], error: null }),
   ]);
-  if (items.error || balances.error || payments.error || methods.error)
+  if (items.error || balances.error || payments.error || methods.error || statement.error)
     throw new Error("family_billing_unavailable");
   return {
     invoices: invoices.data ?? [],
@@ -49,5 +58,6 @@ export async function getFamilyBillingData() {
     balances: balances.data ?? [],
     payments: payments.data ?? [],
     methods: methods.data ?? [],
+    statement: statement.data ?? [],
   };
 }

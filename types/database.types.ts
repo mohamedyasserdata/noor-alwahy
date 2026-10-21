@@ -502,6 +502,69 @@ export type Database = {
           },
         ];
       };
+      expenses: {
+        Row: {
+          amount: number;
+          category: string;
+          created_at: string;
+          created_by: string;
+          currency: string;
+          description: string;
+          expense_no: string;
+          id: string;
+          incurred_on: string;
+          payee: string | null;
+          receipt_path: string | null;
+          reference: string | null;
+          status: string;
+          updated_at: string;
+          void_reason: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          category: string;
+          created_at?: string;
+          created_by: string;
+          currency: string;
+          description: string;
+          expense_no?: string;
+          id?: string;
+          incurred_on?: string;
+          payee?: string | null;
+          receipt_path?: string | null;
+          reference?: string | null;
+          status?: string;
+          updated_at?: string;
+          void_reason?: string | null;
+        };
+        Update: {
+          amount?: number;
+          category?: string;
+          created_at?: string;
+          created_by?: string;
+          currency?: string;
+          description?: string;
+          expense_no?: string;
+          id?: string;
+          incurred_on?: string;
+          payee?: string | null;
+          receipt_path?: string | null;
+          reference?: string | null;
+          status?: string;
+          updated_at?: string;
+          void_reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "expenses_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       guardians: {
         Row: {
           created_at: string;
@@ -2920,12 +2983,39 @@ export type Database = {
       };
     };
     Views: {
+      financial_currency_summary: {
+        Row: {
+          currency: string | null;
+          expenses: number | null;
+          invoiced: number | null;
+          net_cash: number | null;
+          outstanding: number | null;
+          received: number | null;
+          refunded: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       invoice_balance: {
         Row: {
           due: number | null;
           invoice_id: string | null;
           paid: number | null;
           total: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      student_account_statement: {
+        Row: {
+          credit: number | null;
+          currency: string | null;
+          debit: number | null;
+          entry_at: string | null;
+          entry_type: string | null;
+          reference: string | null;
+          running_balance: number | null;
+          student_id: string | null;
         };
         ComputedFields: never;
         Relationships: [];

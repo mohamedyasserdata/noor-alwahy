@@ -13,6 +13,8 @@ import {
   paymentMethodSchema,
   paymentMethodToggleSchema,
   recordPaymentSchema,
+  expenseSchema,
+  voidExpenseSchema,
 } from "@/lib/validators/billing";
 
 function locale(value: string): AppLocale {
@@ -168,4 +170,52 @@ export async function togglePaymentMethodAction(
   if (error) go(currentLocale, "financeError", "method_save_failed");
   refresh(currentLocale);
   go(currentLocale, "financeStatus", "method_saved");
+}
+
+export async function createExpenseAction(localeValue: string, formData: FormData): Promise<never> {
+  const currentLocale = locale(localeValue);
+  const { user } = await requireRole("admin", currentLocale);
+  const parsed = expenseSchema.safeParse({
+    category: formData.get("category"),
+    description: formData.get("description"),
+    amount: formData.get("amount"),
+    currency: formData.get("currency"),
+    incurredOn: formData.get("incurredOn"),
+    payee: formData.get("payee") ?? "",
+    reference: formData.get("reference") ?? "",
+  });
+  if (!parsed.success) go(currentLocale, "financeError", "invalid_expense");
+  const supabase = await createClient();
+  const { error } = await supabase.from("expenses").insert({
+    category: parsed.data.category,
+    description: parsed.data.description,
+    amount: Number(parsed.data.amount),
+    currency: parsed.data.currency,
+    incurred_on: parsed.data.incurredOn,
+    payee: parsed.data.payee || null,
+    reference: parsed.data.reference || null,
+    created_by: user.id,
+  });
+  if (error) go(currentLocale, "financeError", "expense_failed");
+  refresh(currentLocale);
+  go(currentLocale, "financeStatus", "expense_recorded");
+}
+
+export async function voidExpenseAction(localeValue: string, formData: FormData): Promise<never> {
+  const currentLocale = locale(localeValue);
+  await requireRole("admin", currentLocale);
+  const parsed = voidExpenseSchema.safeParse({
+    expenseId: formData.get("expenseId"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) go(currentLocale, "financeError", "invalid_void");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("expenses")
+    .update({ status: "void", void_reason: parsed.data.reason })
+    .eq("id", parsed.data.expenseId)
+    .eq("status", "recorded");
+  if (error) go(currentLocale, "financeError", "void_failed");
+  refresh(currentLocale);
+  go(currentLocale, "financeStatus", "expense_voided");
 }
