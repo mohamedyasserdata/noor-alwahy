@@ -532,6 +532,145 @@ export type Database = {
           },
         ];
       };
+      invoice_items: {
+        Row: {
+          amount: number | null;
+          created_at: string;
+          description_ar: string;
+          description_en: string | null;
+          id: string;
+          invoice_id: string;
+          kind: string;
+          quantity: number;
+          unit_amount: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount?: never;
+          created_at?: string;
+          description_ar: string;
+          description_en?: string | null;
+          id?: string;
+          invoice_id: string;
+          kind: string;
+          quantity?: number;
+          unit_amount: number;
+        };
+        Update: {
+          amount?: never;
+          created_at?: string;
+          description_ar?: string;
+          description_en?: string | null;
+          id?: string;
+          invoice_id?: string;
+          kind?: string;
+          quantity?: number;
+          unit_amount?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoice_balance";
+            referencedColumns: ["invoice_id"];
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoices: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          discount_total: number;
+          due_date: string | null;
+          id: string;
+          invoice_no: string;
+          issued_at: string | null;
+          locale: string;
+          payer_profile_id: string | null;
+          status: Database["public"]["Enums"]["invoice_status"];
+          student_id: string;
+          subscription_id: string | null;
+          subtotal: number;
+          total: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          currency: string;
+          discount_total?: number;
+          due_date?: string | null;
+          id?: string;
+          invoice_no?: string;
+          issued_at?: string | null;
+          locale?: string;
+          payer_profile_id?: string | null;
+          status?: Database["public"]["Enums"]["invoice_status"];
+          student_id: string;
+          subscription_id?: string | null;
+          subtotal?: number;
+          total?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          discount_total?: number;
+          due_date?: string | null;
+          id?: string;
+          invoice_no?: string;
+          issued_at?: string | null;
+          locale?: string;
+          payer_profile_id?: string | null;
+          status?: Database["public"]["Enums"]["invoice_status"];
+          student_id?: string;
+          subscription_id?: string | null;
+          subtotal?: number;
+          total?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invoices_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_payer_profile_id_fkey";
+            columns: ["payer_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       job_runs: {
         Row: {
           affected_rows: number | null;
@@ -1100,6 +1239,164 @@ export type Database = {
           },
         ];
       };
+      payment_methods: {
+        Row: {
+          country_code: string;
+          created_at: string;
+          created_by: string | null;
+          details: NonNullable<Json>;
+          id: string;
+          instructions_ar: string | null;
+          instructions_en: string | null;
+          is_active: boolean;
+          label_ar: string;
+          label_en: string | null;
+          sort_order: number;
+          type: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          country_code: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: NonNullable<Json>;
+          id?: string;
+          instructions_ar?: string | null;
+          instructions_en?: string | null;
+          is_active?: boolean;
+          label_ar: string;
+          label_en?: string | null;
+          sort_order?: number;
+          type: string;
+          updated_at?: string;
+        };
+        Update: {
+          country_code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: NonNullable<Json>;
+          id?: string;
+          instructions_ar?: string | null;
+          instructions_en?: string | null;
+          is_active?: boolean;
+          label_ar?: string;
+          label_en?: string | null;
+          sort_order?: number;
+          type?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_country_code_fkey";
+            columns: ["country_code"];
+            isOneToOne: false;
+            referencedRelation: "countries";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "payment_methods_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payments: {
+        Row: {
+          amount: number;
+          confirmed_at: string | null;
+          confirmed_by: string | null;
+          created_at: string;
+          currency: string;
+          id: string;
+          invoice_id: string;
+          kind: Database["public"]["Enums"]["payment_kind"];
+          paid_at: string | null;
+          payment_method_id: string | null;
+          proof_file_path: string | null;
+          proof_note: string | null;
+          provider: string;
+          receipt_no: string | null;
+          recorded_by: string;
+          status: Database["public"]["Enums"]["payment_status"];
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          confirmed_at?: string | null;
+          confirmed_by?: string | null;
+          created_at?: string;
+          currency: string;
+          id?: string;
+          invoice_id: string;
+          kind?: Database["public"]["Enums"]["payment_kind"];
+          paid_at?: string | null;
+          payment_method_id?: string | null;
+          proof_file_path?: string | null;
+          proof_note?: string | null;
+          provider?: string;
+          receipt_no?: string | null;
+          recorded_by: string;
+          status?: Database["public"]["Enums"]["payment_status"];
+        };
+        Update: {
+          amount?: number;
+          confirmed_at?: string | null;
+          confirmed_by?: string | null;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          invoice_id?: string;
+          kind?: Database["public"]["Enums"]["payment_kind"];
+          paid_at?: string | null;
+          payment_method_id?: string | null;
+          proof_file_path?: string | null;
+          proof_note?: string | null;
+          provider?: string;
+          receipt_no?: string | null;
+          recorded_by?: string;
+          status?: Database["public"]["Enums"]["payment_status"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payments_confirmed_by_fkey";
+            columns: ["confirmed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoice_balance";
+            referencedColumns: ["invoice_id"];
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_payment_method_id_fkey";
+            columns: ["payment_method_id"];
+            isOneToOne: false;
+            referencedRelation: "payment_methods";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       placement_tests: {
         Row: {
           application_id: string;
@@ -1575,6 +1872,7 @@ export type Database = {
           note: string | null;
           reason: Database["public"]["Enums"]["credit_reason"];
           session_id: string | null;
+          source_invoice_id: string | null;
           subscription_id: string;
         };
         ComputedFields: never;
@@ -1586,6 +1884,7 @@ export type Database = {
           note?: string | null;
           reason: Database["public"]["Enums"]["credit_reason"];
           session_id?: string | null;
+          source_invoice_id?: string | null;
           subscription_id: string;
         };
         Update: {
@@ -1596,6 +1895,7 @@ export type Database = {
           note?: string | null;
           reason?: Database["public"]["Enums"]["credit_reason"];
           session_id?: string | null;
+          source_invoice_id?: string | null;
           subscription_id?: string;
         };
         Relationships: [
@@ -1611,6 +1911,20 @@ export type Database = {
             columns: ["session_id"];
             isOneToOne: false;
             referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_credit_ledger_source_invoice_id_fkey";
+            columns: ["source_invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoice_balance";
+            referencedColumns: ["invoice_id"];
+          },
+          {
+            foreignKeyName: "session_credit_ledger_source_invoice_id_fkey";
+            columns: ["source_invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
             referencedColumns: ["id"];
           },
           {
@@ -2548,6 +2862,16 @@ export type Database = {
       };
     };
     Views: {
+      invoice_balance: {
+        Row: {
+          due: number | null;
+          invoice_id: string | null;
+          paid: number | null;
+          total: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       subscription_balance: {
         Row: {
           sessions_remaining: number | null;
