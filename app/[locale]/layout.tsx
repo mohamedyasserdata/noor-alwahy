@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { amiriArabic, amiriLatin, cairoArabic, cairoLatin } from "@/app/fonts";
 import { routing } from "@/i18n/routing";
+import { getSiteUrl } from "@/lib/seo/metadata";
 
 import "../globals.css";
 
@@ -34,6 +35,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "meta" });
 
   return {
+    metadataBase: new URL(getSiteUrl()),
     title: {
       default: t("title"),
       template: `%s | ${t("title")}`,

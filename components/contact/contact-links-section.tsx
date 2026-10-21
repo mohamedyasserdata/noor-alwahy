@@ -2,7 +2,7 @@ import { ExternalLink, Mail, MessageCircle, Phone, Radio } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import type { AppLocale } from "@/i18n/routing";
-import { getContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
+import { getPublicContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
 
 type ContactLinksSectionProps = {
@@ -22,7 +22,7 @@ function localizedLabel(link: ContactLink, locale: AppLocale) {
 
 export async function ContactLinksSection({ locale }: ContactLinksSectionProps) {
   const [links, settings, t] = await Promise.all([
-    getContactLinks(),
+    getPublicContactLinks(),
     getPublicAppSettings(),
     getTranslations({ locale, namespace: "contactLinks.public" }),
   ]);

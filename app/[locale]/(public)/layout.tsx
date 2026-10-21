@@ -1,15 +1,15 @@
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 
-import { redirect } from "@/i18n/navigation";
+import { PublicShell } from "@/components/public-site/public-shell";
 import { routing } from "@/i18n/routing";
 
-export default async function HomePage({ params }: PageProps<"/[locale]">) {
+export default async function PublicLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
-  redirect({ href: "/dev/ui", locale });
+  return <PublicShell locale={locale}>{children}</PublicShell>;
 }

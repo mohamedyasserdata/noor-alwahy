@@ -1,7 +1,7 @@
 "use server";
 
 import type { Route } from "next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { routing, type AppLocale } from "@/i18n/routing";
@@ -24,6 +24,7 @@ function redirectToSettings(locale: AppLocale, key: "error" | "status", value: s
 }
 
 function revalidateContactPages(locale: AppLocale) {
+  updateTag("public-contact-links");
   revalidatePath(`/${locale}/admin/settings`);
   revalidatePath(`/${locale}/student/contact`);
   revalidatePath(`/${locale}/parent/contact`);
