@@ -9,6 +9,7 @@ import { TeacherMemorizationPlansSection } from "@/components/progress/teacher-m
 import { TeacherReportsSection } from "@/components/reports/teacher-reports-section";
 import { TeacherAvailabilitySection } from "@/components/teacher/teacher-availability-section";
 import { TeacherTodaySection } from "@/components/teacher/teacher-today-section";
+import { TeacherEarningsSection } from "@/components/payouts/teacher-earnings-section";
 import { TeacherZoomSection } from "@/components/teacher/teacher-zoom-section";
 import { routing } from "@/i18n/routing";
 
@@ -44,5 +45,6 @@ export default async function TeacherSectionPage({
   if (section === "zoom") {
     return <TeacherZoomSection locale={locale} searchParams={searchParams} />;
   }
+  if (section === "earnings") return <TeacherEarningsSection locale={locale} />;
   return <PortalSectionRoute params={params} portal="teacher" />;
 }

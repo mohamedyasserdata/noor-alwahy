@@ -514,8 +514,10 @@ export type Database = {
           id: string;
           incurred_on: string;
           payee: string | null;
+          payout_id: string | null;
           receipt_path: string | null;
           reference: string | null;
+          source: string;
           status: string;
           updated_at: string;
           void_reason: string | null;
@@ -532,8 +534,10 @@ export type Database = {
           id?: string;
           incurred_on?: string;
           payee?: string | null;
+          payout_id?: string | null;
           receipt_path?: string | null;
           reference?: string | null;
+          source?: string;
           status?: string;
           updated_at?: string;
           void_reason?: string | null;
@@ -549,8 +553,10 @@ export type Database = {
           id?: string;
           incurred_on?: string;
           payee?: string | null;
+          payout_id?: string | null;
           receipt_path?: string | null;
           reference?: string | null;
+          source?: string;
           status?: string;
           updated_at?: string;
           void_reason?: string | null;
@@ -561,6 +567,20 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: true;
+            referencedRelation: "my_earnings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: true;
+            referencedRelation: "teacher_payouts";
             referencedColumns: ["id"];
           },
         ];
@@ -2595,6 +2615,59 @@ export type Database = {
           },
         ];
       };
+      teacher_adjustments: {
+        Row: {
+          amount: number;
+          created_at: string;
+          created_by: string;
+          id: string;
+          kind: string;
+          payout_id: string;
+          reason: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          kind: string;
+          payout_id: string;
+          reason: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          kind?: string;
+          payout_id?: string;
+          reason?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_adjustments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_adjustments_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "my_earnings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_adjustments_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_payouts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teacher_assignments: {
         Row: {
           assigned_by: string;
@@ -2716,6 +2789,8 @@ export type Database = {
           currency: string;
           id: string;
           kind: string;
+          payout_id: string | null;
+          rate_id: string | null;
           rate_snapshot: number;
           session_id: string;
           teacher_id: string;
@@ -2728,6 +2803,8 @@ export type Database = {
           currency: string;
           id?: string;
           kind: string;
+          payout_id?: string | null;
+          rate_id?: string | null;
           rate_snapshot: number;
           session_id: string;
           teacher_id: string;
@@ -2739,12 +2816,35 @@ export type Database = {
           currency?: string;
           id?: string;
           kind?: string;
+          payout_id?: string | null;
+          rate_id?: string | null;
           rate_snapshot?: number;
           session_id?: string;
           teacher_id?: string;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "teacher_payout_items_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "my_earnings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_payout_items_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_payouts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_payout_items_rate_id_fkey";
+            columns: ["rate_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_rates";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "teacher_payout_items_session_id_fkey";
             columns: ["session_id"];
@@ -2754,6 +2854,82 @@ export type Database = {
           },
           {
             foreignKeyName: "teacher_payout_items_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_payouts: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          bonuses: number;
+          created_at: string;
+          currency: string;
+          deductions: number;
+          gross: number;
+          id: string;
+          net: number;
+          paid_at: string | null;
+          payment_reference: string | null;
+          payout_no: string;
+          period_end: string;
+          period_start: string;
+          status: Database["public"]["Enums"]["payout_status"];
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          bonuses?: number;
+          created_at?: string;
+          currency: string;
+          deductions?: number;
+          gross?: number;
+          id?: string;
+          net?: number;
+          paid_at?: string | null;
+          payment_reference?: string | null;
+          payout_no?: string;
+          period_end: string;
+          period_start: string;
+          status?: Database["public"]["Enums"]["payout_status"];
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          bonuses?: number;
+          created_at?: string;
+          currency?: string;
+          deductions?: number;
+          gross?: number;
+          id?: string;
+          net?: number;
+          paid_at?: string | null;
+          payment_reference?: string | null;
+          payout_no?: string;
+          period_end?: string;
+          period_start?: string;
+          status?: Database["public"]["Enums"]["payout_status"];
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_payouts_approved_by_fkey";
+            columns: ["approved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_payouts_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
             referencedRelation: "teachers";
@@ -3006,6 +3182,35 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      my_earnings: {
+        Row: {
+          approved_at: string | null;
+          bonuses: number | null;
+          currency: string | null;
+          deductions: number | null;
+          gross: number | null;
+          id: string | null;
+          net: number | null;
+          paid_at: string | null;
+          payment_reference: string | null;
+          payout_no: string | null;
+          period_end: string | null;
+          period_start: string | null;
+          session_count: number | null;
+          status: Database["public"]["Enums"]["payout_status"] | null;
+          teacher_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "teacher_payouts_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       student_account_statement: {
         Row: {
           credit: number | null;
@@ -3148,6 +3353,10 @@ export type Database = {
     };
     Functions: {
       accept_teacher_code_of_conduct: { Args: Record<PropertyKey, never>; Returns: string };
+      add_teacher_adjustment: {
+        Args: { p_amount: number; p_kind: string; p_payout: string; p_reason: string };
+        Returns: string;
+      };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
       assign_session_substitute: {
         Args: { p_scope: string; p_session_id: string; p_substitute_teacher_id: string };
@@ -3188,6 +3397,10 @@ export type Database = {
       };
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
+        Returns: number;
+      };
+      generate_teacher_payouts: {
+        Args: { p_period_end: string; p_period_start: string };
         Returns: number;
       };
       get_attendance_report: {
@@ -3367,6 +3580,10 @@ export type Database = {
           teacher_name: string;
           timezone: string;
         }[];
+      };
+      transition_teacher_payout: {
+        Args: { p_action: string; p_payout: string; p_reference?: string };
+        Returns: undefined;
       };
       update_evaluation_settings: {
         Args: {

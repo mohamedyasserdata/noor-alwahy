@@ -204,6 +204,11 @@
           "label": "My link",
           "title": "My Zoom link",
           "description": "Keep your permanent approved meeting link ready for assigned lessons."
+        },
+        "earnings": {
+          "label": "My earnings",
+          "title": "My earnings and statements",
+          "description": "Review counted sessions, monthly statements, and each statement's approval and payment status."
         }
       }
     },
@@ -1845,7 +1850,13 @@
       "rejected": "The transaction was rejected.",
       "method_saved": "The payment method was saved.",
       "expense_recorded": "The expense was recorded in its currency ledger.",
-      "expense_voided": "The expense was voided while preserving its audit history."
+      "expense_voided": "The expense was voided while preserving its audit history.",
+      "rate_saved": "The new teacher rate was saved.",
+      "payouts_generated": "Payout statements were generated from unassigned sessions.",
+      "payouts_unchanged": "No new sessions need a statement for this period.",
+      "adjustment_saved": "The statement adjustment was saved and net pay recalculated.",
+      "payout_approved": "The payout statement was approved.",
+      "payout_paid": "Payment was recorded and a matching expense created automatically."
     },
     "errors": {
       "invalid_payment": "Review the transaction amount and details.",
@@ -1861,7 +1872,15 @@
       "invalid_expense": "Review the expense category, amount, currency, and date.",
       "expense_failed": "The expense could not be recorded.",
       "invalid_void": "Provide a valid reason for voiding the entry.",
-      "void_failed": "The expense could not be voided."
+      "void_failed": "The expense could not be voided.",
+      "invalid_rate": "Review the teacher, rate, currency, and effective date.",
+      "rate_failed": "The teacher rate could not be saved.",
+      "invalid_payout_period": "The payout period is invalid or has not ended.",
+      "payout_generation_failed": "Payout statements could not be generated.",
+      "invalid_adjustment": "Review the adjustment type, amount, and reason.",
+      "adjustment_failed": "The adjustment could not be added.",
+      "invalid_payout_transition": "The statement action or payment reference is invalid.",
+      "payout_transition_failed": "The payout statement status could not be updated."
     },
     "methodsAdmin": {
       "eyebrow": "Country transfer methods",
@@ -1941,6 +1960,52 @@
       "branch": "Branch",
       "reference_hint": "Transfer reference"
     }
+  },
+  "payouts": {
+    "eyebrow": "P7 · Teacher compensation",
+    "title": "Teacher rates and monthly statements",
+    "description": "Each session is counted once at the most specific rate effective on its date, then follows an audited approval and payment workflow.",
+    "rateTitle": "Add a teacher rate",
+    "teacher": "Teacher",
+    "chooseTeacher": "Choose a teacher",
+    "unknownTeacher": "Unavailable teacher",
+    "track": "Track",
+    "allTracks": "All tracks",
+    "duration": "Duration in minutes",
+    "allDurations": "All durations",
+    "rate": "Session rate",
+    "currency": "Currency",
+    "validFrom": "Effective from",
+    "saveRate": "Save rate",
+    "savingRate": "Saving…",
+    "generateTitle": "Generate statements for a closed period",
+    "generateHint": "Eligible sessions not previously assigned are collected, with every currency kept in a separate statement.",
+    "periodStart": "Period start",
+    "periodEnd": "Period end",
+    "generate": "Generate statements",
+    "generating": "Generating…",
+    "rates": "Rate history ({count})",
+    "sessions": "{count} counted sessions",
+    "gross": "Session gross",
+    "bonuses": "Bonuses",
+    "deductions": "Deductions",
+    "net": "Net pay",
+    "amount": "Amount",
+    "reason": "Reason",
+    "addAdjustment": "Add adjustment",
+    "addingAdjustment": "Adding…",
+    "approve": "Approve statement",
+    "approving": "Approving…",
+    "paymentReference": "Transfer reference",
+    "markPaid": "Record payment",
+    "markingPaid": "Recording payment…",
+    "empty": "No payout statements yet.",
+    "teacherEyebrow": "Private financial record",
+    "teacherTitle": "My earnings",
+    "teacherDescription": "Your monthly statements are based on eligible sessions and the rate snapshotted for each session.",
+    "teacherEmpty": "No payout statement has been issued for you yet.",
+    "states": { "accruing": "Accruing", "due": "Due", "approved": "Approved", "paid": "Paid" },
+    "adjustmentKinds": { "bonus": "Bonus", "deduction": "Deduction" }
   },
   "subscriptionAdmin": {
     "eyebrow": "P7 · Subscriptions and billing",

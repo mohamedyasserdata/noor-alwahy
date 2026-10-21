@@ -24,7 +24,16 @@ export const portalConfig = {
   },
   teacher: {
     defaultSection: "today",
-    sections: ["today", "evaluations", "students", "reports", "availability", "schedule", "zoom"],
+    sections: [
+      "today",
+      "evaluations",
+      "students",
+      "reports",
+      "availability",
+      "schedule",
+      "zoom",
+      "earnings",
+    ],
   },
   student: {
     defaultSection: "home",

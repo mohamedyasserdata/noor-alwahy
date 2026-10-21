@@ -22,6 +22,7 @@ import {
   UserRoundCheck,
   UserRoundCog,
   Users,
+  WalletCards,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSelectedLayoutSegment } from "next/navigation";
@@ -51,6 +52,7 @@ const sectionIcons = {
   evaluation: Scale,
   evaluations: BookOpenCheck,
   zoom: Link2,
+  earnings: WalletCards,
   certificates: BadgeCheck,
   children: Users,
   billing: Banknote,
