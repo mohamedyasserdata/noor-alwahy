@@ -1,8 +1,8 @@
 import "server-only";
 
-import { connection } from "next/server";
+import { cacheLife, cacheTag } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import {
   academyProfileSchema,
   supportHoursSchema,
@@ -60,8 +60,11 @@ function parseSupportHours(value: unknown): SupportHours {
 }
 
 export async function getPublicAppSettings(): Promise<PublicAppSettings> {
-  await connection();
-  const supabase = await createClient();
+  "use cache";
+  cacheLife("hours");
+  cacheTag("public-app-settings");
+
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("app_settings")
     .select("key,value")

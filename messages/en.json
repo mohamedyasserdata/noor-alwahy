@@ -1244,6 +1244,154 @@
       "average": "Review average"
     }
   },
+  "publicSite": {
+    "shell": {
+      "brand": "Noor Al-Wahy Academy",
+      "navigationLabel": "Public site navigation",
+      "openMenu": "Open site menu",
+      "login": "Sign in",
+      "navigation": {
+        "home": "Home",
+        "tracks": "Learning tracks",
+        "faq": "Questions",
+        "contact": "Contact"
+      },
+      "footerLabel": "Site links",
+      "footerDescription": "One-to-one Quran learning with a clear plan, a steady schedule, and follow-up that respects every family’s privacy."
+    },
+    "home": {
+      "meta": {
+        "title": "Quran learning with a clear plan and personal follow-up",
+        "description": "One-to-one Quran memorization, recitation, and foundation tracks with a steady schedule and clear progress for students and families."
+      },
+      "eyebrow": "One-to-one online learning",
+      "title": "A clear path for learning the Quran, from the first meeting to visible progress",
+      "description": "Every student learns with a suitable teacher, a steady time, and a plan matched to their level. Families can follow progress without complexity or comparison.",
+      "primaryAction": "Explore the tracks",
+      "secondaryAction": "Talk to the academy",
+      "journey": {
+        "label": "The learning journey",
+        "steps": {
+          "0": {
+            "title": "Understand the starting point",
+            "description": "Choose the right track and level before the plan begins."
+          },
+          "1": {
+            "title": "Set a steady time",
+            "description": "A clear weekly time shown in the student’s local timezone."
+          },
+          "2": {
+            "title": "Focus in a private lesson",
+            "description": "A live session centered on one student’s needs."
+          },
+          "3": {
+            "title": "Follow progress clearly",
+            "description": "Progress, homework, and approved reports in one place."
+          }
+        }
+      },
+      "tracks": {
+        "title": "Tracks that begin with the student’s need",
+        "description": "Each track has a clear purpose, while the pace and plan adapt to the student’s actual level.",
+        "action": "See every track in detail",
+        "items": {
+          "memorization": {
+            "title": "Memorization and review",
+            "description": "A gradual memorization plan with scheduled review that protects earlier learning."
+          },
+          "recitation": {
+            "title": "Recitation and tajweed",
+            "description": "Practical recitation correction and step-by-step application of tajweed."
+          },
+          "foundation": {
+            "title": "Quran reading foundation",
+            "description": "A calm start with letters and reading until the student becomes more independent."
+          }
+        }
+      },
+      "closing": {
+        "title": "Choosing a track should not involve guesswork",
+        "description": "Tell the academy about the student’s needs, and we will explain the suitable starting point and next step.",
+        "action": "Contact us"
+      }
+    },
+    "tracks": {
+      "meta": {
+        "title": "Quran learning tracks",
+        "description": "Explore memorization and review, recitation and tajweed, and Quran reading foundation at Noor Al-Wahy Academy."
+      },
+      "eyebrow": "A track for every starting point",
+      "title": "A defined learning goal, with a plan that changes as the student grows",
+      "description": "The track sets the direction. The personal plan then adjusts the amount of learning and review to the student’s level and available time.",
+      "listLabel": "Academy learning tracks",
+      "focusLabel": "What it focuses on",
+      "items": {
+        "memorization": {
+          "title": "Memorization and review",
+          "description": "For students who want to memorize new passages while keeping earlier learning strong through regular review.",
+          "focus": "Weekly and monthly goals, due review, and evaluations that update the progress map."
+        },
+        "recitation": {
+          "title": "Recitation and tajweed",
+          "description": "For improving pronunciation and applying rules through live reading and focused correction.",
+          "focus": "Sound recitation, practical tajweed, and a clear view of strengths and training needs."
+        },
+        "foundation": {
+          "title": "Quran reading foundation",
+          "description": "For beginners who need to build reading from letters and vowels through words and verses.",
+          "focus": "Age-appropriate progression, repeated practice, and clear movement between foundation stages."
+        }
+      },
+      "help": {
+        "title": "Not sure which track fits?",
+        "description": "Tell us about the student’s level and goal, and we will help identify the most suitable starting point.",
+        "action": "Ask the academy"
+      }
+    },
+    "faq": {
+      "meta": {
+        "title": "Frequently asked questions",
+        "description": "Clear answers about private lessons, schedules, teachers, progress, and privacy at Noor Al-Wahy Academy."
+      },
+      "title": "Helpful answers before you begin",
+      "description": "These are the essentials about learning and follow-up. If your question remains, contact the academy directly.",
+      "items": {
+        "format": {
+          "question": "Are lessons private or in groups?",
+          "answer": "Lessons are one-to-one, focused on the student’s level, plan, and needs in recitation, memorization, or reading foundations."
+        },
+        "schedule": {
+          "question": "How are lesson times shown?",
+          "answer": "A weekly time is set and shown in each user’s local timezone, keeping schedules clear across different countries."
+        },
+        "teacher": {
+          "question": "How is a teacher selected?",
+          "answer": "The academy considers the learning track, availability, and capacity, while matching student and teacher gender under academy policy."
+        },
+        "progress": {
+          "question": "How can I follow progress?",
+          "answer": "Student and family portals show attendance, evaluations, homework, the Quran progress map, and reports approved by the academy."
+        },
+        "language": {
+          "question": "Is the experience available in Arabic and English?",
+          "answer": "Yes. The public site and portals support Arabic and English, and language can be switched while keeping the current page."
+        },
+        "privacy": {
+          "question": "Who can see student information?",
+          "answer": "Information is limited by role and permission. Teachers see only their assigned students, and families see only children linked to their accounts."
+        }
+      },
+      "more": {
+        "title": "Still have a question?",
+        "description": "Use an official academy channel and we will clarify what you need.",
+        "action": "View contact options"
+      }
+    },
+    "contactMeta": {
+      "title": "Contact Noor Al-Wahy Academy",
+      "description": "Official contact channels and support hours for Noor Al-Wahy Academy."
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

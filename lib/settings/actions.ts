@@ -1,7 +1,7 @@
 "use server";
 
 import type { Route } from "next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { routing, type AppLocale } from "@/i18n/routing";
@@ -64,6 +64,7 @@ export async function updatePublicAppSettingsAction(
     redirectToSettings(locale, "settingError", "request_failed");
   }
 
+  updateTag("public-app-settings");
   revalidatePath(`/${locale}`, "layout");
   redirectToSettings(locale, "settingStatus", "updated");
 }
