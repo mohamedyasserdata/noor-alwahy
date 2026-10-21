@@ -1,5 +1,6 @@
 import { ClipboardList, Download, GraduationCap, Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { DateTime } from "luxon";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
   updateApplicationAction,
 } from "@/lib/applications/actions";
 import { getApplicationCrm } from "@/lib/applications/crm";
+import { createSubscriptionAction } from "@/lib/subscriptions/actions";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 const states = ["new", "contacted", "trial_booked", "accepted", "rejected", "postponed"] as const;
@@ -31,6 +33,11 @@ export async function ApplicationCrmSection({
   ]);
   const status = typeof query.applicationStatus === "string" ? query.applicationStatus : "";
   const error = typeof query.applicationError === "string" ? query.applicationError : "";
+  const subscriptionStatus =
+    typeof query.subscriptionStatus === "string" ? query.subscriptionStatus : "";
+  const subscriptionError =
+    typeof query.subscriptionError === "string" ? query.subscriptionError : "";
+  const today = DateTime.utc().toISODate() ?? "";
   const name = (item: { name_ar: string; name_en: string | null }) =>
     locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar);
   return (
@@ -51,6 +58,16 @@ export async function ApplicationCrmSection({
       {status ? (
         <p className="mt-5 rounded-xl bg-success/10 p-4 font-bold text-success">
           {t(`notices.${status}` as "notices.updated")}
+        </p>
+      ) : null}
+      {subscriptionStatus ? (
+        <p className="mt-5 rounded-xl bg-success/10 p-4 font-bold text-success">
+          {t("subscriptionCreated")}
+        </p>
+      ) : null}
+      {subscriptionError ? (
+        <p className="mt-5 rounded-xl bg-destructive/10 p-4 font-bold text-destructive">
+          {t(`subscriptionErrors.${subscriptionError}` as "subscriptionErrors.create_failed")}
         </p>
       ) : null}
       {error ? (
@@ -209,16 +226,39 @@ export async function ApplicationCrmSection({
                     />
                   </form>
                   {application.status === "accepted" ? (
-                    <form
-                      action={convertApplicationAction.bind(null, locale)}
-                      className="lg:col-span-2"
-                    >
-                      <input type="hidden" name="applicationId" value={application.id} />
-                      <AdminSubmitButton
-                        label={application.converted_student_id ? t("openStudent") : t("convert")}
-                        pendingLabel={t("converting")}
-                      />
-                    </form>
+                    <div className="flex flex-wrap gap-3 lg:col-span-2">
+                      <form action={convertApplicationAction.bind(null, locale)}>
+                        <input type="hidden" name="applicationId" value={application.id} />
+                        <AdminSubmitButton
+                          label={application.converted_student_id ? t("openStudent") : t("convert")}
+                          pendingLabel={t("converting")}
+                        />
+                      </form>
+                      {application.converted_student_id &&
+                      application.package_id &&
+                      application.country_code ? (
+                        <form action={createSubscriptionAction.bind(null, locale, true)}>
+                          <input type="hidden" name="applicationId" value={application.id} />
+                          <input
+                            type="hidden"
+                            name="studentId"
+                            value={application.converted_student_id}
+                          />
+                          <input type="hidden" name="packageId" value={application.package_id} />
+                          <input
+                            type="hidden"
+                            name="countryCode"
+                            value={application.country_code}
+                          />
+                          <input type="hidden" name="startDate" value={today} />
+                          <AdminSubmitButton
+                            label={t("createSubscription")}
+                            pendingLabel={t("creatingSubscription")}
+                            variant="outline"
+                          />
+                        </form>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
               </details>

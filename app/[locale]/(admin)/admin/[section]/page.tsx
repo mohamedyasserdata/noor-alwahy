@@ -16,6 +16,7 @@ import { PackageAdminSection } from "@/components/packages/package-admin-section
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { AdminReportsSection } from "@/components/reports/admin-reports-section";
+import { SubscriptionAdminSection } from "@/components/subscriptions/subscription-admin-section";
 import { routing } from "@/i18n/routing";
 
 export const instant = false;
@@ -46,6 +47,10 @@ export default async function AdminSectionPage({
 
   if (section === "packages") {
     return <PackageAdminSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "subscriptions") {
+    return <SubscriptionAdminSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "users") {

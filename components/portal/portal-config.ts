@@ -9,6 +9,7 @@ export const portalConfig = {
       "dashboard",
       "packages",
       "applications",
+      "subscriptions",
       "students",
       "teachers",
       "assignments",

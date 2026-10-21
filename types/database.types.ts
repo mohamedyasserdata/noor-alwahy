@@ -2046,13 +2046,23 @@ export type Database = {
       };
       subscriptions: {
         Row: {
+          auto_renew: boolean;
+          coupon_id: string | null;
           created_at: string;
+          created_by: string | null;
           current_period_end: string;
           current_period_start: string;
           id: string;
+          package_id: string | null;
+          package_snapshot: Json | null;
           paused_until: string | null;
           policy_snapshot: NonNullable<Json>;
+          price_amount: number | null;
+          price_country: string | null;
+          price_currency: string | null;
+          renew_date: string | null;
           sessions_per_period: number;
+          source_application_id: string | null;
           start_date: string;
           status: Database["public"]["Enums"]["subscription_status"];
           student_id: string;
@@ -2060,32 +2070,87 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          auto_renew?: boolean;
+          coupon_id?: string | null;
           created_at?: string;
+          created_by?: string | null;
           current_period_end: string;
           current_period_start: string;
           id?: string;
+          package_id?: string | null;
+          package_snapshot?: Json | null;
           paused_until?: string | null;
           policy_snapshot?: NonNullable<Json>;
+          price_amount?: number | null;
+          price_country?: string | null;
+          price_currency?: string | null;
+          renew_date?: string | null;
           sessions_per_period: number;
+          source_application_id?: string | null;
           start_date: string;
           status?: Database["public"]["Enums"]["subscription_status"];
           student_id: string;
           updated_at?: string;
         };
         Update: {
+          auto_renew?: boolean;
+          coupon_id?: string | null;
           created_at?: string;
+          created_by?: string | null;
           current_period_end?: string;
           current_period_start?: string;
           id?: string;
+          package_id?: string | null;
+          package_snapshot?: Json | null;
           paused_until?: string | null;
           policy_snapshot?: NonNullable<Json>;
+          price_amount?: number | null;
+          price_country?: string | null;
+          price_currency?: string | null;
+          renew_date?: string | null;
           sessions_per_period?: number;
+          source_application_id?: string | null;
           start_date?: string;
           status?: Database["public"]["Enums"]["subscription_status"];
           student_id?: string;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "subscriptions_coupon_id_fkey";
+            columns: ["coupon_id"];
+            isOneToOne: false;
+            referencedRelation: "coupons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_package_id_fkey";
+            columns: ["package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_price_country_fkey";
+            columns: ["price_country"];
+            isOneToOne: false;
+            referencedRelation: "countries";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "subscriptions_source_application_id_fkey";
+            columns: ["source_application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "subscriptions_student_id_fkey";
             columns: ["student_id"];
@@ -2626,6 +2691,16 @@ export type Database = {
       convert_application_to_student: { Args: { p_application: string }; Returns: string };
       create_makeup_session: {
         Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
+        Returns: string;
+      };
+      create_subscription: {
+        Args: {
+          p_application?: string;
+          p_country: string;
+          p_package: string;
+          p_start_date?: string;
+          p_student: string;
+        };
         Returns: string;
       };
       generate_sessions: {

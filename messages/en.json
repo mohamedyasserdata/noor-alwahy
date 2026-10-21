@@ -109,6 +109,11 @@
           "title": "Enrollment applications",
           "description": "Review applications, follow their status, and convert accepted applicants with the right permissions."
         },
+        "subscriptions": {
+          "label": "Subscriptions",
+          "title": "Subscription management",
+          "description": "Create subscriptions and track their periods and fixed prices without later package changes affecting them."
+        },
         "students": {
           "label": "Students",
           "title": "Student records",
@@ -1281,6 +1286,16 @@
     "convert": "Convert to student",
     "openStudent": "Open student record",
     "converting": "Converting…",
+    "createSubscription": "Create subscription",
+    "creatingSubscription": "Creating subscription…",
+    "subscriptionCreated": "The subscription was created from the application with fixed package and price snapshots.",
+    "subscriptionErrors": {
+      "invalid_fields": "The subscription details are incomplete.",
+      "already_current": "The student already has a current subscription.",
+      "price_missing": "No current price is available for the selected package.",
+      "application_mismatch": "The student or package does not match the application.",
+      "create_failed": "The subscription could not be created from the application."
+    },
     "empty": "No matching applications.",
     "states": {
       "new": "New",
@@ -1690,6 +1705,47 @@
       "reorder_failed": "The package order could not be saved.",
       "invalid_batch": "The preview expired or does not belong to this account.",
       "import_failed": "The import failed and no packages were saved. Review the file and try again."
+    }
+  },
+  "subscriptionAdmin": {
+    "eyebrow": "P7 · Subscriptions and billing",
+    "title": "Subscriptions",
+    "description": "Create a subscription from a published package. The database preserves independent price, policy, and package snapshots for reliable financial and operational records.",
+    "createTitle": "Create a subscription",
+    "snapshotHint": "It starts as a trial; activation and credit grants remain tied to confirmed payment.",
+    "student": "Student",
+    "package": "Package",
+    "country": "Pricing country",
+    "startDate": "Start date",
+    "chooseStudent": "Choose a student",
+    "choosePackage": "Choose a package",
+    "chooseCountry": "Choose a country",
+    "create": "Create subscription",
+    "creating": "Creating…",
+    "currentTitle": "Subscription records",
+    "unknownStudent": "Unavailable student",
+    "legacyPackage": "Legacy subscription without a linked package",
+    "period": "Period",
+    "fixedPrice": "Fixed price",
+    "sessions": "Period sessions",
+    "renewal": "Renewal",
+    "empty": "No subscriptions yet.",
+    "states": {
+      "trial": "Trial",
+      "active": "Active",
+      "paused": "Paused",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "notices": {
+      "created": "The subscription and its package and price snapshots were created successfully."
+    },
+    "errors": {
+      "invalid_fields": "Review the student, package, country, and start date.",
+      "already_current": "This student already has a current subscription.",
+      "price_missing": "No current country price or fallback price is available for this package.",
+      "application_mismatch": "The application does not match the selected student or package.",
+      "create_failed": "The subscription could not be created. Review the data and try again."
     }
   },
   "accessibility": {
