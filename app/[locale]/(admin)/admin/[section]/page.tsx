@@ -15,6 +15,7 @@ import { AttendanceReportSection } from "@/components/attendance/attendance-repo
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
 import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
 import { CertificateAdminSection } from "@/components/certificates/certificate-admin-section";
+import { AdminDashboardSection } from "@/components/dashboard/admin-dashboard-section";
 import { PackageAdminSection } from "@/components/packages/package-admin-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
@@ -39,6 +40,10 @@ export default async function AdminSectionPage({
   }
 
   await connection();
+
+  if (section === "dashboard") {
+    return <AdminDashboardSection locale={locale} searchParams={searchParams} />;
+  }
 
   if (section === "audit") {
     return <AuditLogSection locale={locale} searchParams={searchParams} />;

@@ -2109,6 +2109,40 @@
       "renewal_failed": "Renewal follow-up could not run. No partial operation was saved."
     }
   },
+  "adminDashboard": {
+    "eyebrow": "Administration dashboard · unified data",
+    "title": "A complete academy overview",
+    "description": "Operational, learning, and financial indicators from the original records, with every currency kept separate.",
+    "period": "From {from} to {to}",
+    "filters": {
+      "from": "From date",
+      "to": "To date",
+      "country": "Country",
+      "currency": "Currency",
+      "allCountries": "All countries",
+      "allCurrencies": "All currencies",
+      "apply": "Apply filters"
+    },
+    "metrics": {
+      "students": "Active students",
+      "teachers": "Active teachers",
+      "subscriptions": "Active subscriptions",
+      "attendanceToday": "Today's attendance",
+      "conversion": "Conversion rate",
+      "churn": "Monthly churn",
+      "mrr": "Monthly recurring revenue",
+      "overdue": "Overdue balances"
+    },
+    "charts": {
+      "attendance": "Attendance commitment trend",
+      "finance": "Revenue and expense by currency",
+      "levels": "Students by level",
+      "teachers": "Teacher commitment"
+    },
+    "packages": { "title": "Top subscribed packages" },
+    "activity": { "title": "Latest audited activity" },
+    "empty": "No data is available for the selected period."
+  },
   "certificateVerification": {
     "statuses": {
       "valid": "Valid certificate",

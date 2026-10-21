@@ -2422,6 +2422,13 @@ export type Database = {
             foreignKeyName: "reports_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "reports_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -2524,6 +2531,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_alerts_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
           },
           {
             foreignKeyName: "session_alerts_teacher_id_fkey";
@@ -2805,6 +2819,13 @@ export type Database = {
             foreignKeyName: "sessions_original_teacher_id_fkey";
             columns: ["original_teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "sessions_original_teacher_id_fkey";
+            columns: ["original_teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -2828,6 +2849,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
           },
           {
             foreignKeyName: "sessions_teacher_id_fkey";
@@ -3304,6 +3332,13 @@ export type Database = {
             foreignKeyName: "teacher_assignments_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_assignments_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -3349,6 +3384,13 @@ export type Database = {
           weekday?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: "teacher_availability_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
           {
             foreignKeyName: "teacher_availability_teacher_id_fkey";
             columns: ["teacher_id"];
@@ -3432,6 +3474,13 @@ export type Database = {
             foreignKeyName: "teacher_payout_items_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_payout_items_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -3508,6 +3557,13 @@ export type Database = {
             foreignKeyName: "teacher_payouts_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_payouts_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -3563,6 +3619,13 @@ export type Database = {
             foreignKeyName: "teacher_rates_teacher_id_fkey";
             columns: ["teacher_id"];
             isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_rates_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
@@ -3596,6 +3659,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "teacher_tracks_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
           {
             foreignKeyName: "teacher_tracks_teacher_id_fkey";
             columns: ["teacher_id"];
@@ -3639,6 +3709,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "teacher_zoom_settings_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
           {
             foreignKeyName: "teacher_zoom_settings_teacher_id_fkey";
             columns: ["teacher_id"];
@@ -3735,6 +3812,70 @@ export type Database = {
       };
     };
     Views: {
+      admin_attendance_daily: {
+        Row: {
+          attended: number | null;
+          day: string | null;
+          eligible: number | null;
+          teacher_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      admin_finance_monthly: {
+        Row: {
+          currency: string | null;
+          expense: number | null;
+          month: string | null;
+          revenue: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      admin_student_distribution: {
+        Row: {
+          country_code: string | null;
+          level_id: string | null;
+          students: number | null;
+          timezone: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "students_level_id_fkey";
+            columns: ["level_id"];
+            isOneToOne: false;
+            referencedRelation: "levels";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      admin_teacher_commitment: {
+        Row: {
+          attended: number | null;
+          commitment_pct: number | null;
+          eligible: number | null;
+          full_name: string | null;
+          teacher_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       financial_currency_summary: {
         Row: {
           currency: string | null;
@@ -3778,6 +3919,13 @@ export type Database = {
         };
         ComputedFields: never;
         Relationships: [
+          {
+            foreignKeyName: "teacher_payouts_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
           {
             foreignKeyName: "teacher_payouts_teacher_id_fkey";
             columns: ["teacher_id"];
@@ -4005,6 +4153,10 @@ export type Database = {
       generate_teacher_payouts: {
         Args: { p_period_end: string; p_period_start: string };
         Returns: number;
+      };
+      get_admin_dashboard: {
+        Args: { p_country?: string; p_currency?: string; p_from?: string; p_to?: string };
+        Returns: Json;
       };
       get_attendance_report: {
         Args: { p_anchor?: string; p_period: string };
