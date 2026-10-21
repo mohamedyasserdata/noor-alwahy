@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
 import { decidePaymentAction, recordPaymentAction } from "@/lib/billing/actions";
 import { getFinanceAdminData } from "@/lib/billing/queries";
+import { PaymentMethodsAdmin } from "@/components/billing/payment-methods-admin";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 
@@ -243,6 +244,7 @@ export async function FinanceAdminSection({
           </p>
         )}
       </div>
+      <PaymentMethodsAdmin locale={locale} data={data} />
     </section>
   );
 }

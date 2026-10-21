@@ -75,8 +75,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       className={cn(
         isSidebar ? "grid gap-1.5 px-4" : "grid h-full items-stretch",
         !isSidebar && sections.length === 4 && "grid-cols-4",
-        !isSidebar && sections.length === 5 && "grid-cols-5",
-        !isSidebar && sections.length > 5 && "flex overflow-x-auto",
+        !isSidebar && sections.length > 4 && "flex overflow-x-auto",
       )}
     >
       {sections.map((section) => {

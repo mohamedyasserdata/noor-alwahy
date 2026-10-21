@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function getFinanceAdminData() {
   await connection();
   const supabase = await createClient();
-  const [invoices, balances, payments, methods] = await Promise.all([
+  const [invoices, balances, payments, methods, countries] = await Promise.all([
     supabase
       .from("invoices")
       .select(
@@ -25,11 +25,13 @@ export async function getFinanceAdminData() {
       .limit(500),
     supabase
       .from("payment_methods")
-      .select("id,country_code,type,label_ar,label_en")
-      .eq("is_active", true)
+      .select(
+        "id,country_code,type,label_ar,label_en,details,instructions_ar,instructions_en,is_active,sort_order",
+      )
       .order("sort_order"),
+    supabase.from("countries").select("code,name_ar,name_en").eq("is_enabled", true).order("code"),
   ]);
-  if (invoices.error || balances.error || payments.error || methods.error) {
+  if (invoices.error || balances.error || payments.error || methods.error || countries.error) {
     throw new Error("finance_management_unavailable");
   }
   return {
@@ -37,5 +39,6 @@ export async function getFinanceAdminData() {
     balances: balances.data ?? [],
     payments: payments.data ?? [],
     methods: methods.data ?? [],
+    countries: countries.data ?? [],
   };
 }

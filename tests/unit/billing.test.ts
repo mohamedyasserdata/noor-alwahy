@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { createReceiptHtml } from "../../lib/billing/receipt-pdf";
-import { paymentDecisionSchema, recordPaymentSchema } from "../../lib/validators/billing";
+import {
+  paymentDecisionSchema,
+  paymentMethodSchema,
+  recordPaymentSchema,
+} from "../../lib/validators/billing";
 
 const payment = {
   invoiceId: "10000000-0000-4000-8000-000000000001",
@@ -30,6 +34,27 @@ describe("billing validation and receipt", () => {
         decision: "pending_confirmation",
       }).success,
     ).toBe(false);
+  });
+
+  it("accepts bounded payment method details and rejects unsupported countries", () => {
+    const method = {
+      id: "",
+      countryCode: "EG",
+      type: "bank",
+      labelAr: "حساب الأكاديمية",
+      labelEn: "Academy account",
+      accountName: "Noor Al-Wahy",
+      accountNumber: "123456",
+      iban: "EG000000000000",
+      phone: "",
+      branch: "Cairo",
+      referenceHint: "Use the invoice number",
+      instructionsAr: "اكتب رقم الفاتورة في المرجع",
+      instructionsEn: "Use the invoice number as reference",
+      sortOrder: 0,
+    };
+    expect(paymentMethodSchema.safeParse(method).success).toBe(true);
+    expect(paymentMethodSchema.safeParse({ ...method, countryCode: "EGY" }).success).toBe(false);
   });
 
   it("renders a self-contained RTL receipt without external requests", async () => {

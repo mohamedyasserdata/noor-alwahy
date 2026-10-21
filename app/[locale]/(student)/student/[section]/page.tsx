@@ -2,6 +2,7 @@ import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 
 import { ContactLinksSection } from "@/components/contact/contact-links-section";
+import { FamilyBillingSection } from "@/components/billing/family-billing-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { QuranMapSection } from "@/components/progress/quran-map-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
@@ -28,6 +29,8 @@ export default async function StudentSectionPage({
   }
 
   if (section === "schedule") return <ScheduleSection locale={locale} />;
+
+  if (section === "billing") return <FamilyBillingSection locale={locale} />;
 
   if (section === "home") return <NextSessionSection locale={locale} />;
 

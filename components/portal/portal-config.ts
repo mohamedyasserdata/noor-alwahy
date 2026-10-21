@@ -28,7 +28,7 @@ export const portalConfig = {
   },
   student: {
     defaultSection: "home",
-    sections: ["home", "progress", "schedule", "certificates", "contact"],
+    sections: ["home", "progress", "schedule", "billing", "certificates", "contact"],
   },
   parent: {
     defaultSection: "children",

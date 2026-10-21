@@ -226,6 +226,11 @@
           "title": "Session schedule",
           "description": "Session times will be shown in the appropriate time zone once scheduling is connected."
         },
+        "billing": {
+          "label": "Billing",
+          "title": "My subscription and invoices",
+          "description": "Track your subscription, invoices, payments, and transfer methods available for your country."
+        },
         "certificates": {
           "label": "Certificates",
           "title": "Certificates and milestones",
@@ -1756,7 +1761,8 @@
       "payment_recorded": "The payment was recorded and awaits confirmation.",
       "refund_recorded": "The refund was recorded and awaits confirmation.",
       "confirmed": "The transaction was confirmed and the invoice balance updated.",
-      "rejected": "The transaction was rejected."
+      "rejected": "The transaction was rejected.",
+      "method_saved": "The payment method was saved."
     },
     "errors": {
       "invalid_payment": "Review the transaction amount and details.",
@@ -1766,7 +1772,80 @@
       "invalid_decision": "The review decision is invalid.",
       "refund_exceeds_paid": "The refund exceeds the confirmed net paid amount.",
       "mfa_required": "Complete multi-factor authentication to confirm the payment.",
-      "decision_failed": "The review decision could not be saved."
+      "decision_failed": "The review decision could not be saved.",
+      "invalid_method": "Review the payment method country, type, and details.",
+      "method_save_failed": "The payment method could not be saved."
+    },
+    "methodsAdmin": {
+      "eyebrow": "Country transfer methods",
+      "title": "Payment method management",
+      "description": "Only active details are shown to students and guardians for the invoice country. Never store passwords or secret keys here.",
+      "add": "Add payment method",
+      "country": "Country",
+      "type": "Type",
+      "labelAr": "Arabic label",
+      "labelEn": "English label",
+      "accountName": "Account name",
+      "accountNumber": "Account number",
+      "iban": "IBAN",
+      "phone": "Wallet/phone number",
+      "branch": "Branch",
+      "referenceHint": "Reference instructions",
+      "sortOrder": "Sort order",
+      "instructionsAr": "Arabic transfer instructions",
+      "instructionsEn": "English transfer instructions",
+      "save": "Save method",
+      "saving": "Saving…",
+      "disable": "Disable",
+      "enable": "Enable",
+      "active": "Active",
+      "inactive": "Inactive",
+      "types": {
+        "bank": "Bank account",
+        "wallet": "Wallet",
+        "instapay": "InstaPay",
+        "cash": "Cash",
+        "other": "Other"
+      }
+    }
+  },
+  "familyBilling": {
+    "eyebrow": "A clear financial record",
+    "title": "Invoices and payments",
+    "description": "Review your invoices and country transfer methods, follow every payment status, and download receipts for confirmed transactions.",
+    "student": "Student",
+    "summary": "Invoice summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "paid": "Confirmed",
+    "due": "Due",
+    "methods": "Available transfer methods ({country})",
+    "noMethods": "No transfer method is currently active for this country. Contact the academy before paying.",
+    "transactions": "Invoice transactions",
+    "payment": "Payment",
+    "refund": "Refund",
+    "receipt": "Download receipt",
+    "empty": "No invoices are available for this account.",
+    "states": {
+      "draft": "Draft",
+      "issued": "Due",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "paymentStates": {
+      "pending_confirmation": "Under review",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected"
+    },
+    "details": {
+      "account_name": "Account name",
+      "account_number": "Account number",
+      "iban": "IBAN",
+      "phone": "Phone/wallet",
+      "branch": "Branch",
+      "reference_hint": "Transfer reference"
     }
   },
   "subscriptionAdmin": {
