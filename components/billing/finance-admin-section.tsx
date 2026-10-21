@@ -11,6 +11,7 @@ import { decidePaymentAction, recordPaymentAction } from "@/lib/billing/actions"
 import { getFinanceAdminData } from "@/lib/billing/queries";
 import { PaymentMethodsAdmin } from "@/components/billing/payment-methods-admin";
 import { TeacherPayoutsAdmin } from "@/components/payouts/teacher-payouts-admin";
+import { ReconciliationAdmin } from "@/components/reconciliation/reconciliation-admin";
 import { FinancialReportsAdmin } from "@/components/billing/financial-reports-admin";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
@@ -249,6 +250,7 @@ export async function FinanceAdminSection({
       </div>
       <PaymentMethodsAdmin locale={locale} data={data} />
       <TeacherPayoutsAdmin locale={locale} />
+      <ReconciliationAdmin locale={locale} />
     </section>
   );
 }

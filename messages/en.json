@@ -1856,7 +1856,9 @@
       "payouts_unchanged": "No new sessions need a statement for this period.",
       "adjustment_saved": "The statement adjustment was saved and net pay recalculated.",
       "payout_approved": "The payout statement was approved.",
-      "payout_paid": "Payment was recorded and a matching expense created automatically."
+      "payout_paid": "Payment was recorded and a matching expense created automatically.",
+      "reconciliation_passed": "Financial reconciliation completed with no differences.",
+      "reconciliation_issues": "Reconciliation completed with differences requiring review in the reconciliation section."
     },
     "errors": {
       "invalid_payment": "Review the transaction amount and details.",
@@ -1880,7 +1882,8 @@
       "invalid_adjustment": "Review the adjustment type, amount, and reason.",
       "adjustment_failed": "The adjustment could not be added.",
       "invalid_payout_transition": "The statement action or payment reference is invalid.",
-      "payout_transition_failed": "The payout statement status could not be updated."
+      "payout_transition_failed": "The payout statement status could not be updated.",
+      "reconciliation_failed": "Financial reconciliation could not run. No record was hidden or modified."
     },
     "methodsAdmin": {
       "eyebrow": "Country transfer methods",
@@ -1959,6 +1962,27 @@
       "phone": "Phone/wallet",
       "branch": "Branch",
       "reference_hint": "Transfer reference"
+    }
+  },
+  "reconciliation": {
+    "eyebrow": "P7 · Ledger integrity",
+    "title": "Automated financial reconciliation",
+    "description": "Compares invoices with net confirmed payments and session credit grants/consumption, then matches teacher items, statement totals, and payout expenses. Differences are never repaired or hidden automatically.",
+    "run": "Run reconciliation now",
+    "running": "Checking ledgers…",
+    "empty": "Reconciliation has not run yet.",
+    "issueCount": "{count} differences",
+    "expected": "Expected",
+    "actual": "Actual",
+    "history": "Previous run history",
+    "states": { "running": "Running", "passed": "Matched", "failed": "Differences found" },
+    "categories": {
+      "invoice_status": "Invoice status does not match net payments",
+      "invoice_credit": "Invoice credit grant mismatch",
+      "session_credit": "Session credit consumption mismatch",
+      "payout_total": "Payout statement total mismatch",
+      "payout_expense": "Payout expense does not match statement",
+      "payout_item": "Payout item does not match snapshotted rate"
     }
   },
   "payouts": {

@@ -1784,6 +1784,90 @@ export type Database = {
         };
         Relationships: [];
       };
+      reconciliation_issues: {
+        Row: {
+          actual: string;
+          category: string;
+          created_at: string;
+          details: NonNullable<Json>;
+          entity_id: string;
+          expected: string;
+          id: number;
+          run_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          actual: string;
+          category: string;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          entity_id: string;
+          expected: string;
+          id?: never;
+          run_id: string;
+        };
+        Update: {
+          actual?: string;
+          category?: string;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          entity_id?: string;
+          expected?: string;
+          id?: never;
+          run_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_issues_run_id_fkey";
+            columns: ["run_id"];
+            isOneToOne: false;
+            referencedRelation: "reconciliation_runs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      reconciliation_runs: {
+        Row: {
+          details: NonNullable<Json>;
+          finished_at: string | null;
+          id: string;
+          issue_count: number;
+          scope: string;
+          started_at: string;
+          status: string;
+          triggered_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          details?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: string;
+          issue_count?: number;
+          scope?: string;
+          started_at?: string;
+          status?: string;
+          triggered_by?: string | null;
+        };
+        Update: {
+          details?: NonNullable<Json>;
+          finished_at?: string | null;
+          id?: string;
+          issue_count?: number;
+          scope?: string;
+          started_at?: string;
+          status?: string;
+          triggered_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reconciliation_runs_triggered_by_fkey";
+            columns: ["triggered_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       reports: {
         Row: {
           approved_at: string | null;
@@ -3559,6 +3643,7 @@ export type Database = {
       };
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
+      run_financial_reconciliation: { Args: Record<PropertyKey, never>; Returns: string };
       save_package: { Args: { p_payload: Json }; Returns: string };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
