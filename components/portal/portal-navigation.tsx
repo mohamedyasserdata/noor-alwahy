@@ -51,6 +51,7 @@ const sectionIcons = {
   schedule: CalendarDays,
   evaluation: Scale,
   evaluations: BookOpenCheck,
+  exams: ClipboardList,
   zoom: Link2,
   earnings: WalletCards,
   certificates: BadgeCheck,

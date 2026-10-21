@@ -7,6 +7,7 @@ import { AssignmentManagementSection } from "@/components/admin/assignment-manag
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
 import { EvaluationSettingsSection } from "@/components/admin/evaluation-settings-section";
+import { ExamManagementSection } from "@/components/exams/exam-management-section";
 import { StudentManagementSection } from "@/components/admin/student-management-section";
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
@@ -84,6 +85,10 @@ export default async function AdminSectionPage({
 
   if (section === "evaluation") {
     return <EvaluationSettingsSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "exams") {
+    return <ExamManagementSection locale={locale} portal="admin" searchParams={searchParams} />;
   }
 
   if (section === "reports") {

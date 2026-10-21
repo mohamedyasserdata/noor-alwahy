@@ -4,6 +4,7 @@ import { connection } from "next/server";
 
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { SessionEvaluationsSection } from "@/components/evaluation/session-evaluations-section";
+import { ExamManagementSection } from "@/components/exams/exam-management-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { TeacherMemorizationPlansSection } from "@/components/progress/teacher-memorization-plans-section";
 import { TeacherReportsSection } from "@/components/reports/teacher-reports-section";
@@ -31,6 +32,9 @@ export default async function TeacherSectionPage({
   }
   if (section === "evaluations") {
     return <SessionEvaluationsSection locale={locale} searchParams={searchParams} />;
+  }
+  if (section === "exams") {
+    return <ExamManagementSection locale={locale} portal="teacher" searchParams={searchParams} />;
   }
   if (section === "students") {
     return <TeacherMemorizationPlansSection locale={locale} searchParams={searchParams} />;

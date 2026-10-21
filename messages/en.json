@@ -144,6 +144,11 @@
           "title": "Evaluation settings",
           "description": "Calibrate criteria weights, deductions, and rating thresholds for every session type."
         },
+        "exams": {
+          "label": "Exams",
+          "title": "Exams and grades",
+          "description": "Create exams, enter calculated grades, and approve results."
+        },
         "reports": {
           "label": "Reports",
           "title": "Report review",
@@ -209,6 +214,11 @@
           "label": "My earnings",
           "title": "My earnings and statements",
           "description": "Review counted sessions, monthly statements, and each statement's approval and payment status."
+        },
+        "exams": {
+          "label": "Exams",
+          "title": "Exam grading",
+          "description": "Enter grades for assigned students using the academy's approved criteria."
         }
       }
     },
@@ -2092,6 +2102,93 @@
       "change_failed": "The package change could not be applied.",
       "invalid_run": "The renewal processing date is invalid.",
       "renewal_failed": "Renewal follow-up could not run. No partial operation was saved."
+    }
+  },
+  "exams": {
+    "eyebrow": "Phase eight · assessment and achievement",
+    "title": "Exams and grades",
+    "description": "A complete workflow from exam setup and student grading to immutable approved results.",
+    "summary": "{exams} exams · {results} results",
+    "calculationNotice": "Scores and deductions are calculated in the database using approved settings.",
+    "create": {
+      "title": "Create an exam",
+      "description": "Set the exam type, track, and maximum score before opening grade entry."
+    },
+    "fields": {
+      "titleAr": "Arabic title",
+      "titleEn": "English title",
+      "kind": "Exam type",
+      "sessionType": "Assessment area",
+      "track": "Track",
+      "maxScore": "Maximum score",
+      "weight": "Weight",
+      "heldOn": "Exam date",
+      "student": "Student",
+      "chooseStudent": "Choose a student"
+    },
+    "kinds": { "monthly": "Monthly", "term": "Term", "final": "Final", "juz": "Juz exam" },
+    "sessionTypes": {
+      "new_memo": "New memorization",
+      "revision": "Revision",
+      "recitation": "Recitation",
+      "tajweed": "Tajweed",
+      "tafsir": "Tafsir"
+    },
+    "statuses": { "draft": "Draft", "open": "Open for grading", "closed": "Closed" },
+    "grades": {
+      "repeat": "Repeat required",
+      "pass": "Pass",
+      "good": "Good",
+      "very_good": "Very good",
+      "excellent": "Excellent"
+    },
+    "allTracks": "All tracks",
+    "maximum": "Maximum score: {score}",
+    "entry": { "title": "Enter a student result" },
+    "errorsCount": {
+      "major": "Major errors",
+      "minor": "Minor errors",
+      "prompts": "Prompts",
+      "forgot": "Forgotten passages"
+    },
+    "results": {
+      "title": "Recorded results",
+      "empty": "No results have been recorded for this exam.",
+      "score": "{total} of {maximum} · {percentage}%"
+    },
+    "empty": {
+      "title": "No exams yet",
+      "description": "Create the first exam to begin grading and approval."
+    },
+    "unknownStudent": "Unavailable student",
+    "locked": "Approved result",
+    "actions": {
+      "create": "Create exam",
+      "creating": "Creating…",
+      "open": "Open grading",
+      "close": "Close exam",
+      "updating": "Updating…",
+      "saveResult": "Save result",
+      "savingResult": "Calculating and saving…",
+      "lock": "Approve and lock",
+      "locking": "Approving…"
+    },
+    "notices": {
+      "created": "The exam was created as a draft.",
+      "open": "The exam is now open for grading.",
+      "closed": "The exam was closed.",
+      "result_saved": "The result was calculated and saved using approved settings.",
+      "locked": "The result was approved and locked."
+    },
+    "errors": {
+      "invalid_exam": "Review the exam details.",
+      "create_failed": "The exam could not be created.",
+      "invalid_status": "The exam status is invalid.",
+      "status_failed": "The exam status could not be updated.",
+      "invalid_result": "Review the student, scores, and errors.",
+      "result_locked": "This result is approved and cannot be changed.",
+      "save_failed": "The result could not be calculated and saved.",
+      "lock_failed": "The result could not be approved."
     }
   },
   "accessibility": {

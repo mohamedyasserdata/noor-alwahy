@@ -16,6 +16,7 @@ export const portalConfig = {
       "assignments",
       "schedule",
       "evaluation",
+      "exams",
       "reports",
       "users",
       "audit",
@@ -33,6 +34,7 @@ export const portalConfig = {
       "schedule",
       "zoom",
       "earnings",
+      "exams",
     ],
   },
   student: {

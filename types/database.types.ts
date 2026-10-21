@@ -502,6 +502,157 @@ export type Database = {
           },
         ];
       };
+      exam_results: {
+        Row: {
+          created_at: string;
+          entered_by: string;
+          errors: NonNullable<Json>;
+          exam_id: string;
+          grade: string;
+          id: string;
+          is_locked: boolean;
+          locked_at: string | null;
+          locked_by: string | null;
+          percentage: number;
+          rating: number;
+          scores: NonNullable<Json>;
+          settings_snapshot: NonNullable<Json>;
+          student_id: string;
+          total: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          entered_by: string;
+          errors?: NonNullable<Json>;
+          exam_id: string;
+          grade?: string;
+          id?: string;
+          is_locked?: boolean;
+          locked_at?: string | null;
+          locked_by?: string | null;
+          percentage?: number;
+          rating?: number;
+          scores: NonNullable<Json>;
+          settings_snapshot?: NonNullable<Json>;
+          student_id: string;
+          total?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          entered_by?: string;
+          errors?: NonNullable<Json>;
+          exam_id?: string;
+          grade?: string;
+          id?: string;
+          is_locked?: boolean;
+          locked_at?: string | null;
+          locked_by?: string | null;
+          percentage?: number;
+          rating?: number;
+          scores?: NonNullable<Json>;
+          settings_snapshot?: NonNullable<Json>;
+          student_id?: string;
+          total?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exam_results_entered_by_fkey";
+            columns: ["entered_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exam_results_exam_id_fkey";
+            columns: ["exam_id"];
+            isOneToOne: false;
+            referencedRelation: "exams";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exam_results_locked_by_fkey";
+            columns: ["locked_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exam_results_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      exams: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          held_on: string;
+          id: string;
+          kind: string;
+          max_score: number;
+          session_type: Database["public"]["Enums"]["session_type_t"];
+          status: string;
+          title_ar: string;
+          title_en: string | null;
+          track_id: string | null;
+          updated_at: string;
+          weight: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          held_on: string;
+          id?: string;
+          kind: string;
+          max_score: number;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+          status?: string;
+          title_ar: string;
+          title_en?: string | null;
+          track_id?: string | null;
+          updated_at?: string;
+          weight?: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          held_on?: string;
+          id?: string;
+          kind?: string;
+          max_score?: number;
+          session_type?: Database["public"]["Enums"]["session_type_t"];
+          status?: string;
+          title_ar?: string;
+          title_en?: string | null;
+          track_id?: string | null;
+          updated_at?: string;
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exams_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exams_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       expenses: {
         Row: {
           amount: number;
@@ -3576,6 +3727,7 @@ export type Database = {
         }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      lock_exam_result: { Args: { p_result: string }; Returns: undefined };
       manage_teacher_assignment: {
         Args: {
           p_action?: string;
@@ -3644,6 +3796,10 @@ export type Database = {
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
       run_financial_reconciliation: { Args: Record<PropertyKey, never>; Returns: string };
+      save_exam_result: {
+        Args: { p_errors: Json; p_exam: string; p_scores: Json; p_student: string };
+        Returns: string;
+      };
       save_package: { Args: { p_payload: Json }; Returns: string };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
