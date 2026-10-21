@@ -284,6 +284,347 @@ export type Database = {
           },
         ];
       };
+      certificate_batch_items: {
+        Row: {
+          attempts: number;
+          batch_id: string;
+          certificate_id: string | null;
+          error_code: string | null;
+          id: string;
+          status: string;
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempts?: number;
+          batch_id: string;
+          certificate_id?: string | null;
+          error_code?: string | null;
+          id?: string;
+          status?: string;
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          attempts?: number;
+          batch_id?: string;
+          certificate_id?: string | null;
+          error_code?: string | null;
+          id?: string;
+          status?: string;
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificate_batch_items_batch_id_fkey";
+            columns: ["batch_id"];
+            isOneToOne: false;
+            referencedRelation: "certificate_batches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_batch_items_certificate_id_fkey";
+            columns: ["certificate_id"];
+            isOneToOne: false;
+            referencedRelation: "certificates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_batch_items_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      certificate_batches: {
+        Row: {
+          achievement: string;
+          completed_count: number;
+          created_at: string;
+          created_by: string;
+          failed_count: number;
+          finished_at: string | null;
+          id: string;
+          idempotency_key: string;
+          locale: string;
+          started_at: string | null;
+          status: string;
+          template_version_id: string;
+          total_count: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          achievement: string;
+          completed_count?: number;
+          created_at?: string;
+          created_by: string;
+          failed_count?: number;
+          finished_at?: string | null;
+          id?: string;
+          idempotency_key: string;
+          locale: string;
+          started_at?: string | null;
+          status?: string;
+          template_version_id: string;
+          total_count: number;
+          updated_at?: string;
+        };
+        Update: {
+          achievement?: string;
+          completed_count?: number;
+          created_at?: string;
+          created_by?: string;
+          failed_count?: number;
+          finished_at?: string | null;
+          id?: string;
+          idempotency_key?: string;
+          locale?: string;
+          started_at?: string | null;
+          status?: string;
+          template_version_id?: string;
+          total_count?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificate_batches_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_batches_template_version_id_fkey";
+            columns: ["template_version_id"];
+            isOneToOne: false;
+            referencedRelation: "certificate_template_versions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      certificate_template_versions: {
+        Row: {
+          body_ar: string;
+          body_en: string | null;
+          created_at: string;
+          created_by: string;
+          id: string;
+          logo_path: string | null;
+          published_at: string | null;
+          published_by: string | null;
+          seal_path: string | null;
+          signatures: NonNullable<Json>;
+          status: string;
+          template_id: string;
+          theme: NonNullable<Json>;
+          title_ar: string;
+          title_en: string | null;
+          updated_at: string;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          body_ar: string;
+          body_en?: string | null;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          logo_path?: string | null;
+          published_at?: string | null;
+          published_by?: string | null;
+          seal_path?: string | null;
+          signatures?: NonNullable<Json>;
+          status?: string;
+          template_id: string;
+          theme?: NonNullable<Json>;
+          title_ar: string;
+          title_en?: string | null;
+          updated_at?: string;
+          version: number;
+        };
+        Update: {
+          body_ar?: string;
+          body_en?: string | null;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          logo_path?: string | null;
+          published_at?: string | null;
+          published_by?: string | null;
+          seal_path?: string | null;
+          signatures?: NonNullable<Json>;
+          status?: string;
+          template_id?: string;
+          theme?: NonNullable<Json>;
+          title_ar?: string;
+          title_en?: string | null;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificate_template_versions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_template_versions_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_template_versions_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "certificate_templates";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      certificate_templates: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          id: string;
+          is_active: boolean;
+          kind: string;
+          name_ar: string;
+          name_en: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          is_active?: boolean;
+          kind: string;
+          name_ar: string;
+          name_en?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          is_active?: boolean;
+          kind?: string;
+          name_ar?: string;
+          name_en?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificate_templates_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      certificates: {
+        Row: {
+          created_at: string;
+          id: string;
+          idempotency_key: string;
+          issued_at: string;
+          issued_by: string;
+          kind: string;
+          locale: string;
+          payload_snapshot: NonNullable<Json>;
+          pdf_path: string | null;
+          pdf_sha256: string | null;
+          revoke_reason: string | null;
+          revoked_at: string | null;
+          revoked_by: string | null;
+          serial_no: string;
+          student_id: string;
+          template_snapshot: NonNullable<Json>;
+          template_version_id: string;
+          verify_code: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          idempotency_key: string;
+          issued_at?: string;
+          issued_by: string;
+          kind: string;
+          locale?: string;
+          payload_snapshot: NonNullable<Json>;
+          pdf_path?: string | null;
+          pdf_sha256?: string | null;
+          revoke_reason?: string | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          serial_no: string;
+          student_id: string;
+          template_snapshot: NonNullable<Json>;
+          template_version_id: string;
+          verify_code: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          idempotency_key?: string;
+          issued_at?: string;
+          issued_by?: string;
+          kind?: string;
+          locale?: string;
+          payload_snapshot?: NonNullable<Json>;
+          pdf_path?: string | null;
+          pdf_sha256?: string | null;
+          revoke_reason?: string | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          serial_no?: string;
+          student_id?: string;
+          template_snapshot?: NonNullable<Json>;
+          template_version_id?: string;
+          verify_code?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificates_issued_by_fkey";
+            columns: ["issued_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_revoked_by_fkey";
+            columns: ["revoked_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_template_version_id_fkey";
+            columns: ["template_version_id"];
+            isOneToOne: false;
+            referencedRelation: "certificate_template_versions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       contact_links: {
         Row: {
           created_at: string;
@@ -3612,6 +3953,7 @@ export type Database = {
         };
         Returns: number;
       };
+      clone_certificate_template_version: { Args: { p_version: string }; Returns: string };
       clone_package: { Args: { p_package: string }; Returns: string };
       confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
@@ -3627,6 +3969,16 @@ export type Database = {
           p_package: string;
           p_start_date?: string;
           p_student: string;
+        };
+        Returns: string;
+      };
+      enqueue_certificate_batch: {
+        Args: {
+          p_achievement: string;
+          p_idempotency_key: string;
+          p_locale: string;
+          p_students: string[];
+          p_version: string;
         };
         Returns: string;
       };
@@ -3727,6 +4079,16 @@ export type Database = {
         }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      issue_certificate: {
+        Args: {
+          p_achievement: string;
+          p_idempotency_key: string;
+          p_locale: string;
+          p_student: string;
+          p_version: string;
+        };
+        Returns: string;
+      };
       lock_exam_result: { Args: { p_result: string }; Returns: undefined };
       manage_teacher_assignment: {
         Args: {
@@ -3742,7 +4104,9 @@ export type Database = {
         Args: { p_reason: string; p_subscription: string; p_until: string };
         Returns: undefined;
       };
+      process_certificate_batch: { Args: { p_batch: string; p_limit?: number }; Returns: Json };
       process_subscription_renewals: { Args: { p_as_of?: string }; Returns: Json };
+      publish_certificate_template: { Args: { p_version: string }; Returns: undefined };
       record_attendance: {
         Args: {
           p_minutes?: number;
