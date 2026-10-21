@@ -201,6 +201,107 @@ export type Database = {
         };
         Relationships: [];
       };
+      countries: {
+        Row: {
+          code: string;
+          created_at: string;
+          currency: string;
+          default_timezone: string | null;
+          is_enabled: boolean;
+          name_ar: string;
+          name_en: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          code: string;
+          created_at?: string;
+          currency: string;
+          default_timezone?: string | null;
+          is_enabled?: boolean;
+          name_ar: string;
+          name_en?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          currency?: string;
+          default_timezone?: string | null;
+          is_enabled?: boolean;
+          name_ar?: string;
+          name_en?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      coupons: {
+        Row: {
+          code: string;
+          created_at: string;
+          created_by: string | null;
+          currency: string | null;
+          ends_at: string | null;
+          id: string;
+          is_active: boolean;
+          kind: string;
+          max_redemptions: number | null;
+          package_id: string | null;
+          redeemed_count: number;
+          starts_at: string | null;
+          updated_at: string;
+          value: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          code: string;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          kind: string;
+          max_redemptions?: number | null;
+          package_id?: string | null;
+          redeemed_count?: number;
+          starts_at?: string | null;
+          updated_at?: string;
+          value: number;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          kind?: string;
+          max_redemptions?: number | null;
+          package_id?: string | null;
+          redeemed_count?: number;
+          starts_at?: string | null;
+          updated_at?: string;
+          value?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coupons_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "coupons_package_id_fkey";
+            columns: ["package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       eval_criteria: {
         Row: {
           applies_to: Database["public"]["Enums"]["session_type_t"][];
@@ -674,6 +775,159 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      package_prices: {
+        Row: {
+          amount: number;
+          country_code: string;
+          created_at: string;
+          created_by: string | null;
+          currency: string;
+          id: string;
+          is_active: boolean;
+          max_amount: number | null;
+          min_amount: number | null;
+          package_id: string;
+          updated_at: string;
+          valid_from: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          country_code: string;
+          created_at?: string;
+          created_by?: string | null;
+          currency: string;
+          id?: string;
+          is_active?: boolean;
+          max_amount?: number | null;
+          min_amount?: number | null;
+          package_id: string;
+          updated_at?: string;
+          valid_from?: string;
+        };
+        Update: {
+          amount?: number;
+          country_code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: string;
+          id?: string;
+          is_active?: boolean;
+          max_amount?: number | null;
+          min_amount?: number | null;
+          package_id?: string;
+          updated_at?: string;
+          valid_from?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "package_prices_country_code_fkey";
+            columns: ["country_code"];
+            isOneToOne: false;
+            referencedRelation: "countries";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "package_prices_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "package_prices_package_id_fkey";
+            columns: ["package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      packages: {
+        Row: {
+          audience: string | null;
+          billing_period: Database["public"]["Enums"]["billing_period"];
+          created_at: string;
+          created_by: string | null;
+          description_ar: string | null;
+          description_en: string | null;
+          duration_min: number;
+          features: NonNullable<Json>;
+          id: string;
+          is_active: boolean;
+          is_published: boolean;
+          name_ar: string;
+          name_en: string | null;
+          policy: NonNullable<Json>;
+          sessions_per_week: number;
+          slug: string;
+          sort_order: number;
+          teacher_gender: Database["public"]["Enums"]["gender_t"] | null;
+          track_id: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          audience?: string | null;
+          billing_period?: Database["public"]["Enums"]["billing_period"];
+          created_at?: string;
+          created_by?: string | null;
+          description_ar?: string | null;
+          description_en?: string | null;
+          duration_min?: number;
+          features?: NonNullable<Json>;
+          id?: string;
+          is_active?: boolean;
+          is_published?: boolean;
+          name_ar: string;
+          name_en?: string | null;
+          policy?: NonNullable<Json>;
+          sessions_per_week: number;
+          slug: string;
+          sort_order?: number;
+          teacher_gender?: Database["public"]["Enums"]["gender_t"] | null;
+          track_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          audience?: string | null;
+          billing_period?: Database["public"]["Enums"]["billing_period"];
+          created_at?: string;
+          created_by?: string | null;
+          description_ar?: string | null;
+          description_en?: string | null;
+          duration_min?: number;
+          features?: NonNullable<Json>;
+          id?: string;
+          is_active?: boolean;
+          is_published?: boolean;
+          name_ar?: string;
+          name_en?: string | null;
+          policy?: NonNullable<Json>;
+          sessions_per_week?: number;
+          slug?: string;
+          sort_order?: number;
+          teacher_gender?: Database["public"]["Enums"]["gender_t"] | null;
+          track_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "packages_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "packages_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
             referencedColumns: ["id"];
           },
         ];
@@ -2270,6 +2524,14 @@ export type Database = {
       reschedule_session: {
         Args: { p_scheduled_at: string; p_session_id: string };
         Returns: string;
+      };
+      resolve_price: {
+        Args: { p_at?: string; p_country: string; p_package: string };
+        Returns: {
+          amount: number;
+          country_code: string;
+          currency: string;
+        }[];
       };
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
