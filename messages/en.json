@@ -1249,6 +1249,67 @@
       "average": "Review average"
     }
   },
+  "applicationCrm": {
+    "eyebrow": "P6 · Application management",
+    "title": "Application pipeline and placement",
+    "description": "Review applications securely, update the workflow stage, record internal notes, and capture placement before student conversion.",
+    "export": "Export CSV",
+    "search": "Search name, number, or email",
+    "all": "All statuses",
+    "filter": "Filter",
+    "details": "Application details",
+    "age": "Age",
+    "contact": "Contact",
+    "timezone": "Time zone",
+    "level": "Level",
+    "preferredTimes": "Preferred times",
+    "source": "Source",
+    "workflowStatus": "Application stage",
+    "internalNotes": "Internal notes",
+    "saveWorkflow": "Save stage",
+    "saving": "Saving…",
+    "placement": "Initial placement",
+    "latestScores": "Latest: recitation {recitation} · tajweed {tajweed} · memorization {memorization}",
+    "recitation": "Recitation out of 100",
+    "tajweed": "Tajweed out of 100",
+    "memorization": "Memorization out of 100",
+    "recommendedTrack": "Recommended track",
+    "recommendedPackage": "Recommended package",
+    "none": "No recommendation",
+    "placementNotes": "Placement notes",
+    "savePlacement": "Save placement",
+    "convert": "Convert to student",
+    "openStudent": "Open student record",
+    "converting": "Converting…",
+    "empty": "No matching applications.",
+    "states": {
+      "new": "New",
+      "contacted": "Contacted",
+      "trial_booked": "Trial booked",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "postponed": "Postponed"
+    },
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "memorizing": "Currently memorizing"
+    },
+    "notices": {
+      "updated": "The application workflow was updated.",
+      "placement_saved": "The placement result was saved."
+    },
+    "errors": {
+      "invalid_fields": "Review the required fields.",
+      "invalid_transition": "That transition is not allowed from the current status.",
+      "update_failed": "The application could not be updated.",
+      "invalid_placement": "Review the placement scores and recommendations.",
+      "placement_failed": "The placement could not be saved.",
+      "not_accepted": "Accept the application before conversion.",
+      "conversion_failed": "The application could not be converted to a student."
+    }
+  },
   "applicationsPublic": {
     "eyebrow": "Join Noor Al-Wahy Academy",
     "title": "Begin your Quran learning journey",

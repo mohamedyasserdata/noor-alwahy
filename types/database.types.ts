@@ -1100,6 +1100,78 @@ export type Database = {
           },
         ];
       };
+      placement_tests: {
+        Row: {
+          application_id: string;
+          created_at: string;
+          evaluator_id: string;
+          id: string;
+          memorization_score: number | null;
+          notes: string | null;
+          recitation_score: number | null;
+          recommended_package_id: string | null;
+          recommended_track_id: string | null;
+          tajweed_score: number | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          application_id: string;
+          created_at?: string;
+          evaluator_id: string;
+          id?: string;
+          memorization_score?: number | null;
+          notes?: string | null;
+          recitation_score?: number | null;
+          recommended_package_id?: string | null;
+          recommended_track_id?: string | null;
+          tajweed_score?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          application_id?: string;
+          created_at?: string;
+          evaluator_id?: string;
+          id?: string;
+          memorization_score?: number | null;
+          notes?: string | null;
+          recitation_score?: number | null;
+          recommended_package_id?: string | null;
+          recommended_track_id?: string | null;
+          tajweed_score?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "placement_tests_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "placement_tests_evaluator_id_fkey";
+            columns: ["evaluator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "placement_tests_recommended_package_id_fkey";
+            columns: ["recommended_package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "placement_tests_recommended_track_id_fkey";
+            columns: ["recommended_track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profile_private: {
         Row: {
           address: string | null;
@@ -2551,6 +2623,7 @@ export type Database = {
       clone_package: { Args: { p_package: string }; Returns: string };
       confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
+      convert_application_to_student: { Args: { p_application: string }; Returns: string };
       create_makeup_session: {
         Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
         Returns: string;
