@@ -44,3 +44,7 @@ export const batchCertificateSchema = z.object({
   achievement: z.string().trim().min(2).max(500),
 });
 export const processCertificateBatchSchema = z.object({ batchId: z.uuid() });
+export const revokeCertificateSchema = z.object({
+  certificateId: z.uuid(),
+  reason: z.string().trim().min(5).max(500),
+});

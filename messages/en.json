@@ -2109,6 +2109,45 @@
       "renewal_failed": "Renewal follow-up could not run. No partial operation was saved."
     }
   },
+  "certificateVerification": {
+    "statuses": {
+      "valid": "Valid certificate",
+      "revoked": "Revoked certificate",
+      "not_found": "Not found",
+      "rate_limited": "Too many attempts"
+    },
+    "valid": {
+      "title": "This certificate is valid and approved",
+      "description": "The details match a Noor Al-Wahy Academy record that has not been revoked."
+    },
+    "revoked": {
+      "title": "This certificate has been revoked",
+      "description": "The record exists but is no longer valid. Contact the academy if needed."
+    },
+    "not_found": {
+      "title": "Certificate could not be verified",
+      "description": "No record matches this code. Check the link or scan the QR code on the original copy."
+    },
+    "rate_limited": {
+      "title": "Verification is temporarily paused",
+      "description": "The allowed number of attempts was exceeded. Wait briefly before trying again."
+    },
+    "fields": {
+      "student": "Short student name",
+      "kind": "Certificate type",
+      "issuedOn": "Issue date",
+      "serial": "Serial number"
+    },
+    "kinds": {
+      "memorization": "Memorization",
+      "excellence": "Excellence",
+      "attendance": "Attendance",
+      "ijazah": "Ijazah",
+      "juz": "Juz completion",
+      "other": "Other"
+    },
+    "privacy": "Verification shows the minimum data and never exposes account, contact, or detailed student information."
+  },
   "certificates": {
     "eyebrow": "Phase eight · documented achievement",
     "title": "Professional certificate center",
@@ -2168,7 +2207,8 @@
       "locale": "Certificate language",
       "student": "Student",
       "students": "Students (multiple selection)",
-      "achievement": "Achievement description"
+      "achievement": "Achievement description",
+      "revokeReason": "Revocation reason"
     },
     "issueSingle": {
       "title": "Issue one certificate",
@@ -2197,7 +2237,10 @@
       "enqueueBatch": "Start batch issuance",
       "processBatch": "Continue queue",
       "processingBatch": "Processing…",
-      "download": "Download PDF"
+      "download": "Download PDF",
+      "revoke": "Revoke certificate",
+      "confirmRevoke": "Confirm revocation",
+      "revoking": "Revoking…"
     },
     "notices": {
       "template_created": "The template was created as a draft.",
@@ -2206,7 +2249,8 @@
       "draft_cloned": "A new draft was created without changing the published version.",
       "issued": "The certificate was issued and notification sent.",
       "batch_queued": "The batch was created and limited processing started.",
-      "batch_processed": "Another queue batch was processed."
+      "batch_processed": "Another queue batch was processed.",
+      "revoked": "The certificate was revoked with its reason and audit history retained."
     },
     "errors": {
       "invalid_template": "Review the template details and required fields.",
@@ -2221,7 +2265,9 @@
       "issue_failed": "The certificate could not be issued.",
       "invalid_batch": "Choose a valid template and students.",
       "batch_failed": "The issuance batch could not be created.",
-      "batch_process_failed": "Batch processing failed; it can be retried."
+      "batch_process_failed": "Batch processing failed; it can be retried.",
+      "invalid_revocation": "Enter a clear revocation reason of at least five characters.",
+      "revoke_failed": "The certificate could not be revoked or is already revoked."
     },
     "student": {
       "eyebrow": "Documented achievements",

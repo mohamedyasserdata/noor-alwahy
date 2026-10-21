@@ -4174,6 +4174,7 @@ export type Database = {
         }[];
       };
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
+      revoke_certificate: { Args: { p_certificate: string; p_reason: string }; Returns: undefined };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
       run_financial_reconciliation: { Args: Record<PropertyKey, never>; Returns: string };
       save_exam_result: {
@@ -4251,6 +4252,17 @@ export type Database = {
         Returns: string;
       };
       upsert_teacher: { Args: { p_payload: Json }; Returns: string };
+      verify_certificate: {
+        Args: { p_code: string };
+        Returns: {
+          certificate_kind: string;
+          issued_on: string;
+          serial_no: string;
+          status: string;
+          student_name: string;
+          valid: boolean;
+        }[];
+      };
     };
     Enums: {
       application_status:

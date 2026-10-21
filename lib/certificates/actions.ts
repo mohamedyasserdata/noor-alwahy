@@ -16,6 +16,7 @@ import {
   certificateVersionSchema,
   issueCertificateSchema,
   processCertificateBatchSchema,
+  revokeCertificateSchema,
 } from "@/lib/validators/certificates";
 
 function locale(value: string): AppLocale {
@@ -253,6 +254,24 @@ export async function processCertificateBatchAction(localeValue: string, formDat
   if (error) go(current, "certificateError", "batch_process_failed");
   refresh(current);
   go(current, "certificateStatus", "batch_processed");
+}
+
+export async function revokeCertificateAction(localeValue: string, formData: FormData) {
+  const current = locale(localeValue);
+  await requireRole("admin", current);
+  const parsed = revokeCertificateSchema.safeParse({
+    certificateId: formData.get("certificateId"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) go(current, "certificateError", "invalid_revocation");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("revoke_certificate", {
+    p_certificate: parsed.data.certificateId,
+    p_reason: parsed.data.reason,
+  });
+  if (error) go(current, "certificateError", "revoke_failed");
+  refresh(current);
+  go(current, "certificateStatus", "revoked");
 }
 
 async function uploadAsset(

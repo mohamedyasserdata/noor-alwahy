@@ -21,7 +21,7 @@ export async function getCertificateAdminData() {
     supabase
       .from("certificates")
       .select(
-        "id,student_id,kind,serial_no,locale,issued_at,revoked_at,student:students(full_name)",
+        "id,student_id,kind,serial_no,locale,issued_at,revoked_at,revoke_reason,student:students(full_name)",
       )
       .order("issued_at", { ascending: false })
       .limit(100),

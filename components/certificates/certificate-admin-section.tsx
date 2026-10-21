@@ -14,6 +14,7 @@ import {
   issueCertificateAction,
   processCertificateBatchAction,
   publishCertificateTemplateAction,
+  revokeCertificateAction,
   updateCertificateTemplateAction,
 } from "@/lib/certificates/actions";
 import { getCertificateAdminData } from "@/lib/certificates/queries";
@@ -290,12 +291,47 @@ export async function CertificateAdminSection({
                     {certificate.serial_no} · {date.format(new Date(certificate.issued_at))}
                   </p>
                 </div>
-                <a
-                  href={`/api/pdf/certificates/${certificate.id}`}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border px-4 text-sm font-bold text-primary hover:bg-accent"
-                >
-                  {t("actions.download")}
-                </a>
+                <div className="flex flex-wrap gap-2">
+                  {certificate.revoked_at ? (
+                    <Badge variant="destructive">{t("student.revoked")}</Badge>
+                  ) : (
+                    <>
+                      <a
+                        href={`/api/pdf/certificates/${certificate.id}`}
+                        className="inline-flex min-h-11 items-center justify-center rounded-lg border px-4 text-sm font-bold text-primary hover:bg-accent"
+                      >
+                        {t("actions.download")}
+                      </a>
+                      <details className="rounded-lg border">
+                        <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-bold text-destructive">
+                          {t("actions.revoke")}
+                        </summary>
+                        <form
+                          action={revokeCertificateAction.bind(null, locale)}
+                          className="grid w-72 gap-3 border-t p-3"
+                        >
+                          <input type="hidden" name="certificateId" value={certificate.id} />
+                          <Label htmlFor={`revoke-${certificate.id}`}>
+                            {t("fields.revokeReason")}
+                          </Label>
+                          <textarea
+                            id={`revoke-${certificate.id}`}
+                            name="reason"
+                            required
+                            minLength={5}
+                            maxLength={500}
+                            className="min-h-20 rounded-lg border bg-background p-3 text-sm"
+                          />
+                          <AdminSubmitButton
+                            variant="destructive"
+                            label={t("actions.confirmRevoke")}
+                            pendingLabel={t("actions.revoking")}
+                          />
+                        </form>
+                      </details>
+                    </>
+                  )}
+                </div>
               </div>
             ))
           ) : (
