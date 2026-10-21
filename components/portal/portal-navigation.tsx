@@ -13,6 +13,7 @@ import {
   House,
   Link2,
   Mail,
+  PackageOpen,
   Scale,
   ScrollText,
   Settings,
@@ -30,6 +31,7 @@ import { cn } from "@/lib/utils";
 
 const sectionIcons = {
   dashboard: ChartNoAxesCombined,
+  packages: PackageOpen,
   applications: ClipboardList,
   assignments: UserRoundCheck,
   students: Users,
