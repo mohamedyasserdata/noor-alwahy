@@ -28,7 +28,14 @@ alter table public.memorization_plans enable row level security;
 alter table public.memorization_plans replica identity full;
 
 revoke all on table public.memorization_plans from public, anon, authenticated, service_role;
-grant select, insert, update, delete on table public.memorization_plans to authenticated;
+grant select, insert, delete on table public.memorization_plans to authenticated;
+grant update (
+  weekly_target_pages,
+  monthly_target_pages,
+  starts_on,
+  ends_on,
+  updated_by
+) on table public.memorization_plans to authenticated;
 grant select on table public.memorization_plans to service_role;
 
 create policy memorization_plans_admin_all on public.memorization_plans

@@ -1,6 +1,6 @@
 begin;
 
-select plan(33);
+select plan(34);
 
 select has_table('public', 'memorization_plans', 'memorization plans table exists');
 select has_view('public', 'v_memorization_plan_adherence', 'memorization plan adherence view exists');
@@ -13,7 +13,8 @@ select ok((select reloptions @> array['security_invoker=true'] from pg_class whe
 select is(has_table_privilege('anon', 'public.memorization_plans', 'select'), false, 'anonymous callers cannot read plans');
 select is(has_table_privilege('authenticated', 'public.memorization_plans', 'select'), true, 'authenticated callers reach plan RLS');
 select is(has_table_privilege('authenticated', 'public.memorization_plans', 'insert'), true, 'authorized authenticated callers can create plans');
-select is(has_table_privilege('authenticated', 'public.memorization_plans', 'update'), true, 'authorized authenticated callers can update plans');
+select is(has_column_privilege('authenticated', 'public.memorization_plans', 'weekly_target_pages', 'update'), true, 'authorized authenticated callers can update plan targets');
+select is(has_column_privilege('authenticated', 'public.memorization_plans', 'created_by', 'update'), false, 'callers cannot rewrite plan authorship');
 select is(has_table_privilege('service_role', 'public.memorization_plans', 'insert'), false, 'service role cannot bypass plan writes');
 
 insert into public.tracks (id, code, name_ar, name_en)

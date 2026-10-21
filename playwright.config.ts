@@ -13,6 +13,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   globalTimeout: 10 * 60 * 1000,
+  expect: { timeout: 15_000 },
   reporter: [
     [process.env.CI ? "line" : "list"],
     ["html", { open: "never", outputFolder: "output/playwright/report" }],

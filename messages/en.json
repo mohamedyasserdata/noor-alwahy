@@ -1184,6 +1184,39 @@
       "average": "Review average"
     }
   },
+  "memorizationPlan": {
+    "weekly": "Weekly goal",
+    "monthly": "Monthly goal",
+    "weeklyTarget": "Weekly target (pages)",
+    "monthlyTarget": "Monthly target (pages)",
+    "startsOn": "Starts on",
+    "endsOn": "Ends on (optional)",
+    "create": "Create plan",
+    "update": "Update plan",
+    "saving": "Saving…",
+    "student": {
+      "title": "Your memorization plan",
+      "description": "A private progress indicator against the goals agreed with your teacher.",
+      "empty": "Your teacher has not set a memorization plan yet.",
+      "achieved": "{achieved} of {target} pages completed",
+      "period": "Plan period: {start} to {end}",
+      "openEnded": "ongoing"
+    },
+    "teacher": {
+      "eyebrow": "Individual learning goals",
+      "title": "Student memorization plans",
+      "description": "Set realistic weekly and monthly page goals for the students currently assigned to you.",
+      "existing": "Active plan",
+      "new": "No plan yet",
+      "empty": "No assigned students are available for planning."
+    },
+    "notices": {
+      "created": "The memorization plan was created.",
+      "updated": "The memorization plan was updated.",
+      "invalid": "Check the targets and dates. The monthly target must not be lower than the weekly target.",
+      "error": "The plan could not be saved. Try again."
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

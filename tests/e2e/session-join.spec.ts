@@ -1,14 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import type { Database } from "../../types/database.types";
-import { signInAs } from "./helpers/auth";
 
 test("US-073 next-session card releases Zoom details only in the join window", async ({ page }) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
   try {
-    await signInAs(page, "en", "student");
+    await signIn(page, "en", fixture.studentEmail, fixture.password, "student/home");
     await expect(page.getByRole("heading", { name: "Your next session" })).toBeVisible();
     await expect(page.getByText("Available now")).toBeVisible();
     await expect(page.getByText("join-meeting-id")).toBeVisible();
@@ -16,7 +15,7 @@ test("US-073 next-session card releases Zoom details only in the join window", a
     const studentJoin = page.getByRole("link", { name: "Join session" });
     await expect(studentJoin).toHaveAttribute("href", fixture.joinUrl);
 
-    await signInAs(page, "ar", "parent");
+    await signIn(page, "ar", fixture.parentEmail, fixture.password, "parent/children");
     await expect(page.getByRole("heading", { name: "حصتك القادمة" })).toBeVisible();
     await expect(page.getByText("متاحة الآن")).toBeVisible();
     await expect(page.getByText("join-meeting-id")).toBeVisible();
@@ -39,16 +38,33 @@ async function createFixture() {
     required("SUPABASE_SERVICE_ROLE_KEY"),
     { auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false } },
   );
-  const student = await findStudent(db);
+  const suffix = crypto.randomUUID().slice(0, 8);
+  const password = "AcademyTest1!";
+  const studentEmail = `session-join-student-${suffix}@noor.local`;
+  const parentEmail = `session-join-parent-${suffix}@noor.local`;
+  const studentProfileId = await createAuthUser(db, studentEmail, password, "student");
+  const parentProfileId = await createAuthUser(db, parentEmail, password, "parent");
   const teacher = await findTeacher(db);
-  const guardian = await findGuardian(db);
-  const studentId = student.id;
+  const studentId = crypto.randomUUID();
+  const guardianId = crypto.randomUUID();
   const teacherId = teacher.id;
-  const guardianId = guardian.id;
   const sessionId = crypto.randomUUID();
   const joinUrl = "https://academy.zoom.us/j/session-window";
   const scheduledAt = new Date(Date.now() + 5 * 60_000);
   const endsAt = new Date(scheduledAt.getTime() + 30 * 60_000);
+
+  const { error: studentError } = await db.from("students").insert({
+    id: studentId,
+    profile_id: studentProfileId,
+    full_name: `Join Window Student ${suffix}`,
+    gender: "male",
+    timezone: "Africa/Cairo",
+  });
+  if (studentError) throw studentError;
+  const { error: guardianError } = await db
+    .from("guardians")
+    .insert({ id: guardianId, profile_id: parentProfileId });
+  if (guardianError) throw guardianError;
 
   const { error: linkError } = await db
     .from("student_guardians")
@@ -57,12 +73,6 @@ async function createFixture() {
       { onConflict: "student_id,guardian_id" },
     );
   if (linkError) throw linkError;
-
-  const { error: cleanupError } = await db
-    .from("sessions")
-    .delete()
-    .or(`student_id.eq.${studentId},teacher_id.eq.${teacherId}`);
-  if (cleanupError) throw cleanupError;
 
   const { error: sessionError } = await db.from("sessions").insert({
     id: sessionId,
@@ -78,6 +88,9 @@ async function createFixture() {
   if (sessionError) throw sessionError;
   return {
     joinUrl,
+    parentEmail,
+    password,
+    studentEmail,
     async cleanup() {
       await db.from("sessions").delete().eq("id", sessionId);
       await db
@@ -85,35 +98,16 @@ async function createFixture() {
         .delete()
         .eq("student_id", studentId)
         .eq("guardian_id", guardianId);
-      if (student.created) await db.from("students").delete().eq("id", studentId);
+      await db.from("students").delete().eq("id", studentId);
+      await db.from("guardians").delete().eq("id", guardianId);
+      await db.auth.admin.deleteUser(studentProfileId);
+      await db.auth.admin.deleteUser(parentProfileId);
       if (teacher.created) await db.from("teachers").delete().eq("id", teacherId);
-      if (guardian.created) await db.from("guardians").delete().eq("id", guardianId);
     },
   };
 }
 
 type Db = SupabaseClient<Database>;
-
-async function findStudent(db: Db) {
-  const profileId = "10000000-0000-4000-8000-000000000003";
-  const { data, error } = await db
-    .from("students")
-    .select("id")
-    .eq("profile_id", profileId)
-    .maybeSingle();
-  if (error) throw error;
-  if (data) return { id: data.id, created: false };
-  const id = crypto.randomUUID();
-  const { error: insertError } = await db.from("students").insert({
-    id,
-    profile_id: profileId,
-    full_name: "Join Window Student",
-    gender: "male",
-    timezone: "Africa/Cairo",
-  });
-  if (insertError) throw insertError;
-  return { id, created: true };
-}
 
 async function findTeacher(db: Db) {
   const profileId = "10000000-0000-4000-8000-000000000002";
@@ -138,19 +132,31 @@ async function findTeacher(db: Db) {
   return { id, created: true };
 }
 
-async function findGuardian(db: Db) {
-  const profileId = "10000000-0000-4000-8000-000000000004";
-  const { data, error } = await db
-    .from("guardians")
-    .select("id")
-    .eq("profile_id", profileId)
-    .maybeSingle();
+async function createAuthUser(db: Db, email: string, password: string, role: "student" | "parent") {
+  const { data, error } = await db.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    app_metadata: { role },
+    user_metadata: { full_name: `Join Window ${role}`, role },
+  });
   if (error) throw error;
-  if (data) return { id: data.id, created: false };
-  const id = crypto.randomUUID();
-  const { error: insertError } = await db.from("guardians").insert({ id, profile_id: profileId });
-  if (insertError) throw insertError;
-  return { id, created: true };
+  return data.user.id;
+}
+
+async function signIn(
+  page: Page,
+  locale: "ar" | "en",
+  email: string,
+  password: string,
+  home: "student/home" | "parent/children",
+) {
+  await page.context().clearCookies();
+  await page.goto(`/${locale}/auth/login`);
+  await page.locator("#email").fill(email);
+  await page.locator("#password").fill(password);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(new RegExp(`/${locale}/${home}(?:\\?.*)?$`));
 }
 
 function required(name: string) {
