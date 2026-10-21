@@ -114,6 +114,11 @@
           "title": "Subscription management",
           "description": "Create subscriptions and track their periods and fixed prices without later package changes affecting them."
         },
+        "finance": {
+          "label": "Finance",
+          "title": "Invoices and payments",
+          "description": "Track invoices, record and review payments, and issue receipts from the approved financial ledger."
+        },
         "students": {
           "label": "Students",
           "title": "Student records",
@@ -1174,6 +1179,8 @@
       "teacherLate": "A teacher is late for a session",
       "teacherAbsenceThreshold": "A teacher reached the absence alert threshold",
       "reportApproved": "Student report approved",
+      "paymentConfirmed": "Payment confirmed and receipt issued",
+      "refundConfirmed": "Refund confirmed",
       "generic": "You have a new academy update"
     }
   },
@@ -1705,6 +1712,61 @@
       "reorder_failed": "The package order could not be saved.",
       "invalid_batch": "The preview expired or does not belong to this account.",
       "import_failed": "The import failed and no packages were saved. Review the file and try again."
+    }
+  },
+  "financeAdmin": {
+    "eyebrow": "P7 · Financial ledger",
+    "title": "Invoices and payments",
+    "description": "Record payments and refunds, then review them before confirmation. A subscription is activated and credited only after confirmed payments cover the invoice.",
+    "unknownStudent": "Unavailable student",
+    "due": "Due",
+    "payments": "Invoice transactions",
+    "payment": "Payment",
+    "refund": "Refund",
+    "noProofNote": "No proof note",
+    "confirm": "Confirm",
+    "confirming": "Confirming…",
+    "reject": "Reject",
+    "rejecting": "Rejecting…",
+    "receipt": "Receipt",
+    "noPayments": "No payments have been recorded for this invoice.",
+    "recordTitle": "Record a transaction",
+    "kind": "Transaction type",
+    "amount": "Amount",
+    "method": "Payment method",
+    "noMethod": "No specified method",
+    "proofNote": "Proof reference or note",
+    "record": "Submit for review",
+    "recording": "Recording…",
+    "empty": "No invoices yet.",
+    "states": {
+      "draft": "Draft",
+      "issued": "Issued",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "paymentStates": {
+      "pending_confirmation": "Pending confirmation",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected"
+    },
+    "notices": {
+      "payment_recorded": "The payment was recorded and awaits confirmation.",
+      "refund_recorded": "The refund was recorded and awaits confirmation.",
+      "confirmed": "The transaction was confirmed and the invoice balance updated.",
+      "rejected": "The transaction was rejected."
+    },
+    "errors": {
+      "invalid_payment": "Review the transaction amount and details.",
+      "currency_mismatch": "The payment currency does not match the invoice.",
+      "invoice_not_payable": "A payment cannot be recorded for this invoice.",
+      "record_failed": "The transaction could not be recorded.",
+      "invalid_decision": "The review decision is invalid.",
+      "refund_exceeds_paid": "The refund exceeds the confirmed net paid amount.",
+      "mfa_required": "Complete multi-factor authentication to confirm the payment.",
+      "decision_failed": "The review decision could not be saved."
     }
   },
   "subscriptionAdmin": {

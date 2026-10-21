@@ -324,5 +324,7 @@ function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"n
   if (type === "teacher_late") return t("types.teacherLate");
   if (type === "teacher_absence_threshold") return t("types.teacherAbsenceThreshold");
   if (type === "report_approved") return t("types.reportApproved");
+  if (type === "payment_confirmed") return t("types.paymentConfirmed");
+  if (type === "refund_confirmed") return t("types.refundConfirmed");
   return t("types.generic");
 }

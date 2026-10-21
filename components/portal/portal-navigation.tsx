@@ -35,6 +35,7 @@ const sectionIcons = {
   packages: PackageOpen,
   applications: ClipboardList,
   subscriptions: CreditCard,
+  finance: Banknote,
   assignments: UserRoundCheck,
   students: Users,
   teachers: GraduationCap,

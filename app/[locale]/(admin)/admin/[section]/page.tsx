@@ -12,6 +12,7 @@ import { TeacherManagementSection } from "@/components/admin/teacher-management-
 import { UserManagementSection } from "@/components/admin/user-management-section";
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
+import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
 import { PackageAdminSection } from "@/components/packages/package-admin-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
@@ -51,6 +52,10 @@ export default async function AdminSectionPage({
 
   if (section === "subscriptions") {
     return <SubscriptionAdminSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "finance") {
+    return <FinanceAdminSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "users") {
