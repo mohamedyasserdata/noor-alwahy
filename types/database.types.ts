@@ -3958,6 +3958,22 @@ export type Database = {
       confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
       convert_application_to_student: { Args: { p_application: string }; Returns: string };
+      create_certificate_template: {
+        Args: {
+          p_body_ar: string;
+          p_body_en: string;
+          p_kind: string;
+          p_logo_path: string;
+          p_name_ar: string;
+          p_name_en: string;
+          p_seal_path: string;
+          p_signatures: Json;
+          p_theme: Json;
+          p_title_ar: string;
+          p_title_en: string;
+        };
+        Returns: string;
+      };
       create_makeup_session: {
         Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
         Returns: string;
@@ -4188,6 +4204,23 @@ export type Database = {
       };
       transition_teacher_payout: {
         Args: { p_action: string; p_payout: string; p_reference?: string };
+        Returns: undefined;
+      };
+      update_certificate_template_draft: {
+        Args: {
+          p_body_ar: string;
+          p_body_en: string;
+          p_kind: string;
+          p_logo_path: string;
+          p_name_ar: string;
+          p_name_en: string;
+          p_seal_path: string;
+          p_signatures: Json;
+          p_theme: Json;
+          p_title_ar: string;
+          p_title_en: string;
+          p_version: string;
+        };
         Returns: undefined;
       };
       update_evaluation_settings: {

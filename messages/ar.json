@@ -144,6 +144,11 @@
           "title": "إعدادات التقييم",
           "description": "معايرة أوزان المعايير والخصومات وعتبات التقدير لكل نوع جلسة."
         },
+        "certificates": {
+          "label": "الشهادات",
+          "title": "إدارة الشهادات",
+          "description": "صمّم القوالب المعتمدة وأصدر الشهادات الفردية والجماعية بأمان."
+        },
         "exams": {
           "label": "الاختبارات",
           "title": "الاختبارات والدرجات",
@@ -2104,6 +2109,127 @@
       "change_failed": "تعذر تطبيق تغيير الباقة.",
       "invalid_run": "تاريخ تشغيل التجديدات غير صالح.",
       "renewal_failed": "تعذر تشغيل متابعة التجديدات. لم تُحفظ عملية جزئية."
+    }
+  },
+  "certificates": {
+    "eyebrow": "المرحلة الثامنة · توثيق الإنجاز",
+    "title": "مركز الشهادات الاحترافي",
+    "description": "قوالب إسلامية آمنة ذات نسخ ثابتة، ومعاينة واضحة، وإصدار فردي وجماعي قابل للتحقق.",
+    "summary": "{templates} قالب · {certificates} شهادة",
+    "immutableNotice": "كل شهادة تحفظ قالبها وبياناتها كما كانت لحظة الإصدار.",
+    "createTemplate": "إنشاء قالب جديد",
+    "editDraft": "تعديل المسودة ومعاينتها",
+    "active": "مفعّل",
+    "inactive": "غير مفعّل",
+    "version": "النسخة {version}",
+    "variablesHint": "المتغيرات المسموحة فقط: student_name وachievement وissued_on وserial_no، وتُكتب بين قوسين مزدوجين.",
+    "kinds": {
+      "memorization": "إتمام الحفظ",
+      "excellence": "تفوق",
+      "attendance": "حضور",
+      "ijazah": "إجازة",
+      "juz": "إتمام جزء",
+      "other": "أخرى"
+    },
+    "styles": {
+      "geometric": "هندسي إسلامي",
+      "arabesque": "أرابيسك",
+      "minimal": "هادئ",
+      "illuminated": "مزخرف"
+    },
+    "statuses": { "draft": "مسودة", "published": "منشور وثابت", "archived": "مؤرشف" },
+    "batchStatuses": {
+      "queued": "في الطابور",
+      "processing": "قيد المعالجة",
+      "completed": "مكتمل",
+      "partial": "مكتمل جزئيًا",
+      "failed": "متعذر"
+    },
+    "fields": {
+      "kind": "نوع الشهادة",
+      "nameAr": "اسم القالب بالعربية",
+      "nameEn": "اسم القالب بالإنجليزية",
+      "titleAr": "عنوان الشهادة بالعربية",
+      "titleEn": "العنوان بالإنجليزية",
+      "bodyAr": "النص العربي",
+      "bodyEn": "النص الإنجليزي",
+      "style": "الطراز",
+      "logo": "شعار الأكاديمية",
+      "seal": "الختم",
+      "signatureImage": "صورة التوقيع",
+      "signerName": "اسم الموقّع",
+      "signerTitle": "صفة الموقّع",
+      "primary": "اللون الأساسي",
+      "accent": "لون الزخرفة",
+      "templateVersion": "نسخة القالب المنشورة",
+      "chooseTemplate": "اختر القالب",
+      "locale": "لغة الشهادة",
+      "student": "الطالب",
+      "students": "الطلاب (اختيار متعدد)",
+      "achievement": "وصف الإنجاز"
+    },
+    "issueSingle": {
+      "title": "إصدار شهادة فردية",
+      "description": "أنشئ شهادة ثابتة لطالب واحد من نسخة منشورة."
+    },
+    "issueBatch": {
+      "title": "إصدار جماعي",
+      "description": "أضف مجموعة طلاب إلى طابور محدود الموارد وقابل لإعادة المحاولة."
+    },
+    "batches": {
+      "title": "طوابير الإصدار",
+      "progress": "اكتمل {completed} · تعذر {failed} · الإجمالي {total}",
+      "empty": "لا توجد دفعات إصدار بعد."
+    },
+    "issued": { "title": "الشهادات الصادرة", "empty": "لم تصدر شهادات بعد." },
+    "unknownStudent": "طالب غير متاح",
+    "actions": {
+      "createTemplate": "حفظ القالب",
+      "saveDraft": "حفظ المسودة",
+      "saving": "جارٍ الحفظ…",
+      "publish": "نشر النسخة",
+      "publishing": "جارٍ النشر…",
+      "newVersion": "إنشاء نسخة جديدة",
+      "cloning": "جارٍ النسخ…",
+      "issue": "إصدار الشهادة",
+      "enqueueBatch": "بدء الإصدار الجماعي",
+      "processBatch": "متابعة الطابور",
+      "processingBatch": "جارٍ المعالجة…",
+      "download": "تنزيل PDF"
+    },
+    "notices": {
+      "template_created": "تم إنشاء القالب كمسودة.",
+      "template_updated": "حُفظت المسودة والمعاينة.",
+      "published": "نُشرت النسخة وأصبحت ثابتة.",
+      "draft_cloned": "أُنشئت مسودة جديدة دون تغيير النسخة المنشورة.",
+      "issued": "أُصدرت الشهادة وأُرسل الإشعار.",
+      "batch_queued": "أُنشئت الدفعة وبدأت المعالجة المحدودة.",
+      "batch_processed": "تمت معالجة دفعة إضافية من الطابور."
+    },
+    "errors": {
+      "invalid_template": "راجع بيانات القالب والحقول المطلوبة.",
+      "invalid_asset": "يجب أن تكون الصورة PNG أو JPEG أو WebP وأقل من 2MB.",
+      "asset_upload_failed": "تعذر رفع أصل القالب.",
+      "create_failed": "تعذر إنشاء القالب.",
+      "update_failed": "تعذر حفظ المسودة.",
+      "invalid_version": "نسخة القالب غير صالحة.",
+      "publish_failed": "تعذر نشر النسخة.",
+      "clone_failed": "تعذر إنشاء نسخة جديدة.",
+      "invalid_issue": "راجع القالب والطالب ووصف الإنجاز.",
+      "issue_failed": "تعذر إصدار الشهادة.",
+      "invalid_batch": "اختر قالبًا وطلابًا صالحين.",
+      "batch_failed": "تعذر إنشاء دفعة الإصدار.",
+      "batch_process_failed": "تعذرت معالجة الدفعة؛ يمكن إعادة المحاولة."
+    },
+    "student": {
+      "eyebrow": "إنجازاتك الموثقة",
+      "title": "شهاداتي",
+      "description": "حمّل شهاداتك المعتمدة وتحقق من حالتها.",
+      "valid": "سارية",
+      "revoked": "ملغاة",
+      "revokedNotice": "هذه الشهادة ملغاة ولا يتاح تنزيلها.",
+      "emptyTitle": "لا توجد شهادات بعد",
+      "emptyDescription": "ستظهر هنا الشهادات فور اعتمادها من الأكاديمية."
     }
   },
   "exams": {

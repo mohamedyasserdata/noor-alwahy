@@ -144,6 +144,11 @@
           "title": "Evaluation settings",
           "description": "Calibrate criteria weights, deductions, and rating thresholds for every session type."
         },
+        "certificates": {
+          "label": "Certificates",
+          "title": "Certificate management",
+          "description": "Design approved templates and securely issue individual and batch certificates."
+        },
         "exams": {
           "label": "Exams",
           "title": "Exams and grades",
@@ -2102,6 +2107,131 @@
       "change_failed": "The package change could not be applied.",
       "invalid_run": "The renewal processing date is invalid.",
       "renewal_failed": "Renewal follow-up could not run. No partial operation was saved."
+    }
+  },
+  "certificates": {
+    "eyebrow": "Phase eight · documented achievement",
+    "title": "Professional certificate center",
+    "description": "Safe Islamic templates with immutable versions, clear previews, and verifiable individual or batch issuance.",
+    "summary": "{templates} templates · {certificates} certificates",
+    "immutableNotice": "Every certificate preserves its template and data exactly as issued.",
+    "createTemplate": "Create a new template",
+    "editDraft": "Edit and preview draft",
+    "active": "Active",
+    "inactive": "Inactive",
+    "version": "Version {version}",
+    "variablesHint": "Allowed variables only: student_name, achievement, issued_on, and serial_no, each wrapped in double braces.",
+    "kinds": {
+      "memorization": "Memorization",
+      "excellence": "Excellence",
+      "attendance": "Attendance",
+      "ijazah": "Ijazah",
+      "juz": "Juz completion",
+      "other": "Other"
+    },
+    "styles": {
+      "geometric": "Islamic geometric",
+      "arabesque": "Arabesque",
+      "minimal": "Minimal",
+      "illuminated": "Illuminated"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published and immutable",
+      "archived": "Archived"
+    },
+    "batchStatuses": {
+      "queued": "Queued",
+      "processing": "Processing",
+      "completed": "Completed",
+      "partial": "Partially completed",
+      "failed": "Failed"
+    },
+    "fields": {
+      "kind": "Certificate type",
+      "nameAr": "Arabic template name",
+      "nameEn": "English template name",
+      "titleAr": "Arabic certificate title",
+      "titleEn": "English certificate title",
+      "bodyAr": "Arabic body",
+      "bodyEn": "English body",
+      "style": "Style",
+      "logo": "Academy logo",
+      "seal": "Seal",
+      "signatureImage": "Signature image",
+      "signerName": "Signatory name",
+      "signerTitle": "Signatory title",
+      "primary": "Primary color",
+      "accent": "Ornament color",
+      "templateVersion": "Published template version",
+      "chooseTemplate": "Choose a template",
+      "locale": "Certificate language",
+      "student": "Student",
+      "students": "Students (multiple selection)",
+      "achievement": "Achievement description"
+    },
+    "issueSingle": {
+      "title": "Issue one certificate",
+      "description": "Create an immutable certificate for one student from a published version."
+    },
+    "issueBatch": {
+      "title": "Batch issuance",
+      "description": "Add students to a resource-limited, retryable issuance queue."
+    },
+    "batches": {
+      "title": "Issuance queues",
+      "progress": "{completed} completed · {failed} failed · {total} total",
+      "empty": "No issuance batches yet."
+    },
+    "issued": { "title": "Issued certificates", "empty": "No certificates have been issued." },
+    "unknownStudent": "Unavailable student",
+    "actions": {
+      "createTemplate": "Save template",
+      "saveDraft": "Save draft",
+      "saving": "Saving…",
+      "publish": "Publish version",
+      "publishing": "Publishing…",
+      "newVersion": "Create new version",
+      "cloning": "Cloning…",
+      "issue": "Issue certificate",
+      "enqueueBatch": "Start batch issuance",
+      "processBatch": "Continue queue",
+      "processingBatch": "Processing…",
+      "download": "Download PDF"
+    },
+    "notices": {
+      "template_created": "The template was created as a draft.",
+      "template_updated": "The draft and preview were saved.",
+      "published": "The version is published and immutable.",
+      "draft_cloned": "A new draft was created without changing the published version.",
+      "issued": "The certificate was issued and notification sent.",
+      "batch_queued": "The batch was created and limited processing started.",
+      "batch_processed": "Another queue batch was processed."
+    },
+    "errors": {
+      "invalid_template": "Review the template details and required fields.",
+      "invalid_asset": "Images must be PNG, JPEG, or WebP and under 2MB.",
+      "asset_upload_failed": "The template asset could not be uploaded.",
+      "create_failed": "The template could not be created.",
+      "update_failed": "The draft could not be saved.",
+      "invalid_version": "The template version is invalid.",
+      "publish_failed": "The version could not be published.",
+      "clone_failed": "A new version could not be created.",
+      "invalid_issue": "Review the template, student, and achievement.",
+      "issue_failed": "The certificate could not be issued.",
+      "invalid_batch": "Choose a valid template and students.",
+      "batch_failed": "The issuance batch could not be created.",
+      "batch_process_failed": "Batch processing failed; it can be retried."
+    },
+    "student": {
+      "eyebrow": "Documented achievements",
+      "title": "My certificates",
+      "description": "Download your approved certificates and check their status.",
+      "valid": "Valid",
+      "revoked": "Revoked",
+      "revokedNotice": "This certificate is revoked and cannot be downloaded.",
+      "emptyTitle": "No certificates yet",
+      "emptyDescription": "Certificates will appear here as soon as the academy approves them."
     }
   },
   "exams": {

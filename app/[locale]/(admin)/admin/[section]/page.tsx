@@ -14,6 +14,7 @@ import { UserManagementSection } from "@/components/admin/user-management-sectio
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
 import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
+import { CertificateAdminSection } from "@/components/certificates/certificate-admin-section";
 import { PackageAdminSection } from "@/components/packages/package-admin-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
@@ -89,6 +90,10 @@ export default async function AdminSectionPage({
 
   if (section === "exams") {
     return <ExamManagementSection locale={locale} portal="admin" searchParams={searchParams} />;
+  }
+
+  if (section === "certificates") {
+    return <CertificateAdminSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "reports") {

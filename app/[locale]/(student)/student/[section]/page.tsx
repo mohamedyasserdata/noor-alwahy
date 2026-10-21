@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ContactLinksSection } from "@/components/contact/contact-links-section";
 import { FamilyBillingSection } from "@/components/billing/family-billing-section";
+import { StudentCertificatesSection } from "@/components/certificates/student-certificates-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { QuranMapSection } from "@/components/progress/quran-map-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
@@ -35,6 +36,8 @@ export default async function StudentSectionPage({
   if (section === "home") return <NextSessionSection locale={locale} />;
 
   if (section === "progress") return <QuranMapSection locale={locale} />;
+
+  if (section === "certificates") return <StudentCertificatesSection locale={locale} />;
 
   return <PortalSectionRoute params={params} portal="student" />;
 }
