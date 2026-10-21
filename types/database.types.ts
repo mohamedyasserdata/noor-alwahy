@@ -36,6 +36,126 @@ export type Database = {
           },
         ];
       };
+      applications: {
+        Row: {
+          consent_at: string;
+          consent_version: string;
+          contact_email: string | null;
+          contact_hash: string;
+          contact_phone: string | null;
+          converted_student_id: string | null;
+          country_code: string | null;
+          created_at: string;
+          guardian_name: string | null;
+          id: string;
+          internal_notes: string | null;
+          lookup_hash: string;
+          notes: string | null;
+          order_no: string;
+          package_id: string | null;
+          preferred_teacher_gender: Database["public"]["Enums"]["gender_t"] | null;
+          preferred_times: NonNullable<Json>;
+          request_ip_hash: string;
+          self_level: string;
+          source: string;
+          status: Database["public"]["Enums"]["application_status"];
+          student_age: number;
+          student_gender: Database["public"]["Enums"]["gender_t"];
+          student_name: string;
+          timezone: string;
+          track_id: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          consent_at?: string;
+          consent_version: string;
+          contact_email?: string | null;
+          contact_hash: string;
+          contact_phone?: string | null;
+          converted_student_id?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          guardian_name?: string | null;
+          id?: string;
+          internal_notes?: string | null;
+          lookup_hash: string;
+          notes?: string | null;
+          order_no: string;
+          package_id?: string | null;
+          preferred_teacher_gender?: Database["public"]["Enums"]["gender_t"] | null;
+          preferred_times: NonNullable<Json>;
+          request_ip_hash: string;
+          self_level: string;
+          source?: string;
+          status?: Database["public"]["Enums"]["application_status"];
+          student_age: number;
+          student_gender: Database["public"]["Enums"]["gender_t"];
+          student_name: string;
+          timezone: string;
+          track_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          consent_at?: string;
+          consent_version?: string;
+          contact_email?: string | null;
+          contact_hash?: string;
+          contact_phone?: string | null;
+          converted_student_id?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          guardian_name?: string | null;
+          id?: string;
+          internal_notes?: string | null;
+          lookup_hash?: string;
+          notes?: string | null;
+          order_no?: string;
+          package_id?: string | null;
+          preferred_teacher_gender?: Database["public"]["Enums"]["gender_t"] | null;
+          preferred_times?: NonNullable<Json>;
+          request_ip_hash?: string;
+          self_level?: string;
+          source?: string;
+          status?: Database["public"]["Enums"]["application_status"];
+          student_age?: number;
+          student_gender?: Database["public"]["Enums"]["gender_t"];
+          student_name?: string;
+          timezone?: string;
+          track_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "applications_converted_student_id_fkey";
+            columns: ["converted_student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "applications_country_code_fkey";
+            columns: ["country_code"];
+            isOneToOne: false;
+            referencedRelation: "countries";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "applications_package_id_fkey";
+            columns: ["package_id"];
+            isOneToOne: false;
+            referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "applications_track_id_fkey";
+            columns: ["track_id"];
+            isOneToOne: false;
+            referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       attendance: {
         Row: {
           locked_at: string | null;
@@ -2590,6 +2710,10 @@ export type Database = {
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;
+      };
+      submit_application: {
+        Args: { p_contact_hash: string; p_ip_hash: string; p_lookup_hash: string; p_payload: Json };
+        Returns: string;
       };
       suggest_teachers: {
         Args: { p_student: string; p_track: string };
