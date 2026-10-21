@@ -1355,7 +1355,51 @@
       "published": "The package was saved and published.",
       "hidden": "The package is hidden from the public site.",
       "cloned": "The package was cloned as an editable draft.",
-      "reordered": "The package order was saved."
+      "reordered": "The package order was saved.",
+      "imported": "The package import completed in one transaction."
+    },
+    "import": {
+      "title": "Import and export packages",
+      "description": "Download the template or export current data, then upload an Excel or CSV file for validation and preview before confirmation. Each row is one country price, with identical package data repeated across its rows.",
+      "template": "Download template",
+      "exportXlsx": "Export Excel",
+      "exportCsv": "Export CSV",
+      "file": "Package file",
+      "preview": "Validate and preview",
+      "previewing": "Validating…",
+      "errorTitle": "Correct these errors before importing",
+      "row": "Row {row}",
+      "ready": "Preview ready: {count} packages",
+      "confirm": "Confirm import",
+      "confirming": "Saving…",
+      "published": "Will publish",
+      "draft": "Draft",
+      "limits": "Maximum 1,000 rows and 4 MB. Formulas, macros, and external links are rejected.",
+      "columns": { "slug": "Slug", "name": "Package name", "prices": "Prices", "status": "Status" },
+      "errors": {
+        "invalidFile": "The file is invalid or exceeds the allowed size.",
+        "unsafeWorkbook": "The workbook contains unsafe or suspiciously compressed content.",
+        "missingPackagesSheet": "The Packages worksheet is missing.",
+        "formulasNotAllowed": "Excel formulas are not allowed in imports.",
+        "invalidHeaders": "Column headers do not match the template.",
+        "invalidRowCount": "The row count is invalid.",
+        "unknownTrack": "The track code is unknown.",
+        "unknownCountry": "The country code is unsupported.",
+        "currencyMismatch": "The currency does not match the country.",
+        "inconsistentPackage": "Package details differ across its price rows.",
+        "duplicateCountry": "The country is duplicated within the package.",
+        "duplicate_country": "The country is duplicated within the package.",
+        "fallbackRequired": "A published package needs an active ZZ fallback price.",
+        "fallback_required": "A published package needs an active ZZ fallback price.",
+        "invalidBoolean": "Use true or false only.",
+        "invalidValue": "The value does not match the column rules.",
+        "invalid_value": "The value does not match the column rules.",
+        "below_minimum": "The price is below the minimum.",
+        "belowMinimum": "The price is below the minimum.",
+        "above_maximum": "The price is above the maximum.",
+        "aboveMaximum": "The price is above the maximum.",
+        "requestFailed": "The file could not be validated now."
+      }
     },
     "errors": {
       "invalid_fields": "Review the required fields and entered values.",
@@ -1365,7 +1409,9 @@
       "clone_failed": "The package could not be cloned.",
       "publication_failed": "The publication state could not be changed.",
       "invalid_order": "The package order is invalid.",
-      "reorder_failed": "The package order could not be saved."
+      "reorder_failed": "The package order could not be saved.",
+      "invalid_batch": "The preview expired or does not belong to this account.",
+      "import_failed": "The import failed and no packages were saved. Review the file and try again."
     }
   },
   "accessibility": {

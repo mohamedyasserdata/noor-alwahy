@@ -779,6 +779,54 @@ export type Database = {
           },
         ];
       };
+      package_import_batches: {
+        Row: {
+          confirmed_at: string | null;
+          created_at: string;
+          created_by: string;
+          id: string;
+          package_count: number;
+          payload: NonNullable<Json>;
+          price_count: number;
+          source_name: string;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          confirmed_at?: string | null;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          package_count: number;
+          payload: NonNullable<Json>;
+          price_count: number;
+          source_name: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          confirmed_at?: string | null;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          package_count?: number;
+          payload?: NonNullable<Json>;
+          price_count?: number;
+          source_name?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "package_import_batches_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       package_prices: {
         Row: {
           amount: number;
@@ -2381,6 +2429,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"];
       };
       clone_package: { Args: { p_package: string }; Returns: string };
+      confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
       create_makeup_session: {
         Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
