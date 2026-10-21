@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChartNoAxesCombined,
   ClipboardList,
+  Command,
   Clock3,
   CreditCard,
   FileChartColumn,
@@ -34,6 +35,7 @@ import { cn } from "@/lib/utils";
 
 const sectionIcons = {
   dashboard: ChartNoAxesCombined,
+  "control-center": Command,
   packages: PackageOpen,
   applications: ClipboardList,
   subscriptions: CreditCard,

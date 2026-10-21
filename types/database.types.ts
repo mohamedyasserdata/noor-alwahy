@@ -334,6 +334,13 @@ export type Database = {
             foreignKeyName: "attendance_session_id_fkey";
             columns: ["session_id"];
             isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "attendance_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -1527,6 +1534,13 @@ export type Database = {
             foreignKeyName: "makeup_entitlements_source_session_id_fkey";
             columns: ["source_session_id"];
             isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_source_session_id_fkey";
+            columns: ["source_session_id"];
+            isOneToOne: true;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -1550,6 +1564,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "subscriptions";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_used_by_session_id_fkey";
+            columns: ["used_by_session_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
           },
           {
             foreignKeyName: "makeup_entitlements_used_by_session_id_fkey";
@@ -2706,6 +2727,13 @@ export type Database = {
             foreignKeyName: "session_alerts_session_id_fkey";
             columns: ["session_id"];
             isOneToOne: false;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "session_alerts_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -2781,6 +2809,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_credit_ledger_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
           },
           {
             foreignKeyName: "session_credit_ledger_session_id_fkey";
@@ -2911,6 +2946,13 @@ export type Database = {
             foreignKeyName: "session_evaluations_session_id_fkey";
             columns: ["session_id"];
             isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "session_evaluations_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -3003,6 +3045,13 @@ export type Database = {
             foreignKeyName: "sessions_makeup_of_fkey";
             columns: ["makeup_of"];
             isOneToOne: false;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "sessions_makeup_of_fkey";
+            columns: ["makeup_of"];
+            isOneToOne: false;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -3019,6 +3068,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "teachers";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_rescheduled_from_fkey";
+            columns: ["rescheduled_from"];
+            isOneToOne: false;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
           },
           {
             foreignKeyName: "sessions_rescheduled_from_fkey";
@@ -3693,6 +3749,13 @@ export type Database = {
             foreignKeyName: "teacher_payout_items_session_id_fkey";
             columns: ["session_id"];
             isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "teacher_payout_items_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
           },
@@ -4063,6 +4126,24 @@ export type Database = {
           },
         ];
       };
+      admin_finance_fact: {
+        Row: {
+          amount: number | null;
+          country_code: string | null;
+          currency: string | null;
+          entry_id: string | null;
+          entry_kind: string | null;
+          occurred_at: string | null;
+          refreshed_at: string | null;
+          status: string | null;
+          student_id: string | null;
+          student_status: Database["public"]["Enums"]["student_status"] | null;
+          teacher_id: string | null;
+          track_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       admin_finance_monthly: {
         Row: {
           currency: string | null;
@@ -4072,6 +4153,100 @@ export type Database = {
         };
         ComputedFields: never;
         Relationships: [];
+      };
+      admin_learning_fact: {
+        Row: {
+          country_code: string | null;
+          created_at: string | null;
+          evaluation_id: string | null;
+          is_locked: boolean | null;
+          pages: number | null;
+          rating: number | null;
+          refreshed_at: string | null;
+          session_type: Database["public"]["Enums"]["session_type_t"] | null;
+          student_id: string | null;
+          student_status: Database["public"]["Enums"]["student_status"] | null;
+          teacher_id: string | null;
+          total_score: number | null;
+          track_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      admin_operations_fact: {
+        Row: {
+          attendance_recorded_at: string | null;
+          attendance_status: Database["public"]["Enums"]["attendance_status"] | null;
+          country_code: string | null;
+          refreshed_at: string | null;
+          scheduled_at: string | null;
+          session_id: string | null;
+          session_status: Database["public"]["Enums"]["session_status"] | null;
+          student_id: string | null;
+          student_status: Database["public"]["Enums"]["student_status"] | null;
+          teacher_id: string | null;
+          track_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       admin_student_distribution: {
         Row: {
@@ -4442,6 +4617,43 @@ export type Database = {
       };
       get_admin_dashboard: {
         Args: { p_country?: string; p_currency?: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      get_admin_finance_metrics: {
+        Args: {
+          p_country?: string;
+          p_from: string;
+          p_status?: string;
+          p_teacher?: string;
+          p_timezone?: string;
+          p_to: string;
+          p_track?: string;
+        };
+        Returns: Json;
+      };
+      get_admin_learning_metrics: {
+        Args: {
+          p_country?: string;
+          p_from: string;
+          p_status?: string;
+          p_teacher?: string;
+          p_timezone?: string;
+          p_to: string;
+          p_track?: string;
+        };
+        Returns: Json;
+      };
+      get_admin_metric_filter_options: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_admin_operations_metrics: {
+        Args: {
+          p_country?: string;
+          p_from: string;
+          p_status?: string;
+          p_teacher?: string;
+          p_timezone?: string;
+          p_to: string;
+          p_track?: string;
+        };
         Returns: Json;
       };
       get_admin_student_risk_flags: {

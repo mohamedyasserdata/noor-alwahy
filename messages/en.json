@@ -99,6 +99,11 @@
           "title": "Academy overview",
           "description": "A central starting point for academy operations and indicators once approved data is connected."
         },
+        "control-center": {
+          "label": "Control centre",
+          "title": "Administration control centre",
+          "description": "Unified operational metrics linked to their source records."
+        },
         "packages": {
           "label": "Packages",
           "title": "Packages and pricing",
@@ -2501,6 +2506,91 @@
       "result_locked": "This result is approved and cannot be changed.",
       "save_failed": "The result could not be calculated and saved.",
       "lock_failed": "The result could not be approved."
+    }
+  },
+  "adminControlCenter": {
+    "eyebrow": "Unified operational picture",
+    "title": "Administration control centre",
+    "description": "Read the academy's position from approved sources, then open the exact records behind every indicator without duplicating calculations in the interface.",
+    "periodLabel": "Selected period",
+    "filters": {
+      "title": "Metric scope",
+      "from": "From",
+      "to": "To",
+      "country": "Country",
+      "track": "Track",
+      "teacher": "Teacher",
+      "status": "Student status",
+      "timezone": "Time zone",
+      "all": "All",
+      "apply": "Refresh metrics"
+    },
+    "statuses": {
+      "active": "Active",
+      "dropped": "Dropped",
+      "graduated": "Graduated",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    },
+    "sources": {
+      "operations": {
+        "title": "Operations and attendance",
+        "description": "Students, teachers, sessions, attendance, and subscriptions from operational ledgers."
+      },
+      "learning": {
+        "title": "Memorization, evaluation, and reports",
+        "description": "Memorization progress, review due dates, locked evaluations, and learning reports."
+      },
+      "finance": {
+        "title": "Finance by currency",
+        "description": "Invoices, collections, and teacher payouts without combining different currencies."
+      }
+    },
+    "unavailable": "This source is unavailable. Other sources remain visible; refresh the page to retry.",
+    "metrics": {
+      "students": "Students in scope",
+      "teachers": "Active teachers",
+      "sessions": "Total sessions",
+      "held_sessions": "Held sessions",
+      "missed_sessions": "Missed sessions",
+      "cancelled_sessions": "Cancelled sessions",
+      "attendance_rate": "Attendance rate",
+      "active_subscriptions": "Active subscriptions",
+      "mastered_pages": "Mastered pages",
+      "due_reviews": "Reviews due",
+      "evaluation_average": "Evaluation average",
+      "locked_evaluations": "Approved evaluations",
+      "visible_reports": "Published reports",
+      "pending_reports": "Pending reports"
+    },
+    "definitions": {
+      "students": "Students matching the country, track, teacher, and status filters at read time.",
+      "teachers": "Active teachers matching the selected track or teacher.",
+      "sessions": "All scheduled sessions inside the selected period and scope.",
+      "held_sessions": "Sessions with held status divided by all sessions in the period.",
+      "missed_sessions": "Sessions with missed status divided by all sessions in the period.",
+      "cancelled_sessions": "Sessions with cancelled status divided by all sessions in the period.",
+      "attendance_rate": "Present and late records divided by eligible attendance, excluding admin/teacher cancellation and teacher absence.",
+      "active_subscriptions": "Currently active subscriptions for in-scope students divided by all their subscriptions.",
+      "mastered_pages": "Pages marked mastered divided by all tracked progress pages for in-scope students.",
+      "due_reviews": "Pages due for review by the period end, from all tracked progress pages.",
+      "evaluation_average": "Average final score across locked evaluations inside the period.",
+      "locked_evaluations": "Locked evaluations divided by all evaluations inside the period.",
+      "visible_reports": "Reports made visible during the period, from all matching student reports.",
+      "pending_reports": "Current drafts and reports awaiting administration review."
+    },
+    "periods": {
+      "snapshot": "Current snapshot",
+      "range": "Selected period"
+    },
+    "finance": {
+      "currency": "Currency",
+      "invoiced": "Invoiced",
+      "overdue": "Overdue",
+      "payments": "Net collected",
+      "payouts": "Teacher payouts",
+      "payoutsDue": "Payouts due",
+      "empty": "No financial entries match the selected period and filters."
     }
   },
   "accessibility": {
