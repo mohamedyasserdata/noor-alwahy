@@ -1,4 +1,4 @@
-import { Award, BookOpenCheck, CalendarDays, LockKeyhole, Plus } from "lucide-react";
+import { Award, BookOpenCheck, CalendarDays, Download, LockKeyhole, Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -283,6 +283,15 @@ export async function ExamManagementSection({
                                 pendingLabel={t("actions.locking")}
                               />
                             </form>
+                          ) : null}
+                          {result.is_locked ? (
+                            <a
+                              href={`/api/pdf/exams/${result.student_id}?locale=${locale}`}
+                              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-bold text-primary outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              <Download className="size-4" aria-hidden="true" />
+                              {t("actions.downloadReport")}
+                            </a>
                           ) : null}
                         </div>
                       ))}

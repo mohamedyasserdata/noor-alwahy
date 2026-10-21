@@ -2171,7 +2171,8 @@
       "saveResult": "Save result",
       "savingResult": "Calculating and saving…",
       "lock": "Approve and lock",
-      "locking": "Approving…"
+      "locking": "Approving…",
+      "downloadReport": "Download grade report"
     },
     "notices": {
       "created": "The exam was created as a draft.",
