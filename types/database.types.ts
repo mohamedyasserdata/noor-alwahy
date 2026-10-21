@@ -2380,6 +2380,7 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
       };
+      clone_package: { Args: { p_package: string }; Returns: string };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
       create_makeup_session: {
         Args: { p_entitlement_id: string; p_scheduled_at: string; p_teacher_id?: string };
@@ -2521,6 +2522,7 @@ export type Database = {
         Args: { p_guardian_id: string; p_student_id: string };
         Returns: undefined;
       };
+      reorder_packages: { Args: { p_package_ids: string[] }; Returns: undefined };
       reschedule_session: {
         Args: { p_scheduled_at: string; p_session_id: string };
         Returns: string;
@@ -2535,6 +2537,7 @@ export type Database = {
       };
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
+      save_package: { Args: { p_payload: Json }; Returns: string };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
         Returns: undefined;

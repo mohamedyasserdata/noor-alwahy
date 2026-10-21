@@ -7,6 +7,7 @@ export const portalConfig = {
     defaultSection: "dashboard",
     sections: [
       "dashboard",
+      "packages",
       "applications",
       "students",
       "teachers",

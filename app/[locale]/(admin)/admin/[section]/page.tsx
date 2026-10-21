@@ -11,6 +11,7 @@ import { StudentManagementSection } from "@/components/admin/student-management-
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
+import { PackageAdminSection } from "@/components/packages/package-admin-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
 import { AdminReportsSection } from "@/components/reports/admin-reports-section";
@@ -36,6 +37,10 @@ export default async function AdminSectionPage({
 
   if (section === "audit") {
     return <AuditLogSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "packages") {
+    return <PackageAdminSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "users") {
