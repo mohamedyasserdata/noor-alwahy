@@ -9,12 +9,21 @@ export type NotificationItem = {
   type: string;
   createdAt: string;
   readAt: string | null;
+  payload: NotificationPayload;
+};
+
+export type NotificationPayload = {
+  titleAr?: string;
+  titleEn?: string;
+  bodyAr?: string;
+  bodyEn?: string;
 };
 
 export type NotificationPreferences = {
   inApp: boolean;
   scheduleChanged: boolean;
   zoomLinkChanged: boolean;
+  announcement: boolean;
 };
 
 export type NotificationCenterData = {
@@ -27,6 +36,7 @@ const defaultPreferences: NotificationPreferences = {
   inApp: true,
   scheduleChanged: true,
   zoomLinkChanged: true,
+  announcement: true,
 };
 
 export async function getNotificationCenter(): Promise<NotificationCenterData | null> {
@@ -39,7 +49,7 @@ export async function getNotificationCenter(): Promise<NotificationCenterData | 
   const [notificationResult, preferenceResult] = await Promise.all([
     supabase
       .from("notifications")
-      .select("id,type,created_at,read_at")
+      .select("id,type,payload,created_at,read_at")
       .order("created_at", { ascending: false })
       .limit(12),
     supabase.from("notification_prefs").select("prefs").maybeSingle(),
@@ -55,6 +65,7 @@ export async function getNotificationCenter(): Promise<NotificationCenterData | 
       type: item.type,
       createdAt: item.created_at,
       readAt: item.read_at,
+      payload: readPayload(item.payload),
     })),
     preferences: readPreferences(preferenceResult.data?.prefs),
   };
@@ -67,5 +78,17 @@ function readPreferences(value: unknown): NotificationPreferences {
     inApp: typeof prefs.in_app === "boolean" ? prefs.in_app : true,
     scheduleChanged: typeof prefs.schedule_changed === "boolean" ? prefs.schedule_changed : true,
     zoomLinkChanged: typeof prefs.zoom_link_changed === "boolean" ? prefs.zoom_link_changed : true,
+    announcement: typeof prefs.announcement === "boolean" ? prefs.announcement : true,
+  };
+}
+
+function readPayload(value: unknown): NotificationPayload {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const payload = value as Record<string, unknown>;
+  return {
+    titleAr: typeof payload.title_ar === "string" ? payload.title_ar : undefined,
+    titleEn: typeof payload.title_en === "string" ? payload.title_en : undefined,
+    bodyAr: typeof payload.body_ar === "string" ? payload.body_ar : undefined,
+    bodyEn: typeof payload.body_en === "string" ? payload.body_en : undefined,
   };
 }

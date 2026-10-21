@@ -159,6 +159,11 @@
           "title": "Report review",
           "description": "Review student reports and publish them to families after approval."
         },
+        "announcements": {
+          "label": "Announcements",
+          "title": "Targeted announcements",
+          "description": "Create general or targeted announcements by role, country, level, and track."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",
@@ -1194,6 +1199,7 @@
     "inApp": "In-app notifications",
     "scheduleChanged": "Schedule changes",
     "zoomLinkChanged": "Zoom link changes",
+    "announcement": "Academy announcements",
     "save": "Save preferences",
     "saving": "Saving…",
     "saved": "Preferences saved.",
@@ -1207,7 +1213,66 @@
       "paymentConfirmed": "Payment confirmed and receipt issued",
       "refundConfirmed": "Refund confirmed",
       "subscriptionRenewalDue": "A subscription renewal is due soon",
+      "announcement": "New academy announcement",
       "generic": "You have a new academy update"
+    }
+  },
+  "announcements": {
+    "eyebrow": "Administration · Multi-factor protected",
+    "title": "General and targeted announcements",
+    "description": "Write the announcement in both academy languages, select recipients from authorized records, then review and publish it once to the notification center.",
+    "feedback": {
+      "saved": "Announcement saved as a draft.",
+      "published": "Announcement published to {count} recipients.",
+      "archived": "Announcement archived while its publication and delivery history remains intact.",
+      "error": "The action could not be completed. Check the fields and announcement state, then try again."
+    },
+    "form": {
+      "createTitle": "Create announcement draft",
+      "editTitle": "Edit announcement draft",
+      "draftNotice": "Nothing is sent until you choose Publish.",
+      "titleAr": "Arabic title",
+      "titleEn": "English title (optional)",
+      "bodyAr": "Arabic announcement",
+      "bodyEn": "English announcement (optional)",
+      "audience": "Target audience",
+      "all": "All active accounts",
+      "allHint": "When selected, detailed audience filters below are ignored.",
+      "roles": "Roles",
+      "countries": "Countries",
+      "levels": "Levels",
+      "tracks": "Tracks",
+      "endsOn": "Visible until (optional)"
+    },
+    "roles": {
+      "admin": "Administrators",
+      "teacher": "Teachers",
+      "student": "Students",
+      "parent": "Parents"
+    },
+    "audience": {
+      "all": "All active accounts",
+      "filters": "{count} audience filters"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "actions": {
+      "save": "Save draft",
+      "saving": "Saving…",
+      "edit": "Edit",
+      "cancel": "Cancel editing",
+      "publish": "Publish now",
+      "publishing": "Publishing…",
+      "archive": "Archive",
+      "archiving": "Archiving…"
+    },
+    "list": {
+      "title": "Announcement history",
+      "delivered": "Delivered to {count}",
+      "empty": "No announcements yet."
     }
   },
   "memorizationPlan": {

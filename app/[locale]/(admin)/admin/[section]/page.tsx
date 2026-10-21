@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AssignmentManagementSection } from "@/components/admin/assignment-management-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
+import { AnnouncementAdminSection } from "@/components/announcements/announcement-admin-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
 import { EvaluationSettingsSection } from "@/components/admin/evaluation-settings-section";
 import { ExamManagementSection } from "@/components/exams/exam-management-section";
@@ -103,6 +104,10 @@ export default async function AdminSectionPage({
 
   if (section === "reports") {
     return <AdminReportsSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "announcements") {
+    return <AnnouncementAdminSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

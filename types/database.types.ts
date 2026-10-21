@@ -3,6 +3,127 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      announcement_deliveries: {
+        Row: {
+          announcement_id: string;
+          delivered_at: string;
+          notification_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          announcement_id: string;
+          delivered_at?: string;
+          notification_id: string;
+          user_id: string;
+        };
+        Update: {
+          announcement_id?: string;
+          delivered_at?: string;
+          notification_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcement_deliveries_announcement_id_fkey";
+            columns: ["announcement_id"];
+            isOneToOne: false;
+            referencedRelation: "announcements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcement_deliveries_notification_id_fkey";
+            columns: ["notification_id"];
+            isOneToOne: true;
+            referencedRelation: "notifications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcement_deliveries_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      announcements: {
+        Row: {
+          audience: NonNullable<Json>;
+          body_ar: string;
+          body_en: string | null;
+          created_at: string;
+          created_by: string;
+          ends_at: string | null;
+          id: string;
+          published_at: string | null;
+          published_by: string | null;
+          starts_at: string;
+          status: string;
+          title_ar: string;
+          title_en: string | null;
+          updated_at: string;
+          updated_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          audience?: NonNullable<Json>;
+          body_ar: string;
+          body_en?: string | null;
+          created_at?: string;
+          created_by: string;
+          ends_at?: string | null;
+          id?: string;
+          published_at?: string | null;
+          published_by?: string | null;
+          starts_at?: string;
+          status?: string;
+          title_ar: string;
+          title_en?: string | null;
+          updated_at?: string;
+          updated_by: string;
+        };
+        Update: {
+          audience?: NonNullable<Json>;
+          body_ar?: string;
+          body_en?: string | null;
+          created_at?: string;
+          created_by?: string;
+          ends_at?: string | null;
+          id?: string;
+          published_at?: string | null;
+          published_by?: string | null;
+          starts_at?: string;
+          status?: string;
+          title_ar?: string;
+          title_en?: string | null;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcements_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcements_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcements_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       app_settings: {
         Row: {
           created_at: string;
@@ -4245,6 +4366,7 @@ export type Database = {
         Args: { p_amount: number; p_kind: string; p_payout: string; p_reason: string };
         Returns: string;
       };
+      archive_admin_announcement: { Args: { p_id: string }; Returns: undefined };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
       assign_session_substitute: {
         Args: { p_scope: string; p_session_id: string; p_substitute_teacher_id: string };
@@ -4442,6 +4564,7 @@ export type Database = {
       };
       process_certificate_batch: { Args: { p_batch: string; p_limit?: number }; Returns: Json };
       process_subscription_renewals: { Args: { p_as_of?: string }; Returns: Json };
+      publish_admin_announcement: { Args: { p_id: string }; Returns: number };
       publish_certificate_template: { Args: { p_version: string }; Returns: undefined };
       record_attendance: {
         Args: {
@@ -4497,6 +4620,19 @@ export type Database = {
       revoke_certificate: { Args: { p_certificate: string; p_reason: string }; Returns: undefined };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
       run_financial_reconciliation: { Args: Record<PropertyKey, never>; Returns: string };
+      save_admin_announcement: {
+        Args: {
+          p_audience: Json;
+          p_body_ar: string;
+          p_body_en: string;
+          p_ends_at?: string;
+          p_id?: string;
+          p_starts_at: string;
+          p_title_ar: string;
+          p_title_en: string;
+        };
+        Returns: string;
+      };
       save_exam_result: {
         Args: { p_errors: Json; p_exam: string; p_scores: Json; p_student: string };
         Returns: string;

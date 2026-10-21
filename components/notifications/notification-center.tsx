@@ -41,7 +41,7 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
   const refreshItems = useCallback(async () => {
     const { data, error } = await supabase
       .from("notifications")
-      .select("id,type,created_at,read_at")
+      .select("id,type,payload,created_at,read_at")
       .order("created_at", { ascending: false })
       .limit(12);
     if (error) return;
@@ -51,6 +51,24 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
         type: item.type,
         createdAt: item.created_at,
         readAt: item.read_at,
+        payload: {
+          titleAr:
+            item.payload && typeof item.payload === "object" && "title_ar" in item.payload
+              ? String(item.payload.title_ar ?? "")
+              : undefined,
+          titleEn:
+            item.payload && typeof item.payload === "object" && "title_en" in item.payload
+              ? String(item.payload.title_en ?? "")
+              : undefined,
+          bodyAr:
+            item.payload && typeof item.payload === "object" && "body_ar" in item.payload
+              ? String(item.payload.body_ar ?? "")
+              : undefined,
+          bodyEn:
+            item.payload && typeof item.payload === "object" && "body_en" in item.payload
+              ? String(item.payload.body_en ?? "")
+              : undefined,
+        },
       })),
     );
   }, [supabase]);
@@ -250,8 +268,19 @@ function NotificationList({
             />
             <span className="min-w-0">
               <span className="block text-sm font-bold text-foreground">
-                {notificationTitle(item.type, t)}
+                {item.type === "announcement"
+                  ? locale === "ar" || !item.payload.titleEn
+                    ? item.payload.titleAr || notificationTitle(item.type, t)
+                    : item.payload.titleEn
+                  : notificationTitle(item.type, t)}
               </span>
+              {item.type === "announcement" ? (
+                <span className="mt-1 line-clamp-3 block text-xs leading-5 text-muted-foreground">
+                  {locale === "ar" || !item.payload.bodyEn
+                    ? item.payload.bodyAr
+                    : item.payload.bodyEn}
+                </span>
+              ) : null}
               <time className="mt-1 block text-xs text-muted-foreground" dateTime={item.createdAt}>
                 {new Intl.DateTimeFormat(locale, {
                   dateStyle: "medium",
@@ -284,6 +313,7 @@ function Preferences({
     ["inApp", t("inApp")],
     ["scheduleChanged", t("scheduleChanged")],
     ["zoomLinkChanged", t("zoomLinkChanged")],
+    ["announcement", t("announcement")],
   ];
   return (
     <div className="grid gap-4 p-4">
@@ -327,5 +357,6 @@ function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"n
   if (type === "payment_confirmed") return t("types.paymentConfirmed");
   if (type === "refund_confirmed") return t("types.refundConfirmed");
   if (type === "subscription_renewal_due") return t("types.subscriptionRenewalDue");
+  if (type === "announcement") return t("types.announcement");
   return t("types.generic");
 }
