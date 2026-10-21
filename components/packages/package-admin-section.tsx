@@ -1,4 +1,4 @@
-import { ArrowRight, Check, PackagePlus } from "lucide-react";
+import { ArrowRight, Check, Grid3X3, PackagePlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { PackageOrderBoard } from "@/components/packages/package-order-board";
@@ -53,12 +53,20 @@ export async function PackageAdminSection({
           </h1>
           <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
         </div>
-        <Button asChild variant="gold">
-          <Link href="/admin/packages/wizard">
-            <PackagePlus aria-hidden="true" />
-            {t("actions.newPackage")}
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link href="/admin/packages/pricing-grid">
+              <Grid3X3 aria-hidden="true" />
+              {t("actions.pricingGrid")}
+            </Link>
+          </Button>
+          <Button asChild variant="gold">
+            <Link href="/admin/packages/wizard">
+              <PackagePlus aria-hidden="true" />
+              {t("actions.newPackage")}
+            </Link>
+          </Button>
+        </div>
       </header>
 
       {status ? (

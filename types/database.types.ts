@@ -3009,6 +3009,17 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["user_role"];
       };
+      bulk_append_package_prices: {
+        Args: {
+          p_multiplier: number;
+          p_package_ids?: string[];
+          p_round_to: number;
+          p_source_country: string;
+          p_target_country: string;
+          p_valid_from: string;
+        };
+        Returns: number;
+      };
       clone_package: { Args: { p_package: string }; Returns: string };
       confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
       confirm_student_import: { Args: { p_batch_id: string }; Returns: number };
