@@ -1,6 +1,7 @@
 import {
   Banknote,
   CalendarCheck2,
+  FileDown,
   GraduationCap,
   TrendingDown,
   TrendingUp,
@@ -37,6 +38,7 @@ export async function AdminDashboardSection({
     getAdminDashboardData({ from, to, country, currency }),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+  const exportParams = new URLSearchParams({ locale, from, to, country, currency });
   return (
     <section className="mx-auto w-full max-w-7xl" aria-labelledby="admin-dashboard-title">
       <header className="grid gap-6 border-b border-secondary/30 pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
@@ -50,7 +52,21 @@ export async function AdminDashboardSection({
           </h1>
           <p className="mt-4 max-w-3xl leading-8 text-muted-foreground">{t("description")}</p>
         </div>
-        <Badge variant="secondary">{t("period", { from, to })}</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{t("period", { from, to })}</Badge>
+          <Button asChild variant="outline" size="sm">
+            <a href={`/api/admin/dashboard/export?${exportParams.toString()}&format=pdf`} download>
+              <FileDown aria-hidden="true" />
+              {t("exports.pdf")}
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <a href={`/api/admin/dashboard/export?${exportParams.toString()}&format=xlsx`} download>
+              <FileDown aria-hidden="true" />
+              {t("exports.xlsx")}
+            </a>
+          </Button>
+        </div>
       </header>
       <form className="mt-6 grid gap-4 border bg-card p-4 shadow-card sm:grid-cols-2 lg:grid-cols-5">
         <Filter label={t("filters.from")} name="from" type="date" value={from} />
@@ -156,6 +172,66 @@ export async function AdminDashboardSection({
           }))}
         />
       </div>
+      <section className="mt-7 border bg-card p-5 shadow-card sm:p-7">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-black text-primary">{t("risk.title")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("risk.description")}</p>
+          </div>
+          <Badge variant="secondary">{t("risk.count", { count: data.riskFlags.length })}</Badge>
+        </div>
+        {data.riskFlags.length ? (
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-4xl border-collapse text-sm">
+              <thead>
+                <tr className="bg-primary text-primary-foreground">
+                  {["student", "level", "score", "reasons", "absence", "inactive", "reviews"].map(
+                    (key) => (
+                      <th key={key} scope="col" className="border p-3 text-start font-black">
+                        {t(`risk.columns.${key}`)}
+                      </th>
+                    ),
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {data.riskFlags.map((row) => (
+                  <tr key={row.student_id} className="odd:bg-muted/35">
+                    <td className="border p-3">
+                      <b className="block text-primary">{row.full_name}</b>
+                      <span className="text-xs text-muted-foreground" dir="ltr">
+                        {row.student_no}
+                      </span>
+                    </td>
+                    <td className="border p-3">
+                      {locale === "ar" ? row.level_name_ar : row.level_name_en}
+                    </td>
+                    <td className="border p-3">
+                      <Badge variant={row.risk_level === "high" ? "destructive" : "secondary"}>
+                        {t(`risk.levels.${row.risk_level}`, { score: row.risk_score })}
+                      </Badge>
+                    </td>
+                    <td className="border p-3">
+                      <ul className="grid gap-1">
+                        {row.reasons.map((reason) => (
+                          <li key={reason}>{t(`risk.reasons.${reason}`)}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="border p-3" dir="ltr">
+                      {row.absence_rate == null ? "—" : `${number.format(row.absence_rate)}%`}
+                    </td>
+                    <td className="border p-3">{row.inactive_days ?? "—"}</td>
+                    <td className="border p-3">{row.overdue_review_pages}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="mt-5 py-8 text-center text-muted-foreground">{t("risk.empty")}</p>
+        )}
+      </section>
     </section>
   );
 }

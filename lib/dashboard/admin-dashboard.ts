@@ -6,6 +6,26 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
 const moneyRow = z.object({ currency: z.string(), amount: z.coerce.number() });
+const riskFlagSchema = z.object({
+  student_id: z.string(),
+  student_no: z.string(),
+  full_name: z.string(),
+  country: z.string().nullable(),
+  level_name_ar: z.string(),
+  level_name_en: z.string(),
+  risk_score: z.coerce.number(),
+  risk_level: z.enum(["low", "medium", "high"]),
+  reasons: z.array(z.string()),
+  eligible_sessions: z.coerce.number(),
+  absent_sessions: z.coerce.number(),
+  absence_rate: z.coerce.number().nullable(),
+  inactive_days: z.coerce.number().nullable(),
+  evaluation_average: z.coerce.number().nullable(),
+  overdue_review_pages: z.coerce.number(),
+  subscription_status: z.string().nullable(),
+  subscription_period_end: z.string().nullable(),
+  last_report_period_end: z.string().nullable(),
+});
 const dashboardSchema = z.object({
   totals: z.object({
     students: z.coerce.number(),
@@ -58,6 +78,8 @@ const dashboardSchema = z.object({
 });
 
 export type AdminDashboardData = z.infer<typeof dashboardSchema>;
+export type StudentRiskFlag = z.infer<typeof riskFlagSchema>;
+export type AdminDashboardReport = AdminDashboardData & { riskFlags: StudentRiskFlag[] };
 export async function getAdminDashboardData(filters: {
   from: string;
   to: string;
@@ -66,12 +88,21 @@ export async function getAdminDashboardData(filters: {
 }) {
   await connection();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_admin_dashboard", {
-    p_from: filters.from,
-    p_to: filters.to,
-    p_country: filters.country || undefined,
-    p_currency: filters.currency || undefined,
-  });
-  if (error) throw new Error("admin_dashboard_unavailable");
-  return dashboardSchema.parse(data);
+  const [dashboard, risks] = await Promise.all([
+    supabase.rpc("get_admin_dashboard", {
+      p_from: filters.from,
+      p_to: filters.to,
+      p_country: filters.country || undefined,
+      p_currency: filters.currency || undefined,
+    }),
+    supabase.rpc("get_admin_student_risk_flags", {
+      p_country: filters.country || undefined,
+      p_limit: 100,
+    }),
+  ]);
+  if (dashboard.error || risks.error) throw new Error("admin_dashboard_unavailable");
+  return {
+    ...dashboardSchema.parse(dashboard.data),
+    riskFlags: z.array(riskFlagSchema).parse(risks.data),
+  } satisfies AdminDashboardReport;
 }

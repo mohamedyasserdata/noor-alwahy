@@ -2139,6 +2139,42 @@
       "levels": "Students by level",
       "teachers": "Teacher commitment"
     },
+    "exports": {
+      "pdf": "Export PDF",
+      "xlsx": "Export Excel"
+    },
+    "risk": {
+      "title": "Dropout risk flags",
+      "description": "Explainable deterministic signals from attendance, activity, reviews, evaluations, subscriptions, and reports.",
+      "count": "{count} cases",
+      "empty": "No students exceed the current risk thresholds.",
+      "columns": {
+        "student": "Student",
+        "level": "Level",
+        "score": "Risk score",
+        "reasons": "Reasons",
+        "absence": "Absence rate",
+        "inactive": "Inactive days",
+        "reviews": "Overdue reviews"
+      },
+      "levels": {
+        "low": "Low · {score}",
+        "medium": "Medium · {score}",
+        "high": "High · {score}"
+      },
+      "reasons": {
+        "attendance_critical": "Critical absence in the last 30 days",
+        "attendance_warning": "Repeated absence in the last 30 days",
+        "inactive_30_days": "No attendance for at least 30 days",
+        "inactive_21_days": "No attendance for at least 21 days",
+        "reviews_critical": "At least ten overdue review pages",
+        "reviews_warning": "At least five overdue review pages",
+        "evaluation_critical": "Evaluation average is below 50%",
+        "evaluation_warning": "Evaluation average is below 65%",
+        "subscription_inactive": "Subscription is expired or inactive",
+        "report_overdue": "No visible report in the last 45 days"
+      }
+    },
     "packages": { "title": "Top subscribed packages" },
     "activity": { "title": "Latest audited activity" },
     "empty": "No data is available for the selected period."

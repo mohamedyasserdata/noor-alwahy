@@ -130,6 +130,13 @@ export type Database = {
             foreignKeyName: "applications_converted_student_id_fkey";
             columns: ["converted_student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "applications_converted_student_id_fkey";
+            columns: ["converted_student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -330,6 +337,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "certificates";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificate_batch_items_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "certificate_batch_items_student_id_fkey";
@@ -608,6 +622,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "certificates_student_id_fkey";
@@ -920,6 +941,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exam_results_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "exam_results_student_id_fkey";
@@ -1246,6 +1274,13 @@ export type Database = {
             foreignKeyName: "invoices_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "invoices_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -1378,6 +1413,13 @@ export type Database = {
             foreignKeyName: "makeup_entitlements_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "makeup_entitlements_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -1447,6 +1489,13 @@ export type Database = {
             foreignKeyName: "memorization_plans_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: true;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "memorization_plans_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -1507,6 +1556,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "quran_pages";
             referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "memorization_progress_student_id_fkey";
@@ -2415,6 +2471,13 @@ export type Database = {
             foreignKeyName: "reports_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "reports_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -2524,6 +2587,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "sessions";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_alerts_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "session_alerts_student_id_fkey";
@@ -2847,6 +2917,13 @@ export type Database = {
             foreignKeyName: "sessions_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -2902,6 +2979,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "guardians";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_guardians_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "student_guardians_student_id_fkey";
@@ -2984,6 +3068,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "student_private_notes_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
           {
             foreignKeyName: "student_private_notes_student_id_fkey";
             columns: ["student_id"];
@@ -3214,6 +3305,13 @@ export type Database = {
             foreignKeyName: "subscriptions_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "subscriptions_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -3320,6 +3418,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_assignments_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
           },
           {
             foreignKeyName: "teacher_assignments_student_id_fkey";
@@ -3865,6 +3970,37 @@ export type Database = {
           },
         ];
       };
+      admin_student_risk_signals: {
+        Row: {
+          absence_rate: number | null;
+          absent_sessions: number | null;
+          country_code: string | null;
+          eligible_sessions: number | null;
+          evaluation_average: number | null;
+          full_name: string | null;
+          inactive_days: number | null;
+          last_attended_at: string | null;
+          last_report_period_end: string | null;
+          level_id: string | null;
+          level_name_ar: string | null;
+          level_name_en: string | null;
+          overdue_review_pages: number | null;
+          student_id: string | null;
+          student_no: string | null;
+          subscription_period_end: string | null;
+          subscription_status: Database["public"]["Enums"]["subscription_status"] | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "students_level_id_fkey";
+            columns: ["level_id"];
+            isOneToOne: false;
+            referencedRelation: "levels";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       admin_teacher_commitment: {
         Row: {
           attended: number | null;
@@ -3982,6 +4118,13 @@ export type Database = {
             foreignKeyName: "memorization_progress_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -4006,6 +4149,13 @@ export type Database = {
         };
         ComputedFields: never;
         Relationships: [
+          {
+            foreignKeyName: "memorization_plans_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
           {
             foreignKeyName: "memorization_plans_student_id_fkey";
             columns: ["student_id"];
@@ -4040,6 +4190,13 @@ export type Database = {
             foreignKeyName: "memorization_progress_student_id_fkey";
             columns: ["student_id"];
             isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
             referencedRelation: "students";
             referencedColumns: ["id"];
           },
@@ -4058,6 +4215,13 @@ export type Database = {
         };
         ComputedFields: never;
         Relationships: [
+          {
+            foreignKeyName: "memorization_progress_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
           {
             foreignKeyName: "memorization_progress_student_id_fkey";
             columns: ["student_id"];
@@ -4156,6 +4320,10 @@ export type Database = {
       };
       get_admin_dashboard: {
         Args: { p_country?: string; p_currency?: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      get_admin_student_risk_flags: {
+        Args: { p_country?: string; p_limit?: number };
         Returns: Json;
       };
       get_attendance_report: {
