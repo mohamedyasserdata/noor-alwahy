@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 import type { Database } from "../../types/database.types";
@@ -15,6 +16,7 @@ test("P4-T04 teacher restores a local draft and locks a mobile session evaluatio
   await page.goto(`/en/teacher/evaluations?sessionId=${fixture.sessionId}`);
   await expect(page.getByRole("heading", { level: 1, name: "Session evaluation" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: fixture.studentName })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   const startedAt = Date.now();
   await page.getByLabel("Homework").fill("Review Al-Fatihah twice");

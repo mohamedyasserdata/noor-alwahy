@@ -231,6 +231,7 @@ export function QuranMap({
                           role="gridcell"
                           aria-colindex={column + 1}
                           aria-selected={selectedPage === page.page}
+                          tabIndex={selectedPage === page.page ? 0 : -1}
                           aria-label={t("pageLabel", {
                             page: page.page,
                             status: t(`statuses.${status}`),

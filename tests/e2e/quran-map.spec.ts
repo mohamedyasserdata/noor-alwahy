@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import type { Database } from "../../types/database.types";
@@ -14,6 +15,7 @@ test("P4-T07 student navigates all Quran pages and receives locked progress live
   await page.goto("/en/student/progress");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quran progress map" })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.locator("#quran-map-surah option")).toHaveCount(114);
   await expect(page.getByRole("button", { name: /^Juz / })).toHaveCount(30);
   const pageOne = page.getByRole("gridcell", { name: "Page 1: Not started" });

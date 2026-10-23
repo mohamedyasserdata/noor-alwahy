@@ -164,6 +164,34 @@ export function SessionEvaluationForm({
     }));
   }
 
+  function handleScoreKey(
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    criterionCode: string,
+    score: number,
+  ) {
+    const horizontalStep = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    const nextScore =
+      event.key === "Home"
+        ? 1
+        : event.key === "End"
+          ? 5
+          : horizontalStep === 0
+            ? null
+            : Math.max(
+                1,
+                Math.min(5, score + (locale === "ar" ? -horizontalStep : horizontalStep)),
+              );
+    if (nextScore === null) return;
+    event.preventDefault();
+    updateDraft((current) => ({
+      ...current,
+      scores: { ...current.scores, [criterionCode]: nextScore },
+    }));
+    event.currentTarget.parentElement
+      ?.querySelector<HTMLButtonElement>(`[data-score="${nextScore}"]`)
+      ?.focus();
+  }
+
   return (
     <form action={submitSessionEvaluationAction.bind(null, locale)} className="grid gap-7">
       <input type="hidden" name="sessionId" value={sessionId} />
@@ -171,7 +199,11 @@ export function SessionEvaluationForm({
       {Object.entries(draft.scores).map(([code, score]) => (
         <input key={code} type="hidden" name={`score:${code}`} value={score} />
       ))}
-      {restored ? <p className="text-sm font-bold text-success">{text.restored}</p> : null}
+      {restored ? (
+        <p className="text-sm font-bold text-success" aria-live="polite">
+          {text.restored}
+        </p>
+      ) : null}
 
       <fieldset>
         <legend className="text-lg font-black text-primary">{text.type}</legend>
@@ -181,6 +213,7 @@ export function SessionEvaluationForm({
               key={entry.sessionType}
               type="button"
               variant={entry.sessionType === draft.sessionType ? "default" : "outline"}
+              aria-pressed={entry.sessionType === draft.sessionType}
               onClick={() => changeType(entry.sessionType)}
             >
               {sessionTypeLabel(entry.sessionType, locale)}
@@ -261,6 +294,9 @@ export function SessionEvaluationForm({
                     role="radio"
                     aria-checked={draft.scores[criterion.code] === score}
                     aria-label={`${score} - ${ratingLabels[locale][score - 1]}`}
+                    tabIndex={draft.scores[criterion.code] === score ? 0 : -1}
+                    data-score={score}
+                    onKeyDown={(event) => handleScoreKey(event, criterion.code, score)}
                     onClick={() =>
                       updateDraft((current) => ({
                         ...current,
@@ -408,13 +444,15 @@ function Counter({
           aria-label={`- ${label}`}
           onClick={() => onChange(Math.max(0, value - 1))}
         >
-          <Minus />
+          <Minus aria-hidden="true" />
         </Button>
         <Input
           name={name}
           type="number"
           min={0}
           max={999}
+          aria-label={label}
+          inputMode="numeric"
           value={value}
           onChange={(event) => onChange(Math.max(0, Number(event.target.value)))}
           className="text-center font-black tabular-nums"
@@ -426,7 +464,7 @@ function Counter({
           aria-label={`+ ${label}`}
           onClick={() => onChange(Math.min(999, value + 1))}
         >
-          <Plus />
+          <Plus aria-hidden="true" />
         </Button>
       </div>
     </div>
