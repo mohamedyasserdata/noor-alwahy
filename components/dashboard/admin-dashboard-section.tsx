@@ -319,9 +319,7 @@ function LineChart({ rows }: { rows: AdminDashboardData["attendance"] }) {
             r="1.5"
             className="fill-primary"
           >
-            <title>
-              {row.day}: {row.rate ?? 0}%
-            </title>
+            <title>{`${row.day}: ${row.rate ?? 0}%`}</title>
           </circle>
         ))}
       </svg>
