@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, CheckCheck, LoaderCircle, Settings2 } from "lucide-react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
@@ -67,6 +68,14 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
           bodyEn:
             item.payload && typeof item.payload === "object" && "body_en" in item.payload
               ? String(item.payload.body_en ?? "")
+              : undefined,
+          href:
+            item.payload &&
+            typeof item.payload === "object" &&
+            "action_href" in item.payload &&
+            typeof item.payload.action_href === "string" &&
+            /^\/(ar|en)\/admin\//.test(item.payload.action_href)
+              ? item.payload.action_href
               : undefined,
         },
       })),
@@ -251,13 +260,16 @@ function NotificationList({
     <ul className="max-h-[min(26rem,65vh)] overflow-y-auto p-2">
       {items.map((item) => (
         <li key={item.id}>
-          <button
-            type="button"
+          <Link
+            href={item.payload.href ?? "#"}
             className={cn(
               "flex min-h-16 w-full items-start gap-3 rounded-xl px-3 py-3 text-start transition-colors hover:bg-accent/55 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
               !item.readAt && "bg-secondary/10",
             )}
-            onClick={() => onRead(item)}
+            onClick={(event) => {
+              onRead(item);
+              if (!item.payload.href) event.preventDefault();
+            }}
           >
             <span
               className={cn(
@@ -288,7 +300,7 @@ function NotificationList({
                 }).format(new Date(item.createdAt))}
               </time>
             </span>
-          </button>
+          </Link>
         </li>
       ))}
     </ul>
@@ -314,6 +326,8 @@ function Preferences({
     ["scheduleChanged", t("scheduleChanged")],
     ["zoomLinkChanged", t("zoomLinkChanged")],
     ["announcement", t("announcement")],
+    ["intervention", t("intervention")],
+    ["interventionEmail", t("interventionEmail")],
   ];
   return (
     <div className="grid gap-4 p-4">
@@ -329,7 +343,7 @@ function Preferences({
               type="checkbox"
               className="size-5 accent-primary"
               checked={preferences[key]}
-              disabled={key !== "inApp" && !preferences.inApp}
+              disabled={key !== "inApp" && key !== "interventionEmail" && !preferences.inApp}
               onChange={(event) => onChange({ ...preferences, [key]: event.target.checked })}
             />
           </label>
@@ -358,5 +372,7 @@ function notificationTitle(type: string, t: ReturnType<typeof useTranslations<"n
   if (type === "refund_confirmed") return t("types.refundConfirmed");
   if (type === "subscription_renewal_due") return t("types.subscriptionRenewalDue");
   if (type === "announcement") return t("types.announcement");
+  if (type === "intervention_opened") return t("types.interventionOpened");
+  if (type === "intervention_escalated") return t("types.interventionEscalated");
   return t("types.generic");
 }

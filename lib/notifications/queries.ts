@@ -17,6 +17,7 @@ export type NotificationPayload = {
   titleEn?: string;
   bodyAr?: string;
   bodyEn?: string;
+  href?: string;
 };
 
 export type NotificationPreferences = {
@@ -24,6 +25,8 @@ export type NotificationPreferences = {
   scheduleChanged: boolean;
   zoomLinkChanged: boolean;
   announcement: boolean;
+  intervention: boolean;
+  interventionEmail: boolean;
 };
 
 export type NotificationCenterData = {
@@ -37,6 +40,8 @@ const defaultPreferences: NotificationPreferences = {
   scheduleChanged: true,
   zoomLinkChanged: true,
   announcement: true,
+  intervention: true,
+  interventionEmail: true,
 };
 
 export async function getNotificationCenter(): Promise<NotificationCenterData | null> {
@@ -79,6 +84,9 @@ function readPreferences(value: unknown): NotificationPreferences {
     scheduleChanged: typeof prefs.schedule_changed === "boolean" ? prefs.schedule_changed : true,
     zoomLinkChanged: typeof prefs.zoom_link_changed === "boolean" ? prefs.zoom_link_changed : true,
     announcement: typeof prefs.announcement === "boolean" ? prefs.announcement : true,
+    intervention: typeof prefs.intervention === "boolean" ? prefs.intervention : true,
+    interventionEmail:
+      typeof prefs.intervention_email === "boolean" ? prefs.intervention_email : true,
   };
 }
 
@@ -90,5 +98,9 @@ function readPayload(value: unknown): NotificationPayload {
     titleEn: typeof payload.title_en === "string" ? payload.title_en : undefined,
     bodyAr: typeof payload.body_ar === "string" ? payload.body_ar : undefined,
     bodyEn: typeof payload.body_en === "string" ? payload.body_en : undefined,
+    href:
+      typeof payload.action_href === "string" && /^\/(ar|en)\/admin\//.test(payload.action_href)
+        ? payload.action_href
+        : undefined,
   };
 }

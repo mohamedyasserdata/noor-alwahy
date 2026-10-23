@@ -10,6 +10,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InterventionCenter } from "@/components/control-center/intervention-center";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
@@ -19,6 +20,7 @@ import {
   type FinanceMetrics,
   type MetricSourceState,
 } from "@/lib/control-center/admin-metrics";
+import { getInterventionCenter, parseInterventionFilters } from "@/lib/interventions/queries";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 
@@ -42,9 +44,11 @@ export async function AdminControlCenter({
     status: statusValue(query.status),
     timezone: timezoneValue(query.timezone),
   };
-  const [t, center] = await Promise.all([
+  const interventionFilters = parseInterventionFilters(query);
+  const [t, center, interventions] = await Promise.all([
     getTranslations({ locale, namespace: "adminControlCenter" }),
     getAdminControlCenter(filters),
+    getInterventionCenter(interventionFilters),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
   const selectedQuery = new URLSearchParams(
@@ -225,6 +229,13 @@ export async function AdminControlCenter({
           )}
         </SourceSection>
       </div>
+
+      <InterventionCenter
+        locale={locale}
+        data={interventions.center}
+        rules={interventions.rules}
+        filters={interventionFilters}
+      />
     </section>
   );
 }

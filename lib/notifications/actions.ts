@@ -13,6 +13,8 @@ const preferencesSchema = z.object({
   scheduleChanged: z.boolean(),
   zoomLinkChanged: z.boolean(),
   announcement: z.boolean(),
+  intervention: z.boolean(),
+  interventionEmail: z.boolean(),
 });
 
 export async function markNotificationReadAction(
@@ -57,6 +59,8 @@ export async function saveNotificationPreferencesAction(
     schedule_changed: preferences.scheduleChanged,
     zoom_link_changed: preferences.zoomLinkChanged,
     announcement: preferences.announcement,
+    intervention: preferences.intervention,
+    intervention_email: preferences.interventionEmail,
   };
   const { data: updated, error: updateError } = await supabase
     .from("notification_prefs")

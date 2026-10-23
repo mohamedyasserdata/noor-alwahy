@@ -1200,11 +1200,13 @@
     "markAllRead": "تعليم الكل كمقروء",
     "preferences": "تفضيلات الإشعارات",
     "empty": "لا توجد إشعارات جديدة.",
-    "preferencesDescription": "اختر تحديثات التطبيق التي تريد استلامها. ستُضاف القنوات الأخرى لاحقًا.",
+    "preferencesDescription": "اختر تحديثات التطبيق والبريد التي تريد استلامها.",
     "inApp": "إشعارات داخل التطبيق",
     "scheduleChanged": "تغييرات المواعيد",
     "zoomLinkChanged": "تغييرات رابط Zoom",
     "announcement": "إعلانات الأكاديمية",
+    "intervention": "حالات تحتاج تدخلي داخل التطبيق",
+    "interventionEmail": "إرسال حالات التدخل بالبريد",
     "save": "حفظ التفضيلات",
     "saving": "جارٍ الحفظ…",
     "saved": "حُفظت التفضيلات.",
@@ -1219,6 +1221,8 @@
       "refundConfirmed": "تم تأكيد استرداد مالي",
       "subscriptionRenewalDue": "اقترب موعد تجديد اشتراك",
       "announcement": "إعلان جديد من الأكاديمية",
+      "interventionOpened": "حالة جديدة تحتاج تدخلك",
+      "interventionEscalated": "تم تصعيد حالة تحتاج تدخلك",
       "generic": "لديك تحديث جديد من الأكاديمية"
     }
   },
@@ -2629,6 +2633,86 @@
       "payouts": "أجور المدرسين",
       "payoutsDue": "أجور مستحقة",
       "empty": "لا توجد قيود مالية مطابقة للفترة والفلاتر."
+    }
+  },
+  "interventionCenter": {
+    "eyebrow": "الحالات التي تتطلب قرارًا",
+    "title": "يحتاج تدخلك",
+    "description": "طابور موحّد يوضح السبب والدليل والإجراء المقترح. الإقرار لا يمحو السبب، وكل حل أو استبعاد يبقى في سجل التدقيق.",
+    "statuses": {
+      "open": "مفتوحة",
+      "acknowledged": "تم الإقرار",
+      "resolved": "محلولة",
+      "dismissed": "مستبعدة"
+    },
+    "filters": {
+      "title": "فلاتر حالات التدخل",
+      "status": "الحالة",
+      "priority": "الأولوية",
+      "rule": "نوع الحالة",
+      "all": "الكل",
+      "apply": "تطبيق الفلاتر"
+    },
+    "priorityValue": "أولوية {value}",
+    "escalated": "مصعّدة",
+    "firstSeen": "ظهرت أول مرة",
+    "lastSeen": "آخر رصد",
+    "detections": "مرات الرصد",
+    "evidence": "الدليل",
+    "disposition": "سبب الإغلاق",
+    "acknowledge": "إقرار المتابعة",
+    "closeCase": "حل أو استبعاد الحالة",
+    "reasonLabel": "السبب (إلزامي عند الاستبعاد)",
+    "resolve": "تم الحل",
+    "dismiss": "استبعاد",
+    "empty": "لا توجد حالات مطابقة تحتاج تدخلاً الآن.",
+    "emptyHint": "غيّر الفلاتر لمراجعة الحالات السابقة أو اترك المحرك المجدول يحدّث الطابور تلقائيًا.",
+    "pagination": "صفحات حالات التدخل",
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة {page} من {total}",
+    "rules": {
+      "student_struggle": "تعثر الطالب",
+      "student_absence": "غياب الطالب",
+      "teacher_late": "تأخر المدرس",
+      "renewal_due": "تجديد قريب",
+      "payment_overdue": "دفعة متأخرة",
+      "report_pending": "تقرير معلق",
+      "credit_exhausted": "رصيد حصص منخفض"
+    },
+    "reasons": {
+      "evaluation_average_below_threshold": "انخفض متوسط التقييم عن الحد المعتمد.",
+      "absence_threshold_reached": "بلغ الغياب العتبة المعتمدة.",
+      "teacher_lateness_threshold_reached": "تكرر تأخر المدرس فوق الحد المعتمد.",
+      "subscription_renewal_due": "اقترب موعد تجديد الاشتراك.",
+      "invoice_payment_overdue": "تجاوزت الفاتورة مهلة السداد.",
+      "report_pending_too_long": "بقي التقرير معلقًا أطول من المهلة.",
+      "session_credit_exhausted": "وصل رصيد الحصص إلى الحد المنخفض."
+    },
+    "actions": {
+      "review_student_progress": "فتح تقدم الطالب",
+      "contact_guardian": "فتح ملف الطالب والأسرة",
+      "review_teacher_attendance": "فتح سجل الحضور",
+      "contact_payer": "فتح الاشتراكات",
+      "review_invoice": "فتح الفاتورة",
+      "review_report": "فتح التقرير",
+      "replenish_credit": "فتح الرصيد والاشتراك"
+    },
+    "settings": {
+      "title": "إدارة عتبات وقواعد التدخل",
+      "window": "نافذة القياس بالأيام",
+      "cooldown": "فترة التهدئة بالأيام",
+      "enabled": "القاعدة مفعلة",
+      "save": "حفظ القاعدة"
+    },
+    "thresholds": {
+      "student_struggle": { "a": "أعلى متوسط منخفض", "b": "أقل عدد تقييمات" },
+      "student_absence": { "a": "أقل عدد غيابات", "b": "" },
+      "teacher_late": { "a": "دقائق التأخير", "b": "أقل عدد مرات" },
+      "renewal_due": { "a": "أيام قبل التجديد", "b": "" },
+      "payment_overdue": { "a": "أيام التأخر", "b": "" },
+      "report_pending": { "a": "أيام التعليق", "b": "" },
+      "credit_exhausted": { "a": "أقصى رصيد متبقٍ", "b": "" }
     }
   },
   "accessibility": {

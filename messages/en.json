@@ -1200,11 +1200,13 @@
     "markAllRead": "Mark all as read",
     "preferences": "Notification preferences",
     "empty": "You are all caught up.",
-    "preferencesDescription": "Choose which in-app updates you want to receive. Additional channels will be added later.",
+    "preferencesDescription": "Choose which in-app and email updates you want to receive.",
     "inApp": "In-app notifications",
     "scheduleChanged": "Schedule changes",
     "zoomLinkChanged": "Zoom link changes",
     "announcement": "Academy announcements",
+    "intervention": "Cases needing my attention in the app",
+    "interventionEmail": "Email intervention cases",
     "save": "Save preferences",
     "saving": "Saving…",
     "saved": "Preferences saved.",
@@ -1219,6 +1221,8 @@
       "refundConfirmed": "Refund confirmed",
       "subscriptionRenewalDue": "A subscription renewal is due soon",
       "announcement": "New academy announcement",
+      "interventionOpened": "A new case needs your attention",
+      "interventionEscalated": "A case needing your attention was escalated",
       "generic": "You have a new academy update"
     }
   },
@@ -2631,6 +2635,86 @@
       "payouts": "Teacher payouts",
       "payoutsDue": "Payouts due",
       "empty": "No financial entries match the selected period and filters."
+    }
+  },
+  "interventionCenter": {
+    "eyebrow": "Cases requiring a decision",
+    "title": "Needs your attention",
+    "description": "One queue showing the reason, evidence, and recommended action. Acknowledging never hides the original cause, and every resolution or dismissal remains audited.",
+    "statuses": {
+      "open": "Open",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "filters": {
+      "title": "Intervention filters",
+      "status": "Status",
+      "priority": "Priority",
+      "rule": "Case type",
+      "all": "All",
+      "apply": "Apply filters"
+    },
+    "priorityValue": "Priority {value}",
+    "escalated": "Escalated",
+    "firstSeen": "First detected",
+    "lastSeen": "Last detected",
+    "detections": "Detections",
+    "evidence": "Evidence",
+    "disposition": "Closure reason",
+    "acknowledge": "Acknowledge follow-up",
+    "closeCase": "Resolve or dismiss case",
+    "reasonLabel": "Reason (required for dismissal)",
+    "resolve": "Resolve",
+    "dismiss": "Dismiss",
+    "empty": "No matching cases need attention right now.",
+    "emptyHint": "Change the filters to review previous cases, or let the scheduled engine refresh the queue automatically.",
+    "pagination": "Intervention case pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {total}",
+    "rules": {
+      "student_struggle": "Student struggle",
+      "student_absence": "Student absence",
+      "teacher_late": "Teacher lateness",
+      "renewal_due": "Renewal due",
+      "payment_overdue": "Payment overdue",
+      "report_pending": "Report pending",
+      "credit_exhausted": "Low session credit"
+    },
+    "reasons": {
+      "evaluation_average_below_threshold": "The evaluation average fell below the approved threshold.",
+      "absence_threshold_reached": "Absence reached the approved threshold.",
+      "teacher_lateness_threshold_reached": "Teacher lateness repeatedly exceeded the approved threshold.",
+      "subscription_renewal_due": "The subscription renewal date is approaching.",
+      "invoice_payment_overdue": "The invoice passed its payment deadline.",
+      "report_pending_too_long": "The report remained pending beyond its allowed window.",
+      "session_credit_exhausted": "The session balance reached the low-credit threshold."
+    },
+    "actions": {
+      "review_student_progress": "Open student progress",
+      "contact_guardian": "Open student and family",
+      "review_teacher_attendance": "Open attendance record",
+      "contact_payer": "Open subscriptions",
+      "review_invoice": "Open invoice",
+      "review_report": "Open report",
+      "replenish_credit": "Open balance and subscription"
+    },
+    "settings": {
+      "title": "Manage intervention rules and thresholds",
+      "window": "Measurement window in days",
+      "cooldown": "Cooldown in days",
+      "enabled": "Rule enabled",
+      "save": "Save rule"
+    },
+    "thresholds": {
+      "student_struggle": { "a": "Maximum low average", "b": "Minimum evaluations" },
+      "student_absence": { "a": "Minimum absences", "b": "" },
+      "teacher_late": { "a": "Late minutes", "b": "Minimum occurrences" },
+      "renewal_due": { "a": "Days before renewal", "b": "" },
+      "payment_overdue": { "a": "Days overdue", "b": "" },
+      "report_pending": { "a": "Days pending", "b": "" },
+      "credit_exhausted": { "a": "Maximum remaining credit", "b": "" }
     }
   },
   "accessibility": {
