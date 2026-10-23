@@ -1258,6 +1258,7 @@
       "navigation": {
         "home": "Home",
         "tracks": "Learning tracks",
+        "packages": "Packages & prices",
         "faq": "Questions",
         "contact": "Contact"
       },
@@ -1351,6 +1352,40 @@
         "title": "Not sure which track fits?",
         "description": "Tell us about the student’s level and goal, and we will help identify the most suitable starting point.",
         "action": "Ask the academy"
+      }
+    },
+    "packages": {
+      "meta": {
+        "title": "Quran learning packages and prices",
+        "description": "Explore Noor Al-Wahy Academy packages and the price available for your country, with lesson details and features."
+      },
+      "academyName": "Noor Al-Wahy Academy",
+      "eyebrow": "A package that fits your plan",
+      "title": "Clear details, with pricing shown for your country",
+      "description": "Compare lesson frequency, duration, and package features. You can change the country manually, and the site remembers your choice for the next visit.",
+      "countryLabel": "Pricing country",
+      "updateCountry": "Update price",
+      "availableTitle": "Available packages",
+      "countrySummary": "Prices shown for {country}",
+      "fallbackCountry": "Rest of world",
+      "packageCount": "{count} packages",
+      "loading": "Preparing packages and prices…",
+      "generalTrack": "One-to-one Quran track",
+      "fallbackPrice": "The rest-of-world price is shown because this country has no separate active price.",
+      "defaultDescription": "The academy will explain this package in detail when you get in touch.",
+      "sessions": "Weekly lessons",
+      "sessionsValue": "{count} lessons",
+      "duration": "Lesson duration",
+      "durationValue": "{minutes} minutes",
+      "askAboutPackage": "Ask about this package",
+      "billing": {
+        "monthly": "per month",
+        "quarterly": "every 3 months",
+        "yearly": "per year"
+      },
+      "empty": {
+        "title": "No packages are published yet",
+        "description": "Contact the academy to ask about available tracks until packages are published here."
       }
     },
     "faq": {

@@ -1,7 +1,7 @@
 "use server";
 
 import type { Route } from "next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DateTime } from "luxon";
 import { z } from "zod";
@@ -107,6 +107,7 @@ export async function confirmPackageImportAction(
       : "import_failed";
     redirect(`/${locale}/admin/packages?packageError=${code}` as Route);
   }
+  updateTag("public-packages");
   revalidatePath(`/${locale}/admin/packages`);
   revalidatePath(`/${locale}/packages`);
   revalidatePath(`/${locale}`);
