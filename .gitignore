@@ -16,6 +16,9 @@
 /output/playwright/
 /output/pdf/
 /tmp/pdfs/
+*.dump
+*.dump.enc
+*.dump.enc.json
 
 # next.js
 /.next/
