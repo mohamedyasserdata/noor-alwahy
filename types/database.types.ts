@@ -811,6 +811,123 @@ export type Database = {
         };
         Relationships: [];
       };
+      content_template_versions: {
+        Row: {
+          body_template: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          locale: string;
+          published_at: string | null;
+          published_by: string | null;
+          subject_template: string | null;
+          template_id: string;
+          variables_schema: NonNullable<Json>;
+          version_no: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          body_template: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          locale: string;
+          published_at?: string | null;
+          published_by?: string | null;
+          subject_template?: string | null;
+          template_id: string;
+          variables_schema: NonNullable<Json>;
+          version_no: number;
+        };
+        Update: {
+          body_template?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          locale?: string;
+          published_at?: string | null;
+          published_by?: string | null;
+          subject_template?: string | null;
+          template_id?: string;
+          variables_schema?: NonNullable<Json>;
+          version_no?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "content_template_versions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "content_template_versions_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "content_template_versions_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "content_templates";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      content_templates: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          id: string;
+          kind: string;
+          name_ar: string;
+          name_en: string | null;
+          status: string;
+          updated_at: string;
+          updated_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          kind: string;
+          name_ar: string;
+          name_en?: string | null;
+          status?: string;
+          updated_at?: string;
+          updated_by: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          kind?: string;
+          name_ar?: string;
+          name_en?: string | null;
+          status?: string;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "content_templates_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "content_templates_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       countries: {
         Row: {
           code: string;
@@ -1233,6 +1350,81 @@ export type Database = {
           },
         ];
       };
+      export_jobs: {
+        Row: {
+          attempts: number;
+          created_at: string;
+          error_code: string | null;
+          expires_at: string | null;
+          file_sha256: string | null;
+          filters_snapshot: NonNullable<Json>;
+          finished_at: string | null;
+          format: string;
+          id: string;
+          locale: string;
+          next_attempt_at: string;
+          report_type: string;
+          requested_by: string;
+          row_count: number | null;
+          selected_columns: string[];
+          started_at: string | null;
+          status: string;
+          storage_path: string | null;
+          timezone: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempts?: number;
+          created_at?: string;
+          error_code?: string | null;
+          expires_at?: string | null;
+          file_sha256?: string | null;
+          filters_snapshot: NonNullable<Json>;
+          finished_at?: string | null;
+          format: string;
+          id?: string;
+          locale: string;
+          next_attempt_at?: string;
+          report_type: string;
+          requested_by: string;
+          row_count?: number | null;
+          selected_columns: string[];
+          started_at?: string | null;
+          status?: string;
+          storage_path?: string | null;
+          timezone: string;
+        };
+        Update: {
+          attempts?: number;
+          created_at?: string;
+          error_code?: string | null;
+          expires_at?: string | null;
+          file_sha256?: string | null;
+          filters_snapshot?: NonNullable<Json>;
+          finished_at?: string | null;
+          format?: string;
+          id?: string;
+          locale?: string;
+          next_attempt_at?: string;
+          report_type?: string;
+          requested_by?: string;
+          row_count?: number | null;
+          selected_columns?: string[];
+          started_at?: string | null;
+          status?: string;
+          storage_path?: string | null;
+          timezone?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "export_jobs_requested_by_fkey";
+            columns: ["requested_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       guardians: {
         Row: {
           created_at: string;
@@ -1377,6 +1569,42 @@ export type Database = {
             columns: ["rule_id"];
             isOneToOne: false;
             referencedRelation: "intervention_rules";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      intervention_notification_events: {
+        Row: {
+          case_id: string;
+          created_at: string;
+          event_key: string;
+          id: number;
+          priority: number;
+          recipient_count: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          case_id: string;
+          created_at?: string;
+          event_key: string;
+          id?: never;
+          priority: number;
+          recipient_count: number;
+        };
+        Update: {
+          case_id?: string;
+          created_at?: string;
+          event_key?: string;
+          id?: never;
+          priority?: number;
+          recipient_count?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "intervention_notification_events_case_id_fkey";
+            columns: ["case_id"];
+            isOneToOne: false;
+            referencedRelation: "intervention_cases";
             referencedColumns: ["id"];
           },
         ];
@@ -1960,8 +2188,10 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          in_app_visible: boolean;
           payload: NonNullable<Json>;
           read_at: string | null;
+          source_key: string | null;
           type: string;
           user_id: string;
         };
@@ -1969,16 +2199,20 @@ export type Database = {
         Insert: {
           created_at?: string;
           id?: string;
+          in_app_visible?: boolean;
           payload?: NonNullable<Json>;
           read_at?: string | null;
+          source_key?: string | null;
           type: string;
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
+          in_app_visible?: boolean;
           payload?: NonNullable<Json>;
           read_at?: string | null;
+          source_key?: string | null;
           type?: string;
           user_id?: string;
         };
@@ -2778,6 +3012,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "reports_content_template_version_fkey";
+            columns: ["content_template_version_id"];
+            isOneToOne: false;
+            referencedRelation: "content_template_versions";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "reports_student_id_fkey";
             columns: ["student_id"];
@@ -4711,6 +4952,7 @@ export type Database = {
         Returns: string;
       };
       archive_admin_announcement: { Args: { p_id: string }; Returns: undefined };
+      archive_content_template: { Args: { p_template: string }; Returns: undefined };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
       assign_session_substitute: {
         Args: { p_scope: string; p_session_id: string; p_substitute_teacher_id: string };
@@ -4731,6 +4973,37 @@ export type Database = {
         };
         Returns: number;
       };
+      claim_admin_export_job: {
+        Args: { p_job: string };
+        Returns: {
+          attempts: number;
+          created_at: string;
+          error_code: string | null;
+          expires_at: string | null;
+          file_sha256: string | null;
+          filters_snapshot: NonNullable<Json>;
+          finished_at: string | null;
+          format: string;
+          id: string;
+          locale: string;
+          next_attempt_at: string;
+          report_type: string;
+          requested_by: string;
+          row_count: number | null;
+          selected_columns: string[];
+          started_at: string | null;
+          status: string;
+          storage_path: string | null;
+          timezone: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "export_jobs";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      claim_notification_outbox: { Args: { p_limit?: number }; Returns: Json };
       clone_certificate_template_version: { Args: { p_version: string }; Returns: string };
       clone_package: { Args: { p_package: string }; Returns: string };
       confirm_package_import: { Args: { p_batch_id: string }; Returns: number };
@@ -4766,6 +5039,7 @@ export type Database = {
         };
         Returns: string;
       };
+      dispatch_intervention_notifications: { Args: { p_at?: string }; Returns: number };
       enqueue_certificate_batch: {
         Args: {
           p_achievement: string;
@@ -4777,6 +5051,7 @@ export type Database = {
         Returns: string;
       };
       evaluate_intervention_rules: { Args: { p_at?: string }; Returns: number };
+      expire_admin_export_jobs: { Args: { p_at?: string }; Returns: string[] };
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
@@ -4784,6 +5059,24 @@ export type Database = {
       generate_teacher_payouts: {
         Args: { p_period_end: string; p_period_start: string };
         Returns: number;
+      };
+      get_admin_advanced_report: {
+        Args: {
+          p_country?: string;
+          p_direction?: string;
+          p_from: string;
+          p_locale?: string;
+          p_page?: number;
+          p_page_size?: number;
+          p_report_type: string;
+          p_sort?: string;
+          p_status?: string;
+          p_teacher?: string;
+          p_timezone?: string;
+          p_to: string;
+          p_track?: string;
+        };
+        Returns: Json;
       };
       get_admin_dashboard: {
         Args: { p_country?: string; p_currency?: string; p_from?: string; p_to?: string };
@@ -4857,6 +5150,16 @@ export type Database = {
           track_name_ar: string;
           track_name_en: string;
         }[];
+      };
+      get_intervention_center: {
+        Args: {
+          p_page?: number;
+          p_page_size?: number;
+          p_priority?: number;
+          p_rule_type?: string;
+          p_status?: string;
+        };
+        Returns: Json;
       };
       get_my_calendar_feed: {
         Args: Record<PropertyKey, never>;
@@ -4977,6 +5280,18 @@ export type Database = {
       process_subscription_renewals: { Args: { p_as_of?: string }; Returns: Json };
       publish_admin_announcement: { Args: { p_id: string }; Returns: number };
       publish_certificate_template: { Args: { p_version: string }; Returns: undefined };
+      publish_content_template: { Args: { p_template: string }; Returns: number };
+      queue_admin_export: {
+        Args: {
+          p_columns: string[];
+          p_filters: Json;
+          p_format: string;
+          p_locale: string;
+          p_report_type: string;
+          p_timezone: string;
+        };
+        Returns: string;
+      };
       record_attendance: {
         Args: {
           p_minutes?: number;
@@ -5010,6 +5325,10 @@ export type Database = {
         Args: { p_guardian_id: string; p_student_id: string };
         Returns: undefined;
       };
+      render_content_template: {
+        Args: { p_locale: string; p_values: Json; p_version: string };
+        Returns: Json;
+      };
       reorder_packages: { Args: { p_package_ids: string[] }; Returns: undefined };
       request_subscription_change: {
         Args: { p_subscription: string; p_target_package: string };
@@ -5027,6 +5346,7 @@ export type Database = {
           currency: string;
         }[];
       };
+      retry_admin_export: { Args: { p_job: string }; Returns: string };
       revoke_calendar_feed_token: { Args: Record<PropertyKey, never>; Returns: string };
       revoke_certificate: { Args: { p_certificate: string; p_reason: string }; Returns: undefined };
       rotate_calendar_feed_token: { Args: { p_token_hash: string }; Returns: string };
@@ -5041,6 +5361,19 @@ export type Database = {
           p_starts_at: string;
           p_title_ar: string;
           p_title_en: string;
+        };
+        Returns: string;
+      };
+      save_content_template: {
+        Args: {
+          p_body_ar: string;
+          p_body_en: string;
+          p_kind: string;
+          p_name_ar: string;
+          p_name_en: string;
+          p_subject_ar: string;
+          p_subject_en: string;
+          p_template?: string;
         };
         Returns: string;
       };

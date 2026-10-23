@@ -20,6 +20,14 @@ const renderedTemplateSchema = z.object({
   locale: z.enum(["ar", "en"]),
 });
 
+type TemplateScalar = string | number | boolean | null;
+
+function templateScalar(value: unknown, fallback: TemplateScalar): TemplateScalar {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  return fallback;
+}
+
 function localeFrom(value: string): AppLocale {
   return routing.locales.includes(value as AppLocale)
     ? (value as AppLocale)
@@ -113,9 +121,9 @@ export async function saveReportDraftAction(localeValue: string, formData: FormD
         teacher_name: profileResult.data.full_name,
         period_start: result.data.period_start,
         period_end: result.data.period_end,
-        attendance_rate: attendance.rate ?? "—",
-        evaluation_average: metrics.evaluation_average ?? "—",
-        mastered_pages: metrics.mastered_pages ?? 0,
+        attendance_rate: templateScalar(attendance.rate, "—"),
+        evaluation_average: templateScalar(metrics.evaluation_average, "—"),
+        mastered_pages: templateScalar(metrics.mastered_pages, 0),
         recommendation: value.recommendation,
       },
     });

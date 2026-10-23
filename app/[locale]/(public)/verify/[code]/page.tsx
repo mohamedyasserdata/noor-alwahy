@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { Suspense } from "react";
 import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +16,21 @@ const codeSchema = z
   .max(128)
   .regex(/^[a-zA-Z0-9_-]+$/);
 
-export default async function CertificateVerificationPage({
+export default function CertificateVerificationPage({
   params,
 }: PageProps<"/[locale]/verify/[code]">) {
+  return (
+    <Suspense fallback={<VerificationFallback />}>
+      <CertificateVerificationContent params={params} />
+    </Suspense>
+  );
+}
+
+async function CertificateVerificationContent({
+  params,
+}: {
+  params: PageProps<"/[locale]/verify/[code]">["params"];
+}) {
   const { locale, code } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   await connection();
@@ -105,6 +118,22 @@ export default async function CertificateVerificationPage({
           <p className="mt-8 text-xs leading-6 text-muted-foreground">{t("privacy")}</p>
         </div>
       </article>
+    </main>
+  );
+}
+
+function VerificationFallback() {
+  return (
+    <main
+      className="mx-auto grid min-h-[65vh] w-full max-w-3xl place-items-center px-4 py-16"
+      aria-busy="true"
+    >
+      <div className="w-full animate-pulse overflow-hidden border bg-card p-6 shadow-card sm:p-10">
+        <div className="mx-auto size-16 rounded-full bg-muted" />
+        <div className="mx-auto mt-5 h-7 w-28 rounded-full bg-muted" />
+        <div className="mx-auto mt-5 h-10 w-72 max-w-full rounded bg-muted" />
+        <div className="mx-auto mt-4 h-20 max-w-xl rounded bg-muted" />
+      </div>
     </main>
   );
 }

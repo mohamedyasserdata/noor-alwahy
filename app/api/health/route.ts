@@ -1,7 +1,5 @@
 import { getPublicSupabaseEnv } from "@/lib/env";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
   const startedAt = performance.now();
   try {
