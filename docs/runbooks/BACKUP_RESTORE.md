@@ -14,7 +14,13 @@
 
 `node scripts/database-backup.mjs create`
 
-ينتج ملفًا مشفرًا وmanifest يحوي SHA-256 والحجم والوقت. لا يُرفع أي منهما إلى Git.
+ينسخ السكربت schemas المملوكة للتطبيق والهوية والتخزين وسجل المهاجرات فقط (`public`,
+`private`, `auth`, `storage`, `supabase_migrations`) حتى لا يحاول إعادة إنشاء خدمات Supabase المُدارة مثل
+`pg_cron` وRealtime داخل مشروع staging. ينتج ملفًا مشفرًا وmanifest يحوي SHA-256 والحجم
+والوقت. لا يُرفع أي منهما إلى Git.
+على Windows المحلي، يمكن تعيين `POSTGRES_TOOL_CONTAINER` إلى حاوية PostgreSQL موثوقة
+لتشغيل `pg_dump` و`pg_restore` المتوافقين داخلها؛ ينقل السكربت ملف dump المؤقت فقط ويحذفه
+من الحاوية بعد التشفير أو الاستعادة.
 
 ## تدريب الاستعادة
 

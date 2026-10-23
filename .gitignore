@@ -13,8 +13,10 @@
 # testing
 /coverage
 /.vitest/
+/.lighthouseci/
 /output/playwright/
 /output/pdf/
+/output/lighthouse/
 /tmp/pdfs/
 *.dump
 *.dump.enc

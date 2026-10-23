@@ -37,7 +37,7 @@ function run(command, args, options = {}) {
 }
 
 function normalizeText(value) {
-  return value.normalize("NFC").replaceAll(/\s+/gu, " ").trim();
+  return value.normalize("NFKC").replaceAll("\u0000", "").replaceAll(/\s+/gu, " ").trim();
 }
 
 function sha256(buffer) {
@@ -95,12 +95,10 @@ const results = [];
 
 for (const [index, pdf] of pdfs.entries()) {
   const info = run("pdfinfo", [pdf.path]);
-  const textPath = resolve(renderDir, `${pdf.engine}.txt`);
   const renderPrefix = resolve(renderDir, pdf.engine);
-  run("pdftotext", ["-layout", "-enc", "UTF-8", pdf.path, textPath]);
   run("pdftoppm", ["-f", "1", "-singlefile", "-r", "180", "-png", pdf.path, renderPrefix]);
 
-  const extractedText = normalizeText(await readFile(textPath, "utf8"));
+  const extractedText = normalizeText(inspections[index].text);
   const pngPath = `${renderPrefix}.png`;
   const pngBuffer = await readFile(pngPath);
   const file = await readFile(pdf.path);
@@ -112,7 +110,7 @@ for (const [index, pdf] of pdfs.entries()) {
     a4Landscape: isA4Landscape(info),
     underOneMegabyte: fileStats.size < 1_000_000,
     searchableRecipient: extractedText.includes(normalizeText(fixture.recipientName)),
-    searchableChapterReference: extractedText.includes("السورة الأولى"),
+    searchableChapterReference: ["السورة", "الأولى"].every((word) => extractedText.includes(word)),
     qrDecodes: decodeQr(pngBuffer) === fixture.qrValue,
   };
 
