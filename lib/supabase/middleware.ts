@@ -42,13 +42,23 @@ export async function updateSession(
     },
   );
 
-  // This verified call also refreshes an expired token before the response is
-  // committed. Authorization checks still use getUser() per the constitution.
-  const { data, error } = await supabase.auth.getClaims();
+  // getClaims() verifies and refreshes the token, but a correctly signed token
+  // can outlive its user after a local reset or account deletion. Confirm the
+  // identity with Auth before routing so middleware and Server Components do
+  // not disagree and redirect the browser in a loop.
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  let claims: VerifiedAuthClaims | null = null;
+
+  if (!claimsError && claimsData?.claims) {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (!userError && userData.user) {
+      claims = claimsData.claims;
+    }
+  }
 
   // Build the routing response after a possible refresh so next-intl forwards
   // the updated request cookies to the Server Component in this same request.
-  const response = createResponse(error ? null : (data?.claims ?? null));
+  const response = createResponse(claims);
   pendingCookies.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
   });
