@@ -207,6 +207,7 @@ select is(
       and function.oid <> 'public.get_calendar_feed(text)'::regprocedure
       and function.oid <> 'public.resolve_price(uuid,character,timestamp with time zone)'::regprocedure
       and function.oid <> 'public.get_public_package_catalog(character,timestamp with time zone)'::regprocedure
+      and function.oid <> 'public.verify_certificate(text)'::regprocedure
   ),
   0,
   'R-22: anonymous callers reach only reviewed read-only capabilities'
@@ -236,7 +237,7 @@ select is(
       and function.prorettype <> 'pg_catalog.trigger'::regtype
       and has_function_privilege('authenticated', function.oid, 'EXECUTE')
   ),
-  array['accept_teacher_code_of_conduct', 'assign_session_substitute', 'auth_role', 'clone_package', 'confirm_package_import', 'confirm_student_import', 'convert_application_to_student', 'create_makeup_session', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_public_package_catalog', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reorder_packages', 'reschedule_session', 'resolve_price', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'save_package', 'set_account_active', 'suggest_teachers', 'update_evaluation_settings', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
+  array['accept_teacher_code_of_conduct', 'add_teacher_adjustment', 'archive_admin_announcement', 'assign_session_substitute', 'auth_role', 'bulk_append_package_prices', 'clone_certificate_template_version', 'clone_package', 'confirm_package_import', 'confirm_student_import', 'convert_application_to_student', 'create_certificate_template', 'create_makeup_session', 'create_subscription', 'enqueue_certificate_batch', 'generate_teacher_payouts', 'get_admin_dashboard', 'get_admin_finance_metrics', 'get_admin_learning_metrics', 'get_admin_metric_filter_options', 'get_admin_operations_metrics', 'get_admin_student_risk_flags', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_public_package_catalog', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'issue_certificate', 'lock_exam_result', 'manage_teacher_assignment', 'pause_subscription', 'process_certificate_batch', 'process_subscription_renewals', 'publish_admin_announcement', 'publish_certificate_template', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reorder_packages', 'request_subscription_change', 'reschedule_session', 'resolve_price', 'revoke_calendar_feed_token', 'revoke_certificate', 'rotate_calendar_feed_token', 'run_financial_reconciliation', 'save_admin_announcement', 'save_exam_result', 'save_intervention_rule', 'save_package', 'set_account_active', 'suggest_teachers', 'transition_intervention_case', 'transition_teacher_payout', 'update_certificate_template_draft', 'update_evaluation_settings', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher', 'verify_certificate']::name[],
   'R-22: authenticated callers reach only the guarded SECURITY DEFINER API'
 );
 
