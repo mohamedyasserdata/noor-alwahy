@@ -82,7 +82,9 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       aria-label={t("navigationLabel")}
       data-testid={`portal-navigation-${variant}`}
       className={cn(
-        isSidebar ? "grid gap-1.5 px-4" : "grid h-full items-stretch",
+        isSidebar
+          ? "grid min-h-0 flex-1 [scrollbar-gutter:stable] content-start gap-1.5 overflow-y-auto overscroll-contain px-4 pb-4"
+          : "grid h-full items-stretch",
         !isSidebar && sections.length === 4 && "grid-cols-4",
         !isSidebar && sections.length > 4 && "flex overflow-x-auto",
       )}

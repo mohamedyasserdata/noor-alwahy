@@ -32,14 +32,14 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
         <NotificationCenter initialData={notificationCenter} portal={portal} />
       ) : null}
       <aside
-        className="inset-block-0 fixed start-0 z-30 hidden w-72 flex-col border-e bg-card/95 shadow-card backdrop-blur min-[769px]:flex"
+        className="inset-block-0 fixed start-0 z-30 hidden h-svh w-72 flex-col overflow-hidden border-e bg-card/95 shadow-card backdrop-blur min-[769px]:flex"
         data-testid="portal-sidebar"
       >
-        <div className="border-b px-5 py-5">
+        <div className="shrink-0 border-b px-5 py-5">
           <BrandMark label={academyName} logoPath={settings.academyProfile.logoPath} />
         </div>
 
-        <div className="relative mx-5 my-6 overflow-hidden rounded-t-[7rem] rounded-b-2xl border border-secondary/35 bg-background px-5 pt-9 pb-5 text-center">
+        <div className="relative mx-5 my-6 shrink-0 overflow-hidden rounded-t-[7rem] rounded-b-2xl border border-secondary/35 bg-background px-5 pt-9 pb-5 text-center">
           <span
             className="absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-secondary to-transparent"
             aria-hidden="true"
@@ -56,7 +56,7 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
 
         <PortalNavigation portal={portal} variant="sidebar" />
 
-        <div className="mt-auto grid gap-3 border-t p-4">
+        <div className="mt-auto grid shrink-0 gap-3 border-t p-4">
           <ThemeToggle
             enableDarkLabel={t("theme.enableDark")}
             enableLightLabel={t("theme.enableLight")}

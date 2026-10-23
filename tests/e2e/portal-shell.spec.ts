@@ -111,6 +111,24 @@ test("dark theme is accessible and persists across reloads", async ({ page }) =>
   );
 });
 
+test("admin sidebar scrolls on laptop-height viewports", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1226, height: 668 });
+  await signInAs(page, "ar", "admin");
+  await page.goto("/ar/admin/templates");
+
+  const navigation = page.getByTestId("portal-navigation-sidebar");
+  await expect(navigation).toBeVisible();
+  await expect
+    .poll(() => navigation.evaluate((element) => element.scrollHeight > element.clientHeight))
+    .toBe(true);
+
+  const lastLink = navigation.locator("a").last();
+  await lastLink.scrollIntoViewIfNeeded();
+  await expect(lastLink).toBeInViewport();
+  await expect.poll(() => navigation.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+});
+
 function captureConsoleProblems(page: Page) {
   const problems: string[] = [];
 
