@@ -22,10 +22,28 @@ insert into public.students(id, profile_id, full_name, gender, timezone)
 values
   ('8c000000-0000-4000-8000-000000000001', '8a000000-0000-4000-8000-000000000001', 'Exam Student', 'male', 'Africa/Cairo'),
   ('8c000000-0000-4000-8000-000000000002', '8a000000-0000-4000-8000-000000000002', 'Other Exam Student', 'male', 'Africa/Cairo');
+insert into public.teachers(
+  id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at
+)
+values (
+  '8f000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000002',
+  'male', 'active', now(), now()
+);
+insert into public.teacher_tracks(teacher_id, track_id)
+values (
+  '8f000000-0000-4000-8000-000000000001',
+  '8b000000-0000-4000-8000-000000000001'
+);
 insert into public.teacher_assignments(id, student_id, teacher_id, track_id, assigned_by, reason)
-select '8d000000-0000-4000-8000-000000000001', '8c000000-0000-4000-8000-000000000001', id,
-  '8b000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Exam test'
-from public.teachers where profile_id = '10000000-0000-4000-8000-000000000002';
+values (
+  '8d000000-0000-4000-8000-000000000001',
+  '8c000000-0000-4000-8000-000000000001',
+  '8f000000-0000-4000-8000-000000000001',
+  '8b000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000001',
+  'Exam test'
+);
 
 insert into public.exams(id,title_ar,title_en,kind,session_type,track_id,max_score,weight,held_on,status,created_by)
 values ('8e000000-0000-4000-8000-000000000001','اختبار تجريبي','Test exam','monthly','recitation','8b000000-0000-4000-8000-000000000001',50,1,current_date,'open','10000000-0000-4000-8000-000000000001');
@@ -50,7 +68,12 @@ select throws_ok($$update public.exam_results set scores='{"commitment":1}' wher
 select set_config('request.jwt.claims', '{"sub":"8a000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select is((select count(*)::integer from public.exam_results), 1, 'student reads their own approved result');
-select is_empty($$delete from public.exam_results returning id$$, 'student cannot delete results');
+select throws_ok(
+  $$delete from public.exam_results returning id$$,
+  '42501',
+  null,
+  'student cannot delete results'
+);
 reset role;
 
 select ok((select count(*) >= 3 from public.audit_logs where table_name in ('exams','exam_results')), 'exam changes are audited');

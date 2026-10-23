@@ -24,8 +24,8 @@ set local role authenticated;
 
 insert into public.tracks(id, code, name_ar, name_en)
 values ('71000000-0000-4000-8000-000000000001', 'subscription-test', 'مسار الاشتراك', 'Subscription track');
-insert into public.students(id, full_name, gender, country_code, timezone)
-values ('72000000-0000-4000-8000-000000000001', 'طالب الاشتراك', 'male', 'EG', 'Africa/Cairo');
+insert into public.students(id, student_no, full_name, gender, country_code, timezone)
+values ('72000000-0000-4000-8000-000000000001', 'NW-SUBSCRIPTION-001', 'طالب الاشتراك', 'male', 'EG', 'Africa/Cairo');
 insert into public.packages(
   id, slug, track_id, name_ar, name_en, sessions_per_week, duration_min, billing_period, created_by
 ) values (

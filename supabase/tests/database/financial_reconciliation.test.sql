@@ -9,17 +9,51 @@ select is((select relrowsecurity from pg_class where oid = 'public.reconciliatio
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
-select lives_ok($$select public.run_financial_reconciliation()$$, 'admin runs reconciliation');
-select is((select status from public.reconciliation_runs order by started_at desc limit 1), 'passed', 'clean seed data passes');
-select is((select issue_count from public.reconciliation_runs order by started_at desc limit 1), 0, 'clean run has no issues');
+create temporary table reconciliation_test_runs(label text primary key, run_id uuid not null);
+select lives_ok(
+  $$insert into reconciliation_test_runs values ('clean', public.run_financial_reconciliation())$$,
+  'admin runs reconciliation'
+);
+select is(
+  (select status from public.reconciliation_runs where id = (select run_id from reconciliation_test_runs where label = 'clean')),
+  'passed',
+  'clean seed data passes'
+);
+select is(
+  (select issue_count from public.reconciliation_runs where id = (select run_id from reconciliation_test_runs where label = 'clean')),
+  0,
+  'clean run has no issues'
+);
 
-insert into public.teachers(id, profile_id, gender, status)
-values ('93000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active');
+reset role;
+insert into public.teachers(
+  id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at
+)
+values (
+  '93000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000002',
+  'male', 'active', now(), now()
+);
 insert into public.teacher_payouts(id, teacher_id, period_start, period_end, currency, gross, net, status)
 values ('94000000-0000-4000-8000-000000000001', '93000000-0000-4000-8000-000000000001', '2026-09-01', '2026-09-30', 'USD', 50, 50, 'due');
-select public.run_financial_reconciliation();
-select is((select status from public.reconciliation_runs order by started_at desc limit 1), 'failed', 'mismatched payout fails reconciliation');
-select is((select count(*)::integer from public.reconciliation_issues where category = 'payout_total'), 1, 'payout mismatch is retained as an issue');
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+set local role authenticated;
+insert into reconciliation_test_runs values ('mismatch', public.run_financial_reconciliation());
+select is(
+  (select status from public.reconciliation_runs where id = (select run_id from reconciliation_test_runs where label = 'mismatch')),
+  'failed',
+  'mismatched payout fails reconciliation'
+);
+select is(
+  (
+    select count(*)::integer
+    from public.reconciliation_issues
+    where run_id = (select run_id from reconciliation_test_runs where label = 'mismatch')
+      and category = 'payout_total'
+  ),
+  1,
+  'payout mismatch is retained as an issue'
+);
 reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);

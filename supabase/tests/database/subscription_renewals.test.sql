@@ -22,8 +22,8 @@ set local role authenticated;
 
 insert into public.tracks(id, code, name_ar, name_en)
 values ('81000000-0000-4000-8000-000000000001', 'renewal-test', 'مسار التجديد', 'Renewal track');
-insert into public.students(id, full_name, gender, country_code, timezone)
-values ('82000000-0000-4000-8000-000000000001', 'طالب التجديد', 'male', 'EG', 'Africa/Cairo');
+insert into public.students(id, student_no, full_name, gender, country_code, timezone)
+values ('82000000-0000-4000-8000-000000000001', 'NW-RENEWAL-001', 'طالب التجديد', 'male', 'EG', 'Africa/Cairo');
 insert into public.packages(
   id, slug, track_id, name_ar, name_en, sessions_per_week, duration_min, billing_period, created_by
 ) values
@@ -31,6 +31,8 @@ insert into public.packages(
   ('83000000-0000-4000-8000-000000000002', 'renewal-upgrade', '81000000-0000-4000-8000-000000000001', 'المتقدمة', 'Upgrade', 4, 45, 'monthly', '10000000-0000-4000-8000-000000000001');
 insert into public.package_prices(package_id, country_code, currency, amount, valid_from, created_by)
 values
+  ('83000000-0000-4000-8000-000000000001', 'ZZ', 'USD', 30, '2026-01-01', '10000000-0000-4000-8000-000000000001'),
+  ('83000000-0000-4000-8000-000000000002', 'ZZ', 'USD', 45, '2026-01-01', '10000000-0000-4000-8000-000000000001'),
   ('83000000-0000-4000-8000-000000000001', 'EG', 'EGP', 800, '2026-01-01', '10000000-0000-4000-8000-000000000001'),
   ('83000000-0000-4000-8000-000000000002', 'EG', 'EGP', 1200, '2026-01-01', '10000000-0000-4000-8000-000000000001');
 update public.packages set is_published = true where id in (

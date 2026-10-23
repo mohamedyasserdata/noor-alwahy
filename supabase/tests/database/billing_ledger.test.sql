@@ -17,8 +17,8 @@ set local role authenticated;
 
 insert into public.tracks(id, code, name_ar)
 values ('81000000-0000-4000-8000-000000000001', 'billing-test', 'مسار الفوترة');
-insert into public.students(id, full_name, gender, country_code)
-values ('82000000-0000-4000-8000-000000000001', 'طالب الفوترة', 'male', 'EG');
+insert into public.students(id, student_no, full_name, gender, country_code)
+values ('82000000-0000-4000-8000-000000000001', 'NW-BILLING-001', 'طالب الفوترة', 'male', 'EG');
 insert into public.packages(id, slug, track_id, name_ar, sessions_per_week, created_by)
 values (
   '83000000-0000-4000-8000-000000000001', 'billing-monthly',
@@ -39,7 +39,7 @@ select is((select count(*)::integer from public.invoices), 1, 'subscription crea
 select is((select status::text from public.invoices limit 1), 'issued', 'subscription invoice is issued');
 select is((select total from public.invoices limit 1), 900.00::numeric, 'invoice total comes from fixed subscription price');
 select is((select due from public.invoice_balance limit 1), 900.00::numeric, 'initial invoice balance is fully due');
-select like((select invoice_no from public.invoices limit 1), 'INV-2026-%', 'invoice has a numbered identifier');
+select matches((select invoice_no from public.invoices limit 1), '^INV-2026-', 'invoice has a numbered identifier');
 
 select throws_ok(
   $$update public.invoice_items set unit_amount = 901$$,
@@ -61,14 +61,18 @@ where id = '84000000-0000-4000-8000-000000000001';
 select is((select status::text from public.invoices limit 1), 'partially_paid', 'partial payment marks invoice partially paid');
 select is((select paid from public.invoice_balance limit 1), 400.00::numeric, 'confirmed partial payment updates balance');
 select is((select count(*)::integer from public.session_credit_ledger), 0, 'partial payment does not grant credits');
-select like((select receipt_no from public.payments where id = '84000000-0000-4000-8000-000000000001'), 'REC-2026-%', 'confirmed payment gets a receipt number');
+select matches(
+  (select receipt_no from public.payments where id = '84000000-0000-4000-8000-000000000001'),
+  '^REC-2026-',
+  'confirmed payment gets a receipt number'
+);
 select throws_ok(
   $$update public.payments set amount = 401 where id = '84000000-0000-4000-8000-000000000001'$$,
   'P0001', 'payment_immutable', 'confirmed payment cannot be edited'
 );
 select throws_ok(
   $$delete from public.payments where id = '84000000-0000-4000-8000-000000000001'$$,
-  'P0001', 'payment_immutable', 'payments cannot be deleted'
+  '42501', null, 'application roles cannot delete payments'
 );
 
 insert into public.payments(id, invoice_id, amount, currency, recorded_by)
@@ -104,6 +108,11 @@ select is((select status::text from public.invoices limit 1), 'partially_paid', 
 select is((select paid from public.invoice_balance limit 1), 800.00::numeric, 'refund reduces net paid amount');
 select is((select count(*)::integer from public.session_credit_ledger where reason = 'grant'), 1, 'refund does not duplicate the original grant');
 reset role;
+
+select throws_ok(
+  $$delete from public.payments where id = '84000000-0000-4000-8000-000000000001'$$,
+  'P0001', 'payment_immutable', 'confirmed payments remain immutable for privileged callers'
+);
 
 select set_config(
   'request.jwt.claims',

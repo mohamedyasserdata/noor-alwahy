@@ -8,12 +8,19 @@ select has_function('public', 'generate_teacher_payouts', array['date', 'date'],
 select has_function('public', 'add_teacher_adjustment', array['uuid', 'text', 'numeric', 'text'], 'adjustment RPC exists');
 select has_function('public', 'transition_teacher_payout', array['uuid', 'text', 'text'], 'payout transition RPC exists');
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
-set local role authenticated;
-insert into public.teachers(id, profile_id, gender, status)
-values ('91000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active');
+insert into public.teachers(
+  id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at
+)
+values (
+  '91000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000002',
+  'male', 'active', now(), now()
+);
 insert into public.teacher_payouts(id, teacher_id, period_start, period_end, currency, status)
 values ('92000000-0000-4000-8000-000000000001', '91000000-0000-4000-8000-000000000001', '2026-09-01', '2026-09-30', 'USD', 'due');
+
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+set local role authenticated;
 select lives_ok($$select public.add_teacher_adjustment('92000000-0000-4000-8000-000000000001', 'bonus', 100, 'مكافأة اختبار')$$, 'admin adds a bonus before approval');
 select is((select net from public.teacher_payouts where id = '92000000-0000-4000-8000-000000000001'), 100.00::numeric, 'adjustment recalculates net pay');
 select lives_ok($$select public.transition_teacher_payout('92000000-0000-4000-8000-000000000001', 'approve', null)$$, 'due payout can be approved');
