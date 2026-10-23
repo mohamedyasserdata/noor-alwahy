@@ -14,13 +14,13 @@ export async function POST(request: Request) {
   const parsed = applicationStatusLookupSchema.safeParse(input);
   if (!parsed.success) return Response.json({ error: "not_found" }, { status: 404 });
   const admin = createAdminClient();
-  const { data } = await admin
-    .from("applications")
-    .select("status,updated_at")
-    .eq("order_no", parsed.data.order_no)
-    .eq("lookup_hash", applicationHash(parsed.data.identifier))
+  const { data, error } = await admin
+    .rpc("lookup_application_status", {
+      p_order_no: parsed.data.order_no,
+      p_lookup_hash: applicationHash(parsed.data.identifier),
+    })
     .maybeSingle();
-  if (!data) return Response.json({ error: "not_found" }, { status: 404 });
+  if (error || !data) return Response.json({ error: "not_found" }, { status: 404 });
   return Response.json(
     { status: data.status, updated_at: data.updated_at },
     { headers: { "Cache-Control": "private, no-store, max-age=0" } },

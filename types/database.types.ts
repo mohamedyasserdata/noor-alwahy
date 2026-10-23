@@ -2743,6 +2743,13 @@ export type Database = {
         }[];
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      lookup_application_status: {
+        Args: { p_lookup_hash: string; p_order_no: string };
+        Returns: {
+          status: Database["public"]["Enums"]["application_status"];
+          updated_at: string;
+        }[];
+      };
       manage_teacher_assignment: {
         Args: {
           p_action?: string;

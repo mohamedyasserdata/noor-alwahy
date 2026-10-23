@@ -17,13 +17,13 @@ test("P6 administrator creates, previews, exports, and atomically reimports a pa
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();
-  await page.getByLabel("Price").fill("45");
+  await page.getByLabel("Price", { exact: true }).fill("45");
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByRole("button", { name: "Add feature" }).click();
   await page.getByLabel("Arabic feature").fill("تقارير أسبوعية");
   await page.getByLabel("English feature").fill("Weekly reports");
   await page.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(page.getByText("Complete foundation", { exact: true })).toBeVisible();
+  await expect(page.getByText("باقة التأسيس الشاملة", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await page.getByLabel("Publish immediately after saving").check();
   await page.getByRole("button", { name: "Save package" }).click();

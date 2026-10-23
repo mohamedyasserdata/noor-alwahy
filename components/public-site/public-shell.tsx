@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { BrandMark } from "@/components/brand/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
@@ -22,7 +23,7 @@ const navigation = [
 ] as const;
 
 function LanguageFallback() {
-  return <span className="block size-11 rounded-lg border bg-card" aria-hidden="true" />;
+  return <span className="block size-11 rounded-full border bg-card" aria-hidden="true" />;
 }
 
 export async function PublicShell({ children, locale }: PublicShellProps) {
@@ -52,8 +53,14 @@ export async function PublicShell({ children, locale }: PublicShellProps) {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle
+              compact
+              enableDarkLabel={t("theme.enableDark")}
+              enableLightLabel={t("theme.enableLight")}
+              className="rounded-full"
+            />
             <Suspense fallback={<LanguageFallback />}>
-              <LocaleSwitcher />
+              <LocaleSwitcher compact />
             </Suspense>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link href="/auth/login">
