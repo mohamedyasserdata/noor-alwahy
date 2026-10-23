@@ -36,7 +36,7 @@ test("US-150/151 notification bell refreshes through Realtime and saves preferen
     });
     if (insertError) throw insertError;
 
-    const notification = page.getByRole("button", { name: /A session time has changed/ });
+    const notification = page.getByRole("link", { name: /A session time has changed/ });
     await expect(notification).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText("1 unread notification")).toBeVisible();
     await notification.click();

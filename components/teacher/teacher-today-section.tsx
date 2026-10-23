@@ -288,7 +288,7 @@ function OverviewCard({
     </>
   );
   const className =
-    "flex min-h-32 gap-3 rounded-2xl border bg-card p-4 transition hover:border-secondary/60";
+    "flex min-h-32 min-w-0 max-w-full gap-3 overflow-hidden rounded-2xl border bg-card p-4 transition hover:border-secondary/60";
   return href ? (
     <Link href={href} className={className}>
       {content}

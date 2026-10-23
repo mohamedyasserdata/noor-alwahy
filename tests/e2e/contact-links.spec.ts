@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import { signInAs } from "./helpers/auth";
 
@@ -6,7 +7,7 @@ test("US-153 admin manages audited official links visible to students and parent
   page,
 }, testInfo) => {
   test.setTimeout(90_000);
-  const suffix = testInfo.retry + 1;
+  const suffix = `${testInfo.retry + 1}-${randomUUID().slice(0, 8)}`;
   const labelAr = `دعم الأكاديمية ${suffix}`;
   const labelEn = `Academy support ${suffix}`;
   const destination = `https://example.com/noor-support-${suffix}`;
@@ -37,7 +38,7 @@ test("US-153 admin manages audited official links visible to students and parent
   const studentLink = page.getByRole("link", { name: new RegExp(labelEn) });
   await expect(studentLink).toHaveAttribute("href", destination);
   await expect(studentLink).toHaveAttribute("target", "_blank");
-  await expect(page.getByTestId("portal-navigation-bottom").getByRole("link")).toHaveCount(5);
+  await expect(page.getByTestId("portal-navigation-bottom").getByRole("link")).toHaveCount(6);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
 
   await signInAs(page, "ar", "parent");

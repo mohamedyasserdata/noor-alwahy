@@ -20,7 +20,9 @@ export async function StudentPlanCard({
     return (
       <Card className="mt-8 border-dashed shadow-none">
         <CardHeader>
-          <CardTitle>{t("student.emptyTitle")}</CardTitle>
+          <h2 className="text-lg font-extrabold tracking-tight text-primary">
+            {t("student.emptyTitle")}
+          </h2>
           <CardDescription>{t("student.emptyDescription")}</CardDescription>
         </CardHeader>
       </Card>

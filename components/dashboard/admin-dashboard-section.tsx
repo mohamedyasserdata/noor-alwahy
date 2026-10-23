@@ -54,13 +54,13 @@ export async function AdminDashboardSection({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{t("period", { from, to })}</Badge>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="min-h-11">
             <a href={`/api/admin/dashboard/export?${exportParams.toString()}&format=pdf`} download>
               <FileDown aria-hidden="true" />
               {t("exports.pdf")}
             </a>
           </Button>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="min-h-11">
             <a href={`/api/admin/dashboard/export?${exportParams.toString()}&format=xlsx`} download>
               <FileDown aria-hidden="true" />
               {t("exports.xlsx")}

@@ -33,7 +33,7 @@ export function QuranMap({
   const t = useTranslations("quranMap");
   const supabase = useMemo(() => createClient(), []);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const [columns, setColumns] = useState(6);
+  const [columns, setColumns] = useState(5);
   const [scrollTop, setScrollTop] = useState(0);
   const [selectedPage, setSelectedPage] = useState(1);
   const [pendingFocus, setPendingFocus] = useState<number | null>(null);
@@ -75,7 +75,7 @@ export function QuranMap({
     if (!viewport) return;
     const observer = new ResizeObserver(([entry]) => {
       if (!entry) return;
-      const next = Math.max(6, Math.min(14, Math.floor((entry.contentRect.width - 16) / 48)));
+      const next = Math.max(5, Math.min(14, Math.floor((entry.contentRect.width - 16) / 50)));
       setColumns(next);
     });
     observer.observe(viewport);

@@ -16,7 +16,7 @@ test("US-040 public applicant submits and checks status with a second identifier
   await page.getByLabel("Guardian name (required under age 18)").fill("Public Test Guardian");
   await page.getByLabel("Email address").fill(contactEmail);
   await page.getByLabel("Preferred times").fill("Sunday 18:00");
-  await page.getByLabel(/I agree/).check();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Submit application" }).click();
   await expect(page.getByText("Your application was received")).toBeVisible();
   const order = await page.locator("p[dir=ltr]").textContent();

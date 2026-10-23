@@ -6,7 +6,7 @@ const portals = [
   {
     id: "admin",
     section: "dashboard",
-    title: { ar: "نظرة الإدارة الشاملة", en: "Academy overview" },
+    title: { ar: "نظرة شاملة على الأكاديمية", en: "A complete academy overview" },
   },
   {
     id: "teacher",
@@ -131,9 +131,25 @@ async function expectNoHorizontalOverflow(page: Page) {
   const viewport = await page.evaluate(() => ({
     innerWidth: window.innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
+    offenders: Array.from(document.querySelectorAll<HTMLElement>("body *"))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          testId: element.dataset.testid ?? "",
+          text: element.textContent?.trim().slice(0, 48) ?? "",
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        };
+      })
+      .filter(({ left, right, width }) => width > 0 && (left < -1 || right > window.innerWidth + 1))
+      .slice(0, 8),
   }));
 
-  expect(viewport.scrollWidth).toBe(viewport.innerWidth);
+  expect(viewport, `Horizontal overflow: ${JSON.stringify(viewport.offenders)}`).toMatchObject({
+    scrollWidth: viewport.innerWidth,
+  });
 }
 
 async function expectTouchTargets(page: Page) {

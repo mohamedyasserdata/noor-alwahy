@@ -117,7 +117,7 @@ export async function SessionEvaluationsSection({
           ) : (
             <>
               <div className="mb-7 border-b pb-5">
-                <p className="text-sm font-bold text-secondary">{t("evaluating")}</p>
+                <p className="text-sm font-bold text-primary">{t("evaluating")}</p>
                 <h2 className="mt-1 text-2xl font-black text-primary">{selected.studentName}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {formatter.format(new Date(selected.scheduledAt))}
