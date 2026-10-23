@@ -138,12 +138,15 @@ async function expectNoHorizontalOverflow(page: Page) {
           tag: element.tagName.toLowerCase(),
           testId: element.dataset.testid ?? "",
           text: element.textContent?.trim().slice(0, 48) ?? "",
-          left: Math.round(rect.left),
-          right: Math.round(rect.right),
+          horizontalStart: Math.round(rect.x),
+          horizontalEnd: Math.round(rect.x + rect.width),
           width: Math.round(rect.width),
         };
       })
-      .filter(({ left, right, width }) => width > 0 && (left < -1 || right > window.innerWidth + 1))
+      .filter(
+        ({ horizontalStart, horizontalEnd, width }) =>
+          width > 0 && (horizontalStart < -1 || horizontalEnd > window.innerWidth + 1),
+      )
       .slice(0, 8),
   }));
 
