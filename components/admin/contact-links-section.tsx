@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { AuthNotice } from "@/components/auth/auth-notice";
+import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,6 +106,9 @@ export async function ContactLinksAdminSection({
                   className="rounded-2xl border bg-background/55 p-4 sm:p-5"
                 >
                   <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <span className="grid size-10 place-items-center rounded-xl bg-primary text-secondary [&_svg]:size-4">
+                      <ContactChannelIcon type={link.type} />
+                    </span>
                     <p className="font-black text-primary">{link.labelAr}</p>
                     <Badge variant={link.isVisible ? "success" : "outline"}>
                       {link.isVisible ? t("visibility.visible") : t("visibility.hidden")}

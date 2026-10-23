@@ -12,9 +12,13 @@ export const publicApplicationSchema = z
       .optional()
       .default(""),
     contact_phone: z
-      .string()
-      .trim()
-      .regex(/^\+?[0-9 ()-]{7,30}$/)
+      .union([
+        z
+          .string()
+          .trim()
+          .regex(/^\+?[0-9 ()-]{7,30}$/),
+        z.literal(""),
+      ])
       .optional()
       .default(""),
     country_code: z

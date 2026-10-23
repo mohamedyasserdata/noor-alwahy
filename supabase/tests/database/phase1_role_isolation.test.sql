@@ -181,8 +181,8 @@ select is(
 );
 
 -- R-22: every application SECURITY DEFINER function must pin its resolution
--- context. The sole anonymous exception is the opaque, revocable calendar-feed
--- capability introduced by P3-T08 and tested exhaustively in its own suite.
+-- context. Anonymous exceptions are explicit reviewed read-only capabilities
+-- tested exhaustively in their own suites.
 select is(
   (
     select count(*)::integer
@@ -205,9 +205,11 @@ select is(
       and function.prosecdef
       and has_function_privilege('anon', function.oid, 'EXECUTE')
       and function.oid <> 'public.get_calendar_feed(text)'::regprocedure
+      and function.oid <> 'public.resolve_price(uuid,character,timestamp with time zone)'::regprocedure
+      and function.oid <> 'public.get_public_package_catalog(character,timestamp with time zone)'::regprocedure
   ),
   0,
-  'R-22: anonymous callers reach only the reviewed calendar capability'
+  'R-22: anonymous callers reach only reviewed read-only capabilities'
 );
 
 select is(
@@ -234,7 +236,7 @@ select is(
       and function.prorettype <> 'pg_catalog.trigger'::regtype
       and has_function_privilege('authenticated', function.oid, 'EXECUTE')
   ),
-  array['accept_teacher_code_of_conduct', 'assign_session_substitute', 'auth_role', 'confirm_student_import', 'create_makeup_session', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reschedule_session', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'set_account_active', 'suggest_teachers', 'update_evaluation_settings', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
+  array['accept_teacher_code_of_conduct', 'assign_session_substitute', 'auth_role', 'clone_package', 'confirm_package_import', 'confirm_student_import', 'convert_application_to_student', 'create_makeup_session', 'get_attendance_report', 'get_calendar_feed', 'get_my_calendar_feed', 'get_public_package_catalog', 'get_session_join', 'get_shared_student_notes', 'get_student_private_notes', 'get_visible_schedule', 'is_admin', 'manage_teacher_assignment', 'record_attendance', 'record_student_export', 'remove_student_guardian', 'reorder_packages', 'reschedule_session', 'resolve_price', 'revoke_calendar_feed_token', 'rotate_calendar_feed_token', 'save_package', 'set_account_active', 'suggest_teachers', 'update_evaluation_settings', 'upsert_student', 'upsert_student_guardian', 'upsert_teacher']::name[],
   'R-22: authenticated callers reach only the guarded SECURITY DEFINER API'
 );
 

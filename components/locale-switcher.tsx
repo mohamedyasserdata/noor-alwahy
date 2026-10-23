@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-export function LocaleSwitcher() {
+type LocaleSwitcherProps = {
+  compact?: boolean;
+};
+
+export function LocaleSwitcher({ compact = false }: LocaleSwitcherProps) {
   const locale = useLocale();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -21,6 +25,28 @@ export function LocaleSwitcher() {
     }),
   );
   const href = searchParams.size > 0 ? { pathname, query } : pathname;
+  const alternateLocale =
+    routing.locales.find((option) => option !== locale) ?? routing.defaultLocale;
+
+  if (compact) {
+    return (
+      <nav className="flex" aria-label={t("label")}>
+        <Button asChild variant="outline" size="icon" className="rounded-full">
+          <Link
+            href={href}
+            locale={alternateLocale}
+            prefetch={false}
+            aria-label={t("switchTo", { language: t(alternateLocale) })}
+            title={t("switchTo", { language: t(alternateLocale) })}
+            lang={alternateLocale}
+            dir={alternateLocale === "ar" ? "rtl" : "ltr"}
+          >
+            <Languages aria-hidden="true" />
+          </Link>
+        </Button>
+      </nav>
+    );
+  }
 
   return (
     <nav

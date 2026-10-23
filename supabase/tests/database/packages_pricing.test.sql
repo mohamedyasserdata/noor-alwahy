@@ -122,16 +122,16 @@ select lives_ok(
 select throws_ok(
   $$update public.package_prices set amount = 501
     where package_id = '62000000-0000-4000-8000-000000000001' and country_code = 'EG'$$,
-  'P0001',
-  'package_price_immutable',
-  'existing price rows cannot be updated'
+  '42501',
+  null,
+  'existing price rows cannot be updated through grants'
 );
 select throws_ok(
   $$delete from public.package_prices
     where package_id = '62000000-0000-4000-8000-000000000001' and country_code = 'EG'$$,
-  'P0001',
-  'package_price_immutable',
-  'existing price rows cannot be deleted'
+  '42501',
+  null,
+  'existing price rows cannot be deleted through grants'
 );
 select lives_ok(
   $$insert into public.coupons(code, kind, value, starts_at, ends_at, max_redemptions, created_by)
@@ -191,7 +191,12 @@ select is(
   50.00::numeric,
   'unknown country falls back to ZZ'
 );
-select is((select count(*)::integer from public.coupons), 0, 'anonymous visitor cannot enumerate coupons');
+select throws_ok(
+  $$select count(*) from public.coupons$$,
+  '42501',
+  null,
+  'anonymous visitor cannot enumerate coupons'
+);
 reset role;
 
 select set_config(

@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { PackageWizard } from "@/components/packages/package-wizard";
 import { routing } from "@/i18n/routing";
@@ -13,12 +14,32 @@ type Props = {
 };
 
 export default async function PackageWizardPage({ params, searchParams }: Props) {
-  const [{ locale }, query, data] = await Promise.all([
-    params,
-    searchParams,
-    getPackageAdminData(),
-  ]);
+  const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
+
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-96 animate-pulse rounded-3xl border bg-card shadow-soft motion-reduce:animate-none"
+          role="status"
+          aria-label={locale === "ar" ? "جارٍ تجهيز معالج الباقات" : "Preparing package wizard"}
+        />
+      }
+    >
+      <PackageWizardContent locale={locale} searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function PackageWizardContent({
+  locale,
+  searchParams,
+}: {
+  locale: "ar" | "en";
+  searchParams: Props["searchParams"];
+}) {
+  const [query, data] = await Promise.all([searchParams, getPackageAdminData()]);
 
   const validFrom = DateTime.utc().toISO();
   if (!validFrom) throw new Error("package_management_unavailable");

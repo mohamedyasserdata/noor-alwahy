@@ -8,7 +8,7 @@ const valid = {
   student_gender: "male",
   student_age: 12,
   guardian_name: "Test Guardian",
-  contact_email: "family@example.test",
+  contact_email: "family@example.com",
   contact_phone: "",
   country_code: "EG",
   timezone: "Africa/Cairo",

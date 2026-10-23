@@ -1,6 +1,7 @@
-import { ExternalLink, Mail, MessageCircle, Phone, Radio } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
@@ -8,13 +9,6 @@ import { getPublicAppSettings } from "@/lib/settings/public-settings";
 type ContactLinksSectionProps = {
   locale: AppLocale;
 };
-
-function ContactIcon({ type }: { type: string }) {
-  if (type === "phone") return <Phone aria-hidden="true" />;
-  if (type === "email") return <Mail aria-hidden="true" />;
-  if (type === "whatsapp" || type === "telegram") return <MessageCircle aria-hidden="true" />;
-  return <Radio aria-hidden="true" />;
-}
 
 function localizedLabel(link: ContactLink, locale: AppLocale) {
   return locale === "en" && link.labelEn ? link.labelEn : link.labelAr;
@@ -45,7 +39,16 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
 
       {links.length === 0 ? (
         <div className="mt-8 rounded-3xl border border-dashed bg-card p-8 text-center shadow-card">
-          <MessageCircle className="mx-auto size-9 text-secondary" aria-hidden="true" />
+          <div
+            className="mx-auto flex w-fit items-center gap-2 rounded-full border border-secondary/25 bg-secondary/10 p-2 text-secondary [&_span]:grid [&_span]:size-10 [&_span]:place-items-center [&_span]:rounded-full [&_span]:bg-card [&_span]:shadow-card [&_svg]:size-5"
+            aria-hidden="true"
+          >
+            {(["whatsapp", "phone", "email", "telegram"] as const).map((type) => (
+              <span key={type}>
+                <ContactChannelIcon type={type} />
+              </span>
+            ))}
+          </div>
           <h2 className="mt-4 text-xl font-black text-primary">{t("empty.title")}</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("empty.description")}</p>
         </div>
@@ -63,7 +66,7 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
                   rel={external ? "noopener noreferrer" : undefined}
                 >
                   <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-secondary [&_svg]:size-5">
-                    <ContactIcon type={link.type} />
+                    <ContactChannelIcon type={link.type} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-black text-primary">

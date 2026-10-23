@@ -1,0 +1,12 @@
+title = "Noor Al-Wahy Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Historical session-join test route false positive"
+condition = "AND"
+commits = ["158a91aab52ce09f633b350c6f7a697723d9f80f"]
+paths = ['''^tests/e2e/session-join\.spec\.ts$''']
+regexTarget = "line"
+regexes = ['''await signIn\(page, "[a-z]{2}", fixture\.parentEmail, fixture\.password, "[a-z]{6}/[a-z]{8}"\);''']
