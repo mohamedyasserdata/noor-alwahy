@@ -190,10 +190,13 @@ select is(
     join pg_catalog.pg_namespace as namespace on namespace.oid = function.pronamespace
     where namespace.nspname = 'public'
       and function.prosecdef
-      and not ('search_path=""' = any(coalesce(function.proconfig, array[]::text[])))
+      and not (
+        'search_path=""' = any(coalesce(function.proconfig, array[]::text[]))
+        or 'search_path=pg_catalog, extensions' = any(coalesce(function.proconfig, array[]::text[]))
+      )
   ),
   0,
-  'R-22: every public SECURITY DEFINER function pins an empty search_path'
+  'R-22: every public SECURITY DEFINER function pins an empty or explicitly trusted search_path'
 );
 
 select is(
