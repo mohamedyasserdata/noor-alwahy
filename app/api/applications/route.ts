@@ -6,6 +6,7 @@ import {
   verifyApplicationCaptcha,
 } from "@/lib/applications/security";
 import { publicApplicationSchema } from "@/lib/validators/applications";
+import { legalDocumentVersion } from "@/lib/legal/documents";
 
 export async function POST(request: Request) {
   if (!request.headers.get("content-type")?.toLowerCase().includes("application/json"))
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     ...parsed.data,
     captcha_token: undefined,
     consent: undefined,
-    consent_version: "2026-10-21",
+    consent_version: legalDocumentVersion,
   };
   const admin = createAdminClient();
   const { data, error } = await admin.rpc("submit_application", {

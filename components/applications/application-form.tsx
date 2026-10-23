@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
+import { legalDocumentVersion } from "@/lib/legal/documents";
 
 type Option = { id: string; name: string };
 type Country = { code: string; name: string };
@@ -206,7 +207,20 @@ export function ApplicationForm({
         </div>
         <label className="flex items-start gap-3 rounded-xl border bg-background p-4 text-sm leading-7">
           <input name="consent" type="checkbox" required className="mt-1 size-5 accent-primary" />
-          {t("consent")}
+          <span>
+            {t("consentPrefix")}{" "}
+            <Link href="/privacy" className="font-bold underline">
+              {t("privacyPolicy")}
+            </Link>{" "}
+            {t("and")}{" "}
+            <Link href="/terms" className="font-bold underline">
+              {t("terms")}
+            </Link>
+            . {t("consentSuffix")}
+            <span className="mt-1 block text-xs text-muted-foreground">
+              {t("consentVersion", { version: legalDocumentVersion })}
+            </span>
+          </span>
         </label>
         {error ? (
           <p role="alert" className="font-bold text-destructive">

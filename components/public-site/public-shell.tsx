@@ -22,6 +22,11 @@ const navigation = [
   { href: "/contact", key: "contact" },
 ] as const;
 
+const legalNavigation = [
+  { href: "/privacy", key: "privacy" },
+  { href: "/terms", key: "terms" },
+] as const;
+
 function LanguageFallback() {
   return <span className="block size-11 rounded-full border bg-card" aria-hidden="true" />;
 }
@@ -118,6 +123,15 @@ export async function PublicShell({ children, locale }: PublicShellProps) {
             aria-label={t("footerLabel")}
           >
             {navigation.slice(1).map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="min-h-11 content-center rounded-md text-primary-foreground/80 underline-offset-4 hover:text-secondary hover:underline focus-visible:ring-2 focus-visible:ring-secondary focus-visible:outline-none"
+              >
+                {t(`navigation.${item.key}`)}
+              </Link>
+            ))}
+            {legalNavigation.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}

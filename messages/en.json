@@ -1466,6 +1466,12 @@
     "timesPlaceholder": "Example: Sunday 6 PM, Tuesday 7 PM",
     "notes": "Additional notes",
     "consent": "I agree that these details may be used to review and contact me about this application under the privacy policy.",
+    "consentPrefix": "I confirm that I have read and agree to the",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "terms": "Terms of Use",
+    "consentSuffix": "and, where applicable, I consent as guardian to processing the minor’s data.",
+    "consentVersion": "Consent version: {version}",
     "submit": "Submit application",
     "submitting": "Submitting…",
     "successTitle": "Your application was received",
@@ -1522,7 +1528,9 @@
         "tracks": "Learning tracks",
         "packages": "Packages & prices",
         "faq": "Questions",
-        "contact": "Contact"
+        "contact": "Contact",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Use"
       },
       "footerLabel": "Site links",
       "footerDescription": "One-to-one Quran learning with a clear plan, a steady schedule, and follow-up that respects every family’s privacy."
@@ -2720,6 +2728,96 @@
       "payment_overdue": { "a": "Days overdue", "b": "" },
       "report_pending": { "a": "Days pending", "b": "" },
       "credit_exhausted": { "a": "Maximum remaining credit", "b": "" }
+    }
+  },
+  "legal": {
+    "privacy": {
+      "eyebrow": "Privacy & family protection",
+      "title": "Privacy Policy",
+      "summary": "This policy explains the data the academy needs to provide its services and how it protects and limits its use.",
+      "draftTitle": "Draft for legal review.",
+      "draftDescription": "This text is not final for launch until approved by management and legal counsel for the students’ jurisdictions.",
+      "version": "Version: {version}",
+      "sections": {
+        "collection": {
+          "title": "Data we collect",
+          "body": "Student, guardian, contact, country, time zone, track, and availability details, followed by the lesson, attendance, evaluation, progress, and billing records required to provide the service."
+        },
+        "purpose": {
+          "title": "How data is used",
+          "body": "We use data to review applications, assign teachers, schedule lessons, track learning, issue reports and invoices, secure accounts, and meet legal obligations."
+        },
+        "sharing": {
+          "title": "Sharing",
+          "body": "We do not sell data. We share the minimum necessary with infrastructure and email providers under appropriate controls. Teachers and families do not receive each other’s private contact details."
+        },
+        "children": {
+          "title": "Children’s data",
+          "body": "Applications for students under 18 require a guardian name and consent. Child data is limited to authorized roles, with no public rankings or external behavioral analytics."
+        },
+        "retention": {
+          "title": "Retention & deletion",
+          "body": "Records are retained for educational, financial, and legal needs, then deleted or de-identified under a retention schedule approved for the applicable jurisdiction."
+        },
+        "rights": {
+          "title": "Your rights",
+          "body": "You may request access, correction, restriction, or deletion where law permits. Financial and audit records may be retained when legally required."
+        },
+        "security": {
+          "title": "Security",
+          "body": "Controls include role-based access, administrator MFA, transport encryption, audit trails, and encrypted backups. No digital system can eliminate every risk."
+        },
+        "contact": {
+          "title": "Contact & requests",
+          "body": "Use the official contact page for privacy questions and rights requests. The final version will identify the responsible entity, address, and statutory response period."
+        }
+      }
+    },
+    "terms": {
+      "eyebrow": "Service agreement",
+      "title": "Terms of Use",
+      "summary": "These terms govern use of the academy portals, lessons, plans, reports, and payments.",
+      "draftTitle": "Draft for legal review.",
+      "draftDescription": "Final provisions, governing law, and refund policy require management and legal approval.",
+      "version": "Version: {version}",
+      "sections": {
+        "service": {
+          "title": "The service",
+          "body": "The academy provides one-to-one remote learning under the selected track, package, and schedule. Outcomes depend on level and participation and are not guaranteed."
+        },
+        "accounts": {
+          "title": "Accounts",
+          "body": "Users must provide accurate information, protect passwords and authentication codes, and promptly report suspected unauthorized access."
+        },
+        "lessons": {
+          "title": "Lessons & attendance",
+          "body": "Lesson duration, cancellation notice, makeup, and absence rules follow the package policy snapshot accepted at subscription, with administrative exceptions audited."
+        },
+        "payments": {
+          "title": "Fees & payments",
+          "body": "Prices appear in the selected country’s currency. Subscription and invoice values are snapshotted when issued. Refunds follow the package policy and applicable law."
+        },
+        "conduct": {
+          "title": "Acceptable conduct",
+          "body": "Users must not misuse the service, share lesson links or accounts, bypass access controls, or harm teachers, students, or the platform."
+        },
+        "content": {
+          "title": "Content & materials",
+          "body": "Educational materials and academy branding remain with their owners. Quran dataset records are internal progress references, and verse text is not displayed by the product."
+        },
+        "termination": {
+          "title": "Suspension & termination",
+          "body": "Accounts may be suspended to protect users, for material breach, or non-payment, subject to required notice and financial or statutory rights."
+        },
+        "liability": {
+          "title": "Liability",
+          "body": "Limitations apply only to the extent permitted by law and never exclude liability that cannot legally be excluded. Final wording depends on the service jurisdictions."
+        },
+        "changes": {
+          "title": "Changes",
+          "body": "Each version and date is recorded. Fresh consent is requested before continued use when a material change requires it."
+        }
+      }
     }
   },
   "accessibility": {
