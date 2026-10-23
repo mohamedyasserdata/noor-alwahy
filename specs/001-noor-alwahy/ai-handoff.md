@@ -19,7 +19,7 @@ NON-NEGOTIABLE RULES (violating any = task rejected):
   confirmed payments are immutable; prices are snapshotted into subscriptions/invoices.
 - Time: timestamptz (UTC) + IANA timezones; one time library; no ad-hoc Date math.
 - i18n: no hard-coded UI strings; use logical CSS properties only (ms-/me-/ps-/pe-/start/end).
-- Quran text is NEVER typed or generated: only imported from the vetted dataset. Never output Quranic text.
+- Quran text is NEVER typed or generated and is never displayed in product UI, reports, PDFs, notifications, or user-facing APIs. Imported data is internal-only for memorization, evaluation, and progress; expose identifiers and surah/ayah/page/juz metadata only.
 - service_role key only in lib/supabase/admin.ts (server-only). Validate input with Zod. Use getUser() not getSession() server-side.
 - Schema changes only via migrations. Every new table ships with RLS + policies + pgTAP tests.
 

@@ -449,6 +449,10 @@ create table quran_ayahs (
   text_uthmani text not null,
   unique (surah_id, ayah_no)
 );
+
+> حقل نص الآية مرجع داخلي مستورد وثابت للتحقق من سلامة مجموعة البيانات فقط. لا يدخل في
+> DTO أو View أو RPC أو تقرير/PDF موجه للمستخدم؛ وظائف الحفظ والتقييم والتقدم تعتمد المعرفات
+> وأرقام السورة/الآية والصفحة والجزء.
 create table quran_pages (page smallint primary key, juz smallint not null,
   first_ayah_id int not null references quran_ayahs(id), last_ayah_id int not null references quran_ayahs(id),
   lines_count smallint);                            -- اختياري، يحتاج مصدراً إضافياً (G-09)
