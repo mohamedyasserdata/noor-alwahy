@@ -21,6 +21,7 @@ export const portalConfig = {
       "certificates",
       "reports",
       "announcements",
+      "templates",
       "users",
       "audit",
       "settings",

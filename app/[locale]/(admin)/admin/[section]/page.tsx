@@ -16,6 +16,7 @@ import { AttendanceReportSection } from "@/components/attendance/attendance-repo
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
 import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
 import { CertificateAdminSection } from "@/components/certificates/certificate-admin-section";
+import { ContentTemplateAdmin } from "@/components/content-templates/content-template-admin";
 import { AdminControlCenter } from "@/components/control-center/admin-control-center";
 import { AdminDashboardSection } from "@/components/dashboard/admin-dashboard-section";
 import { PackageAdminSection } from "@/components/packages/package-admin-section";
@@ -113,6 +114,10 @@ export default async function AdminSectionPage({
 
   if (section === "announcements") {
     return <AnnouncementAdminSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "templates") {
+    return <ContentTemplateAdmin locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "settings") {

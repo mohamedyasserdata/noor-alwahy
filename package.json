@@ -21,6 +21,7 @@
     "format:check": "prettier --check .",
     "check:logical-css": "node scripts/check-logical-css.mjs",
     "check:no-messaging": "node scripts/check-no-messaging-routes.mjs",
+    "check:no-ai": "node scripts/check-no-ai.mjs",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "db:reset": "supabase db reset --local",

@@ -33,6 +33,8 @@ const copy = {
     improve: "ما يحتاج إلى تحسين",
     plan: "خطة الفترة القادمة",
     recommendation: "توصية للطالب وولي الأمر",
+    template: "قالب التقرير المعتمد",
+    noTemplate: "بدون قالب",
     save: "حفظ المسودة",
     saving: "جارٍ الحفظ…",
     approve: "اعتماد التقرير",
@@ -75,6 +77,8 @@ const copy = {
     improve: "Areas to improve",
     plan: "Next-period plan",
     recommendation: "Recommendation for student and guardian",
+    template: "Approved report template",
+    noTemplate: "No template",
     save: "Save draft",
     saving: "Saving…",
     approve: "Approve report",
@@ -149,7 +153,7 @@ export async function TeacherReportsSection({
           <FilePenLine className="size-8 text-secondary" aria-hidden="true" />
           <h2 className="mt-5 text-2xl font-black">{t.newTitle}</h2>
           <p className="mt-2 text-sm leading-7 text-primary-foreground/75">{t.newHint}</p>
-          <ReportForm locale={locale} students={data.students} t={t} />
+          <ReportForm locale={locale} students={data.students} templates={data.templates} t={t} />
         </aside>
 
         <div>
@@ -216,7 +220,13 @@ export async function TeacherReportsSection({
                   </div>
                   {report.status === "draft" ? (
                     <div className="p-5 sm:p-6">
-                      <ReportForm locale={locale} students={data.students} t={t} report={report} />
+                      <ReportForm
+                        locale={locale}
+                        students={data.students}
+                        templates={data.templates}
+                        t={t}
+                        report={report}
+                      />
                       <form
                         action={approveReportAction.bind(null, locale)}
                         className="mt-5 flex justify-end border-t pt-5"
@@ -249,11 +259,13 @@ type Report = Awaited<ReturnType<typeof getTeacherReportsData>>["reports"][numbe
 function ReportForm({
   locale,
   students,
+  templates,
   t,
   report,
 }: {
   locale: AppLocale;
   students: { id: string; name: string }[];
+  templates: Awaited<ReturnType<typeof getTeacherReportsData>>["templates"];
   t: T;
   report?: Report;
 }) {
@@ -263,6 +275,24 @@ function ReportForm({
     <form action={saveReportDraftAction.bind(null, locale)} className="mt-6 grid gap-4">
       {report ? <input type="hidden" name="reportId" value={report.id} /> : null}
       <div className="grid gap-4 sm:grid-cols-2">
+        <Field label={t.template} htmlFor={`template-${report?.id ?? "new"}`}>
+          <select
+            id={`template-${report?.id ?? "new"}`}
+            name="templateVersionId"
+            defaultValue={report?.content_template_version_id ?? ""}
+            className="h-11 w-full rounded-xl border bg-background px-3 text-sm text-foreground"
+          >
+            <option value="">{t.noTemplate}</option>
+            {templates
+              .filter((template) => template.locale === locale)
+              .map((template) => (
+                <option key={template.id} value={template.id}>
+                  {locale === "ar" || !template.nameEn ? template.nameAr : template.nameEn} · v
+                  {template.version}
+                </option>
+              ))}
+          </select>
+        </Field>
         <Field label={t.student} htmlFor={`student-${report?.id ?? "new"}`}>
           <select
             id={`student-${report?.id ?? "new"}`}

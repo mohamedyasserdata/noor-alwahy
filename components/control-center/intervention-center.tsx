@@ -285,6 +285,17 @@ export async function InterventionCenter({
   );
 }
 
+type RuleLabels = {
+  name: string;
+  priority: string;
+  window: string;
+  cooldown: string;
+  thresholdA: string;
+  thresholdB: string;
+  enabled: string;
+  save: string;
+};
+
 function RuleForm({
   locale,
   rule,
@@ -292,7 +303,7 @@ function RuleForm({
 }: {
   locale: AppLocale;
   rule: InterventionRule;
-  labels: Record<string, string>;
+  labels: RuleLabels;
 }) {
   const values = thresholdValues(rule);
   return (

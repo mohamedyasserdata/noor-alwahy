@@ -169,6 +169,11 @@
           "title": "Targeted announcements",
           "description": "Create general or targeted announcements by role, country, level, and track."
         },
+        "templates": {
+          "label": "Templates",
+          "title": "Content template library",
+          "description": "Manage versioned report, administration message, and announcement templates with reviewed publishing."
+        },
         "users": {
           "label": "Accounts",
           "title": "User accounts",

@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, CheckCheck, LoaderCircle, Settings2 } from "lucide-react";
+import type { Route } from "next";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
@@ -261,7 +262,7 @@ function NotificationList({
       {items.map((item) => (
         <li key={item.id}>
           <Link
-            href={item.payload.href ?? "#"}
+            href={(item.payload.href ?? "#") as Route}
             className={cn(
               "flex min-h-16 w-full items-start gap-3 rounded-xl px-3 py-3 text-start transition-colors hover:bg-accent/55 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
               !item.readAt && "bg-secondary/10",

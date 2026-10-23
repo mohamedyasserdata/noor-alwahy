@@ -52,6 +52,7 @@ jobs:
 
       - name: Run static and unit checks
         run: |
+          pnpm check:no-ai
           pnpm typecheck
           pnpm lint
           pnpm format:check
