@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
 import { processNotificationOutbox } from "@/lib/notifications/outbox-worker";
+import { reportJobFailure } from "@/lib/monitoring/job-alert";
 
 export async function POST(request: Request) {
   if (!authorized(request.headers.get("authorization"), process.env.CRON_SECRET)) {
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
     const result = await processNotificationOutbox(25);
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch {
+    await reportJobFailure("notification_outbox", "notification_worker_failed");
     return Response.json({ error: "notification_worker_failed" }, { status: 503 });
   }
 }
