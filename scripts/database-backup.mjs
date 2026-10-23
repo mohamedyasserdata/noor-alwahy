@@ -10,13 +10,26 @@ const mode = process.argv[2];
 const magic = Buffer.from("NOORBACKUP1");
 const tagLength = 16;
 const key = Buffer.from(process.env.BACKUP_ENCRYPTION_KEY ?? "", "base64");
+const postgresToolContainer = process.env.POSTGRES_TOOL_CONTAINER?.trim();
 if (key.length !== 32)
   throw new Error("BACKUP_ENCRYPTION_KEY must be a base64-encoded 32-byte key.");
+if (postgresToolContainer && !/^[A-Za-z0-9][A-Za-z0-9_.-]*$/u.test(postgresToolContainer))
+  throw new Error("POSTGRES_TOOL_CONTAINER has an invalid container name.");
 
 function run(command, args) {
   const result = spawnSync(command, args, { stdio: "inherit", env: process.env });
   if (result.status !== 0)
     throw new Error(`${command} failed with status ${result.status ?? "unknown"}.`);
+}
+
+function containerPath(prefix) {
+  return `/tmp/${prefix}-${process.pid}-${randomBytes(6).toString("hex")}.dump`;
+}
+
+function removeContainerFile(path) {
+  if (postgresToolContainer) {
+    run("docker", ["exec", postgresToolContainer, "rm", "-f", path]);
+  }
 }
 
 async function sha256File(path) {
@@ -36,14 +49,26 @@ if (mode === "create") {
   const plain = join(work, "database.dump");
   const stamp = new Date().toISOString().replaceAll(":", "-");
   const encrypted = resolve(outputDirectory, `noor-alwahy-${stamp}.dump.enc`);
+  const containerPlain = postgresToolContainer ? containerPath("noor-backup") : null;
   try {
-    run("pg_dump", [
+    const dumpArgs = [
       "--format=custom",
       "--no-owner",
       "--no-acl",
+      "--schema=public",
+      "--schema=private",
+      "--schema=auth",
+      "--schema=storage",
+      "--schema=supabase_migrations",
       `--dbname=${databaseUrl}`,
-      `--file=${plain}`,
-    ]);
+      `--file=${containerPlain ?? plain}`,
+    ];
+    if (postgresToolContainer && containerPlain) {
+      run("docker", ["exec", postgresToolContainer, "pg_dump", ...dumpArgs]);
+      run("docker", ["cp", `${postgresToolContainer}:${containerPlain}`, plain]);
+    } else {
+      run("pg_dump", dumpArgs);
+    }
     const iv = randomBytes(12);
     const cipher = createCipheriv("aes-256-gcm", key, iv);
     writeFileSync(encrypted, Buffer.concat([magic, iv]));
@@ -61,6 +86,7 @@ if (mode === "create") {
     );
     process.stdout.write(`Encrypted backup created: ${encrypted}\n`);
   } finally {
+    if (containerPlain) removeContainerFile(containerPlain);
     rmSync(work, { recursive: true, force: true });
   }
 } else if (mode === "restore") {
@@ -74,6 +100,7 @@ if (mode === "create") {
     throw new Error("Refusing to restore into PRODUCTION_DATABASE_URL.");
   const work = mkdtempSync(join(tmpdir(), "noor-restore-"));
   const plain = join(work, "database.dump");
+  const containerPlain = postgresToolContainer ? containerPath("noor-restore") : null;
   try {
     const metadata = await stat(source);
     const header = Buffer.alloc(magic.length + 12);
@@ -91,18 +118,25 @@ if (mode === "create") {
       decipher,
       createWriteStream(plain),
     );
-    run("pg_restore", [
+    const restoreArgs = [
       "--clean",
       "--if-exists",
       "--no-owner",
       "--no-acl",
       `--dbname=${target}`,
-      plain,
-    ]);
+      containerPlain ?? plain,
+    ];
+    if (postgresToolContainer && containerPlain) {
+      run("docker", ["cp", plain, `${postgresToolContainer}:${containerPlain}`]);
+      run("docker", ["exec", postgresToolContainer, "pg_restore", ...restoreArgs]);
+    } else {
+      run("pg_restore", restoreArgs);
+    }
     process.stdout.write(
       "Restore completed; run the documented validation checklist before approval.\n",
     );
   } finally {
+    if (containerPlain) removeContainerFile(containerPlain);
     rmSync(work, { recursive: true, force: true });
   }
 } else {

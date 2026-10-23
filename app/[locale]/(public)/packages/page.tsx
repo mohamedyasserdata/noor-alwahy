@@ -28,14 +28,16 @@ export default async function PackagesPage({ params }: PageProps<"/[locale]/pack
   const t = await getTranslations({ locale, namespace: "publicSite.packages" });
 
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto min-h-[32rem] max-w-7xl px-6 py-20 lg:px-8" role="status">
-          <p className="font-bold text-muted-foreground">{t("loading")}</p>
-        </div>
-      }
-    >
-      <PackageCatalogue locale={locale} />
-    </Suspense>
+    <div className="min-h-[52rem]">
+      <Suspense
+        fallback={
+          <div className="mx-auto min-h-[52rem] max-w-7xl px-6 py-20 lg:px-8" role="status">
+            <p className="font-bold text-muted-foreground">{t("loading")}</p>
+          </div>
+        }
+      >
+        <PackageCatalogue locale={locale} />
+      </Suspense>
+    </div>
   );
 }

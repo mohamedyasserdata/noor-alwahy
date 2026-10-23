@@ -51,6 +51,7 @@ def inspect(path_value):
         "file": str(path),
         "pages": len(reader.pages),
         "encrypted": reader.is_encrypted,
+        "text": "\n".join(page.extract_text() or "" for page in reader.pages),
         "fonts": fonts,
         "allFontsEmbedded": bool(fonts) and all(font["embedded"] for font in fonts.values()),
     }
