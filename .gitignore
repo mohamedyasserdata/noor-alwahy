@@ -13,9 +13,12 @@
 # testing
 /coverage
 /.vitest/
+/.lighthouseci/
 /output/playwright/
 /output/pdf/
+/output/lighthouse/
 /tmp/pdfs/
+/tmp/k6-*.json
 *.dump
 *.dump.enc
 *.dump.enc.json
