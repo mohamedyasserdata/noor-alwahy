@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   outputFileTracingIncludes: {
     "/api/calendar/pdf": ["./node_modules/@fontsource-variable/cairo/files/*.woff2"],
+    "/api/admin/exports": ["./node_modules/@fontsource-variable/cairo/files/*.woff2"],
+    "/api/admin/exports/[id]/retry": ["./node_modules/@fontsource-variable/cairo/files/*.woff2"],
   },
   partialPrefetching: true,
   typedRoutes: true,

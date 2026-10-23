@@ -1,6 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { AdvancedReportPanel } from "@/components/control-center/advanced-report-panel";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import type { AppLocale } from "@/i18n/routing";
@@ -18,6 +19,9 @@ export async function AdminReportsSection({
 }) {
   const [reports, query] = await Promise.all([getAdminReports(), searchParams]);
   const ar = locale === "ar";
+  const today = new Date();
+  const defaultFrom = new Date(today);
+  defaultFrom.setUTCDate(today.getUTCDate() - 29);
   const updated = query.reportStatus === "updated";
   const hasError = Boolean(query.reportError);
   return (
@@ -109,6 +113,11 @@ export async function AdminReportsSection({
           </p>
         )}
       </div>
+      <AdvancedReportPanel
+        locale={locale}
+        defaultFrom={defaultFrom.toISOString().slice(0, 10)}
+        defaultTo={today.toISOString().slice(0, 10)}
+      />
     </section>
   );
 }
