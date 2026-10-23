@@ -1263,6 +1263,175 @@ export type Database = {
           },
         ];
       };
+      intervention_cases: {
+        Row: {
+          acknowledged_at: string | null;
+          acknowledged_by: string | null;
+          created_at: string;
+          dedupe_key: string;
+          detection_count: number;
+          dismissed_at: string | null;
+          dismissed_by: string | null;
+          disposition_reason: string | null;
+          escalated_at: string | null;
+          evidence: NonNullable<Json>;
+          first_detected_at: string;
+          id: string;
+          last_detected_at: string;
+          priority: number;
+          reason_code: string;
+          recommended_action: string;
+          reopened_from_case_id: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          rule_id: string;
+          status: string;
+          subject_id: string;
+          subject_type: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          created_at?: string;
+          dedupe_key: string;
+          detection_count?: number;
+          dismissed_at?: string | null;
+          dismissed_by?: string | null;
+          disposition_reason?: string | null;
+          escalated_at?: string | null;
+          evidence: NonNullable<Json>;
+          first_detected_at: string;
+          id?: string;
+          last_detected_at: string;
+          priority: number;
+          reason_code: string;
+          recommended_action: string;
+          reopened_from_case_id?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rule_id: string;
+          status?: string;
+          subject_id: string;
+          subject_type: string;
+          updated_at?: string;
+        };
+        Update: {
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          created_at?: string;
+          dedupe_key?: string;
+          detection_count?: number;
+          dismissed_at?: string | null;
+          dismissed_by?: string | null;
+          disposition_reason?: string | null;
+          escalated_at?: string | null;
+          evidence?: NonNullable<Json>;
+          first_detected_at?: string;
+          id?: string;
+          last_detected_at?: string;
+          priority?: number;
+          reason_code?: string;
+          recommended_action?: string;
+          reopened_from_case_id?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          rule_id?: string;
+          status?: string;
+          subject_id?: string;
+          subject_type?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "intervention_cases_acknowledged_by_fkey";
+            columns: ["acknowledged_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intervention_cases_dismissed_by_fkey";
+            columns: ["dismissed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intervention_cases_reopened_from_case_id_fkey";
+            columns: ["reopened_from_case_id"];
+            isOneToOne: false;
+            referencedRelation: "intervention_cases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intervention_cases_resolved_by_fkey";
+            columns: ["resolved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intervention_cases_rule_id_fkey";
+            columns: ["rule_id"];
+            isOneToOne: false;
+            referencedRelation: "intervention_rules";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      intervention_rules: {
+        Row: {
+          action_code: string;
+          cooldown_interval: string;
+          created_at: string;
+          id: string;
+          is_enabled: boolean;
+          priority: number;
+          rule_type: string;
+          thresholds: NonNullable<Json>;
+          updated_at: string;
+          updated_by: string;
+          window_interval: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          action_code: string;
+          cooldown_interval: string;
+          created_at?: string;
+          id?: string;
+          is_enabled?: boolean;
+          priority: number;
+          rule_type: string;
+          thresholds: NonNullable<Json>;
+          updated_at?: string;
+          updated_by: string;
+          window_interval: string;
+        };
+        Update: {
+          action_code?: string;
+          cooldown_interval?: string;
+          created_at?: string;
+          id?: string;
+          is_enabled?: boolean;
+          priority?: number;
+          rule_type?: string;
+          thresholds?: NonNullable<Json>;
+          updated_at?: string;
+          updated_by?: string;
+          window_interval?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "intervention_rules_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invoice_items: {
         Row: {
           amount: number | null;
@@ -4607,6 +4776,7 @@ export type Database = {
         };
         Returns: string;
       };
+      evaluate_intervention_rules: { Args: { p_at?: string }; Returns: number };
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
@@ -4878,6 +5048,18 @@ export type Database = {
         Args: { p_errors: Json; p_exam: string; p_scores: Json; p_student: string };
         Returns: string;
       };
+      save_intervention_rule: {
+        Args: {
+          p_cooldown_interval: string;
+          p_is_enabled?: boolean;
+          p_priority: number;
+          p_rule_id?: string;
+          p_rule_type: string;
+          p_thresholds: Json;
+          p_window_interval: string;
+        };
+        Returns: string;
+      };
       save_package: { Args: { p_payload: Json }; Returns: string };
       set_account_active: {
         Args: { p_is_active: boolean; p_profile_id: string };
@@ -4899,6 +5081,10 @@ export type Database = {
           teacher_name: string;
           timezone: string;
         }[];
+      };
+      transition_intervention_case: {
+        Args: { p_case: string; p_reason?: string; p_status: string };
+        Returns: undefined;
       };
       transition_teacher_payout: {
         Args: { p_action: string; p_payout: string; p_reference?: string };
