@@ -107,7 +107,7 @@ export async function renderPayoutPdf(document: PayoutExportDocument) {
         `<tr><td>${escape(item.date)}</td><td>${escape(item.kind)}</td><td>${item.rate.toFixed(2)}</td><td>${item.amount.toFixed(2)} ${escape(document.currency)}</td></tr>`,
     )
     .join("");
-  const html = `<!doctype html><html lang="${document.locale}" dir="${ar ? "rtl" : "ltr"}"><head><meta charset="utf-8"><style>@font-face{font-family:Cairo;src:url('${font}')}@page{size:A4;margin:14mm}*{box-sizing:border-box}body{font:10.5pt/1.7 Cairo,Arial;color:#102b50}header{background:#102b50;color:white;border-radius:5mm;padding:7mm}h1{margin:0;color:#d3aa45}.meta{display:grid;grid-template-columns:2fr 1fr;gap:4mm;margin-top:4mm}table{width:100%;border-collapse:collapse;margin-top:7mm}th{background:#102b50;color:#fff}th,td{border:.3mm solid #d9dfe8;padding:2.5mm;text-align:${ar ? "right" : "left"}}td:nth-child(n+3){direction:ltr}.totals{margin-top:6mm;margin-inline-start:auto;width:70mm}.totals div{display:flex;justify-content:space-between;border-bottom:.3mm solid #d9dfe8;padding:2mm}.totals div:last-child{background:#f7efd8;font-weight:bold;font-size:13pt}</style></head><body><header><h1>${labels.title}</h1><div>${escape(document.payoutNo)} · ${escape(document.status)}</div></header><div class="meta"><p><b>${labels.teacher}:</b> ${escape(document.teacher)}</p><p><b>${labels.period}:</b> ${escape(document.periodStart)} — ${escape(document.periodEnd)}</p></div><table><thead><tr><th>${labels.date}</th><th>${labels.kind}</th><th>${labels.rate}</th><th>${labels.amount}</th></tr></thead><tbody>${rows}</tbody></table><div class="totals"><div><span>${labels.gross}</span><b>${document.gross.toFixed(2)}</b></div><div><span>${labels.bonuses}</span><b>${document.bonuses.toFixed(2)}</b></div><div><span>${labels.deductions}</span><b>${document.deductions.toFixed(2)}</b></div><div><span>${labels.net}</span><b>${document.net.toFixed(2)} ${escape(document.currency)}</b></div></div></body></html>`;
+  const html = `<!doctype html><html lang="${document.locale}" dir="${ar ? "rtl" : "ltr"}"><head><meta charset="utf-8"><style>@font-face{font-family:Cairo;src:url('${font}')}@page{size:A4;margin:10mm}*{box-sizing:border-box}body{font:10pt/1.55 Cairo,Arial;color:#102b50}header{background:#102b50;color:white;border-radius:5mm;padding:5mm}h1{margin:0;color:#d3aa45}.meta{display:grid;grid-template-columns:2fr 1fr;gap:3mm;margin-top:2mm}.meta p{margin:1mm 0}table{width:100%;border-collapse:collapse;margin-top:4mm}thead{display:table-header-group}tr{break-inside:avoid}th{background:#102b50;color:#fff}th,td{border:.3mm solid #d9dfe8;padding:1.8mm;text-align:${ar ? "right" : "left"}}td:nth-child(n+3){direction:ltr}.totals{break-inside:avoid;margin-top:4mm;margin-inline-start:auto;width:70mm}.totals div{display:flex;justify-content:space-between;border-bottom:.3mm solid #d9dfe8;padding:1.5mm}.totals div:last-child{background:#f7efd8;font-weight:bold;font-size:13pt}</style></head><body><header><h1>${labels.title}</h1><div>${escape(document.payoutNo)} · ${escape(document.status)}</div></header><div class="meta"><p><b>${labels.teacher}:</b> ${escape(document.teacher)}</p><p><b>${labels.period}:</b> ${escape(document.periodStart)} — ${escape(document.periodEnd)}</p></div><table><thead><tr><th>${labels.date}</th><th>${labels.kind}</th><th>${labels.rate}</th><th>${labels.amount}</th></tr></thead><tbody>${rows}</tbody></table><div class="totals"><div><span>${labels.gross}</span><b>${document.gross.toFixed(2)}</b></div><div><span>${labels.bonuses}</span><b>${document.bonuses.toFixed(2)}</b></div><div><span>${labels.deductions}</span><b>${document.deductions.toFixed(2)}</b></div><div><span>${labels.net}</span><b>${document.net.toFixed(2)} ${escape(document.currency)}</b></div></div></body></html>`;
   const browser = await puppeteer.launch({
     ...(process.env.PUPPETEER_EXECUTABLE_PATH ? {} : { args: chromium.args }),
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (await chromium.executablePath()),
@@ -132,7 +132,7 @@ function sheet(rows: Array<Array<string | number>>, rtl: boolean) {
             const ref = `${String.fromCharCode(65 + x)}${y + 1}`;
             return typeof value === "number"
               ? `<c r="${ref}" s="2"><v>${value}</v></c>`
-              : `<c r="${ref}" s="${y === 0 ? 1 : 0}" t="inlineStr"><is><t>${escape(value)}</t></is></c>`;
+              : `<c r="${ref}" s="${y === 0 ? 1 : 0}" t="inlineStr"><is><t>${escape(protectFormula(value))}</t></is></c>`;
           })
           .join("")}</row>`,
     )
@@ -148,4 +148,7 @@ function escape(value: string) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+function protectFormula(value: string) {
+  return /^[=+\-@]/.test(value) ? `'${value}` : value;
 }

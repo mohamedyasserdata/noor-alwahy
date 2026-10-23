@@ -100,7 +100,17 @@ async function financialHtml(
         `<tr>${[row.currency, row.invoiced, row.received, row.refunded, row.expenses, row.outstanding, row.netCash].map((value) => `<td>${escapeHtml(String(value))}</td>`).join("")}</tr>`,
     )
     .join("");
-  return `<!doctype html><html lang="${locale}" dir="${ar ? "rtl" : "ltr"}"><head><meta charset="utf-8"><style>@font-face{font-family:Cairo;src:url('${font}')}@page{size:A4 landscape;margin:14mm}*{box-sizing:border-box}body{font:11pt/1.7 Cairo,Arial;color:#102b50}header{background:#102b50;color:white;border-radius:5mm;padding:8mm}h1{margin:0;color:#d3aa45}p{margin:2mm 0 0}table{width:100%;border-collapse:collapse;margin-top:8mm}th{background:#102b50;color:white}th,td{border:.3mm solid #d9dfe8;padding:3mm;text-align:${ar ? "right" : "left"}}td:not(:first-child){direction:ltr;font-variant-numeric:tabular-nums}</style></head><body><header><h1>${ar ? "التقرير المالي حسب العملة" : "Financial report by currency"}</h1><p>${ar ? "أكاديمية نور الوحي" : "Noor Al-Wahy Academy"} · ${escapeHtml(generatedAt)}</p></header><table><thead><tr>${labels.map((label) => `<th>${label}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></body></html>`;
+  return `<!doctype html><html lang="${locale}" dir="${ar ? "rtl" : "ltr"}"><head><meta charset="utf-8"><style>@font-face{font-family:Cairo;src:url('${font}')}@page{size:A4 landscape;margin:14mm}*{box-sizing:border-box}body{font:11pt/1.7 Cairo,Arial;color:#102b50}header{background:#102b50;color:white;border-radius:5mm;padding:8mm}h1{margin:0;color:#d3aa45}p{margin:2mm 0 0}table{width:100%;border-collapse:collapse;margin-top:8mm}th{background:#102b50;color:white}th,td{border:.3mm solid #d9dfe8;padding:3mm;text-align:${ar ? "right" : "left"}}td:not(:first-child){direction:ltr;font-variant-numeric:tabular-nums}</style></head><body><header><h1>${ar ? "التقرير المالي حسب العملة" : "Financial report by currency"}</h1><p>${ar ? "أكاديمية نور الوحي" : "Noor Al-Wahy Academy"} · <bdi>${escapeHtml(formatExportTimestamp(generatedAt, locale))}</bdi></p></header><table><thead><tr>${labels.map((label) => `<th>${label}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></body></html>`;
+}
+
+function formatExportTimestamp(value: string, locale: "ar" | "en") {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return `${new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(parsed)} UTC`;
 }
 
 function sheet(rows: Array<Array<string | number>>, rtl: boolean) {
@@ -126,7 +136,10 @@ function xml(value: string) {
   return strToU8(value);
 }
 function escapeXml(value: string) {
-  return escapeHtml(value).replaceAll("'", "&apos;").replaceAll('"', "&quot;");
+  return escapeHtml(protectFormula(value)).replaceAll("'", "&apos;").replaceAll('"', "&quot;");
+}
+function protectFormula(value: string) {
+  return /^[=+\-@]/.test(value) ? `'${value}` : value;
 }
 function escapeHtml(value: string) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");

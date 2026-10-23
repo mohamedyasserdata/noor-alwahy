@@ -36,8 +36,11 @@ export async function getTeacherReportsData() {
   const { data: teacher, error: teacherError } = await supabase
     .from("teachers")
     .select("id")
-    .single();
+    .maybeSingle();
   if (teacherError) throw new Error("reports_unavailable");
+  if (!teacher) {
+    return { students: [], reports: [], templates: [] };
+  }
 
   const [assignmentsResult, reportsResult, templateResult] = await Promise.all([
     supabase
