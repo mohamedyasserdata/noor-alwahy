@@ -2676,6 +2676,28 @@ export type Database = {
           track_name_en: string;
         }[];
       };
+      get_public_package_catalog: {
+        Args: { p_at?: string; p_country: string };
+        Returns: {
+          amount: number;
+          audience: string;
+          billing_period: Database["public"]["Enums"]["billing_period"];
+          country_code: string;
+          currency: string;
+          description_ar: string;
+          description_en: string;
+          duration_min: number;
+          features: Json;
+          name_ar: string;
+          name_en: string;
+          package_id: string;
+          sessions_per_week: number;
+          slug: string;
+          teacher_gender: Database["public"]["Enums"]["gender_t"];
+          track_name_ar: string;
+          track_name_en: string;
+        }[];
+      };
       get_session_join: {
         Args: { p_session_id: string };
         Returns: {
