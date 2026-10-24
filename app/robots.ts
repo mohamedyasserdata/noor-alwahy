@@ -18,6 +18,8 @@ export default function robots(): MetadataRoute.Robots {
         "/en/student/",
         "/ar/parent/",
         "/en/parent/",
+        "/ar/offer/",
+        "/en/offer/",
         "/api/",
       ],
     },

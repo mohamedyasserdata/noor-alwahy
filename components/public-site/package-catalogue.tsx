@@ -1,5 +1,4 @@
 import { Check, Clock3, Globe2, UsersRound } from "lucide-react";
-import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
@@ -9,13 +8,13 @@ import { setCountryOverrideAction } from "@/lib/public-site/actions";
 import { detectVisitorCountry } from "@/lib/public-site/country";
 import { getPublicCountries, getPublicPackages } from "@/lib/public-site/packages";
 
-type PackageCatalogueProps = { locale: AppLocale };
+type PackageCatalogueProps = { locale: AppLocale; returnPath: string };
 
 function localized(valueAr: string | null, valueEn: string | null, locale: AppLocale) {
   return locale === "en" && valueEn ? valueEn : (valueAr ?? "");
 }
 
-export async function PackageCatalogue({ locale }: PackageCatalogueProps) {
+export async function PackageCatalogue({ locale, returnPath }: PackageCatalogueProps) {
   const detectedCountry = await detectVisitorCountry();
   const [countries, packages, t] = await Promise.all([
     getPublicCountries(),
@@ -28,29 +27,8 @@ export async function PackageCatalogue({ locale }: PackageCatalogueProps) {
   const country = countries.find(({ code }) => code === selectedCountry);
   const numberLocale = locale === "ar" ? "ar-EG-u-nu-latn" : "en-US";
   const packageCount = new Intl.NumberFormat(numberLocale).format(packages.length);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": packages.map((item) => ({
-      "@type": "Course",
-      name: localized(item.nameAr, item.nameEn, locale),
-      description: localized(item.descriptionAr, item.descriptionEn, locale),
-      provider: { "@type": "EducationalOrganization", name: t("academyName") },
-      offers: {
-        "@type": "Offer",
-        price: item.amount.toFixed(2),
-        priceCurrency: item.currency,
-        availability: "https://schema.org/InStock",
-      },
-    })),
-  };
-
   return (
     <>
-      <Script
-        id={`package-catalogue-json-ld-${locale}-${selectedCountry}`}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replaceAll("<", "\\u003c") }}
-      />
       <section className="border-b bg-primary text-primary-foreground">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-14 lg:grid-cols-[1fr_auto] lg:items-end lg:px-8">
           <div className="max-w-3xl">
@@ -61,7 +39,7 @@ export async function PackageCatalogue({ locale }: PackageCatalogueProps) {
             <p className="mt-5 text-lg leading-9 text-primary-foreground/75">{t("description")}</p>
           </div>
           <form
-            action={setCountryOverrideAction.bind(null, locale)}
+            action={setCountryOverrideAction.bind(null, locale, returnPath)}
             className="grid min-w-0 gap-2 rounded-2xl border border-primary-foreground/20 bg-primary-foreground/8 p-4 sm:grid-cols-[minmax(12rem,1fr)_auto] sm:items-end"
           >
             <label className="grid gap-2 text-sm font-bold" htmlFor="package-country">

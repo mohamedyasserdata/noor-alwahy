@@ -9,7 +9,9 @@ import {
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
+import { ApplicationOptions } from "@/components/applications/application-options";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -51,13 +53,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button asChild size="lg" variant="gold">
-                <Link href="/tracks">
+                <a href="#apply">
                   {t("primaryAction")}
                   <ArrowUpLeft className="rtl:-scale-x-100" aria-hidden="true" />
-                </Link>
+                </a>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/contact">{t("secondaryAction")}</Link>
+                <Link href="/tracks">{t("secondaryAction")}</Link>
               </Button>
             </div>
           </div>
@@ -120,6 +122,36 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <Button asChild variant="ghost" className="mt-7">
           <Link href="/tracks">{t("tracks.action")}</Link>
         </Button>
+      </section>
+
+      <section
+        id="apply"
+        className="scroll-mt-24 border-y bg-muted/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+        aria-labelledby="home-application-title"
+      >
+        <div className="mx-auto max-w-4xl">
+          <header className="mb-8 max-w-3xl">
+            <h2
+              id="home-application-title"
+              className="text-3xl font-black text-balance text-primary sm:text-4xl"
+            >
+              {t("application.title")}
+            </h2>
+            <p className="mt-4 text-lg leading-8 text-pretty text-muted-foreground">
+              {t("application.description")}
+            </p>
+            <p className="mt-3 text-sm font-bold text-primary">{t("application.hint")}</p>
+          </header>
+          <Suspense
+            fallback={
+              <div className="min-h-80 rounded-3xl border bg-card p-8 shadow-soft" role="status">
+                <p className="font-bold text-muted-foreground">{t("application.loading")}</p>
+              </div>
+            }
+          >
+            <ApplicationOptions embedded locale={locale} />
+          </Suspense>
+        </div>
       </section>
 
       <section className="border-y bg-primary text-primary-foreground">

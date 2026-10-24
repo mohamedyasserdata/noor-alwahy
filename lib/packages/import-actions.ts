@@ -109,7 +109,6 @@ export async function confirmPackageImportAction(
   }
   updateTag("public-packages");
   revalidatePath(`/${locale}/admin/packages`);
-  revalidatePath(`/${locale}/packages`);
   revalidatePath(`/${locale}`);
   redirect(`/${locale}/admin/packages?packageStatus=imported&count=${data}` as Route);
 }

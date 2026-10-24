@@ -6,26 +6,21 @@ import { Suspense } from "react";
 
 import { PackageCatalogue } from "@/components/public-site/package-catalogue";
 import { routing } from "@/i18n/routing";
-import { localizedMetadata } from "@/lib/seo/metadata";
+import { hasPrivatePricingAccess } from "@/lib/public-site/pricing-access";
 
-export async function generateMetadata({
+export const metadata: Metadata = {
+  robots: { follow: false, index: false, noarchive: true, nosnippet: true },
+  referrer: "no-referrer",
+};
+export const instant = false;
+
+export default async function PrivateOfferPage({
   params,
-}: PageProps<"/[locale]/packages">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  const t = await getTranslations({ locale, namespace: "publicSite.packages.meta" });
-  return localizedMetadata({
-    locale,
-    path: "/packages",
-    title: t("title"),
-    description: t("description"),
-  });
-}
-
-export default async function PackagesPage({ params }: PageProps<"/[locale]/packages">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
+}: PageProps<"/[locale]/offer/[accessKey]">) {
+  const { accessKey, locale } = await params;
+  if (!hasLocale(routing.locales, locale) || !hasPrivatePricingAccess(accessKey)) notFound();
   const t = await getTranslations({ locale, namespace: "publicSite.packages" });
+  const returnPath = `/${locale}/offer/${encodeURIComponent(accessKey)}`;
 
   return (
     <div className="min-h-[52rem]">
@@ -36,7 +31,7 @@ export default async function PackagesPage({ params }: PageProps<"/[locale]/pack
           </div>
         }
       >
-        <PackageCatalogue locale={locale} />
+        <PackageCatalogue locale={locale} returnPath={returnPath} />
       </Suspense>
     </div>
   );

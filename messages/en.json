@@ -1529,6 +1529,7 @@
       "navigation": {
         "home": "Home",
         "tracks": "Learning tracks",
+        "apply": "Apply for a student",
         "packages": "Packages & prices",
         "faq": "Questions",
         "contact": "Contact",
@@ -1546,8 +1547,8 @@
       "eyebrow": "One-to-one online learning",
       "title": "A clear path for learning the Quran, from the first meeting to visible progress",
       "description": "Every student learns with a suitable teacher, a steady time, and a plan matched to their level. Families can follow progress without complexity or comparison.",
-      "primaryAction": "Explore the tracks",
-      "secondaryAction": "Talk to the academy",
+      "primaryAction": "Apply for a student",
+      "secondaryAction": "Explore the tracks",
       "journey": {
         "label": "The learning journey",
         "steps": {
@@ -1587,6 +1588,12 @@
             "description": "A calm start with letters and reading until the student becomes more independent."
           }
         }
+      },
+      "application": {
+        "title": "Start with a simple application, and we will arrange the next step",
+        "description": "Share the student’s details, goal, and suitable times. The academy team will review the request and contact you directly.",
+        "hint": "It usually takes under five minutes, and you can track the application with a private number after sending it.",
+        "loading": "Preparing the application form…"
       },
       "closing": {
         "title": "Choosing a track should not involve guesswork",

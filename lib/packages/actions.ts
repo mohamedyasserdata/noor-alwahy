@@ -26,7 +26,6 @@ function destination(locale: AppLocale, key: "packageError" | "packageStatus", v
 function refreshPackages(locale: AppLocale) {
   updateTag("public-packages");
   revalidatePath(`/${locale}/admin/packages`);
-  revalidatePath(`/${locale}/packages`);
   revalidatePath(`/${locale}`);
 }
 

@@ -31,7 +31,7 @@ export const options = {
 };
 
 export function publicPages() {
-  for (const path of ["/ar", "/en", "/ar/packages"]) {
+  for (const path of ["/ar", "/en", "/ar/contact"]) {
     const response = http.get(`${baseUrl}${path}`, { redirects: 2 });
     check(response, { [`${path} returns 200`]: (result) => result.status === 200 });
   }

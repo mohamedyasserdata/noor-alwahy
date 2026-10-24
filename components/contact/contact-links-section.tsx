@@ -1,7 +1,10 @@
 import { ExternalLink } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
-import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
+import {
+  ContactChannelIcon,
+  getContactChannelTheme,
+} from "@/components/contact/contact-channel-icon";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
@@ -65,7 +68,9 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                 >
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-secondary [&_svg]:size-5">
+                  <span
+                    className={`grid size-12 shrink-0 place-items-center rounded-2xl shadow-sm [&_svg]:size-6 ${getContactChannelTheme(link.type)}`}
+                  >
                     <ContactChannelIcon type={link.type} />
                   </span>
                   <span className="min-w-0 flex-1">

@@ -8,7 +8,11 @@ import { routing, type AppLocale } from "@/i18n/routing";
 import { countryCodeSchema, countryCookieName } from "@/lib/public-site/country";
 import { getPublicCountries } from "@/lib/public-site/packages";
 
-export async function setCountryOverrideAction(localeValue: string, formData: FormData) {
+export async function setCountryOverrideAction(
+  localeValue: string,
+  returnPathValue: string,
+  formData: FormData,
+) {
   const locale = routing.locales.includes(localeValue as AppLocale)
     ? (localeValue as AppLocale)
     : routing.defaultLocale;
@@ -25,5 +29,10 @@ export async function setCountryOverrideAction(localeValue: string, formData: Fo
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
-  redirect(`/${locale}/packages` as Route);
+  const safeReturnPath = new RegExp(`^/${locale}/offer/[A-Za-z0-9_-]{16,128}$`).test(
+    returnPathValue,
+  )
+    ? returnPathValue
+    : `/${locale}`;
+  redirect(safeReturnPath as Route);
 }
