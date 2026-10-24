@@ -10,7 +10,7 @@ const viewports = [
   { name: "mobile", width: 360, height: 800 },
   { name: "desktop", width: 1280, height: 900 },
 ] as const;
-const publicPaths = ["", "/tracks", "/faq", "/contact"] as const;
+const publicPaths = ["", "/tracks", "/faq", "/contact", "/privacy", "/terms"] as const;
 const packageSlug = "public-site-e2e";
 const packageNameAr = "باقة اختبار الموقع الثابتة";
 const packageNameEn = "Stable public site test package";

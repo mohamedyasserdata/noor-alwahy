@@ -178,7 +178,7 @@ export function QuranMap({
               {t("surahLabel")}
               <select
                 id="quran-map-surah"
-                className="min-h-11 rounded-lg border bg-card px-3 text-foreground"
+                className="min-h-11 rounded-lg border bg-card px-3 text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                 value={selected?.firstSurahId ?? 1}
                 onChange={(event) =>
                   selectAndReveal(firstPageBySurah.get(Number(event.target.value)) ?? 1)

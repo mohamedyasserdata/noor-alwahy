@@ -21,6 +21,13 @@ test("P4-T07 student navigates all Quran pages and receives locked progress live
   const pageOne = page.getByRole("gridcell", { name: "Page 1: Not started" });
   await expect(pageOne).toBeVisible();
   await pageOne.focus();
+  await pageOne.press("ArrowRight");
+  const pageTwo = page.getByRole("gridcell", { name: "Page 2: Not started" });
+  await expect(pageTwo).toBeFocused();
+  await pageTwo.press("ArrowDown");
+  await expect(page.getByRole("gridcell", { name: "Page 7: Not started" })).toBeFocused();
+  await page.getByRole("gridcell", { name: "Page 7: Not started" }).press("Home");
+  await expect(pageOne).toBeFocused();
   await pageOne.press("End");
   await expect(page.getByRole("gridcell", { name: "Page 604: Not started" })).toBeFocused();
   await expect(page.getByRole("heading", { level: 3, name: "Page 604" })).toBeVisible();

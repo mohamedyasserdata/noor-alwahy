@@ -242,7 +242,7 @@ export function SessionEvaluationForm({
                       [`${side}Ayah`]: 1,
                     }))
                   }
-                  className="h-11 rounded-lg border bg-card px-3"
+                  className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   {surahs.map((surah) => (
                     <option key={surah.id} value={surah.id}>
@@ -304,7 +304,7 @@ export function SessionEvaluationForm({
                       }))
                     }
                     className={cn(
-                      "min-h-11 min-w-11 rounded-lg border text-sm font-black",
+                      "min-h-11 min-w-11 rounded-lg border text-sm font-black focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
                       draft.scores[criterion.code] === score
                         ? "border-primary bg-primary text-primary-foreground"
                         : "bg-card",
@@ -371,7 +371,7 @@ export function SessionEvaluationForm({
               decision: event.target.value as EvaluationDraft["decision"],
             }))
           }
-          className="h-11 rounded-lg border bg-card px-3"
+          className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <option value="passed">{text.passed}</option>
           <option value="repeat">{text.repeat}</option>
@@ -386,7 +386,7 @@ export function SessionEvaluationForm({
           onChange={(event) =>
             updateDraft((current) => ({ ...current, homework: event.target.value }))
           }
-          className="rounded-xl border bg-card p-3"
+          className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
         />
         <Label htmlFor="family-note">{text.familyNote}</Label>
         <textarea
@@ -397,11 +397,15 @@ export function SessionEvaluationForm({
           onChange={(event) =>
             updateDraft((current) => ({ ...current, familyNote: event.target.value }))
           }
-          className="rounded-xl border bg-card p-3"
+          className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
         />
       </fieldset>
 
-      <div className="grid gap-4 border-s-4 border-secondary bg-primary p-5 text-primary-foreground sm:grid-cols-[1fr_auto] sm:items-center">
+      <div
+        className="grid gap-4 border-s-4 border-secondary bg-primary p-5 text-primary-foreground sm:grid-cols-[1fr_auto] sm:items-center"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <div>
           <p className="font-black text-secondary">{text.preview}</p>
           <p className="mt-1 text-3xl font-black tabular-nums">

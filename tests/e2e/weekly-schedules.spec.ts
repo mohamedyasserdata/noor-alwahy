@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
+import { DateTime } from "luxon";
 
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
@@ -7,6 +8,8 @@ import { signInAs } from "./helpers/auth";
 test("US-070 and US-076 weekly schedules render in every role's local time", async ({ page }) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
+  const teacherTime = nextFridayTime("Asia/Riyadh");
+  const parentTime = nextFridayTime("Europe/London");
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/schedule");
@@ -21,20 +24,30 @@ test("US-070 and US-076 weekly schedules render in every role's local time", asy
 
   await signInAs(page, "en", "teacher");
   await page.goto("/en/teacher/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 18:30/)).toBeVisible();
+  const teacherSlot = page.locator("article").filter({ hasText: fixture.trackName });
+  await expect(teacherSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+  await expect(teacherSlot.getByText(`Friday · ${teacherTime}`, { exact: true })).toBeVisible();
 
   await signInAs(page, "en", "student");
   await page.goto("/en/student/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 18:30/)).toBeVisible();
+  const studentSlot = page.locator("article").filter({ hasText: fixture.trackName });
+  await expect(studentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+  await expect(studentSlot.getByText("Friday · 18:30", { exact: true })).toBeVisible();
 
   await signInAs(page, "en", "parent");
   await page.goto("/en/parent/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 16:30/)).toBeVisible();
-  await expect(page.getByText(/Anchored to Africa\/Cairo/)).toBeVisible();
+  const parentSlot = page.locator("article").filter({ hasText: fixture.trackName });
+  await expect(parentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+  await expect(parentSlot.getByText(`Friday · ${parentTime}`, { exact: true })).toBeVisible();
+  await expect(parentSlot.getByText(/Anchored to Africa\/Cairo/)).toBeVisible();
 });
+
+function nextFridayTime(viewerTimezone: string) {
+  const anchorTimezone = "Africa/Cairo";
+  const today = DateTime.now().setZone(anchorTimezone).startOf("day");
+  const nextFriday = today.plus({ days: (5 - today.weekday + 7) % 7 });
+  return nextFriday.set({ hour: 18, minute: 30 }).setZone(viewerTimezone).toFormat("HH:mm");
+}
 
 async function createFixture() {
   const db = createClient<Database>(
@@ -45,6 +58,7 @@ async function createFixture() {
     },
   );
   const trackId = crypto.randomUUID();
+  const trackName = `Schedule ${trackId.slice(0, 8)}`;
   const assignmentId = crypto.randomUUID();
   const now = new Date().toISOString();
   const studentId = await findOrCreateStudent(db);
@@ -67,7 +81,7 @@ async function createFixture() {
       id: trackId,
       code: `schedule-${trackId.slice(0, 8)}`,
       name_ar: "جدول",
-      name_en: "Schedule",
+      name_en: trackName,
     }),
   ];
   for (const write of writes) {
@@ -94,7 +108,7 @@ async function createFixture() {
     reason: "Weekly schedule test",
   });
   if (assignmentError) throw assignmentError;
-  return { assignmentId };
+  return { assignmentId, trackName };
 }
 
 type FixtureClient = SupabaseClient<Database>;
