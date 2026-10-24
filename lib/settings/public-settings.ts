@@ -2,6 +2,7 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 
+import { academyLogoPath } from "@/lib/brand/assets";
 import { createPublicClient } from "@/lib/supabase/public";
 import {
   academyProfileSchema,
@@ -16,7 +17,7 @@ export const defaultAcademyProfile: AcademyProfile = {
   nameEn: "Noor Al-Wahy Academy",
   descriptionAr: "تعليم قرآني منظم بمتابعة آمنة وواضحة.",
   descriptionEn: "Structured Quran learning with safe, clear follow-up.",
-  logoPath: null,
+  logoPath: academyLogoPath,
 };
 
 export const defaultSupportHours: SupportHours = {
@@ -45,7 +46,9 @@ function parseAcademyProfile(value: unknown): AcademyProfile {
     logoPath: record.logo_url,
   });
 
-  return parsed.success ? parsed.data : defaultAcademyProfile;
+  return parsed.success
+    ? { ...parsed.data, logoPath: parsed.data.logoPath ?? academyLogoPath }
+    : defaultAcademyProfile;
 }
 
 function parseSupportHours(value: unknown): SupportHours {

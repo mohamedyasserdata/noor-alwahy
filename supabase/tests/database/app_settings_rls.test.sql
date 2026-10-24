@@ -100,14 +100,14 @@ select is(
 set local role authenticated;
 select lives_ok(
   $$select public.update_public_app_settings(
-    '{"name_ar":"أكاديمية نور الوحي","name_en":"Noor Al-Wahy Academy","description_ar":"تعليم قرآني آمن وواضح","description_en":"Safe and clear Quran learning","logo_url":"/icon.svg"}',
+    '{"name_ar":"أكاديمية نور الوحي","name_en":"Noor Al-Wahy Academy","description_ar":"تعليم قرآني آمن وواضح","description_en":"Safe and clear Quran learning","logo_url":"/images/brand/noor-alwahy-emblem.png"}',
     '{"ar":"الأحد إلى الخميس","en":"Sunday to Thursday"}'
   )$$,
   'the AAL2 admin updates both public settings atomically through the RPC'
 );
 select is(
   (select value ->> 'logo_url' from public.app_settings where key = 'academy_profile'),
-  '/icon.svg'::text,
+  '/images/brand/noor-alwahy-emblem.png'::text,
   'the academy logo path is stored'
 );
 select throws_ok(

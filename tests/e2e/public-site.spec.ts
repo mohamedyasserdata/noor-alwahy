@@ -96,6 +96,15 @@ for (const locale of locales) {
       }
 
       await page.goto(`/${locale.code}`);
+      const academyLogo = page.locator('header img[src*="noor-alwahy-emblem"]').first();
+      await expect(academyLogo).toBeVisible();
+      expect(
+        await academyLogo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+      ).toBeGreaterThan(0);
+      if (locale.code === "ar" && viewport.name === "mobile") {
+        expect((await page.request.get("/icon.png")).ok()).toBe(true);
+        expect((await page.request.get("/apple-icon.png")).ok()).toBe(true);
+      }
       await expect(
         page.getByText(locale.code === "ar" ? "الباقات والأسعار" : "Packages & prices", {
           exact: true,
