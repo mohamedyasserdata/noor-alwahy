@@ -10,6 +10,7 @@ const defaults = {
   supportAr: "تكون الاستجابة خلال مواعيد العمل المعلنة للأكاديمية.",
   supportEn: "Responses are provided during the academy’s announced working hours.",
 };
+const officialLogoPath = "/images/brand/noor-alwahy-emblem.png";
 
 async function fillSettings(
   page: Parameters<typeof signInAs>[0],
@@ -31,7 +32,7 @@ test("US-154 admin updates audited public academy settings atomically", async ({
     nameEn: "Noor Test Academy",
     descriptionAr: "هوية عامة آمنة لاختبار إعدادات الأكاديمية.",
     descriptionEn: "A safe public identity used to verify academy settings.",
-    logoPath: "/icon.svg",
+    logoPath: officialLogoPath,
     supportAr: "الأحد إلى الخميس، من التاسعة صباحًا إلى الخامسة مساءً.",
     supportEn: "Sunday through Thursday, 9:00–17:00 Cairo time.",
   };
@@ -45,7 +46,7 @@ test("US-154 admin updates audited public academy settings atomically", async ({
   await expect(page).toHaveURL(/\/en\/admin\/settings\?settingStatus=updated$/);
   await expect(page.getByText("The public academy settings were updated.")).toBeVisible();
   await expect(page.getByText(changed.nameEn, { exact: true }).first()).toBeVisible();
-  await expect(page.locator('img[src*="icon.svg"]').first()).toBeVisible();
+  await expect(page.locator('img[src*="noor-alwahy-emblem.png"]').first()).toBeVisible();
 
   await signInAs(page, "en", "student");
   await page.goto("/en/student/contact");
@@ -55,10 +56,10 @@ test("US-154 admin updates audited public academy settings atomically", async ({
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/audit?table=app_settings&record=academy_profile");
   await expect(page.getByRole("status")).toHaveText(/Matching records: [1-9]\d*/);
-  await expect(page.locator("table").getByText("Updated", { exact: true })).toBeVisible();
+  await expect(page.locator("table").getByText("Updated", { exact: true }).first()).toBeVisible();
 
   await page.goto("/en/admin/settings");
-  await fillSettings(page, { ...defaults, logoPath: "" });
+  await fillSettings(page, { ...defaults, logoPath: officialLogoPath });
   await page.getByRole("button", { name: "Save public settings" }).click();
   await expect(page).toHaveURL(/\/en\/admin\/settings\?settingStatus=updated$/);
 });

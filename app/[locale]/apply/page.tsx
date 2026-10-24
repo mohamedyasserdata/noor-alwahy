@@ -3,9 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { ApplicationForm } from "@/components/applications/application-form";
-import { type AppLocale, routing } from "@/i18n/routing";
-import { createClient } from "@/lib/supabase/server";
+import { ApplicationOptions } from "@/components/applications/application-options";
+import { routing } from "@/i18n/routing";
 
 export default async function ApplyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -32,38 +31,5 @@ export default async function ApplyPage({ params }: { params: Promise<{ locale: 
         <ApplicationOptions locale={locale} />
       </Suspense>
     </main>
-  );
-}
-
-async function ApplicationOptions({ locale }: { locale: AppLocale }) {
-  const supabase = await createClient();
-  const [tracks, packages, countries] = await Promise.all([
-    supabase.from("tracks").select("id,name_ar,name_en").eq("is_active", true).order("sort_order"),
-    supabase
-      .from("packages")
-      .select("id,name_ar,name_en")
-      .eq("is_published", true)
-      .eq("is_active", true)
-      .order("sort_order"),
-    supabase.from("countries").select("code,name_ar,name_en").eq("is_enabled", true).order("code"),
-  ]);
-  if (tracks.error || packages.error || countries.error)
-    throw new Error("application_options_unavailable");
-  return (
-    <ApplicationForm
-      siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? ""}
-      tracks={(tracks.data ?? []).map((item) => ({
-        id: item.id,
-        name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),
-      }))}
-      packages={(packages.data ?? []).map((item) => ({
-        id: item.id,
-        name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),
-      }))}
-      countries={(countries.data ?? []).map((item) => ({
-        code: item.code,
-        name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),
-      }))}
-    />
   );
 }

@@ -349,6 +349,9 @@
       "enrollPending": "Preparing authenticator…",
       "qrAlt": "QR code for adding Noor Al-Wahy Academy to an authenticator app",
       "manualCode": "Cannot scan? Enter this setup key manually",
+      "localDescription": "Local development mode: open the demo administrator account in one step while real multi-factor authentication is completed automatically. This option is unavailable in deployed builds.",
+      "localAction": "Open administration for local testing",
+      "localPending": "Preparing secure local access…",
       "verifyDescription": "Enter the current six-digit code from your authenticator app.",
       "code": "Authentication code",
       "verifyAction": "Verify and open administration",
@@ -1526,6 +1529,7 @@
       "navigation": {
         "home": "Home",
         "tracks": "Learning tracks",
+        "apply": "Apply for a student",
         "packages": "Packages & prices",
         "faq": "Questions",
         "contact": "Contact",
@@ -1543,8 +1547,8 @@
       "eyebrow": "One-to-one online learning",
       "title": "A clear path for learning the Quran, from the first meeting to visible progress",
       "description": "Every student learns with a suitable teacher, a steady time, and a plan matched to their level. Families can follow progress without complexity or comparison.",
-      "primaryAction": "Explore the tracks",
-      "secondaryAction": "Talk to the academy",
+      "primaryAction": "Apply for a student",
+      "secondaryAction": "Explore the tracks",
       "journey": {
         "label": "The learning journey",
         "steps": {

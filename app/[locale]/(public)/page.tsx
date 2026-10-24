@@ -51,13 +51,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button asChild size="lg" variant="gold">
-                <Link href="/tracks">
+                <Link href="/apply">
                   {t("primaryAction")}
                   <ArrowUpLeft className="rtl:-scale-x-100" aria-hidden="true" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/contact">{t("secondaryAction")}</Link>
+                <Link href="/tracks">{t("secondaryAction")}</Link>
               </Button>
             </div>
           </div>

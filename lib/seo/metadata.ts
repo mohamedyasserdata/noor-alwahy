@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import type { AppLocale } from "@/i18n/routing";
+import { academyLogoPath } from "@/lib/brand/assets";
 
 const siteUrlSchema = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
 
@@ -46,6 +47,20 @@ export function localizedMetadata({
       locale: locale === "ar" ? "ar_EG" : "en_US",
       type: "website",
       url: canonical,
+      images: [
+        {
+          url: academyLogoPath,
+          width: 640,
+          height: 640,
+          alt: "Noor Al-Wahy Quran Academy",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: [academyLogoPath],
     },
   };
 }

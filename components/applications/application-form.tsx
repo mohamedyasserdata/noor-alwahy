@@ -60,7 +60,7 @@ export function ApplicationForm({
         notes: form.get("notes"),
         consent: form.get("consent") === "on",
         captcha_token: captcha,
-        source: "website",
+        source: "application_page",
       };
       const response = await fetch("/api/applications", {
         method: "POST",

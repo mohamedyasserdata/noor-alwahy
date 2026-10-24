@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { MfaGate } from "@/components/auth/mfa-gate";
 import { routing } from "@/i18n/routing";
+import { isLocalAdminMfaHelperAvailable } from "@/lib/auth/local-admin-mfa";
 import { requireAdminMfaEntry } from "@/lib/auth/require-role";
 
 export const instant = false;
@@ -21,11 +22,12 @@ export default async function MfaPage({ params, searchParams }: MfaPageProps) {
     notFound();
   }
 
-  const [{ supabase }, query, t, portals] = await Promise.all([
+  const [{ supabase }, query, t, portals, localHelperAvailable] = await Promise.all([
     requireAdminMfaEntry(locale),
     searchParams,
     getTranslations({ locale, namespace: "auth.mfa" }),
     getTranslations({ locale, namespace: "portals" }),
+    isLocalAdminMfaHelperAvailable(),
   ]);
   const { data, error } = await supabase.auth.mfa.listFactors();
 
@@ -52,6 +54,7 @@ export default async function MfaPage({ params, searchParams }: MfaPageProps) {
       }}
     >
       <MfaGate
+        localHelperAvailable={localHelperAvailable}
         returnTo={returnTo}
         verifiedFactorId={verifiedFactor?.id}
         unverifiedFactorIds={unverifiedFactorIds}
@@ -62,6 +65,9 @@ export default async function MfaPage({ params, searchParams }: MfaPageProps) {
           enrollPending: t("enrollPending"),
           error: t("error"),
           manualCode: t("manualCode"),
+          localAction: t("localAction"),
+          localDescription: t("localDescription"),
+          localPending: t("localPending"),
           qrAlt: t("qrAlt"),
           recovery: t("recovery"),
           signOut: t("signOut"),

@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { academyLogoPath } from "@/lib/brand/assets";
 import { cn } from "@/lib/utils";
 import { isSafeLogoPath } from "@/lib/validators/app-settings";
 
@@ -11,28 +12,12 @@ type BrandMarkProps = {
 };
 
 export function BrandMark({ label, className, labelClassName, logoPath }: BrandMarkProps) {
-  const safeLogoPath = logoPath && isSafeLogoPath(logoPath) ? logoPath : null;
+  const safeLogoPath = logoPath && isSafeLogoPath(logoPath) ? logoPath : academyLogoPath;
 
   return (
     <div className={cn("inline-flex items-center gap-3", className)} translate="no">
-      <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-primary text-secondary shadow-card">
-        {safeLogoPath ? (
-          <Image src={safeLogoPath} alt="" fill sizes="44px" className="object-contain" />
-        ) : (
-          <svg viewBox="0 0 48 48" className="size-7" aria-hidden="true">
-            <path
-              d="M24 4 29.2 14.8 41 16.5 32.5 25 34.5 37 24 31.4 13.5 37 15.5 25 7 16.5 18.8 14.8 24 4Z"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M17 22.5c4.5 0 7 1.5 7 4.8 0-3.3 2.5-4.8 7-4.8v8c-3.3 0-5.5.8-7 2.5-1.5-1.7-3.7-2.5-7-2.5v-8Z"
-              fill="currentColor"
-            />
-          </svg>
-        )}
+      <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-background shadow-card ring-1 ring-secondary/35">
+        <Image src={safeLogoPath} alt="" fill sizes="48px" className="object-contain" />
       </span>
       <span className={cn("text-lg font-black tracking-tight text-primary", labelClassName)}>
         {label}

@@ -10,7 +10,7 @@ const viewports = [
   { name: "mobile", width: 360, height: 800 },
   { name: "desktop", width: 1280, height: 900 },
 ] as const;
-const publicPaths = ["", "/tracks", "/packages", "/faq", "/contact"] as const;
+const publicPaths = ["", "/tracks", "/faq", "/contact"] as const;
 const packageSlug = "public-site-e2e";
 const packageNameAr = "باقة اختبار الموقع الثابتة";
 const packageNameEn = "Stable public site test package";
@@ -95,7 +95,30 @@ for (const locale of locales) {
         expect(dimensions.scrollWidth).toBe(dimensions.innerWidth);
       }
 
-      await page.goto(`/${locale.code}/packages`);
+      await page.goto(`/${locale.code}`);
+      const academyLogo = page.locator('header img[src*="noor-alwahy-emblem"]').first();
+      await expect(academyLogo).toBeVisible();
+      expect(
+        await academyLogo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+      ).toBeGreaterThan(0);
+      if (locale.code === "ar" && viewport.name === "mobile") {
+        expect((await page.request.get("/icon.png")).ok()).toBe(true);
+        expect((await page.request.get("/apple-icon.png")).ok()).toBe(true);
+      }
+      await expect(
+        page.getByText(locale.code === "ar" ? "الباقات والأسعار" : "Packages & prices", {
+          exact: true,
+        }),
+      ).toHaveCount(0);
+
+      const hiddenPricingResponse = await page.goto(`/${locale.code}/packages`);
+      expect(hiddenPricingResponse?.status()).toBe(404);
+
+      await page.goto(`/${locale.code}/offer/local-pricing-preview`);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+        "content",
+        /noindex.*nofollow/,
+      );
       const expectedPackageName = locale.code === "ar" ? packageNameAr : packageNameEn;
       const packageCard = page.locator("article").filter({ hasText: expectedPackageName });
       await expect(packageCard.getByText(expectedPackageName)).toBeVisible();
@@ -104,7 +127,7 @@ for (const locale of locales) {
       if (locale.code === "ar" && viewport.name === "mobile") {
         await page.getByLabel("دولة السعر").selectOption("SA");
         await page.getByRole("button", { name: "تحديث السعر" }).click();
-        await expect(page).toHaveURL(/\/ar\/packages$/);
+        await expect(page).toHaveURL(/\/ar\/offer\/local-pricing-preview$/);
         await expect(packageCard.getByText(/40\.00\s+US\$/)).toBeVisible();
         expect(
           (await page.context().cookies()).find(({ name }) => name === "nw_country")?.value,

@@ -1,7 +1,7 @@
 "use server";
 
 import type { Route } from "next";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { routing, type AppLocale } from "@/i18n/routing";
@@ -18,9 +18,9 @@ function target(value: AppLocale, values: Record<string, string>) {
   return `/${value}/admin/packages/pricing-grid?${new URLSearchParams(values)}` as Route;
 }
 function refresh(value: AppLocale) {
+  updateTag("public-packages");
   revalidatePath(`/${value}/admin/packages/pricing-grid`);
   revalidatePath(`/${value}/admin/packages`);
-  revalidatePath(`/${value}/packages`);
 }
 function bulk(formData: FormData) {
   return pricingBulkSchema.safeParse({

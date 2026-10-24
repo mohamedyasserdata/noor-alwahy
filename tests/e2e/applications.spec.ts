@@ -10,7 +10,12 @@ const contactEmail = `public.application.${fixtureSuffix}@example.com`;
 test("US-040 public applicant submits and checks status with a second identifier", async ({
   page,
 }) => {
-  await page.goto("/en/apply");
+  await page.goto("/en");
+  await page.getByRole("link", { name: "Apply for a student" }).first().click();
+  await expect(page).toHaveURL(/\/en\/apply$/);
+  await expect(
+    page.getByRole("heading", { name: "Begin your Quran learning journey" }),
+  ).toBeVisible();
   await page.getByLabel("Student name").fill(studentName);
   await page.getByLabel("Age", { exact: true }).fill("12");
   await page.getByLabel("Guardian name (required under age 18)").fill("Public Test Guardian");
