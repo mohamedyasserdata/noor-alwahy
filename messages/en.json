@@ -1589,12 +1589,6 @@
           }
         }
       },
-      "application": {
-        "title": "Start with a simple application, and we will arrange the next step",
-        "description": "Share the student’s details, goal, and suitable times. The academy team will review the request and contact you directly.",
-        "hint": "It usually takes under five minutes, and you can track the application with a private number after sending it.",
-        "loading": "Preparing the application form…"
-      },
       "closing": {
         "title": "Choosing a track should not involve guesswork",
         "description": "Tell the academy about the student’s needs, and we will explain the suitable starting point and next step.",

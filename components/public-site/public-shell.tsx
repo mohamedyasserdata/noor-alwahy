@@ -17,7 +17,7 @@ type PublicShellProps = {
 const navigation = [
   { href: "/", key: "home" },
   { href: "/tracks", key: "tracks" },
-  { href: "/#apply", key: "apply" },
+  { href: "/apply", key: "apply" },
   { href: "/faq", key: "faq" },
   { href: "/contact", key: "contact" },
 ] as const;

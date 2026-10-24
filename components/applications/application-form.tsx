@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { legalDocumentVersion } from "@/lib/legal/documents";
-import { cn } from "@/lib/utils";
 
 type Option = { id: string; name: string };
 type Country = { code: string; name: string };
@@ -19,16 +18,12 @@ export function ApplicationForm({
   tracks,
   packages,
   countries,
-  embedded = false,
   siteKey,
-  source = "website",
 }: {
   tracks: Option[];
   packages: Option[];
   countries: Country[];
-  embedded?: boolean;
   siteKey: string;
-  source?: string;
 }) {
   const locale = useLocale() as "ar" | "en";
   const t = useTranslations("applicationsPublic");
@@ -65,7 +60,7 @@ export function ApplicationForm({
         notes: form.get("notes"),
         consent: form.get("consent") === "on",
         captcha_token: captcha,
-        source,
+        source: "application_page",
       };
       const response = await fetch("/api/applications", {
         method: "POST",
@@ -117,10 +112,7 @@ export function ApplicationForm({
       ) : null}
       <form
         onSubmit={submit}
-        className={cn(
-          "mx-auto grid max-w-4xl gap-6 rounded-3xl border bg-card p-5 shadow-soft sm:p-8",
-          embedded ? "mt-0" : "mt-8",
-        )}
+        className="mx-auto mt-8 grid max-w-4xl gap-6 rounded-3xl border bg-card p-5 shadow-soft sm:p-8"
       >
         <fieldset className="grid gap-5 sm:grid-cols-2">
           <legend className="col-span-full text-xl font-black text-primary">

@@ -36,16 +36,56 @@ export function ContactChannelIcon({ type }: ContactChannelIconProps) {
 }
 
 export function getContactChannelTheme(type: string) {
-  if (type === "whatsapp") return "bg-[#25D366] text-white";
-  if (type === "facebook") return "bg-[#0866FF] text-white";
+  if (type === "whatsapp")
+    return {
+      frame:
+        "border-[#25D366]/70 hover:border-[#25D366] hover:shadow-[0_14px_34px_-22px_rgba(37,211,102,0.95)]",
+      icon: "bg-[#25D366] text-white",
+    };
+  if (type === "facebook")
+    return {
+      frame:
+        "border-[#0866FF]/70 hover:border-[#0866FF] hover:shadow-[0_14px_34px_-22px_rgba(8,102,255,0.95)]",
+      icon: "bg-[#0866FF] text-white",
+    };
   if (type === "instagram")
-    return "bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#FCAF45] text-white";
-  if (type === "telegram") return "bg-[#229ED9] text-white";
-  if (type === "youtube") return "bg-[#FF0000] text-white";
-  if (type === "tiktok") return "bg-[#010101] text-white dark:bg-white dark:text-[#010101]";
-  if (type === "phone") return "bg-[#0B6E4F] text-white";
-  if (type === "email") return "bg-[#B3261E] text-white";
-  return "bg-primary text-secondary";
+    return {
+      frame:
+        "border-[#E1306C]/70 hover:border-[#E1306C] hover:shadow-[0_14px_34px_-22px_rgba(225,48,108,0.95)]",
+      icon: "bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#FCAF45] text-white",
+    };
+  if (type === "telegram")
+    return {
+      frame:
+        "border-[#229ED9]/70 hover:border-[#229ED9] hover:shadow-[0_14px_34px_-22px_rgba(34,158,217,0.95)]",
+      icon: "bg-[#229ED9] text-white",
+    };
+  if (type === "youtube")
+    return {
+      frame:
+        "border-[#FF0000]/70 hover:border-[#FF0000] hover:shadow-[0_14px_34px_-22px_rgba(255,0,0,0.85)]",
+      icon: "bg-[#FF0000] text-white",
+    };
+  if (type === "tiktok")
+    return {
+      frame:
+        "border-[#010101]/70 hover:border-[#010101] dark:border-white/70 dark:hover:border-white",
+      icon: "bg-[#010101] text-white dark:bg-white dark:text-[#010101]",
+    };
+  if (type === "phone")
+    return {
+      frame: "border-[#0B6E4F]/70 hover:border-[#0B6E4F]",
+      icon: "bg-[#0B6E4F] text-white",
+    };
+  if (type === "email")
+    return {
+      frame: "border-[#B3261E]/70 hover:border-[#B3261E]",
+      icon: "bg-[#B3261E] text-white",
+    };
+  return {
+    frame: "border-primary/55 hover:border-primary",
+    icon: "bg-primary text-secondary",
+  };
 }
 
 function BrandIcon({ path }: { path: string }) {

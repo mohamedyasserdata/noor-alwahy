@@ -6,19 +6,14 @@ import { ApplicationForm } from "@/components/applications/application-form";
 import type { AppLocale } from "@/i18n/routing";
 import { createPublicClient } from "@/lib/supabase/public";
 
-type ApplicationOptionsProps = {
-  embedded?: boolean;
-  locale: AppLocale;
-};
+type ApplicationOptionsProps = { locale: AppLocale };
 
-export async function ApplicationOptions({ embedded = false, locale }: ApplicationOptionsProps) {
+export async function ApplicationOptions({ locale }: ApplicationOptionsProps) {
   const { countries, packages, tracks } = await getApplicationOptions();
 
   return (
     <ApplicationForm
-      embedded={embedded}
       siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? ""}
-      source={embedded ? "homepage" : "application_page"}
       tracks={tracks.map((item) => ({
         id: item.id,
         name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),

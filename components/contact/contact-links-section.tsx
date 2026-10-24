@@ -26,8 +26,8 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
   const supportHours = locale === "ar" ? settings.supportHours.ar : settings.supportHours.en;
 
   return (
-    <section className="mx-auto w-full max-w-5xl" aria-labelledby="contact-links-title">
-      <header className="max-w-3xl">
+    <section className="mx-auto w-full max-w-6xl" aria-labelledby="contact-links-title">
+      <header className="mx-auto max-w-3xl text-center">
         <p className="mb-3 inline-flex min-h-8 items-center rounded-full border border-secondary/30 bg-secondary/12 px-3 text-xs font-extrabold tracking-wide text-primary">
           {t("eyebrow")}
         </p>
@@ -56,34 +56,35 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("empty.description")}</p>
         </div>
       ) : (
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+        <ul className="mt-12 grid gap-x-8 gap-y-7 px-1 sm:grid-cols-2 xl:grid-cols-3">
           {links.map((link) => {
             const external = link.url.toLowerCase().startsWith("https://");
+            const theme = getContactChannelTheme(link.type);
 
             return (
-              <li key={link.id}>
+              <li key={link.id} className="min-w-0">
                 <a
                   href={link.url}
-                  className="group flex min-h-24 items-center gap-4 rounded-2xl border bg-card p-5 shadow-card transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transform-none motion-reduce:transition-none"
+                  className={`group relative flex min-h-20 min-w-0 items-center rounded-full border-2 bg-card py-3 ps-[5.25rem] pe-4 shadow-[0_10px_28px_-24px_rgba(15,39,74,0.6)] transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transform-none motion-reduce:transition-none ${theme.frame}`}
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                 >
                   <span
-                    className={`grid size-12 shrink-0 place-items-center rounded-2xl shadow-sm [&_svg]:size-6 ${getContactChannelTheme(link.type)}`}
+                    className={`absolute start-[-0.3rem] top-1/2 grid size-[4.75rem] shrink-0 -translate-y-1/2 place-items-center rounded-full border-4 border-background shadow-[0_10px_24px_-14px_rgba(15,39,74,0.75)] ring-1 ring-border [&_svg]:size-8 ${theme.icon}`}
                   >
                     <ContactChannelIcon type={link.type} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-black text-primary">
+                    <span className="block truncate text-sm font-black text-primary sm:text-base">
                       {localizedLabel(link, locale)}
                     </span>
-                    <span className="mt-1 block text-xs font-bold text-muted-foreground">
+                    <span className="mt-1 block truncate text-xs font-bold text-muted-foreground">
                       {t(`types.${link.type}` as Parameters<typeof t>[0])}
                     </span>
                   </span>
                   {external ? (
                     <ExternalLink
-                      className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
+                      className="ms-2 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
                       aria-hidden="true"
                     />
                   ) : null}
@@ -94,7 +95,7 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
         </ul>
       )}
 
-      <aside className="mt-6 rounded-2xl border border-secondary/25 bg-secondary/10 p-5">
+      <aside className="mx-auto mt-12 max-w-3xl rounded-2xl border border-secondary/25 bg-secondary/10 p-5 text-center">
         <h2 className="font-black text-primary">{t("support.title")}</h2>
         <p className="mt-2 text-sm leading-7 text-muted-foreground">{supportHours}</p>
       </aside>
