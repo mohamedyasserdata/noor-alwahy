@@ -110,6 +110,22 @@ for (const locale of locales) {
           exact: true,
         }),
       ).toHaveCount(0);
+      await expect(page.locator('a[href$="#packages"]').first()).toHaveText(
+        locale.code === "ar" ? "الباقات" : "Packages",
+      );
+
+      const expectedPackageName = locale.code === "ar" ? packageNameAr : packageNameEn;
+      const homePackageCard = page.locator("#packages article").filter({
+        hasText: expectedPackageName,
+      });
+      await expect(homePackageCard).toBeVisible();
+      await expect(homePackageCard).not.toContainText("900");
+      await expect(homePackageCard).not.toContainText(/EGP|ج\.م/);
+      const packageAction = homePackageCard.getByRole("link");
+      await expect(packageAction).toHaveCount(1);
+      expect(await packageAction.getAttribute("href")).toMatch(
+        /(?:whatsapp|wa\.me|\/(?:ar|en)\/contact)/i,
+      );
 
       const hiddenPricingResponse = await page.goto(`/${locale.code}/packages`);
       expect(hiddenPricingResponse?.status()).toBe(404);
@@ -119,7 +135,6 @@ for (const locale of locales) {
         "content",
         /noindex.*nofollow/,
       );
-      const expectedPackageName = locale.code === "ar" ? packageNameAr : packageNameEn;
       const packageCard = page.locator("article").filter({ hasText: expectedPackageName });
       await expect(packageCard.getByText(expectedPackageName)).toBeVisible();
       await expect(packageCard.getByText(/900/)).toBeVisible();

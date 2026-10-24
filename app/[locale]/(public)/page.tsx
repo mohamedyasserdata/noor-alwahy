@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { HomePackages } from "@/components/public-site/home-packages";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { localizedMetadata } from "@/lib/seo/metadata";
@@ -121,6 +122,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <Link href="/tracks">{t("tracks.action")}</Link>
         </Button>
       </section>
+
+      <HomePackages locale={locale} />
 
       <section className="border-y bg-primary text-primary-foreground">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-14 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8">

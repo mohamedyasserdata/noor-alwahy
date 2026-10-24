@@ -1530,7 +1530,7 @@
         "home": "Home",
         "tracks": "Learning tracks",
         "apply": "Apply for a student",
-        "packages": "Packages & prices",
+        "packages": "Packages",
         "faq": "Questions",
         "contact": "Contact",
         "privacy": "Privacy Policy",
@@ -1587,6 +1587,23 @@
             "title": "Quran reading foundation",
             "description": "A calm start with letters and reading until the student becomes more independent."
           }
+        }
+      },
+      "packages": {
+        "title": "Flexible packages for each student’s time and goal",
+        "description": "Choose the package closest to the student’s needs, then contact us for details and help selecting the right option.",
+        "pricingNote": "Prices are not shown publicly. Contact the academy for details appropriate to your country.",
+        "generalTrack": "One-to-one Quran learning",
+        "defaultDescription": "We will explain this package and the suitable learning plan when you contact us.",
+        "sessions": "Each week",
+        "sessionsValue": "{count} lessons",
+        "duration": "Lesson length",
+        "durationValue": "{minutes} minutes",
+        "whatsappAction": "Contact us on WhatsApp",
+        "contactAction": "Ask about this package",
+        "empty": {
+          "title": "Available packages are being prepared",
+          "description": "Contact us now and we will help you choose the suitable track and plan for the student."
         }
       },
       "closing": {
