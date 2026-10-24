@@ -14,6 +14,7 @@ const publicPaths = ["", "/tracks", "/faq", "/contact"] as const;
 const packageSlug = "public-site-e2e";
 const packageNameAr = "باقة اختبار الموقع الثابتة";
 const packageNameEn = "Stable public site test package";
+const pricingAccessKey = process.env.E2E_PRIVATE_PRICING_ACCESS_KEY ?? "local-pricing-preview";
 
 function createLocalAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -98,9 +99,9 @@ for (const locale of locales) {
       await page.goto(`/${locale.code}`);
       const academyLogo = page.locator('header img[src*="noor-alwahy-emblem"]').first();
       await expect(academyLogo).toBeVisible();
-      expect(
-        await academyLogo.evaluate((image: HTMLImageElement) => image.naturalWidth),
-      ).toBeGreaterThan(0);
+      await expect
+        .poll(() => academyLogo.evaluate((image: HTMLImageElement) => image.naturalWidth))
+        .toBeGreaterThan(0);
       if (locale.code === "ar" && viewport.name === "mobile") {
         expect((await page.request.get("/icon.png")).ok()).toBe(true);
         expect((await page.request.get("/apple-icon.png")).ok()).toBe(true);
@@ -114,7 +115,7 @@ for (const locale of locales) {
       const hiddenPricingResponse = await page.goto(`/${locale.code}/packages`);
       expect(hiddenPricingResponse?.status()).toBe(404);
 
-      await page.goto(`/${locale.code}/offer/local-pricing-preview`);
+      await page.goto(`/${locale.code}/offer/${pricingAccessKey}`);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
         "content",
         /noindex.*nofollow/,
@@ -127,7 +128,7 @@ for (const locale of locales) {
       if (locale.code === "ar" && viewport.name === "mobile") {
         await page.getByLabel("دولة السعر").selectOption("SA");
         await page.getByRole("button", { name: "تحديث السعر" }).click();
-        await expect(page).toHaveURL(/\/ar\/offer\/local-pricing-preview$/);
+        await expect(page).toHaveURL(new RegExp(`/ar/offer/${pricingAccessKey}$`));
         await expect(packageCard.getByText(/40\.00\s+US\$/)).toBeVisible();
         expect(
           (await page.context().cookies()).find(({ name }) => name === "nw_country")?.value,

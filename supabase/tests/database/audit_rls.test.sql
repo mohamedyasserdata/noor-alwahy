@@ -101,23 +101,83 @@ update public.profiles
 set is_active = false
 where id = '22222222-2222-4222-8222-222222222222';
 
-select is((select count(*)::integer from public.audit_logs), 1, 'an audited profile change creates one event');
-select is((select action from public.audit_logs), 'UPDATE', 'the event records the update action');
-select is((select table_name from public.audit_logs), 'profiles', 'the event records its source table');
 select is(
-  (select record_id from public.audit_logs),
+  (
+    select count(*)::integer
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  1,
+  'an audited profile change creates one event'
+);
+select is(
+  (
+    select action
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  'UPDATE',
+  'the event records the update action'
+);
+select is(
+  (
+    select table_name
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  'profiles',
+  'the event records its source table'
+);
+select is(
+  (
+    select record_id
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
   '22222222-2222-4222-8222-222222222222',
   'the event records the changed profile identifier'
 );
 select is(
-  (select user_id from public.audit_logs),
+  (
+    select user_id
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
   '11111111-1111-4111-8111-111111111111'::uuid,
   'the event records the authenticated administrator'
 );
-select is((select before ->> 'is_active' from public.audit_logs), 'true', 'before stores the original activation state');
-select is((select after ->> 'is_active' from public.audit_logs), 'false', 'after stores the new activation state');
 select is(
-  (select concat_ws('|', before ->> 'role', after ->> 'role') from public.audit_logs),
+  (
+    select before ->> 'is_active'
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  'true',
+  'before stores the original activation state'
+);
+select is(
+  (
+    select after ->> 'is_active'
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
+  'false',
+  'after stores the new activation state'
+);
+select is(
+  (
+    select concat_ws('|', before ->> 'role', after ->> 'role')
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
   'teacher|teacher',
   'before and after preserve unchanged fields for review'
 );
@@ -127,13 +187,23 @@ set display_name = 'Not an audited field'
 where id = '22222222-2222-4222-8222-222222222222';
 
 select is(
-  (select count(*)::integer from public.audit_logs),
+  (
+    select count(*)::integer
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
   1,
   'a profile change outside role and activation does not create noise'
 );
 
 select ok(
-  (select created_at is not null and updated_at is not null from public.audit_logs),
+  (
+    select created_at is not null and updated_at is not null
+    from public.audit_logs
+    where table_name = 'profiles'
+      and record_id = '22222222-2222-4222-8222-222222222222'
+  ),
   'audit events carry the required timestamps'
 );
 

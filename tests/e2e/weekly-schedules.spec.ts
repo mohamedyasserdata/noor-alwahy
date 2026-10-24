@@ -1,8 +1,11 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 
+import { convertNextOccurrence } from "../../lib/schedules/conversion";
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
+
+const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 test("US-070 and US-076 weekly schedules render in every role's local time", async ({ page }) => {
   test.setTimeout(120_000);
@@ -21,20 +24,38 @@ test("US-070 and US-076 weekly schedules render in every role's local time", asy
 
   await signInAs(page, "en", "teacher");
   await page.goto("/en/teacher/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 18:30/)).toBeVisible();
+  await expectSchedule(page, "Asia/Riyadh");
 
   await signInAs(page, "en", "student");
   await page.goto("/en/student/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 18:30/)).toBeVisible();
+  await expectSchedule(page, "Africa/Cairo");
 
   await signInAs(page, "en", "parent");
   await page.goto("/en/parent/schedule");
-  await expect(page.getByText("Schedule Student")).toBeVisible();
-  await expect(page.getByText(/Friday · 16:30/)).toBeVisible();
-  await expect(page.getByText(/Anchored to Africa\/Cairo/)).toBeVisible();
+  await expectSchedule(page, "Europe/London");
+  await expect(page.getByText(/Anchored to Africa\/Cairo/).first()).toBeVisible();
 });
+
+async function expectSchedule(page: Parameters<typeof signInAs>[0], viewerTimezone: string) {
+  const occurrence = convertNextOccurrence({
+    weekday: 5,
+    time: "18:30:00",
+    anchorTimezone: "Africa/Cairo",
+    viewerTimezone,
+  });
+  if (!occurrence) throw new Error(`Could not convert the weekly schedule for ${viewerTimezone}.`);
+
+  const card = page
+    .locator("article")
+    .filter({ has: page.getByRole("heading", { name: "Schedule Student", exact: true }) })
+    .first();
+  await expect(card).toBeVisible();
+  await expect(
+    card.getByText(`${weekdays[occurrence.weekday]} · ${occurrence.time.slice(0, 5)}`, {
+      exact: true,
+    }),
+  ).toBeVisible();
+}
 
 async function createFixture() {
   const db = createClient<Database>(

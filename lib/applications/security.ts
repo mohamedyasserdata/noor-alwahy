@@ -31,7 +31,11 @@ export function lookupIdentifier(email: string, phone: string) {
 
 export async function verifyApplicationCaptcha(token: string, ip: string) {
   const secret = process.env.RECAPTCHA_SECRET_KEY?.trim();
-  if (!secret) return process.env.NODE_ENV !== "production" && token === LOCAL_CAPTCHA_TOKEN;
+  if (!secret) {
+    const localE2E =
+      process.env.E2E_LOCAL_TESTS === "1" && isLoopbackUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
+    return (process.env.NODE_ENV !== "production" || localE2E) && token === LOCAL_CAPTCHA_TOKEN;
+  }
   const body = new URLSearchParams({ secret, response: token, remoteip: ip });
   const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
     method: "POST",
@@ -42,4 +46,15 @@ export async function verifyApplicationCaptcha(token: string, ip: string) {
   if (!response.ok) return false;
   const result = (await response.json()) as { success?: boolean; score?: number; action?: string };
   return result.success === true && result.action === "apply" && (result.score ?? 0) >= 0.5;
+}
+
+function isLoopbackUrl(value: string | undefined) {
+  if (!value) return false;
+
+  try {
+    const hostname = new URL(value).hostname;
+    return hostname === "127.0.0.1" || hostname === "localhost" || hostname === "[::1]";
+  } catch {
+    return false;
+  }
 }
