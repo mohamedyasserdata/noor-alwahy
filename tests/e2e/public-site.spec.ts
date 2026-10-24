@@ -78,6 +78,13 @@ test.beforeAll(async () => {
 for (const locale of locales) {
   for (const viewport of viewports) {
     test(`${locale.code} public site stays accessible at ${viewport.name}`, async ({ page }) => {
+      const renderedScriptWarnings: string[] = [];
+      page.on("console", (message) => {
+        if (message.text().includes("Encountered a script tag while rendering React component")) {
+          renderedScriptWarnings.push(message.text());
+        }
+      });
+
       await page.setViewportSize(viewport);
       await page.setExtraHTTPHeaders({ "x-vercel-ip-country": "EG" });
 
@@ -152,6 +159,7 @@ for (const locale of locales) {
       await page.goto(`/${locale.code}/tracks?source=public-test`);
       await page.locator(`nav a[lang="${locale.other}"]`).click();
       await expect(page).toHaveURL(new RegExp(`/${locale.other}/tracks\\?source=public-test$`));
+      expect(renderedScriptWarnings).toEqual([]);
     });
   }
 }
