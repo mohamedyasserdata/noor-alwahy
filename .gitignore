@@ -17,6 +17,7 @@
 /output/playwright/
 /output/pdf/
 /output/lighthouse/
+/.playwright-cli/
 /tmp/pdfs/
 /tmp/k6-*.json
 *.dump

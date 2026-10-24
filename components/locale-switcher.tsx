@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Link, usePathname } from "@/i18n/navigation";
+import { getPathname, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 type LocaleSwitcherProps = {
@@ -27,22 +27,22 @@ export function LocaleSwitcher({ compact = false }: LocaleSwitcherProps) {
   const href = searchParams.size > 0 ? { pathname, query } : pathname;
   const alternateLocale =
     routing.locales.find((option) => option !== locale) ?? routing.defaultLocale;
+  const localizedHref = (option: (typeof routing.locales)[number]) =>
+    getPathname({ href, locale: option });
 
   if (compact) {
     return (
       <nav className="flex" aria-label={t("label")}>
         <Button asChild variant="outline" size="icon" className="rounded-full">
-          <Link
-            href={href}
-            locale={alternateLocale}
-            prefetch={false}
+          <a
+            href={localizedHref(alternateLocale)}
             aria-label={t("switchTo", { language: t(alternateLocale) })}
             title={t("switchTo", { language: t(alternateLocale) })}
             lang={alternateLocale}
             dir={alternateLocale === "ar" ? "rtl" : "ltr"}
           >
             <Languages aria-hidden="true" />
-          </Link>
+          </a>
         </Button>
       </nav>
     );
@@ -56,17 +56,15 @@ export function LocaleSwitcher({ compact = false }: LocaleSwitcherProps) {
       <Languages className="ms-2 size-4 text-secondary" aria-hidden="true" />
       {routing.locales.map((option) => (
         <Button key={option} asChild variant={option === locale ? "default" : "ghost"}>
-          <Link
-            href={href}
-            locale={option}
-            prefetch={false}
+          <a
+            href={localizedHref(option)}
             aria-current={option === locale ? "page" : undefined}
             aria-label={t("switchTo", { language: t(option) })}
             lang={option}
             dir={option === "ar" ? "rtl" : "ltr"}
           >
             {t(option)}
-          </Link>
+          </a>
         </Button>
       ))}
     </nav>

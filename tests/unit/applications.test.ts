@@ -28,6 +28,12 @@ describe("public application validation", () => {
     expect(publicApplicationSchema.safeParse(valid).success).toBe(true));
   it("requires guardian details for minors", () =>
     expect(publicApplicationSchema.safeParse({ ...valid, guardian_name: "" }).success).toBe(false));
+  it("allows an adult applicant without guardian details", () =>
+    expect(
+      publicApplicationSchema.safeParse({ ...valid, student_age: 18, guardian_name: "" }).success,
+    ).toBe(true));
+  it("rejects an application without explicit consent", () =>
+    expect(publicApplicationSchema.safeParse({ ...valid, consent: false }).success).toBe(false));
   it("requires one contact method", () =>
     expect(
       publicApplicationSchema.safeParse({ ...valid, contact_email: "", contact_phone: "" }).success,
