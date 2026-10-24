@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { completeLocalAdminMfa } from "@/lib/auth/local-admin-mfa-action";
 import { createClient } from "@/lib/supabase/client";
 
 type MfaLabels = {
@@ -15,6 +16,9 @@ type MfaLabels = {
   enrollDescription: string;
   enrollPending: string;
   manualCode: string;
+  localAction: string;
+  localDescription: string;
+  localPending: string;
   qrAlt: string;
   recovery: string;
   signOut: string;
@@ -31,18 +35,20 @@ type Enrollment = {
 
 export function MfaGate({
   labels,
+  localHelperAvailable,
   returnTo,
   unverifiedFactorIds,
   verifiedFactorId,
 }: {
   labels: MfaLabels;
+  localHelperAvailable: boolean;
   returnTo: string;
   unverifiedFactorIds: string[];
   verifiedFactorId?: string;
 }) {
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [error, setError] = useState(false);
-  const [pending, setPending] = useState<"enroll" | "signout" | "verify" | null>(null);
+  const [pending, setPending] = useState<"enroll" | "local" | "signout" | "verify" | null>(null);
   const [supabase] = useState(createClient);
   const factorId = verifiedFactorId ?? enrollment?.factorId;
 
@@ -112,10 +118,39 @@ export function MfaGate({
     window.location.replace("./login");
   }
 
+  async function completeLocalLogin() {
+    setError(false);
+    setPending("local");
+    const result = await completeLocalAdminMfa();
+
+    if (!result.ok) {
+      setError(true);
+      setPending(null);
+      return;
+    }
+
+    window.location.replace(returnTo);
+  }
+
   const showEnrollment = !verifiedFactorId;
 
   return (
     <div className="grid gap-6">
+      {localHelperAvailable ? (
+        <div className="grid gap-3 rounded-2xl border border-secondary/50 bg-secondary/10 p-4">
+          <p className="text-sm leading-7 text-primary">{labels.localDescription}</p>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 border-secondary/60 bg-background"
+            disabled={pending !== null}
+            onClick={completeLocalLogin}
+          >
+            {pending === "local" ? labels.localPending : labels.localAction}
+          </Button>
+        </div>
+      ) : null}
+
       {showEnrollment && !enrollment ? (
         <div className="grid gap-4">
           <p className="text-sm leading-7 text-muted-foreground">{labels.enrollDescription}</p>
