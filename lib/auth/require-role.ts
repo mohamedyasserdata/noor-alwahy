@@ -22,7 +22,7 @@ async function requireActiveIdentity(locale: AppLocale) {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("role, is_active")
+    .select("role, is_active, full_name, timezone, preferred_locale")
     .eq("id", user.id)
     .maybeSingle();
 

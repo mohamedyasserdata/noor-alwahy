@@ -51,7 +51,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
       <AuthNotice
         message={noticeKey ? t(noticeKey) : undefined}
-        success={query.status === "password_updated"}
+        success={query.status === "password_updated" || query.status === "signed_out"}
       />
 
       <form action={loginAction.bind(null, locale)} className="mt-6 grid gap-5">
@@ -103,6 +103,10 @@ function getLoginNoticeKey(query: Record<string, string | string[] | undefined>)
 
   if (query.status === "password_updated") {
     return "status.passwordUpdated" as const;
+  }
+
+  if (query.status === "signed_out") {
+    return "status.signedOut" as const;
   }
 
   return typeof value === "string" && value in keys ? keys[value as keyof typeof keys] : null;

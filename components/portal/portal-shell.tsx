@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
+import { AccountMenu } from "@/components/account/account-menu";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { NotificationCenter } from "@/components/notifications/notification-center";
@@ -8,16 +9,23 @@ import type { PortalId } from "@/components/portal/portal-config";
 import { PortalNavigation } from "@/components/portal/portal-navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { AppLocale } from "@/i18n/routing";
+import type { UserRole } from "@/lib/auth/roles";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
 import { getNotificationCenter } from "@/lib/notifications/queries";
 
 type PortalShellProps = {
+  account: {
+    email: string;
+    fullName: string;
+    role: UserRole;
+    timezone: string;
+  };
   children: React.ReactNode;
   locale: AppLocale;
   portal: PortalId;
 };
 
-export async function PortalShell({ children, locale, portal }: PortalShellProps) {
+export async function PortalShell({ account, children, locale, portal }: PortalShellProps) {
   const [t, settings, notificationCenter] = await Promise.all([
     getTranslations({ locale, namespace: "portals" }),
     getPublicAppSettings(),
@@ -25,6 +33,20 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
   ]);
   const academyName =
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
+  const accountLabels = {
+    accountSettings: t("account.accountSettings"),
+    closeHint: t("account.closeHint"),
+    email: t("account.email"),
+    role: t("account.role"),
+    roles: {
+      admin: t("account.roles.admin"),
+      teacher: t("account.roles.teacher"),
+      student: t("account.roles.student"),
+      parent: t("account.roles.parent"),
+    },
+    signOut: t("account.signOut"),
+    timezone: t("account.timezone"),
+  };
 
   return (
     <div className="min-h-svh" data-testid={`portal-shell-${portal}`}>
@@ -57,6 +79,7 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
         <PortalNavigation portal={portal} variant="sidebar" />
 
         <div className="mt-auto grid shrink-0 gap-3 border-t p-4">
+          <AccountMenu account={account} labels={accountLabels} locale={locale} />
           <ThemeToggle
             enableDarkLabel={t("theme.enableDark")}
             enableLightLabel={t("theme.enableLight")}
@@ -76,13 +99,14 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
             labelClassName="sr-only min-[440px]:not-sr-only min-[440px]:text-base"
           />
           <div className="flex items-center gap-2">
+            <AccountMenu account={account} labels={accountLabels} locale={locale} compact />
             <ThemeToggle
               compact
               enableDarkLabel={t("theme.enableDark")}
               enableLightLabel={t("theme.enableLight")}
             />
             <Suspense fallback={<ControlFallback compact />}>
-              <LocaleSwitcher />
+              <LocaleSwitcher compact />
             </Suspense>
           </div>
         </header>

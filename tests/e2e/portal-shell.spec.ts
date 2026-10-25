@@ -111,6 +111,17 @@ test("dark theme is accessible and persists across reloads", async ({ page }) =>
   );
 });
 
+test("account settings panel stays inside the mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await signInAs(page, "ar", "student");
+  await page.goto("/ar/student/home");
+
+  const accountMenu = page.getByTestId("account-menu").filter({ visible: true });
+  await accountMenu.locator("summary").click();
+  await expect(page.getByRole("region", { name: "إعدادات الحساب" })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
+
 test("admin sidebar scrolls on laptop-height viewports", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1226, height: 668 });

@@ -47,6 +47,37 @@ test("US-010 routes a teacher to the teacher portal and rejects the admin portal
   await expect(page.getByRole("heading", { level: 1, name: "My sessions today" })).toBeVisible();
 });
 
+test("account settings signs out the current browser before switching accounts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await signInAs(page, "en", "teacher");
+
+  const accountMenu = page.getByTestId("account-menu").filter({ visible: true });
+  await accountMenu.locator("summary").click();
+  const accountDetails = accountMenu.locator("dl");
+  await expect(accountDetails.getByText(testAccounts.teacher.email, { exact: true })).toBeVisible();
+  await expect(accountDetails.getByText("Teacher", { exact: true })).toBeVisible();
+  await expect(accountDetails.getByRole("definition").last()).toHaveText(/^\w+\/\w+$/);
+
+  await accountMenu.getByRole("button", { name: "Sign out and choose another account" }).click();
+  await expect(page).toHaveURL(/\/en\/auth\/login\?status=signed_out$/);
+  await expect(page.locator('[data-slot="alert"]')).toContainText(
+    "You signed out from this browser.",
+  );
+  await expect(page.locator("#email")).toHaveValue("");
+  await expect(page.locator("#password")).toHaveValue("");
+  expect(
+    (await page.context().cookies()).filter(({ name }) => name.includes("auth-token")),
+  ).toEqual([]);
+
+  await page.locator("#email").fill(testAccounts.student.email);
+  await page.locator("#password").fill("AcademyTest1!");
+  const loginForm = page.locator("form").filter({ has: page.locator("#password") });
+  await loginForm.getByRole("button", { name: "Open my portal" }).click();
+  await expect(page).toHaveURL(/\/en\/student\/home$/);
+});
+
 test("US-011 completes password recovery without revealing account existence", async ({
   page,
 }, testInfo) => {

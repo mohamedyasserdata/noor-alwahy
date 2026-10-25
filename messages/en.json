@@ -81,6 +81,20 @@
       "enableDark": "Enable dark mode",
       "enableLight": "Enable light mode"
     },
+    "account": {
+      "accountSettings": "Account settings",
+      "closeHint": "Press the account settings button again to close this panel.",
+      "email": "Email address",
+      "role": "Account type",
+      "timezone": "Time zone",
+      "signOut": "Sign out and choose another account",
+      "roles": {
+        "admin": "Administrator",
+        "teacher": "Teacher",
+        "student": "Student",
+        "parent": "Parent"
+      }
+    },
     "emptyState": {
       "title": "Your workspace is ready",
       "description": "Content authorized for this role will appear here as each workflow is activated. Placeholder records are never shown in place of the academy’s real data."
@@ -363,7 +377,8 @@
     "backToLogin": "Back to sign in",
     "status": {
       "resetSent": "If the email belongs to an account, recovery instructions will arrive shortly. Check the junk folder too.",
-      "passwordUpdated": "Your password was changed. You can now sign in with the new password."
+      "passwordUpdated": "Your password was changed. You can now sign in with the new password.",
+      "signedOut": "You signed out from this browser. Choose the account you want to use."
     },
     "errors": {
       "invalidFields": "Check the email and password, then try again.",

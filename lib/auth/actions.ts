@@ -66,6 +66,14 @@ export async function loginAction(localeValue: string, formData: FormData): Prom
   redirect(getRoleHome(role, locale) as Route);
 }
 
+export async function signOutAction(localeValue: string): Promise<never> {
+  const locale = parseLocale(localeValue);
+  const supabase = await createClient();
+
+  await supabase.auth.signOut({ scope: "local" });
+  redirectToAuth(locale, "login", "status", "signed_out");
+}
+
 export async function forgotPasswordAction(
   localeValue: string,
   formData: FormData,
