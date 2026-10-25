@@ -25,15 +25,59 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
   ]);
   const academyName =
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
+  const isStudentPortal = portal === "student";
 
   return (
-    <div className="min-h-svh" data-testid={`portal-shell-${portal}`}>
-      {notificationCenter ? (
+    <div
+      className={
+        isStudentPortal ? "relative min-h-svh overflow-x-hidden bg-background" : "min-h-svh"
+      }
+      data-testid={`portal-shell-${portal}`}
+    >
+      {isStudentPortal ? (
+        <div
+          className="islamic-pattern pointer-events-none fixed inset-0 opacity-35 dark:opacity-10"
+          aria-hidden="true"
+        />
+      ) : null}
+      {notificationCenter && !isStudentPortal ? (
         <NotificationCenter initialData={notificationCenter} portal={portal} />
+      ) : null}
+      {isStudentPortal ? (
+        <header
+          className="safe-header sticky top-0 z-40 border-b border-secondary/20 bg-card/95 shadow-[0_0.5rem_2rem_-1.5rem_rgb(15_37_71_/_0.3)] backdrop-blur-xl"
+          data-testid="student-portal-header"
+        >
+          <div className="mx-auto grid w-full max-w-[96rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 py-2.5 min-[1100px]:grid-cols-[minmax(12rem,auto)_minmax(0,1fr)_auto] min-[1100px]:gap-5 min-[1100px]:py-3">
+            <BrandMark
+              label={academyName}
+              logoPath={settings.academyProfile.logoPath}
+              className="min-w-0"
+              labelClassName="max-w-40 truncate text-sm min-[520px]:max-w-none min-[520px]:text-base"
+            />
+            <div className="order-3 col-span-2 min-w-0 border-t border-secondary/15 pt-2 min-[1100px]:order-none min-[1100px]:col-span-1 min-[1100px]:border-0 min-[1100px]:pt-0">
+              <PortalNavigation portal={portal} variant="top" />
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              {notificationCenter ? (
+                <NotificationCenter initialData={notificationCenter} portal={portal} embedded />
+              ) : null}
+              <ThemeToggle
+                compact
+                enableDarkLabel={t("theme.enableDark")}
+                enableLightLabel={t("theme.enableLight")}
+              />
+              <Suspense fallback={<ControlFallback compact />}>
+                <LocaleSwitcher compact />
+              </Suspense>
+            </div>
+          </div>
+        </header>
       ) : null}
       <aside
         className="inset-block-0 fixed start-0 z-30 hidden h-svh w-72 flex-col overflow-hidden border-e bg-card/95 shadow-card backdrop-blur min-[769px]:flex"
         data-testid="portal-sidebar"
+        hidden={isStudentPortal}
       >
         <div className="shrink-0 border-b px-5 py-5">
           <BrandMark label={academyName} logoPath={settings.academyProfile.logoPath} />
@@ -67,8 +111,11 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
         </div>
       </aside>
 
-      <div className="min-h-svh min-[769px]:ps-72">
-        <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 pe-14 backdrop-blur min-[769px]:hidden">
+      <div className={isStudentPortal ? "relative min-h-svh" : "min-h-svh min-[769px]:ps-72"}>
+        <header
+          className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 pe-14 backdrop-blur min-[769px]:hidden"
+          hidden={isStudentPortal}
+        >
           <BrandMark
             label={academyName}
             logoPath={settings.academyProfile.logoPath}
@@ -89,7 +136,11 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
 
         <main
           id="main-content"
-          className="mx-auto min-h-[calc(100svh-4rem)] w-full max-w-[96rem] px-4 pt-7 pb-28 min-[769px]:min-h-svh min-[769px]:px-10 min-[769px]:pt-12 min-[769px]:pb-12 sm:px-6 sm:pt-10 xl:px-14"
+          className={
+            isStudentPortal
+              ? "relative mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[96rem] px-4 py-5 sm:px-6 sm:py-7 lg:px-8"
+              : "mx-auto min-h-[calc(100svh-4rem)] w-full max-w-[96rem] px-4 pt-7 pb-28 min-[769px]:min-h-svh min-[769px]:px-10 min-[769px]:pt-12 min-[769px]:pb-12 sm:px-6 sm:pt-10 xl:px-14"
+          }
         >
           {children}
         </main>
@@ -98,6 +149,7 @@ export async function PortalShell({ children, locale, portal }: PortalShellProps
       <div
         className="safe-bottom fixed inset-x-0 bottom-0 z-30 h-[5.25rem] border-t bg-card/96 shadow-[0_-0.75rem_2rem_-1.5rem_rgb(15_37_71_/_0.28)] backdrop-blur min-[769px]:hidden"
         data-testid="portal-bottom-nav"
+        hidden={isStudentPortal}
       >
         <PortalNavigation portal={portal} variant="bottom" />
       </div>

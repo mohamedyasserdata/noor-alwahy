@@ -68,7 +68,7 @@ const sectionIcons = {
 
 type PortalNavigationProps = {
   portal: PortalId;
-  variant: "sidebar" | "bottom";
+  variant: "sidebar" | "bottom" | "top";
 };
 
 export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
@@ -76,6 +76,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   const t = useTranslations(`portals.${portal}`);
   const sections = portalConfig[portal].sections;
   const isSidebar = variant === "sidebar";
+  const isTop = variant === "top";
 
   return (
     <nav
@@ -84,9 +85,11 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       className={cn(
         isSidebar
           ? "grid min-h-0 flex-1 [scrollbar-gutter:stable] content-start gap-1.5 overflow-y-auto overscroll-contain px-4 pb-4"
-          : "grid h-full items-stretch",
-        !isSidebar && sections.length === 4 && "grid-cols-4",
-        !isSidebar && sections.length > 4 && "flex overflow-x-auto",
+          : isTop
+            ? "flex min-w-0 [scrollbar-width:none] items-center gap-1 overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden"
+            : "grid h-full items-stretch",
+        !isSidebar && !isTop && sections.length === 4 && "grid-cols-4",
+        !isSidebar && !isTop && sections.length > 4 && "flex overflow-x-auto",
       )}
     >
       {sections.map((section) => {
@@ -105,13 +108,18 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
               isSidebar &&
                 !isActive &&
                 "text-muted-foreground hover:bg-accent/55 hover:text-foreground",
+              isTop &&
+                "min-w-max gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm text-primary sm:px-4",
+              isTop && isActive && "border-secondary/25 bg-secondary/18 text-primary shadow-card",
+              isTop && !isActive && "hover:border-secondary/20 hover:bg-card hover:text-primary",
               !isSidebar &&
+                !isTop &&
                 "min-w-18 flex-1 flex-col justify-center gap-1 px-1 py-2 text-center text-xs leading-tight",
-              !isSidebar && isActive && "text-primary",
-              !isSidebar && !isActive && "text-muted-foreground hover:text-foreground",
+              !isSidebar && !isTop && isActive && "text-primary",
+              !isSidebar && !isTop && !isActive && "text-muted-foreground hover:text-foreground",
             )}
           >
-            {!isSidebar && isActive && (
+            {!isSidebar && !isTop && isActive && (
               <span
                 className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-secondary"
                 aria-hidden="true"

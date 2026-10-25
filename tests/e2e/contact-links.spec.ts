@@ -43,7 +43,7 @@ test("US-153 admin manages audited official links visible to students and parent
     "background-color",
     "rgb(34, 158, 217)",
   );
-  await expect(page.getByTestId("portal-navigation-bottom").getByRole("link")).toHaveCount(6);
+  await expect(page.getByTestId("portal-navigation-top").getByRole("link")).toHaveCount(6);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
 
   await signInAs(page, "ar", "parent");

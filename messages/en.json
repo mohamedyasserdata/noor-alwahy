@@ -1185,6 +1185,8 @@
     "cardTitle": "Next session",
     "student": "Student",
     "teacher": "Teacher",
+    "teacherPending": "Teacher will be assigned soon",
+    "dateAndTime": "Date & time",
     "meetingId": "Meeting ID",
     "passcode": "Passcode",
     "opensIn": "Join opens in",
@@ -1195,6 +1197,9 @@
     "privacy": "The server releases meeting details only to session participants during the approved window.",
     "emptyTitle": "No upcoming session",
     "emptyDescription": "Your nearest scheduled session will appear here once it is added.",
+    "quickLinksTitle": "Quick access",
+    "quickLinksDescription": "Go directly to the key parts of your learning journey.",
+    "openSection": "Open {section}",
     "states": {
       "before": "Upcoming",
       "open": "Available now",
