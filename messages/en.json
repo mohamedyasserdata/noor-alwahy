@@ -81,6 +81,20 @@
       "enableDark": "Enable dark mode",
       "enableLight": "Enable light mode"
     },
+    "account": {
+      "accountSettings": "Account settings",
+      "closeHint": "Press the account settings button again to close this panel.",
+      "email": "Email address",
+      "role": "Account type",
+      "timezone": "Time zone",
+      "signOut": "Sign out",
+      "roles": {
+        "admin": "Administrator",
+        "teacher": "Teacher",
+        "student": "Student",
+        "parent": "Parent"
+      }
+    },
     "emptyState": {
       "title": "Your workspace is ready",
       "description": "Content authorized for this role will appear here as each workflow is activated. Placeholder records are never shown in place of the academy’s real data."
@@ -113,6 +127,11 @@
           "label": "Applications",
           "title": "Enrollment applications",
           "description": "Review applications, follow their status, and convert accepted applicants with the right permissions."
+        },
+        "teacher-applications": {
+          "label": "Teacher applications",
+          "title": "Teacher applications",
+          "description": "Review teaching applicants, record decisions, and invite accepted teachers without granting access automatically."
         },
         "subscriptions": {
           "label": "Subscriptions",
@@ -282,6 +301,11 @@
       "roleName": "Parent portal",
       "navigationLabel": "Parent portal sections",
       "sections": {
+        "home": {
+          "label": "Home",
+          "title": "Home",
+          "description": "A calm summary of what needs your attention now."
+        },
         "children": {
           "label": "Children",
           "title": "Follow your children",
@@ -303,6 +327,124 @@
           "description": "Reach the academy’s approved contact channels without creating an internal messaging system."
         }
       }
+    }
+  },
+  "parentPortal": {
+    "welcome": "Welcome, {name}",
+    "homeTitle": "Parent Portal",
+    "homeDescription": "Follow your children’s Quran learning journey with clarity and reassurance.",
+    "timezone": "Times use your time zone: {timezone}",
+    "children": {
+      "title": "My Children",
+      "progress": "Memorisation Progress",
+      "openProfile": "View Child Profile",
+      "noPlacement": "Track and level are not approved yet",
+      "noProgress": "No approved progress data is available yet.",
+      "empty": "No children are linked to this account. Contact the academy administration to verify the link."
+    },
+    "nextSession": {
+      "title": "Next Session",
+      "child": "Child",
+      "teacher": "Teacher",
+      "date": "Date",
+      "time": "Local Time",
+      "openSchedule": "View Schedule",
+      "empty": "There is no upcoming session on the schedule."
+    },
+    "alerts": {
+      "title": "Important Alerts",
+      "fallbackTitle": "An Alert Needs Attention",
+      "followUp": "Open the notification centre for details.",
+      "empty": "There are no new alerts that need your attention."
+    },
+    "child": {
+      "backHome": "Back to Home",
+      "teacher": "Teacher: {name}",
+      "tabsLabel": "Child Profile Sections"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "progress": "Progress",
+      "attendance": "Attendance",
+      "reports": "Reports",
+      "schedule": "Schedule"
+    },
+    "statuses": {
+      "active": "Active",
+      "dropped": "Stopped",
+      "graduated": "Graduated",
+      "suspended": "Temporarily Suspended",
+      "archived": "Archived"
+    },
+    "overview": {
+      "learning": "Learning Summary",
+      "mastered": "Mastered Pages",
+      "reviewDue": "Reviews Due",
+      "attendance": "Attendance Rate",
+      "latestEvaluation": "Latest Approved Evaluation",
+      "nextSession": "Next Session",
+      "familyNote": "Teacher Note for the Family",
+      "latestReport": "Latest Published Report"
+    },
+    "progress": {
+      "title": "Memorisation Progress",
+      "percentage": "Mastered Memorisation",
+      "mastered": "Mastered",
+      "inProgress": "In Progress",
+      "needsReview": "Needs Review",
+      "lastUpdated": "Last updated: {date}",
+      "currentGoals": "Current Goals",
+      "weeklyGoal": "Weekly Page Goal",
+      "monthlyGoal": "Monthly Page Goal"
+    },
+    "attendance": {
+      "title": "Attendance & Commitment",
+      "period": "Last {days} Days",
+      "rate": "Attendance Rate",
+      "total": "Recorded Sessions",
+      "present": "Present",
+      "late": "Late",
+      "absent": "Absent",
+      "history": "Attendance History",
+      "statuses": {
+        "present": "Present",
+        "late": "Late",
+        "student_absent": "Absent",
+        "student_excused": "Excused Absence",
+        "teacher_absent": "Teacher Absent",
+        "cancelled_teacher": "Cancelled by Teacher",
+        "cancelled_admin": "Cancelled by Administration"
+      }
+    },
+    "reports": {
+      "published": "Published to Family",
+      "recommendation": "Teacher Recommendation",
+      "download": "View or Download PDF"
+    },
+    "schedule": {
+      "upcoming": "Upcoming Sessions",
+      "previous": "Previous Sessions",
+      "join": "Join on Zoom",
+      "meetingId": "Meeting ID",
+      "passcode": "Passcode",
+      "statuses": {
+        "scheduled": "Scheduled",
+        "held": "Held",
+        "missed": "Missed",
+        "cancelled": "Cancelled",
+        "rescheduled": "Rescheduled"
+      }
+    },
+    "empty": {
+      "noAttendance": "No approved attendance data is available for this period.",
+      "noEvaluation": "No approved evaluation is available yet.",
+      "noTeacher": "No current teacher is approved.",
+      "noUpcomingSession": "There is no upcoming session.",
+      "noPreviousSession": "No previous sessions are available.",
+      "noFamilyNote": "No approved note is available for the family.",
+      "noReports": "No reports have been published to the family yet.",
+      "noProgress": "No approved memorisation data is available yet.",
+      "noGoals": "No approved memorisation goals are available."
     }
   },
   "auth": {
@@ -339,6 +481,12 @@
       "pending": "Saving new password…",
       "requestNewLink": "Request a new recovery link"
     },
+    "invite": {
+      "title": "Accept your account invitation",
+      "description": "We are verifying this one-time invitation before you choose your password.",
+      "loading": "Verifying the secure invitation…",
+      "error": "This invitation is invalid or has expired. Ask the academy administration for a new invitation."
+    },
     "mfa": {
       "eyebrow": "Administrator security check",
       "title": "Protect administration with an authenticator app",
@@ -361,9 +509,11 @@
       "signOut": "Sign out and return to login"
     },
     "backToLogin": "Back to sign in",
+    "backToHome": "Back to home",
     "status": {
       "resetSent": "If the email belongs to an account, recovery instructions will arrive shortly. Check the junk folder too.",
-      "passwordUpdated": "Your password was changed. You can now sign in with the new password."
+      "passwordUpdated": "Your password was changed. You can now sign in with the new password.",
+      "signedOut": "You signed out from this browser. Choose the account you want to use."
     },
     "errors": {
       "invalidFields": "Check the email and password, then try again.",
@@ -381,7 +531,7 @@
     "description": "Create or invite approved academy users, then control access without deleting their records.",
     "create": {
       "title": "Add an account",
-      "description": "Choose an email invitation or set a temporary password.",
+      "description": "Choose an email invitation or set a temporary password. Administrator accounts are invitation-only and must enrol MFA.",
       "action": "Create account",
       "pending": "Creating account…"
     },
@@ -393,7 +543,7 @@
       "role": "Portal role",
       "mode": "Activation method",
       "temporaryPassword": "Temporary password",
-      "passwordHint": "Required only for direct creation; use at least 12 characters."
+      "passwordHint": "Required only for direct creation; use at least 12 characters. Administrators must use an email invitation."
     },
     "genders": { "male": "Male", "female": "Female" },
     "roles": {
@@ -520,10 +670,11 @@
     "admin": {
       "eyebrow": "Official communication settings",
       "title": "Contact channels",
-      "description": "Publish, order, hide, or remove the official links shown to students and parents. Every change is recorded in the audit log.",
+      "description": "Manage the academy’s official links, phone numbers, and email addresses shown on the contact page, in the footer, and across student and parent portals. Every change is recorded in the audit log.",
       "create": {
         "title": "Add a contact channel",
         "description": "Use only an academy-owned destination.",
+        "supported": "Supported channels",
         "action": "Add channel",
         "pending": "Adding…"
       },
@@ -539,7 +690,7 @@
         "labelEn": "English label (optional)",
         "url": "Destination",
         "urlHint": "Allowed: secure https:// links, mailto: email links, and tel: phone links.",
-        "isVisible": "Visible to students and parents"
+        "isVisible": "Visible on the contact page, footer, and portals"
       },
       "visibility": { "visible": "Visible", "hidden": "Hidden" },
       "actions": {
@@ -1191,6 +1342,7 @@
     "windowOpen": "Join window is open",
     "windowClosed": "Join window has closed",
     "join": "Join session",
+    "viewSchedule": "View schedule",
     "preparing": "Preparing link…",
     "privacy": "The server releases meeting details only to session participants during the approved window.",
     "emptyTitle": "No upcoming session",
@@ -1521,6 +1673,7 @@
       "brand": "Noor Al-Wahy Academy",
       "navigationLabel": "Public site navigation",
       "openMenu": "Open site menu",
+      "closeMenu": "Close site menu",
       "login": "Sign in",
       "theme": {
         "enableDark": "Enable dark mode",
@@ -1529,14 +1682,17 @@
       "navigation": {
         "home": "Home",
         "tracks": "Learning tracks",
+        "teachers": "Teachers",
+        "joinTeachers": "Join our teaching team",
         "apply": "Apply for a student",
-        "packages": "Packages & prices",
+        "packages": "Packages",
         "faq": "Questions",
         "contact": "Contact",
         "privacy": "Privacy Policy",
         "terms": "Terms of Use"
       },
       "footerLabel": "Site links",
+      "footerContactLabel": "Official academy channels",
       "footerDescription": "One-to-one Quran learning with a clear plan, a steady schedule, and follow-up that respects every family’s privacy."
     },
     "home": {
@@ -1587,6 +1743,23 @@
             "title": "Quran reading foundation",
             "description": "A calm start with letters and reading until the student becomes more independent."
           }
+        }
+      },
+      "packages": {
+        "title": "Flexible packages for each student’s time and goal",
+        "description": "Choose the package closest to the student’s needs, then contact us for details and help selecting the right option.",
+        "pricingNote": "Prices are not shown publicly. Contact the academy for details appropriate to your country.",
+        "generalTrack": "One-to-one Quran learning",
+        "defaultDescription": "We will explain this package and the suitable learning plan when you contact us.",
+        "sessions": "Each week",
+        "sessionsValue": "{count} lessons",
+        "duration": "Lesson length",
+        "durationValue": "{minutes} minutes",
+        "whatsappAction": "Contact us on WhatsApp",
+        "contactAction": "Ask about this package",
+        "empty": {
+          "title": "Available packages are being prepared",
+          "description": "Contact us now and we will help you choose the suitable track and plan for the student."
         }
       },
       "closing": {
@@ -2821,6 +2994,143 @@
           "title": "Changes",
           "body": "Each version and date is recorded. Fresh consent is requested before continued use when a material change requires it."
         }
+      }
+    }
+  },
+  "teacherApplications": {
+    "meta": {
+      "title": "Join Noor Al-Wahy Academy’s teaching team",
+      "description": "Apply to teach Quran online with Noor Al-Wahy Academy. Applications are reviewed before any account or access is created."
+    },
+    "public": {
+      "eyebrow": "Join the academy’s teaching team",
+      "title": "Teach with clarity, care, and a steady educational plan",
+      "description": "Share your qualifications, teaching experience, languages, and availability. The academy reviews every application before offering an account or assigning students.",
+      "principles": {
+        "safe": {
+          "title": "Private by design",
+          "body": "Your application and CV are available only to authorised administrators."
+        },
+        "review": {
+          "title": "Human review",
+          "body": "Submitting an application never creates teaching access automatically."
+        },
+        "response": {
+          "title": "Clear next step",
+          "body": "Accepted applicants receive a separate account invitation from the academy."
+        }
+      },
+      "before": {
+        "title": "Before you apply",
+        "items": {
+          "profile": "Prepare a concise summary of your Quran teaching qualifications and experience.",
+          "availability": "State your regular teaching availability and the languages you can teach in.",
+          "invite": "An accepted application remains separate from account activation and student assignment."
+        }
+      },
+      "sections": {
+        "identity": "Contact details",
+        "experience": "Teaching experience",
+        "documents": "Supporting document"
+      },
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email address",
+        "phone": "Phone number",
+        "gender": "Gender",
+        "specialization": "Teaching specialisation",
+        "experienceYears": "Years of experience",
+        "qualifications": "Qualifications and ijazah details",
+        "languages": "Teaching languages",
+        "availability": "Regular availability",
+        "cv": "CV (optional)",
+        "cvHint": "PDF, DOC, or DOCX up to 5 MB. Do not include identity documents at this stage."
+      },
+      "gender": { "female": "Female", "male": "Male" },
+      "languages": { "ar": "Arabic", "en": "English", "fr": "French", "other": "Other" },
+      "consent": {
+        "before": "I agree to the processing of this application under the",
+        "privacy": "Privacy Policy",
+        "after": "and confirm that the information is accurate."
+      },
+      "submit": "Send teaching application",
+      "submitting": "Sending…",
+      "success": {
+        "title": "Your teaching application was received",
+        "description": "Keep this application number for your records. Submitting does not create an account or teaching permissions.",
+        "backHome": "Back to home"
+      },
+      "errors": {
+        "already_submitted": "An open application already exists for this email. Wait for the academy’s review.",
+        "captcha_failed": "Verification could not be completed. Refresh the page and try again.",
+        "cv_too_large": "The CV is larger than 5 MB. Choose a smaller file.",
+        "cv_type": "Upload the CV as PDF, DOC, or DOCX.",
+        "cv_upload_failed": "The CV could not be stored securely. Try again without the file or return later.",
+        "invalid_fields": "Review the required fields and correct the information.",
+        "rate_limited": "Too many applications were sent from this connection. Try again later.",
+        "submission_failed": "The application could not be sent. Review the information and try again."
+      }
+    },
+    "admin": {
+      "eyebrow": "Teaching recruitment",
+      "title": "Teacher applications",
+      "description": "Review professional information, record a decision, and send one account invitation only after acceptance.",
+      "filters": {
+        "search": "Search applications",
+        "searchPlaceholder": "Name, email, phone, or application number…",
+        "status": "Status",
+        "apply": "Apply filters"
+      },
+      "statuses": {
+        "all": "All statuses",
+        "new": "New",
+        "reviewing": "In review",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "invited": "Invited"
+      },
+      "gender": { "female": "Female", "male": "Male" },
+      "languages": { "ar": "Arabic", "en": "English", "fr": "French", "other": "Other" },
+      "fields": {
+        "email": "Email",
+        "phone": "Phone",
+        "gender": "Gender",
+        "specialization": "Specialisation",
+        "experienceYears": "Experience",
+        "years": "{count, plural, =0 {No experience yet} one {# year} other {# years}}",
+        "languages": "Teaching languages",
+        "qualifications": "Qualifications",
+        "availability": "Availability",
+        "noCv": "No CV was attached."
+      },
+      "review": { "status": "Review status", "notes": "Internal review notes" },
+      "invite": {
+        "description": "This creates one pending teacher profile and sends a local account invitation. Teaching access still requires the existing verification and conduct controls."
+      },
+      "actions": {
+        "downloadCv": "Download CV",
+        "saveReview": "Save review",
+        "saving": "Saving…",
+        "sendInvite": "Create teacher & send invite",
+        "inviting": "Creating invitation…"
+      },
+      "notices": {
+        "updated": "The review was saved and audited.",
+        "invited": "The teacher account was created and the invitation was sent."
+      },
+      "errors": {
+        "accept_first": "Accept the application before creating an account.",
+        "account_exists": "An account already exists for this email. Review the existing account instead of creating another.",
+        "already_invited": "This application already has an invited teacher account.",
+        "invalid_fields": "Review the selected status and notes.",
+        "invalid_transition": "This status change is not allowed. Move the application through review first.",
+        "invite_failed": "The invitation could not be completed. No duplicate teacher profile was kept.",
+        "not_found": "The application was not found or is no longer available.",
+        "request_failed": "The requested change could not be completed. Try again."
+      },
+      "empty": {
+        "title": "No matching teacher applications",
+        "description": "Change the search or status filter, or wait for a new public application."
       }
     }
   },

@@ -1,15 +1,19 @@
 import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import { signInAs } from "./helpers/auth";
+
+const mailpitUrl = process.env.E2E_MAILPIT_URL ?? "http://127.0.0.1:54324";
 
 test("US-012/013 admin creates, audits, disables, reactivates, and invites accounts", async ({
   page,
 }, testInfo) => {
   test.setTimeout(90_000);
-  const suffix = testInfo.retry + 1;
+  const suffix = `${testInfo.retry + 1}-${randomUUID().slice(0, 8)}`;
   const directEmail = `managed.student.${suffix}@noor.local`;
   const inviteEmail = `invited.teacher.${suffix}@noor.local`;
-  const password = `ManagedTest${suffix}!`;
+  const adminInviteEmail = `invited.admin.${suffix}@noor.local`;
+  const password = `ManagedTest-${suffix}!`;
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/users");
@@ -77,7 +81,7 @@ test("US-012/013 admin creates, audits, disables, reactivates, and invites accou
   await expect(page).toHaveURL(/\/en\/admin\/users\?status=invited$/);
   await expect
     .poll(async () => {
-      const response = await page.request.get("http://127.0.0.1:54324/api/v1/messages");
+      const response = await page.request.get(`${mailpitUrl}/api/v1/messages`);
       const body = (await response.json()) as {
         messages: Array<{ ID: string; To: Array<{ Address: string }> }>;
       };
@@ -89,6 +93,29 @@ test("US-012/013 admin creates, audits, disables, reactivates, and invites accou
     })
     .toBe(true);
   await expect(page.getByText(inviteEmail, { exact: true })).toBeVisible();
+
+  const adminMessagesBefore = await getMessageIds(page);
+  const adminInviteForm = page.locator("form").filter({ has: page.locator("#accountEmail") });
+  await adminInviteForm.locator("#fullName").fill("Invited Administrator");
+  await adminInviteForm.locator("#accountEmail").fill(adminInviteEmail);
+  await adminInviteForm.locator("#role").selectOption("admin");
+  await adminInviteForm.locator("#mode").selectOption("invite");
+  await adminInviteForm.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/en\/admin\/users\?status=invited$/);
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(`${mailpitUrl}/api/v1/messages`);
+      const body = (await response.json()) as {
+        messages: Array<{ ID: string; To: Array<{ Address: string }> }>;
+      };
+      return body.messages.some(
+        (message) =>
+          !adminMessagesBefore.has(message.ID) &&
+          message.To.some(({ Address }) => Address === adminInviteEmail),
+      );
+    })
+    .toBe(true);
+  await expect(page.getByText(adminInviteEmail, { exact: true })).toBeVisible();
 });
 
 async function signInWithCredentials(
@@ -104,7 +131,7 @@ async function signInWithCredentials(
 }
 
 async function getMessageIds(page: Parameters<typeof signInAs>[0]) {
-  const response = await page.request.get("http://127.0.0.1:54324/api/v1/messages");
+  const response = await page.request.get(`${mailpitUrl}/api/v1/messages`);
   const body = (await response.json()) as { messages: Array<{ ID: string }> };
   return new Set(body.messages.map(({ ID }) => ID));
 }

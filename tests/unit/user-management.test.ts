@@ -6,7 +6,7 @@ import {
 } from "../../lib/validators/user-management";
 
 describe("managed account boundaries", () => {
-  it("accepts invitations only for managed non-admin roles", () => {
+  it("accepts managed-role invitations including invitation-only administrators", () => {
     expect(
       createManagedAccountSchema.safeParse({
         email: "teacher@example.com",
@@ -21,6 +21,15 @@ describe("managed account boundaries", () => {
         fullName: "Example Admin",
         mode: "invite",
         role: "admin",
+      }).success,
+    ).toBe(true);
+    expect(
+      createManagedAccountSchema.safeParse({
+        email: "admin@example.com",
+        fullName: "Example Admin",
+        mode: "password",
+        role: "admin",
+        temporaryPassword: "Temporary12!",
       }).success,
     ).toBe(false);
   });

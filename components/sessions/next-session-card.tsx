@@ -1,12 +1,13 @@
 "use client";
 
-import { CalendarClock, Clock3, ShieldCheck, Video } from "lucide-react";
+import { CalendarClock, Clock3, ShieldCheck, UserRound, Video } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { formatCountdown, getJoinWindowState } from "@/lib/sessions/countdown";
 
 type SessionCard = {
@@ -24,15 +25,36 @@ type SessionCard = {
 };
 
 export function NextSessionCard({
+  appearance = "standard",
   serverNowMs,
   session,
 }: {
+  appearance?: "standard" | "student-home";
   serverNowMs: number;
   session: SessionCard | null;
 }) {
   const t = useTranslations("nextSession");
 
   if (!session) {
+    if (appearance === "student-home") {
+      return (
+        <article className="rounded-[1.75rem] border border-secondary/25 bg-card/96 p-5 shadow-[0_1.25rem_3.5rem_-2rem_rgb(15_37_71_/_0.35)] backdrop-blur sm:p-6">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#f7ecd4] text-[#a96f11] dark:bg-accent dark:text-secondary">
+              <CalendarClock className="size-6" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-xl font-black text-primary">{t("emptyTitle")}</h2>
+              <p className="mt-1 leading-7 text-muted-foreground">{t("emptyDescription")}</p>
+            </div>
+            <Button asChild variant="outline" className="shrink-0 border-secondary/45">
+              <Link href="/student/schedule">{t("viewSchedule")}</Link>
+            </Button>
+          </div>
+        </article>
+      );
+    }
+
     return (
       <article className="mt-8 rounded-3xl border border-dashed bg-card p-6 sm:p-8">
         <CalendarClock className="size-7 text-secondary" aria-hidden="true" />
@@ -42,10 +64,18 @@ export function NextSessionCard({
     );
   }
 
-  return <LiveSessionCard serverNowMs={serverNowMs} session={session} />;
+  return <LiveSessionCard appearance={appearance} serverNowMs={serverNowMs} session={session} />;
 }
 
-function LiveSessionCard({ serverNowMs, session }: { serverNowMs: number; session: SessionCard }) {
+function LiveSessionCard({
+  appearance,
+  serverNowMs,
+  session,
+}: {
+  appearance: "standard" | "student-home";
+  serverNowMs: number;
+  session: SessionCard;
+}) {
   const t = useTranslations("nextSession");
   const router = useRouter();
   const [nowMs, setNowMs] = useState(serverNowMs);
@@ -71,6 +101,63 @@ function LiveSessionCard({ serverNowMs, session }: { serverNowMs: number; sessio
       : windowState.phase === "open"
         ? t("windowOpen")
         : t("windowClosed");
+
+  if (appearance === "student-home") {
+    return (
+      <article className="rounded-[1.75rem] border border-secondary/25 bg-card/96 p-5 shadow-[0_1.25rem_3.5rem_-2rem_rgb(15_37_71_/_0.35)] backdrop-blur sm:p-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#f7ecd4] text-[#a96f11] dark:bg-accent dark:text-secondary">
+              <CalendarClock className="size-6" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-black text-primary">{t("cardTitle")}</h2>
+                <Badge variant={windowState.phase === "open" ? "success" : "outline"}>
+                  {t(`states.${windowState.phase}`)}
+                </Badge>
+              </div>
+              <p className="mt-2 font-bold text-foreground">
+                {session.dateLabel} · <span dir="ltr">{session.timeLabel}</span>
+              </p>
+              {session.teacherName ? (
+                <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <UserRound className="size-4 text-secondary" aria-hidden="true" />
+                  {t("teacher")}: {session.teacherName}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-[#f8f1e2] px-5 py-3 text-center dark:bg-accent/45">
+            <p className="text-xs font-bold text-muted-foreground">{countdownLabel}</p>
+            <p
+              className="mt-1 text-xl font-black text-primary tabular-nums"
+              aria-live="polite"
+              dir="ltr"
+            >
+              {windowState.phase === "closed"
+                ? "00:00:00"
+                : formatCountdown(windowState.remainingSeconds)}
+            </p>
+          </div>
+
+          {canOpen && session.joinUrl ? (
+            <Button asChild size="lg" className="min-w-48">
+              <a href={session.joinUrl} target="_blank" rel="noopener noreferrer">
+                <Video aria-hidden="true" /> {t("join")}
+              </a>
+            </Button>
+          ) : (
+            <Button disabled size="lg" className="min-w-48">
+              <Video aria-hidden="true" />
+              {windowState.canJoin ? t("preparing") : t("join")}
+            </Button>
+          )}
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="relative mt-8 overflow-hidden rounded-3xl border bg-card shadow-card">

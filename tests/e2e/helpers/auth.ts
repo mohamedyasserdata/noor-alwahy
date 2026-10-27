@@ -6,7 +6,7 @@ export const testAccounts = {
   admin: { email: "admin.test@noor.local", home: "/admin/dashboard" },
   teacher: { email: "teacher.test@noor.local", home: "/teacher/today" },
   student: { email: "student.test@noor.local", home: "/student/home" },
-  parent: { email: "parent.test@noor.local", home: "/parent/children" },
+  parent: { email: "parent.test@noor.local", home: "/parent/home" },
   recovery: { email: "recovery.test@noor.local", home: "/student/home" },
 } as const;
 

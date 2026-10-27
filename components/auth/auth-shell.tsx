@@ -1,14 +1,17 @@
+import { House } from "lucide-react";
 import { Suspense } from "react";
 
 import { BrandMark } from "@/components/brand/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Link } from "@/i18n/navigation";
 
 type AuthShellProps = {
   brand: string;
   children: React.ReactNode;
   description: string;
   eyebrow: string;
+  homeLabel?: string;
   principle: string;
   theme: {
     enableDark: string;
@@ -22,6 +25,7 @@ export function AuthShell({
   children,
   description,
   eyebrow,
+  homeLabel,
   principle,
   theme,
   title,
@@ -38,8 +42,24 @@ export function AuthShell({
       />
 
       <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-5 sm:px-6 lg:px-8">
-        <BrandMark label={brand} />
+        <Link
+          href="/"
+          aria-label={brand}
+          className="shrink-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          <BrandMark label={brand} />
+        </Link>
         <div className="flex items-center gap-2">
+          {homeLabel ? (
+            <Link
+              href="/"
+              className="inline-flex size-11 min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border bg-card px-0 text-sm font-bold text-primary shadow-card hover:border-secondary hover:bg-accent/55 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto sm:px-4"
+            >
+              <House className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{homeLabel}</span>
+              <span className="sr-only sm:hidden">{homeLabel}</span>
+            </Link>
+          ) : null}
           <ThemeToggle
             compact
             enableDarkLabel={theme.enableDark}

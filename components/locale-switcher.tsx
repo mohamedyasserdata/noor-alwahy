@@ -7,12 +7,14 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getPathname, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 
 type LocaleSwitcherProps = {
   compact?: boolean;
+  strongContrast?: boolean;
 };
 
-export function LocaleSwitcher({ compact = false }: LocaleSwitcherProps) {
+export function LocaleSwitcher({ compact = false, strongContrast = false }: LocaleSwitcherProps) {
   const locale = useLocale();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -55,7 +57,17 @@ export function LocaleSwitcher({ compact = false }: LocaleSwitcherProps) {
     >
       <Languages className="ms-2 size-4 text-secondary" aria-hidden="true" />
       {routing.locales.map((option) => (
-        <Button key={option} asChild variant={option === locale ? "default" : "ghost"}>
+        <Button
+          key={option}
+          asChild
+          variant={option === locale ? "default" : "ghost"}
+          className={cn(
+            strongContrast &&
+              (option === locale
+                ? "bg-[#00132f] text-xl font-black text-white hover:bg-[#00132f] dark:bg-white dark:text-[#00132f] dark:hover:bg-white"
+                : "text-base text-[#0f2547] dark:text-[#fffdf8]"),
+          )}
+        >
           <a
             href={localizedHref(option)}
             aria-current={option === locale ? "page" : undefined}

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -70,7 +69,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           </a>
           {children}
         </NextIntlClientProvider>
-        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </body>
     </html>
   );

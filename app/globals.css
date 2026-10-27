@@ -178,4 +178,48 @@
       2rem 3.5rem;
     background-size: 4rem 7rem;
   }
+
+  .student-home {
+    background-color: #fbf8ef;
+    background-image:
+      radial-gradient(circle at 8% 38%, rgb(201 162 75 / 0.1), transparent 24rem),
+      linear-gradient(30deg, rgb(201 162 75 / 0.045) 12%, transparent 12.5%, transparent 87%),
+      linear-gradient(150deg, rgb(201 162 75 / 0.045) 12%, transparent 12.5%, transparent 87%);
+    background-size:
+      auto,
+      4rem 7rem,
+      4rem 7rem;
+  }
+
+  .dark .student-home {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 8% 38%, rgb(216 185 104 / 0.08), transparent 24rem),
+      linear-gradient(30deg, rgb(216 185 104 / 0.035) 12%, transparent 12.5%, transparent 87%),
+      linear-gradient(150deg, rgb(216 185 104 / 0.035) 12%, transparent 12.5%, transparent 87%);
+  }
+
+  .student-progress-page > :first-child,
+  .student-billing-page > :first-child {
+    margin-block-start: 0;
+  }
+
+  .student-progress-page [data-slot="card"],
+  .student-schedule-page > section,
+  .student-billing-page > section,
+  .student-billing-page > article {
+    border-color: rgb(201 162 75 / 0.24);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .student-progress-page [data-slot="card-header"] {
+    border-color: rgb(201 162 75 / 0.2);
+  }
+
+  @media (max-width: 40rem) {
+    .student-page-content {
+      margin-block-start: -2.5rem;
+    }
+  }
 }

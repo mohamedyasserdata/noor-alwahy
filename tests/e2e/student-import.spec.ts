@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 
 import { expect, test } from "@playwright/test";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
@@ -11,8 +12,9 @@ test("US-015 admin previews and atomically imports the official Excel template",
   page,
 }) => {
   test.setTimeout(120_000);
-  const firstName = "Excel Student One";
-  const secondName = "Excel Student Two";
+  const suffix = randomUUID().slice(0, 8);
+  const firstName = `Excel Student One ${suffix}`;
+  const secondName = `Excel Student Two ${suffix}`;
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/students");

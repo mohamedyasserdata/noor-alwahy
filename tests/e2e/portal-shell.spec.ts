@@ -20,8 +20,8 @@ const portals = [
   },
   {
     id: "parent",
-    section: "children",
-    title: { ar: "حصتك القادمة", en: "Your next session" },
+    section: "home",
+    title: { ar: "بوابة ولي الأمر", en: "Parent Portal" },
   },
 ] as const;
 
@@ -43,10 +43,21 @@ for (const locale of [
       await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(portal.title[locale.code]);
       await expect(page.getByTestId("portal-sidebar")).toBeHidden();
-      await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
-      await expect(
-        page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
-      ).toHaveCount(1);
+      if (portal.id === "student" || portal.id === "parent") {
+        await expect(page.getByTestId(`${portal.id}-portal-header`)).toBeVisible();
+        await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
+        await expect(
+          page
+            .getByTestId("portal-navigation-top")
+            .filter({ visible: true })
+            .locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      } else {
+        await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+        await expect(
+          page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      }
 
       await expectNoHorizontalOverflow(page);
       await expectTouchTargets(page);
@@ -54,7 +65,8 @@ for (const locale of [
 
     await page.setViewportSize({ width: 768, height: 900 });
     await expect(page.getByTestId("portal-sidebar")).toBeHidden();
-    await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+    await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
+    await expect(page.getByTestId("parent-portal-header")).toBeVisible();
     await expectNoHorizontalOverflow(page);
     expect(consoleProblems).toEqual([]);
   });
@@ -67,18 +79,29 @@ for (const locale of [
     for (const portal of portals) {
       await signInAs(page, locale.code, portal.id);
       await page.goto(`/${locale.code}/${portal.id}/${portal.section}`);
-      await expect(page.getByTestId("portal-sidebar")).toBeVisible();
-      await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
-      await expect(
-        page.getByTestId("portal-navigation-sidebar").locator('a[aria-current="page"]'),
-      ).toHaveCount(1);
+      if (portal.id === "student" || portal.id === "parent") {
+        await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
+        await expect(page.getByTestId(`${portal.id}-portal-header`)).toBeVisible();
+        await expect(
+          page
+            .getByTestId("portal-navigation-top")
+            .filter({ visible: true })
+            .locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      } else {
+        await expect(page.getByTestId("portal-sidebar")).toBeVisible();
+        await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+        await expect(
+          page.getByTestId("portal-navigation-sidebar").locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      }
       await expectNoHorizontalOverflow(page);
       await expectTouchTargets(page);
     }
 
     await page.setViewportSize({ width: 1024, height: 768 });
-    await expect(page.getByTestId("portal-sidebar")).toBeVisible();
-    await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+    await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
+    await expect(page.getByTestId("parent-portal-header")).toBeVisible();
     expect(consoleProblems).toEqual([]);
   });
 }
@@ -109,6 +132,17 @@ test("dark theme is accessible and persists across reloads", async ({ page }) =>
     "aria-pressed",
     "true",
   );
+});
+
+test("account settings panel stays inside the mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await signInAs(page, "ar", "student");
+  await page.goto("/ar/student/home");
+
+  const accountMenu = page.getByTestId("account-menu").filter({ visible: true });
+  await accountMenu.locator("summary").click();
+  await expect(page.getByRole("region", { name: "إعدادات الحساب" })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
 });
 
 test("admin sidebar scrolls on laptop-height viewports", async ({ page }) => {

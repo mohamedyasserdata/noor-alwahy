@@ -59,16 +59,13 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await expect(page).toHaveURL(/reportStatus=updated/);
   await expect(adminCard.getByText("visible", { exact: true })).toBeVisible();
 
-  await signIn(page, fixture.parentEmail, fixture.password, "/en/parent/children");
-  await page.goto(`/en/parent/children?student=${fixture.unrelatedStudentId}`);
-  await expect(
-    page.getByRole("heading", { name: `Following ${fixture.studentName}` }),
-  ).toBeVisible();
+  await signIn(page, fixture.parentEmail, fixture.password, "/en/parent/home");
+  await page.goto(`/en/parent/children?student=${fixture.unrelatedStudentId}&view=reports`);
+  await expect(page.getByRole("heading", { name: fixture.studentName })).toBeVisible();
   await expect(page.getByText(fixture.unrelatedStudentName)).toHaveCount(0);
   await page.getByRole("button", { name: "Open notifications" }).click();
   await expect(page.getByText("Student report approved")).toBeVisible();
-  await expect(page.getByText("Your journey at a glance")).toBeVisible();
-  const parentPdf = page.getByRole("link", { name: "Download report" });
+  const parentPdf = page.getByRole("link", { name: "View or Download PDF" });
   await expect(parentPdf).toBeVisible();
   const arabicPdfResponse = await page
     .context()

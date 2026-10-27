@@ -88,6 +88,7 @@ export function ApplicationForm({
         <h1 className="mt-4 text-3xl font-black text-primary">{t("successTitle")}</h1>
         <p className="mt-3 leading-8 text-muted-foreground">{t("successDescription")}</p>
         <p
+          data-testid="application-order-number"
           className="mx-auto mt-5 w-fit rounded-xl bg-primary px-5 py-3 font-mono text-xl font-black tracking-wider text-primary-foreground"
           dir="ltr"
         >

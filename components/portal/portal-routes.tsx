@@ -26,10 +26,19 @@ export async function PortalLayoutRoute({ children, params, portal }: PortalLayo
     notFound();
   }
 
-  await requireRole(portal, locale);
+  const identity = await requireRole(portal, locale);
 
   return (
-    <PortalShell locale={locale} portal={portal}>
+    <PortalShell
+      locale={locale}
+      portal={portal}
+      account={{
+        email: identity.user.email ?? "",
+        fullName: identity.profile.full_name,
+        role: identity.profile.role,
+        timezone: identity.profile.timezone,
+      }}
+    >
       {children}
     </PortalShell>
   );

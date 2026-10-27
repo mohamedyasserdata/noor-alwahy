@@ -47,6 +47,7 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
     <AuthShell
       brand={portals("brand")}
       eyebrow={t("shell.eyebrow")}
+      homeLabel={t("backToHome")}
       title={t("shell.title")}
       description={t("shell.description")}
       principle={t("shell.principle")}

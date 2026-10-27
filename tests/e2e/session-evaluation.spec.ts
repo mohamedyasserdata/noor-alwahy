@@ -18,6 +18,16 @@ test("P4-T04 teacher restores a local draft and locks a mobile session evaluatio
   await expect(page.getByRole("heading", { level: 2, name: fixture.studentName })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
+  const firstCriterion = page.getByRole("radiogroup").first();
+  const initialScore = firstCriterion.getByRole("radio", { checked: true });
+  await initialScore.focus();
+  await initialScore.press("End");
+  await expect(firstCriterion.getByRole("radio", { name: "5 - Excellent" })).toBeChecked();
+  await expect(firstCriterion.getByRole("radio", { name: "5 - Excellent" })).toBeFocused();
+  await expect(
+    page.getByText("Live indicator").locator("xpath=ancestor::*[@aria-live][1]"),
+  ).toHaveAttribute("aria-live", "polite");
+
   const startedAt = Date.now();
   await page.getByLabel("Homework").fill("Review Al-Fatihah twice");
   await page.reload();

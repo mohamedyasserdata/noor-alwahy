@@ -3,8 +3,8 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { ContactLinksSection } from "@/components/contact/contact-links-section";
-import { routing } from "@/i18n/routing";
+import { PublicContactPage } from "@/components/contact/public-contact-page";
+import { routing, type AppLocale } from "@/i18n/routing";
 import { localizedMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata({
@@ -25,9 +25,5 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
 
-  return (
-    <div className="px-6 py-16 sm:py-20 lg:px-8">
-      <ContactLinksSection locale={locale} />
-    </div>
-  );
+  return <PublicContactPage locale={locale as AppLocale} />;
 }

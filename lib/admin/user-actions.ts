@@ -62,8 +62,7 @@ export async function createManagedAccountAction(
       redirectToUsers(locale, "error", "request_failed");
     }
 
-    const callback = new URL(`/${locale}/auth/callback`, new URL(originHeader).origin);
-    callback.searchParams.set("next", `/${locale}/auth/reset-password`);
+    const callback = new URL(`/${locale}/auth/accept-invite`, new URL(originHeader).origin);
     ({ error } = await admin.auth.admin.inviteUserByEmail(parsed.data.email, {
       data: { ...metadata, role: parsed.data.role },
       redirectTo: callback.toString(),

@@ -2,7 +2,7 @@ import { CalendarRange, Target } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { AppLocale } from "@/i18n/routing";
 import type { PlanAdherence } from "@/lib/memorization-plans/queries";
@@ -36,15 +36,15 @@ export async function StudentPlanCard({
     <Card className="mt-8 overflow-hidden border-secondary/30">
       <CardHeader className="border-b bg-primary text-primary-foreground sm:flex sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle className="flex items-center gap-2 text-primary-foreground">
+          <h2 className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-primary-foreground">
             <Target className="text-secondary" aria-hidden="true" />
             {t("student.title")}
-          </CardTitle>
+          </h2>
           <CardDescription className="text-primary-foreground/70">
             {t("student.description")}
           </CardDescription>
         </div>
-        <Badge variant="secondary">
+        <Badge className="border-[#e7c879] bg-[#fff3cf] text-[#714307]">
           <CalendarRange aria-hidden="true" />
           {t("student.active")}
         </Badge>
@@ -97,7 +97,9 @@ function PlanProgress({
           <p className="font-black text-primary">{label}</p>
           <p className="mt-1 text-sm text-muted-foreground">{pagesLabel}</p>
         </div>
-        <strong className="text-2xl font-black text-secondary">{percent}%</strong>
+        <strong className="text-2xl font-black text-[#7d500d] dark:text-secondary">
+          {percent}%
+        </strong>
       </div>
       <Progress value={percent} aria-label={progressLabel} />
     </div>

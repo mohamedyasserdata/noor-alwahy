@@ -1,9 +1,10 @@
-import { CalendarClock, Clock3, Globe2 } from "lucide-react";
+import { CalendarClock, CalendarDays, Clock3, Globe2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { CalendarExports } from "@/components/schedule/calendar-exports";
 import { SessionAdjustmentsSection } from "@/components/schedule/session-adjustments-section";
+import { StudentPageShell } from "@/components/student/student-page-shell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,9 +16,11 @@ import { getScheduleWorkspace, relation } from "@/lib/schedules/management";
 type Query = Promise<Record<string, string | string[] | undefined>>;
 
 export async function ScheduleSection({
+  appearance = "standard",
   locale,
   searchParams = Promise.resolve({}),
 }: {
+  appearance?: "standard" | "student";
   locale: AppLocale;
   searchParams?: Query;
 }) {
@@ -30,18 +33,34 @@ export async function ScheduleSection({
   const error = typeof query.scheduleError === "string" ? query.scheduleError : "";
   const adjustmentStatus = typeof query.adjustmentStatus === "string" ? query.adjustmentStatus : "";
   const adjustmentError = typeof query.adjustmentError === "string" ? query.adjustmentError : "";
-  return (
-    <section className="mx-auto w-full max-w-7xl" aria-labelledby="schedule-title">
-      <header className="max-w-3xl">
-        <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
-        <h1 id="schedule-title" className="text-3xl font-black text-primary sm:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
-        <Badge className="mt-4" variant="outline">
-          <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
-        </Badge>
-      </header>
+  const content = (
+    <section
+      className={
+        appearance === "student"
+          ? "student-schedule-page mx-auto w-full max-w-[94rem] rounded-[1.75rem] border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-7"
+          : "mx-auto w-full max-w-7xl"
+      }
+      aria-labelledby={appearance === "standard" ? "schedule-title" : undefined}
+      aria-label={appearance === "student" ? t("title") : undefined}
+    >
+      {appearance === "standard" ? (
+        <header className="max-w-3xl">
+          <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1 id="schedule-title" className="text-3xl font-black text-primary sm:text-4xl">
+            {t("title")}
+          </h1>
+          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+          <Badge className="mt-4" variant="outline">
+            <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
+          </Badge>
+        </header>
+      ) : (
+        <div className="mb-6 flex justify-end">
+          <Badge variant="outline" className="border-secondary/35 bg-[#fffaf0] dark:bg-accent/30">
+            <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
+          </Badge>
+        </div>
+      )}
       {status ? (
         <Alert className="mt-6" variant="success">
           {t("saved")}
@@ -178,9 +197,10 @@ export async function ScheduleSection({
             </article>
           ))
         ) : (
-          <p className="rounded-2xl border border-dashed p-6 text-muted-foreground md:col-span-2">
-            {t("empty")}
-          </p>
+          <div className="rounded-2xl border border-dashed border-secondary/35 bg-[#fffaf0]/70 p-10 text-center text-muted-foreground md:col-span-2 xl:col-span-3 dark:bg-accent/20">
+            <CalendarDays className="mx-auto size-8 text-secondary" aria-hidden="true" />
+            <p className="mt-3">{t("empty")}</p>
+          </div>
         )}
       </div>
       {data.adjustments ? (
@@ -194,4 +214,21 @@ export async function ScheduleSection({
       ) : null}
     </section>
   );
+
+  if (appearance === "student") {
+    return (
+      <StudentPageShell
+        locale={locale}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        titleId="schedule-title"
+        icon={CalendarDays}
+      >
+        {content}
+      </StudentPageShell>
+    );
+  }
+
+  return content;
 }

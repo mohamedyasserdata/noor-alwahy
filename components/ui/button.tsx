@@ -13,7 +13,8 @@ const buttonVariants = cva(
         gold: "bg-secondary text-secondary-foreground shadow-card hover:bg-secondary/86",
         outline: "border bg-card text-foreground hover:border-secondary hover:bg-accent/50",
         ghost: "text-foreground hover:bg-accent/55",
-        destructive: "bg-destructive text-white shadow-card hover:bg-destructive/90",
+        destructive:
+          "bg-destructive text-white shadow-card hover:bg-destructive/90 dark:bg-[#9f3434] dark:hover:bg-[#8f2e2e]",
       },
       size: {
         default: "h-11 px-5",

@@ -1,27 +1,44 @@
-import { Banknote, Download, Landmark, ReceiptText } from "lucide-react";
+import { Banknote, CreditCard, Download, Landmark, ReceiptText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StudentPageShell } from "@/components/student/student-page-shell";
 import type { AppLocale } from "@/i18n/routing";
 import { getFamilyBillingData } from "@/lib/billing/family-queries";
 
-export async function FamilyBillingSection({ locale }: { locale: AppLocale }) {
+export async function FamilyBillingSection({
+  appearance = "standard",
+  locale,
+}: {
+  appearance?: "standard" | "student";
+  locale: AppLocale;
+}) {
   const [t, data] = await Promise.all([
     getTranslations({ locale, namespace: "familyBilling" }),
     getFamilyBillingData(),
   ]);
   const money = (amount: number | string, currency: string) =>
     new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(amount));
-  return (
-    <section className="mx-auto w-full max-w-6xl" aria-labelledby="billing-title">
-      <header className="max-w-3xl">
-        <p className="text-sm font-black text-secondary">{t("eyebrow")}</p>
-        <h1 id="billing-title" className="mt-3 text-3xl font-black text-primary sm:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
-      </header>
+  const content = (
+    <section
+      className={
+        appearance === "student"
+          ? "student-billing-page mx-auto w-full max-w-[94rem]"
+          : "mx-auto w-full max-w-6xl"
+      }
+      aria-labelledby={appearance === "standard" ? "billing-title" : undefined}
+      aria-label={appearance === "student" ? t("title") : undefined}
+    >
+      {appearance === "standard" ? (
+        <header className="max-w-3xl">
+          <p className="text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1 id="billing-title" className="mt-3 text-3xl font-black text-primary sm:text-4xl">
+            {t("title")}
+          </h1>
+          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+        </header>
+      ) : null}
       {data.statement.length ? (
         <section
           className="mt-8 rounded-3xl border bg-card p-5 shadow-card sm:p-7"
@@ -235,13 +252,33 @@ export async function FamilyBillingSection({ locale }: { locale: AppLocale }) {
             );
           })
         ) : (
-          <p className="rounded-3xl border border-dashed p-10 text-center text-muted-foreground">
-            {t("empty")}
-          </p>
+          <div className="rounded-3xl border border-dashed border-secondary/35 bg-card/96 p-12 text-center shadow-card">
+            <span className="mx-auto grid size-16 place-items-center rounded-full bg-secondary/12 text-secondary">
+              <ReceiptText className="size-8" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-muted-foreground">{t("empty")}</p>
+          </div>
         )}
       </div>
     </section>
   );
+
+  if (appearance === "student") {
+    return (
+      <StudentPageShell
+        locale={locale}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        titleId="billing-title"
+        icon={CreditCard}
+      >
+        {content}
+      </StudentPageShell>
+    );
+  }
+
+  return content;
 }
 
 function Value({ label, value }: { label: string; value: string }) {

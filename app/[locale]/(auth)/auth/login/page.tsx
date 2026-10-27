@@ -1,3 +1,4 @@
+import { House } from "lucide-react";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -36,6 +37,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
     <AuthShell
       brand={portals("brand")}
       eyebrow={t("shell.eyebrow")}
+      homeLabel={t("backToHome")}
       title={t("shell.title")}
       description={t("shell.description")}
       principle={t("shell.principle")}
@@ -44,6 +46,13 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
         enableLight: portals("theme.enableLight"),
       }}
     >
+      <Link
+        href="/"
+        className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-secondary/30 bg-accent/35 px-4 text-sm font-black text-primary hover:border-secondary hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      >
+        <House className="size-4" aria-hidden="true" />
+        {t("backToHome")}
+      </Link>
       <div className="mb-6">
         <h2 className="text-2xl font-black tracking-tight text-primary">{t("login.title")}</h2>
         <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("login.description")}</p>
@@ -51,7 +60,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
       <AuthNotice
         message={noticeKey ? t(noticeKey) : undefined}
-        success={query.status === "password_updated"}
+        success={query.status === "password_updated" || query.status === "signed_out"}
       />
 
       <form action={loginAction.bind(null, locale)} className="mt-6 grid gap-5">
@@ -103,6 +112,10 @@ function getLoginNoticeKey(query: Record<string, string | string[] | undefined>)
 
   if (query.status === "password_updated") {
     return "status.passwordUpdated" as const;
+  }
+
+  if (query.status === "signed_out") {
+    return "status.signedOut" as const;
   }
 
   return typeof value === "string" && value in keys ? keys[value as keyof typeof keys] : null;

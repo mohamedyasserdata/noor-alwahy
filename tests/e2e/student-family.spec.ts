@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import { signInAs } from "./helpers/auth";
 
@@ -6,12 +7,13 @@ test("US-014 admin creates family accounts and links one parent to multiple chil
   page,
 }, testInfo) => {
   test.setTimeout(120_000);
-  const suffix = testInfo.retry + 1;
+  const suffix = `${testInfo.retry + 1}-${randomUUID().slice(0, 8)}`;
   const firstStudent = `Family Child One ${suffix}`;
   const secondStudent = `Family Child Two ${suffix}`;
   const studentEmail = `family.child.${suffix}@noor.local`;
   const parentEmail = `family.parent.${suffix}@noor.local`;
-  const password = `FamilyPortal${suffix}!`;
+  const password = `FamilyPortal-${suffix}!`;
+  const parentName = `Family Parent E2E ${suffix}`;
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/students");
@@ -30,7 +32,7 @@ test("US-014 admin creates family accounts and links one parent to multiple chil
   await expect(page.getByText("The student account was created and linked.")).toBeVisible();
 
   const parentForm = page.locator("form").filter({ has: page.locator("#parent-account-email") });
-  await parentForm.locator("#parent-account-name").fill("Family Parent E2E");
+  await parentForm.locator("#parent-account-name").fill(parentName);
   await parentForm.locator("#parent-account-email").fill(parentEmail);
   await parentForm.locator("#parent-account-password").fill(password);
   await parentForm.locator("#new-parent-relation").fill("Parent");
@@ -55,7 +57,7 @@ test("US-014 admin creates family accounts and links one parent to multiple chil
   const linkForm = page.locator("form").filter({ has: page.locator("#existing-parent") });
   await linkForm
     .locator("#existing-parent")
-    .selectOption({ label: `Family Parent E2E — ${parentEmail}` });
+    .selectOption({ label: `${parentName} — ${parentEmail}` });
   await linkForm.locator("#existing-relation").fill("Parent");
   await linkForm.getByRole("button", { name: "Link parent" }).click();
   await expect(page).toHaveURL(/familyStatus=linked/);

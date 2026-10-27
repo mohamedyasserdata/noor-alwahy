@@ -1,10 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import { signInAs, testAccounts } from "./helpers/auth";
 
+const mailpitUrl = process.env.E2E_MAILPIT_URL ?? "http://127.0.0.1:54324";
+
 for (const locale of [
-  { code: "ar", direction: "rtl", loginTitle: "تسجيل الدخول" },
-  { code: "en", direction: "ltr", loginTitle: "Sign in" },
+  { code: "ar", direction: "rtl", homeLabel: "العودة للرئيسية", loginTitle: "تسجيل الدخول" },
+  { code: "en", direction: "ltr", homeLabel: "Back to home", loginTitle: "Sign in" },
 ] as const) {
   test(`${locale.code} protects portals and renders an accessible login`, async ({ page }) => {
     const consoleProblems = captureConsoleProblems(page);
@@ -19,9 +22,15 @@ for (const locale of [
     await expect(page.getByRole("heading", { level: 2, name: locale.loginTitle })).toBeVisible();
     await expect(page.locator("#email")).toHaveAttribute("autocomplete", "username");
     await expect(page.locator("#password")).toHaveAttribute("autocomplete", "current-password");
+    const homeLink = page.locator("#main-content").getByRole("link", { name: locale.homeLabel });
+    await expect(homeLink).toBeVisible();
+    await expect(homeLink).toHaveAttribute("href", `/${locale.code}`);
     await expectNoHorizontalOverflow(page);
     await expectTouchTargets(page);
     expect(consoleProblems).toEqual([]);
+
+    await homeLink.click();
+    await expect(page).toHaveURL(new RegExp(`/${locale.code}$`));
   });
 }
 
@@ -47,12 +56,42 @@ test("US-010 routes a teacher to the teacher portal and rejects the admin portal
   await expect(page.getByRole("heading", { level: 1, name: "My sessions today" })).toBeVisible();
 });
 
+test("account settings signs out the current browser and returns home", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await signInAs(page, "en", "teacher");
+
+  const accountMenu = page.getByTestId("account-menu").filter({ visible: true });
+  await accountMenu.locator("summary").click();
+  const accountDetails = accountMenu.locator("dl");
+  await expect(accountDetails.getByText(testAccounts.teacher.email, { exact: true })).toBeVisible();
+  await expect(accountDetails.getByText("Teacher", { exact: true })).toBeVisible();
+  await expect(accountDetails.getByRole("definition").last()).toHaveText(/^\w+\/\w+$/);
+
+  await accountMenu.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(
+    page.getByRole("heading", {
+      name: "An inspiring Quran journey begins right here",
+    }),
+  ).toBeVisible();
+  expect(
+    (await page.context().cookies()).filter(({ name }) => name.includes("auth-token")),
+  ).toEqual([]);
+
+  await page.goto("/en/auth/login");
+  await page.locator("#email").fill(testAccounts.student.email);
+  await page.locator("#password").fill("AcademyTest1!");
+  const loginForm = page.locator("form").filter({ has: page.locator("#password") });
+  await loginForm.getByRole("button", { name: "Open my portal" }).click();
+  await expect(page).toHaveURL(/\/en\/student\/home$/);
+});
+
 test("US-011 completes password recovery without revealing account existence", async ({
   page,
 }, testInfo) => {
   test.setTimeout(60_000);
-  const newPassword = `AcademyTest${testInfo.retry + 2}!`;
-  const messagesBeforeResponse = await page.request.get("http://127.0.0.1:54324/api/v1/messages");
+  const newPassword = `Academy-${testInfo.retry + 2}-${randomUUID()}!`;
+  const messagesBeforeResponse = await page.request.get(`${mailpitUrl}/api/v1/messages`);
   const messagesBefore = (await messagesBeforeResponse.json()) as {
     messages: Array<{ ID: string }>;
   };
@@ -70,7 +109,7 @@ test("US-011 completes password recovery without revealing account existence", a
   let recoveryMessageId: string | undefined;
   await expect
     .poll(async () => {
-      const messagesResponse = await page.request.get("http://127.0.0.1:54324/api/v1/messages");
+      const messagesResponse = await page.request.get(`${mailpitUrl}/api/v1/messages`);
       const messageList = (await messagesResponse.json()) as {
         messages: Array<{ ID: string; To: Array<{ Address: string }> }>;
       };
@@ -84,7 +123,7 @@ test("US-011 completes password recovery without revealing account existence", a
     .toBeTruthy();
 
   const messageResponse = await page.request.get(
-    `http://127.0.0.1:54324/api/v1/message/${recoveryMessageId}`,
+    `${mailpitUrl}/api/v1/message/${recoveryMessageId}`,
   );
   expect(messageResponse.ok()).toBe(true);
   const message = (await messageResponse.json()) as { Text: string };

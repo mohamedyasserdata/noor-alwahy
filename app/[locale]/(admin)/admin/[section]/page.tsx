@@ -12,6 +12,7 @@ import { ExamManagementSection } from "@/components/exams/exam-management-sectio
 import { StudentManagementSection } from "@/components/admin/student-management-section";
 import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
+import { TeacherApplicationSection } from "@/components/admin/teacher-application-section";
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
 import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
@@ -58,6 +59,10 @@ export default async function AdminSectionPage({
 
   if (section === "applications") {
     return <ApplicationCrmSection locale={locale} searchParams={searchParams} />;
+  }
+
+  if (section === "teacher-applications") {
+    return <TeacherApplicationSection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "packages") {

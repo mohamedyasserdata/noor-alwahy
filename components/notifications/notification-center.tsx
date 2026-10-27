@@ -24,10 +24,15 @@ import { cn } from "@/lib/utils";
 
 type NotificationCenterProps = {
   initialData: NotificationCenterData;
+  inline?: boolean;
   portal: PortalId;
 };
 
-export function NotificationCenter({ initialData, portal }: NotificationCenterProps) {
+export function NotificationCenter({
+  initialData,
+  inline = false,
+  portal,
+}: NotificationCenterProps) {
   const locale = useLocale() as AppLocale;
   const t = useTranslations("notifications");
   const supabase = useMemo(() => createClient(), []);
@@ -164,7 +169,10 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
 
   return (
     <div
-      className="fixed end-3 top-2.5 z-50 min-[769px]:end-5 min-[769px]:top-5"
+      className={cn(
+        "z-50",
+        inline ? "relative shrink-0" : "fixed end-3 top-2.5 min-[769px]:end-5 min-[769px]:top-5",
+      )}
       data-realtime-status={realtimeStatus}
     >
       <Button
@@ -191,7 +199,11 @@ export function NotificationCenter({ initialData, portal }: NotificationCenterPr
       {open ? (
         <section
           id="notification-panel"
-          className="mt-2 w-[min(23rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border bg-card shadow-[0_1rem_3rem_-1rem_rgb(15_37_71_/_0.35)]"
+          className={cn(
+            "mt-2 w-[min(23rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border bg-card shadow-[0_1rem_3rem_-1rem_rgb(15_37_71_/_0.35)]",
+            inline &&
+              "fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] sm:absolute sm:inset-x-auto sm:end-0 sm:top-full",
+          )}
           aria-labelledby="notification-title"
         >
           <div className="flex items-center justify-between gap-3 border-b px-4 py-3">

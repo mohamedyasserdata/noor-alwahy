@@ -20,7 +20,9 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto("/en/student/schedule");
     await expect(page.getByRole("heading", { name: "Calendar export" })).toBeVisible();
-    await expect(page.getByText("Africa/Cairo", { exact: true }).first()).toBeVisible();
+    await expect(
+      page.getByText("Africa/Cairo", { exact: true }).filter({ visible: true }).first(),
+    ).toBeVisible();
 
     const download = await page.request.get("/api/calendar/download");
     expect(download.status()).toBe(200);

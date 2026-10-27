@@ -10,6 +10,7 @@ export const portalConfig = {
       "control-center",
       "packages",
       "applications",
+      "teacher-applications",
       "subscriptions",
       "finance",
       "students",
@@ -46,8 +47,8 @@ export const portalConfig = {
     sections: ["home", "progress", "schedule", "billing", "certificates", "contact"],
   },
   parent: {
-    defaultSection: "children",
-    sections: ["children", "schedule", "billing", "contact"],
+    defaultSection: "home",
+    sections: ["home", "children", "schedule", "billing", "contact"],
   },
 } as const satisfies Record<
   PortalId,

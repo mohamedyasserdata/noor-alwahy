@@ -82,6 +82,7 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
                   className="h-11 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/25"
                   defaultValue="student"
                 >
+                  <option value="admin">{t("roles.admin")}</option>
                   <option value="teacher">{t("roles.teacher")}</option>
                   <option value="student">{t("roles.student")}</option>
                   <option value="parent">{t("roles.parent")}</option>

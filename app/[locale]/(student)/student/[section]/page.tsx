@@ -7,7 +7,7 @@ import { StudentCertificatesSection } from "@/components/certificates/student-ce
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { QuranMapSection } from "@/components/progress/quran-map-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
-import { NextSessionSection } from "@/components/sessions/next-session-section";
+import { StudentHomeDashboard } from "@/components/student/student-home-dashboard";
 import { routing } from "@/i18n/routing";
 
 export const instant = false;
@@ -26,14 +26,14 @@ export default async function StudentSectionPage({
   }
 
   if (section === "contact") {
-    return <ContactLinksSection locale={locale} />;
+    return <ContactLinksSection locale={locale} appearance="student" />;
   }
 
-  if (section === "schedule") return <ScheduleSection locale={locale} />;
+  if (section === "schedule") return <ScheduleSection locale={locale} appearance="student" />;
 
-  if (section === "billing") return <FamilyBillingSection locale={locale} />;
+  if (section === "billing") return <FamilyBillingSection locale={locale} appearance="student" />;
 
-  if (section === "home") return <NextSessionSection locale={locale} />;
+  if (section === "home") return <StudentHomeDashboard locale={locale} />;
 
   if (section === "progress") return <QuranMapSection locale={locale} />;
 

@@ -7,6 +7,7 @@ import {
   Sparkles,
   TrendingUp,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -80,7 +81,7 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
   const current = Object.values(data.radar.current);
   const previous = Object.values(data.radar.previous);
   return (
-    <div className="mt-8 grid gap-6">
+    <div className="student-progress-dashboard mt-6 grid gap-6">
       <section aria-labelledby="journey-summary-title">
         <div className="mb-4 flex items-center gap-3">
           <Gauge className="size-6 text-secondary" aria-hidden="true" />
@@ -89,10 +90,16 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
           </h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={data.metrics.masteredPages} label={t.pages} />
-          <Stat value={data.metrics.completedJuz} label={t.juz} />
-          <Stat value={`${data.metrics.percent}%`} label={t.percent} />
-          <Stat value={data.metrics.weeklySpeed} label={t.speed} />
+          <Stat value={data.metrics.masteredPages} label={t.pages} icon={BookMarked} tone="blue" />
+          <Stat value={data.metrics.completedJuz} label={t.juz} icon={Award} tone="gold" />
+          <Stat
+            value={`${data.metrics.percent}%`}
+            label={t.percent}
+            icon={Gauge}
+            tone="violet"
+            progressValue={data.metrics.percent}
+          />
+          <Stat value={data.metrics.weeklySpeed} label={t.speed} icon={TrendingUp} tone="green" />
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Detail
@@ -182,12 +189,55 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
   );
 }
 
-function Stat({ value, label }: { value: string | number; label: string }) {
+function Stat({
+  icon: Icon,
+  label,
+  progressValue,
+  tone,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  progressValue?: number;
+  tone: "blue" | "gold" | "green" | "violet";
+  value: string | number;
+}) {
+  const tones = {
+    blue: "border-[#bfd8fb] bg-[#f1f7ff] text-[#1f5c9e]",
+    gold: "border-[#ead6ad] bg-[#fff9ec] text-[#9a6512]",
+    green: "border-[#bfe2ce] bg-[#f0faf4] text-[#237a4b]",
+    violet: "border-[#d5d0f5] bg-[#f7f5ff] text-[#5b55bd]",
+  } as const;
+  const normalized = Math.min(100, Math.max(0, progressValue ?? 0));
+
   return (
-    <div className="rounded-2xl border bg-card p-5">
-      <strong className="block text-3xl font-black text-primary tabular-nums">{value}</strong>
-      <span className="mt-1 block text-sm text-muted-foreground">{label}</span>
-    </div>
+    <article
+      className={`flex min-h-28 items-center gap-4 rounded-2xl border p-5 dark:border-border dark:bg-card ${tones[tone]}`}
+    >
+      {progressValue == null ? (
+        <span className="grid size-12 shrink-0 place-items-center rounded-full bg-current/10">
+          <Icon className="size-6" aria-hidden="true" />
+        </span>
+      ) : (
+        <span
+          className="grid size-16 shrink-0 place-items-center rounded-full p-2"
+          style={{ background: `conic-gradient(#c69432 ${normalized * 3.6}deg, #f1e5cd 0deg)` }}
+          role="progressbar"
+          aria-label={label}
+          aria-valuenow={normalized}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <span className="grid size-full place-items-center rounded-full bg-card text-xs font-black text-primary">
+            {normalized}%
+          </span>
+        </span>
+      )}
+      <div>
+        <strong className="block text-3xl font-black text-primary tabular-nums">{value}</strong>
+        <span className="mt-1 block text-sm text-muted-foreground">{label}</span>
+      </div>
+    </article>
   );
 }
 function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
@@ -211,7 +261,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border bg-card p-5 sm:p-6">
+    <section className="rounded-3xl border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-6">
       <h3 className="mb-5 flex items-center gap-2 text-lg font-black text-primary">
         <span className="text-secondary [&>svg]:size-5">{icon}</span>
         {title}

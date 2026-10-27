@@ -1,60 +1,55 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
+import { DateTime } from "luxon";
 
-import { convertNextOccurrence } from "../../lib/schedules/conversion";
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
-
-const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 test("US-070 and US-076 weekly schedules render in every role's local time", async ({ page }) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
+  const teacherTime = nextFridayTime("Asia/Riyadh");
+  const parentTime = nextFridayTime("Europe/London");
+  try {
+    await signInAs(page, "en", "admin");
+    await page.goto("/en/admin/schedule");
+    await page.locator("#schedule-assignment").selectOption(fixture.assignmentId);
+    await page.locator("#schedule-weekday").selectOption("5");
+    await page.locator("#schedule-time").fill("18:30");
+    await page.locator("#schedule-duration").fill("45");
+    await page.locator("#schedule-timezone").fill("Africa/Cairo");
+    await page.getByRole("button", { name: "Add weekly time" }).click();
+    await expect(page).toHaveURL(/scheduleStatus=saved$/);
+    await expect(page.getByText("Weekly time saved.")).toBeVisible();
 
-  await signInAs(page, "en", "admin");
-  await page.goto("/en/admin/schedule");
-  await page.locator("#schedule-assignment").selectOption(fixture.assignmentId);
-  await page.locator("#schedule-weekday").selectOption("5");
-  await page.locator("#schedule-time").fill("18:30");
-  await page.locator("#schedule-duration").fill("45");
-  await page.locator("#schedule-timezone").fill("Africa/Cairo");
-  await page.getByRole("button", { name: "Add weekly time" }).click();
-  await expect(page).toHaveURL(/scheduleStatus=saved$/);
-  await expect(page.getByText("Weekly time saved.")).toBeVisible();
+    await signInAs(page, "en", "teacher");
+    await page.goto("/en/teacher/schedule");
+    const teacherSlot = page.locator("article").filter({ hasText: fixture.trackName });
+    await expect(teacherSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+    await expect(teacherSlot.getByText(`Friday · ${teacherTime}`, { exact: true })).toBeVisible();
 
-  await signInAs(page, "en", "teacher");
-  await page.goto("/en/teacher/schedule");
-  await expectSchedule(page, "Asia/Riyadh");
+    await signInAs(page, "en", "student");
+    await page.goto("/en/student/schedule");
+    const studentSlot = page.locator("article").filter({ hasText: fixture.trackName });
+    await expect(studentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+    await expect(studentSlot.getByText("Friday · 18:30", { exact: true })).toBeVisible();
 
-  await signInAs(page, "en", "student");
-  await page.goto("/en/student/schedule");
-  await expectSchedule(page, "Africa/Cairo");
-
-  await signInAs(page, "en", "parent");
-  await page.goto("/en/parent/schedule");
-  await expectSchedule(page, "Europe/London");
-  await expect(page.getByText(/Anchored to Africa\/Cairo/).first()).toBeVisible();
+    await signInAs(page, "en", "parent");
+    await page.goto("/en/parent/schedule");
+    const parentSlot = page.locator("article").filter({ hasText: fixture.trackName });
+    await expect(parentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
+    await expect(parentSlot.getByText(`Friday · ${parentTime}`, { exact: true })).toBeVisible();
+    await expect(parentSlot.getByText(/Anchored to Africa\/Cairo/)).toBeVisible();
+  } finally {
+    await fixture.cleanup();
+  }
 });
 
-async function expectSchedule(page: Parameters<typeof signInAs>[0], viewerTimezone: string) {
-  const occurrence = convertNextOccurrence({
-    weekday: 5,
-    time: "18:30:00",
-    anchorTimezone: "Africa/Cairo",
-    viewerTimezone,
-  });
-  if (!occurrence) throw new Error(`Could not convert the weekly schedule for ${viewerTimezone}.`);
-
-  const card = page
-    .locator("article")
-    .filter({ has: page.getByRole("heading", { name: "Schedule Student", exact: true }) })
-    .first();
-  await expect(card).toBeVisible();
-  await expect(
-    card.getByText(`${weekdays[occurrence.weekday]} · ${occurrence.time.slice(0, 5)}`, {
-      exact: true,
-    }),
-  ).toBeVisible();
+function nextFridayTime(viewerTimezone: string) {
+  const anchorTimezone = "Africa/Cairo";
+  const today = DateTime.now().setZone(anchorTimezone).startOf("day");
+  const nextFriday = today.plus({ days: (5 - today.weekday + 7) % 7 });
+  return nextFriday.set({ hour: 18, minute: 30 }).setZone(viewerTimezone).toFormat("HH:mm");
 }
 
 async function createFixture() {
@@ -66,11 +61,13 @@ async function createFixture() {
     },
   );
   const trackId = crypto.randomUUID();
+  const trackName = `Schedule ${trackId.slice(0, 8)}`;
   const assignmentId = crypto.randomUUID();
   const now = new Date().toISOString();
   const studentId = await findOrCreateStudent(db);
   const teacherId = await findOrCreateTeacher(db, now);
   const guardianId = await findOrCreateGuardian(db);
+  await cleanupPreviousFixtures(db, teacherId);
   const writes = [
     db
       .from("profiles")
@@ -88,7 +85,7 @@ async function createFixture() {
       id: trackId,
       code: `schedule-${trackId.slice(0, 8)}`,
       name_ar: "جدول",
-      name_en: "Schedule",
+      name_en: trackName,
     }),
   ];
   for (const write of writes) {
@@ -115,7 +112,36 @@ async function createFixture() {
     reason: "Weekly schedule test",
   });
   if (assignmentError) throw assignmentError;
-  return { assignmentId };
+  return {
+    assignmentId,
+    trackName,
+    async cleanup() {
+      await db.from("schedule_slots").delete().eq("assignment_id", assignmentId);
+      await db.from("teacher_assignments").delete().eq("id", assignmentId);
+      await db.from("teacher_tracks").delete().eq("teacher_id", teacherId).eq("track_id", trackId);
+      await db.from("tracks").delete().eq("id", trackId);
+    },
+  };
+}
+
+async function cleanupPreviousFixtures(db: FixtureClient, teacherId: string) {
+  const { data, error } = await db
+    .from("teacher_assignments")
+    .select("id,track_id")
+    .eq("teacher_id", teacherId)
+    .eq("reason", "Weekly schedule test");
+  if (error) throw error;
+  const assignments = data ?? [];
+  const assignmentIds = assignments.map((assignment) => assignment.id);
+  const trackIds = assignments.map((assignment) => assignment.track_id);
+  if (assignmentIds.length) {
+    await db.from("schedule_slots").delete().in("assignment_id", assignmentIds);
+    await db.from("teacher_assignments").delete().in("id", assignmentIds);
+  }
+  if (trackIds.length) {
+    await db.from("teacher_tracks").delete().eq("teacher_id", teacherId).in("track_id", trackIds);
+    await db.from("tracks").delete().in("id", trackIds);
+  }
 }
 
 type FixtureClient = SupabaseClient<Database>;
