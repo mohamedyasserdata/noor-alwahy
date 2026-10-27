@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { AutoClosingDetails, MobilePublicMenu } from "@/components/public-site/mobile-public-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -55,13 +56,20 @@ export async function PublicShell({ children, locale }: PublicShellProps) {
 
   return (
     <div className="min-h-svh overflow-x-clip">
-      <header className="safe-header sticky top-0 z-40 px-3 pt-3 sm:px-5">
-        <div className="mx-auto flex min-h-20 max-w-[90rem] items-center justify-between gap-3 rounded-[1.75rem] border border-secondary/20 bg-[#fffaf0]/92 px-3 shadow-[0_14px_45px_rgba(16,31,59,.10)] backdrop-blur-xl sm:px-5 dark:bg-[#0c1b33]/92">
+      <header className="safe-header sticky top-0 z-40 px-2.5 pt-2.5 sm:px-5 sm:pt-3">
+        <div
+          data-testid="public-navbar"
+          className="mx-auto flex min-h-[4.25rem] max-w-[90rem] items-center justify-between gap-2 rounded-[1.5rem] border border-secondary/20 bg-[#fffaf0]/96 px-2.5 shadow-[0_8px_28px_rgba(16,31,59,.10)] backdrop-blur-xl sm:min-h-20 sm:gap-3 sm:rounded-[1.75rem] sm:bg-[#fffaf0]/92 sm:px-5 sm:shadow-[0_14px_45px_rgba(16,31,59,.10)] dark:bg-[#0c1b33]/96 sm:dark:bg-[#0c1b33]/92"
+        >
           <Link
             href="/"
-            className="shrink-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="min-w-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:shrink-0"
           >
-            <BrandMark label={t("brand")} />
+            <BrandMark
+              label={t("brand")}
+              className="min-w-0 gap-2 sm:gap-3 [&>span:first-child]:size-11 sm:[&>span:first-child]:size-12"
+              labelClassName="truncate whitespace-nowrap text-sm min-[390px]:text-base sm:text-lg"
+            />
           </Link>
 
           <nav className="hidden items-center gap-0.5 xl:flex" aria-label={t("navigationLabel")}>
@@ -104,7 +112,16 @@ export async function PublicShell({ children, locale }: PublicShellProps) {
                 {t("navigation.apply")}
               </Link>
             </Button>
-            <details className="group relative xl:hidden">
+            <div className="sm:hidden">
+              <Suspense
+                fallback={
+                  <span className="block size-11 rounded-xl border bg-card" aria-hidden="true" />
+                }
+              >
+                <MobilePublicMenu />
+              </Suspense>
+            </div>
+            <AutoClosingDetails className="group relative hidden sm:block xl:hidden">
               <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-lg border bg-card text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
                 <Menu className="size-5" aria-hidden="true" />
                 <span className="sr-only">{t("openMenu")}</span>
@@ -147,7 +164,7 @@ export async function PublicShell({ children, locale }: PublicShellProps) {
                   {t("login")}
                 </Link>
               </nav>
-            </details>
+            </AutoClosingDetails>
           </div>
         </div>
       </header>

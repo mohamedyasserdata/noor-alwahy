@@ -8,7 +8,7 @@ const roleHomes = {
   admin: "/admin/dashboard",
   teacher: "/teacher/today",
   student: "/student/home",
-  parent: "/parent/children",
+  parent: "/parent/home",
 } as const satisfies Record<UserRole, string>;
 
 export function parseUserRole(value: unknown): UserRole | null {

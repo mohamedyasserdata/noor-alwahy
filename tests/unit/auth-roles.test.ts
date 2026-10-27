@@ -12,7 +12,7 @@ describe("authentication role routing", () => {
     ["admin", "/ar/admin/dashboard"],
     ["teacher", "/ar/teacher/today"],
     ["student", "/ar/student/home"],
-    ["parent", "/ar/parent/children"],
+    ["parent", "/ar/parent/home"],
   ] as const)("routes %s to its Arabic portal", (role, expected) => {
     expect(getRoleHome(role, "ar")).toBe(expected);
   });

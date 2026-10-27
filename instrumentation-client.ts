@@ -1,7 +1,6 @@
 try {
   const savedTheme = localStorage.getItem("noor-theme");
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const isDark = savedTheme === "dark" || (savedTheme !== "light" && prefersDark);
+  const isDark = savedTheme === "dark";
 
   document.documentElement.classList.toggle("dark", isDark);
   document.documentElement.style.colorScheme = isDark ? "dark" : "light";

@@ -37,7 +37,11 @@ for (const locale of locales) {
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
       if (viewport.name === "mobile") {
-        await page.locator("header summary").click();
+        await page
+          .getByRole("button", {
+            name: locale.code === "ar" ? "فتح قائمة الموقع" : "Open site menu",
+          })
+          .click();
       }
       await page.locator('[data-testid="theme-toggle"]:visible').click();
       await expect(page.locator("html")).toHaveClass(/dark/);

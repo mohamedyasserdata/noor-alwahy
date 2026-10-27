@@ -15,11 +15,12 @@ test("US-073 next-session card releases Zoom details only in the join window", a
     await expect(studentJoin).toHaveAttribute("href", fixture.joinUrl);
 
     await signInAs(page, "ar", "parent");
-    await expect(page.getByRole("heading", { name: "حصتك القادمة" })).toBeVisible();
-    await expect(page.getByText("متاحة الآن")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "الحصة القادمة" })).toBeVisible();
+    await page.goto(`/ar/parent/children?student=${fixture.studentId}&view=schedule`);
+    await expect(page.getByRole("heading", { name: "الحصص القادمة" })).toBeVisible();
     await expect(page.getByText("join-meeting-id")).toBeVisible();
     await expect(page.getByText("join-passcode")).toBeVisible();
-    await expect(page.getByRole("link", { name: "الانضمام إلى الحصة" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "الانضمام عبر Zoom" })).toHaveAttribute(
       "href",
       fixture.joinUrl,
     );
@@ -88,6 +89,7 @@ async function createFixture() {
   if (sessionError) throw sessionError;
   return {
     joinUrl,
+    studentId,
     async cleanup() {
       await db.from("sessions").delete().eq("id", sessionId);
       for (const priorSession of priorSessions) {

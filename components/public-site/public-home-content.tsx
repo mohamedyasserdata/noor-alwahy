@@ -267,7 +267,11 @@ export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
 
   return (
     <>
-      <section id="tracks" className="scroll-mt-28 px-4 py-20 sm:px-6 lg:py-24">
+      <section
+        id="tracks"
+        data-testid="public-tracks-section"
+        className="scroll-mt-28 px-4 pt-10 pb-16 sm:px-6 sm:py-20 lg:py-24"
+      >
         <div className="mx-auto max-w-[88rem]">
           <SectionHeading
             eyebrow={t.tracks.eyebrow}

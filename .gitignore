@@ -18,6 +18,9 @@
 /output/pdf/
 /output/lighthouse/
 /output/*.log
+/output/local-backups/
+/output/screenshots/
+/output/tunnel/
 /test-results/
 /tmp/pdfs/
 /tmp/k6-*.json

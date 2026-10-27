@@ -301,6 +301,11 @@
       "roleName": "Parent portal",
       "navigationLabel": "Parent portal sections",
       "sections": {
+        "home": {
+          "label": "Home",
+          "title": "Home",
+          "description": "A calm summary of what needs your attention now."
+        },
         "children": {
           "label": "Children",
           "title": "Follow your children",
@@ -322,6 +327,124 @@
           "description": "Reach the academy’s approved contact channels without creating an internal messaging system."
         }
       }
+    }
+  },
+  "parentPortal": {
+    "welcome": "Welcome, {name}",
+    "homeTitle": "Parent Portal",
+    "homeDescription": "Follow your children’s Quran learning journey with clarity and reassurance.",
+    "timezone": "Times use your time zone: {timezone}",
+    "children": {
+      "title": "My Children",
+      "progress": "Memorisation Progress",
+      "openProfile": "View Child Profile",
+      "noPlacement": "Track and level are not approved yet",
+      "noProgress": "No approved progress data is available yet.",
+      "empty": "No children are linked to this account. Contact the academy administration to verify the link."
+    },
+    "nextSession": {
+      "title": "Next Session",
+      "child": "Child",
+      "teacher": "Teacher",
+      "date": "Date",
+      "time": "Local Time",
+      "openSchedule": "View Schedule",
+      "empty": "There is no upcoming session on the schedule."
+    },
+    "alerts": {
+      "title": "Important Alerts",
+      "fallbackTitle": "An Alert Needs Attention",
+      "followUp": "Open the notification centre for details.",
+      "empty": "There are no new alerts that need your attention."
+    },
+    "child": {
+      "backHome": "Back to Home",
+      "teacher": "Teacher: {name}",
+      "tabsLabel": "Child Profile Sections"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "progress": "Progress",
+      "attendance": "Attendance",
+      "reports": "Reports",
+      "schedule": "Schedule"
+    },
+    "statuses": {
+      "active": "Active",
+      "dropped": "Stopped",
+      "graduated": "Graduated",
+      "suspended": "Temporarily Suspended",
+      "archived": "Archived"
+    },
+    "overview": {
+      "learning": "Learning Summary",
+      "mastered": "Mastered Pages",
+      "reviewDue": "Reviews Due",
+      "attendance": "Attendance Rate",
+      "latestEvaluation": "Latest Approved Evaluation",
+      "nextSession": "Next Session",
+      "familyNote": "Teacher Note for the Family",
+      "latestReport": "Latest Published Report"
+    },
+    "progress": {
+      "title": "Memorisation Progress",
+      "percentage": "Mastered Memorisation",
+      "mastered": "Mastered",
+      "inProgress": "In Progress",
+      "needsReview": "Needs Review",
+      "lastUpdated": "Last updated: {date}",
+      "currentGoals": "Current Goals",
+      "weeklyGoal": "Weekly Page Goal",
+      "monthlyGoal": "Monthly Page Goal"
+    },
+    "attendance": {
+      "title": "Attendance & Commitment",
+      "period": "Last {days} Days",
+      "rate": "Attendance Rate",
+      "total": "Recorded Sessions",
+      "present": "Present",
+      "late": "Late",
+      "absent": "Absent",
+      "history": "Attendance History",
+      "statuses": {
+        "present": "Present",
+        "late": "Late",
+        "student_absent": "Absent",
+        "student_excused": "Excused Absence",
+        "teacher_absent": "Teacher Absent",
+        "cancelled_teacher": "Cancelled by Teacher",
+        "cancelled_admin": "Cancelled by Administration"
+      }
+    },
+    "reports": {
+      "published": "Published to Family",
+      "recommendation": "Teacher Recommendation",
+      "download": "View or Download PDF"
+    },
+    "schedule": {
+      "upcoming": "Upcoming Sessions",
+      "previous": "Previous Sessions",
+      "join": "Join on Zoom",
+      "meetingId": "Meeting ID",
+      "passcode": "Passcode",
+      "statuses": {
+        "scheduled": "Scheduled",
+        "held": "Held",
+        "missed": "Missed",
+        "cancelled": "Cancelled",
+        "rescheduled": "Rescheduled"
+      }
+    },
+    "empty": {
+      "noAttendance": "No approved attendance data is available for this period.",
+      "noEvaluation": "No approved evaluation is available yet.",
+      "noTeacher": "No current teacher is approved.",
+      "noUpcomingSession": "There is no upcoming session.",
+      "noPreviousSession": "No previous sessions are available.",
+      "noFamilyNote": "No approved note is available for the family.",
+      "noReports": "No reports have been published to the family yet.",
+      "noProgress": "No approved memorisation data is available yet.",
+      "noGoals": "No approved memorisation goals are available."
     }
   },
   "auth": {
@@ -1550,6 +1673,7 @@
       "brand": "Noor Al-Wahy Academy",
       "navigationLabel": "Public site navigation",
       "openMenu": "Open site menu",
+      "closeMenu": "Close site menu",
       "login": "Sign in",
       "theme": {
         "enableDark": "Enable dark mode",

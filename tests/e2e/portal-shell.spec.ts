@@ -20,8 +20,8 @@ const portals = [
   },
   {
     id: "parent",
-    section: "children",
-    title: { ar: "حصتك القادمة", en: "Your next session" },
+    section: "home",
+    title: { ar: "بوابة ولي الأمر", en: "Parent Portal" },
   },
 ] as const;
 
@@ -43,8 +43,8 @@ for (const locale of [
       await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(portal.title[locale.code]);
       await expect(page.getByTestId("portal-sidebar")).toBeHidden();
-      if (portal.id === "student") {
-        await expect(page.getByTestId("student-portal-header")).toBeVisible();
+      if (portal.id === "student" || portal.id === "parent") {
+        await expect(page.getByTestId(`${portal.id}-portal-header`)).toBeVisible();
         await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
         await expect(
           page
@@ -65,7 +65,8 @@ for (const locale of [
 
     await page.setViewportSize({ width: 768, height: 900 });
     await expect(page.getByTestId("portal-sidebar")).toBeHidden();
-    await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+    await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
+    await expect(page.getByTestId("parent-portal-header")).toBeVisible();
     await expectNoHorizontalOverflow(page);
     expect(consoleProblems).toEqual([]);
   });
@@ -78,9 +79,9 @@ for (const locale of [
     for (const portal of portals) {
       await signInAs(page, locale.code, portal.id);
       await page.goto(`/${locale.code}/${portal.id}/${portal.section}`);
-      if (portal.id === "student") {
+      if (portal.id === "student" || portal.id === "parent") {
         await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
-        await expect(page.getByTestId("student-portal-header")).toBeVisible();
+        await expect(page.getByTestId(`${portal.id}-portal-header`)).toBeVisible();
         await expect(
           page
             .getByTestId("portal-navigation-top")
@@ -99,8 +100,8 @@ for (const locale of [
     }
 
     await page.setViewportSize({ width: 1024, height: 768 });
-    await expect(page.getByTestId("portal-sidebar")).toBeVisible();
-    await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+    await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
+    await expect(page.getByTestId("parent-portal-header")).toBeVisible();
     expect(consoleProblems).toEqual([]);
   });
 }

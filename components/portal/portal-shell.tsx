@@ -34,7 +34,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
   ]);
   const academyName =
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
-  const isStudentPortal = portal === "student";
+  const isHorizontalPortal = portal === "student" || portal === "parent";
   const accountLabels = {
     accountSettings: t("account.accountSettings"),
     closeHint: t("account.closeHint"),
@@ -52,16 +52,16 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
 
   return (
     <div
-      className={cn("min-h-svh", isStudentPortal && "bg-[#fbf8ef] dark:bg-background")}
+      className={cn("min-h-svh", isHorizontalPortal && "bg-[#fbf8ef] dark:bg-background")}
       data-testid={`portal-shell-${portal}`}
     >
-      {!isStudentPortal && notificationCenter ? (
+      {!isHorizontalPortal && notificationCenter ? (
         <NotificationCenter initialData={notificationCenter} portal={portal} />
       ) : null}
-      {isStudentPortal ? (
+      {isHorizontalPortal ? (
         <header
           className="sticky top-0 z-40 border-b border-secondary/20 bg-[#fffdf8]/96 shadow-[0_0.35rem_1.5rem_-1.1rem_rgb(15_37_71_/_0.25)] backdrop-blur-xl dark:bg-card/96"
-          data-testid="student-portal-header"
+          data-testid={`${portal}-portal-header`}
         >
           <div className="safe-header mx-auto grid w-full max-w-[100rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-4 sm:px-6 lg:px-8">
             <BrandMark
@@ -72,7 +72,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
             />
 
             <div className="hidden min-w-0 px-2 min-[980px]:block">
-              <PortalNavigation portal="student" variant="top" />
+              <PortalNavigation portal={portal} variant="top" />
             </div>
 
             <div className="flex shrink-0 items-center justify-end gap-2">
@@ -91,7 +91,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
             </div>
 
             <div className="col-span-full min-w-0 border-t border-secondary/15 py-1.5 min-[980px]:hidden">
-              <PortalNavigation portal="student" variant="top" />
+              <PortalNavigation portal={portal} variant="top" />
             </div>
           </div>
         </header>
@@ -134,8 +134,8 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
         </aside>
       )}
 
-      <div className={cn("min-h-svh", !isStudentPortal && "min-[769px]:ps-72")}>
-        {!isStudentPortal ? (
+      <div className={cn("min-h-svh", !isHorizontalPortal && "min-[769px]:ps-72")}>
+        {!isHorizontalPortal ? (
           <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 pe-14 backdrop-blur min-[769px]:hidden">
             <BrandMark
               label={academyName}
@@ -161,7 +161,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
           id="main-content"
           className={cn(
             "min-h-[calc(100svh-4rem)] w-full",
-            isStudentPortal
+            isHorizontalPortal
               ? "min-h-svh overflow-hidden"
               : "mx-auto max-w-[96rem] px-4 pt-7 pb-28 min-[769px]:min-h-svh min-[769px]:px-10 min-[769px]:pt-12 min-[769px]:pb-12 sm:px-6 sm:pt-10 xl:px-14",
           )}
@@ -170,7 +170,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
         </main>
       </div>
 
-      {!isStudentPortal ? (
+      {!isHorizontalPortal ? (
         <div
           className="safe-bottom fixed inset-x-0 bottom-0 z-30 h-[5.25rem] border-t bg-card/96 shadow-[0_-0.75rem_2rem_-1.5rem_rgb(15_37_71_/_0.28)] backdrop-blur min-[769px]:hidden"
           data-testid="portal-bottom-nav"

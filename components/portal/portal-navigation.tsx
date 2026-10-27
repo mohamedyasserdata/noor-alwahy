@@ -89,8 +89,8 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
           : isTop
             ? "flex min-w-0 [scrollbar-width:none] items-center gap-1 overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden"
             : "grid h-full items-stretch",
-        !isSidebar && !isTop && sections.length === 4 && "grid-cols-4",
-        !isSidebar && !isTop && sections.length > 4 && "flex overflow-x-auto",
+        !isSidebar && !isTop && sections.length <= 5 && "grid-cols-5",
+        !isSidebar && !isTop && sections.length > 5 && "flex overflow-x-auto",
       )}
     >
       {sections.map((section) => {

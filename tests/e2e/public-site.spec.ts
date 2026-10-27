@@ -140,7 +140,11 @@ for (const locale of locales) {
 
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       if (viewport.name === "mobile") {
-        await page.locator("header summary").click();
+        await page
+          .getByRole("button", {
+            name: locale.code === "ar" ? "فتح قائمة الموقع" : "Open site menu",
+          })
+          .click();
       }
       const themeToggle = page.locator('[data-testid="theme-toggle"]:visible');
       await themeToggle.click();
@@ -172,7 +176,11 @@ for (const locale of locales) {
 
       await page.goto(`/${locale.code}/tracks?source=public-test`);
       if (viewport.name === "mobile") {
-        await page.locator("header summary").click();
+        await page
+          .getByRole("button", {
+            name: locale.code === "ar" ? "فتح قائمة الموقع" : "Open site menu",
+          })
+          .click();
       }
       await page.locator(`nav a[lang="${locale.other}"]:visible`).click();
       await expect(page).toHaveURL(new RegExp(`/${locale.other}/tracks\\?source=public-test$`));
