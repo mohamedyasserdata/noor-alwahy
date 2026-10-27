@@ -33,12 +33,28 @@ const contactLinkFields = {
   url: safeContactUrlSchema,
 };
 
-export const createContactLinkSchema = z.object(contactLinkFields);
+function enforceChannelProtocol(
+  value: { type: ContactLinkType; url: string },
+  context: z.RefinementCtx,
+) {
+  const protocol = value.url.slice(0, value.url.indexOf(":"))?.toLowerCase();
+  const expected = value.type === "phone" ? "tel" : value.type === "email" ? "mailto" : "https";
 
-export const updateContactLinkSchema = z.object({
-  id: z.uuid(),
-  ...contactLinkFields,
-});
+  if (protocol !== expected) {
+    context.addIssue({ code: "custom", message: "protocol_mismatch", path: ["url"] });
+  }
+}
+
+export const createContactLinkSchema = z
+  .object(contactLinkFields)
+  .superRefine(enforceChannelProtocol);
+
+export const updateContactLinkSchema = z
+  .object({
+    id: z.uuid(),
+    ...contactLinkFields,
+  })
+  .superRefine(enforceChannelProtocol);
 
 export const deleteContactLinkSchema = z.object({ id: z.uuid() });
 

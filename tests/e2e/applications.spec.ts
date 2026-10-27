@@ -24,7 +24,7 @@ test("US-040 public applicant submits and checks status with a second identifier
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Submit application" }).click();
   await expect(page.getByText("Your application was received")).toBeVisible();
-  const order = await page.locator("p[dir=ltr]").textContent();
+  const order = await page.getByTestId("application-order-number").textContent();
   expect(order).toMatch(/^NW-A-[A-F0-9]{20}$/);
 
   await page.getByRole("link", { name: "Track application status" }).click();

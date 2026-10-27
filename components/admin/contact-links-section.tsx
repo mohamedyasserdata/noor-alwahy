@@ -76,6 +76,22 @@ export async function ContactLinksAdminSection({
               <p className="mt-1 text-sm text-muted-foreground">{t("create.description")}</p>
             </div>
           </div>
+          <div className="mt-5 rounded-2xl border border-secondary/25 bg-secondary/8 p-4">
+            <p className="text-sm font-black text-primary">{t("create.supported")}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {contactLinkTypes
+                .filter((type) => type !== "other")
+                .map((type) => (
+                  <span
+                    key={type}
+                    className="inline-flex min-h-9 items-center gap-2 rounded-full border bg-card px-3 text-xs font-bold text-primary [&_svg]:size-4"
+                  >
+                    <ContactChannelIcon type={type} />
+                    {t(`types.${type}`)}
+                  </span>
+                ))}
+            </div>
+          </div>
           <ContactLinkForm locale={locale} t={t} />
         </article>
 

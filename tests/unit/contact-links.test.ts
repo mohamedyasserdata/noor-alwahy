@@ -26,11 +26,48 @@ describe("contact link boundaries", () => {
 
   it("accepts approved phone and email protocols", () => {
     expect(
-      createContactLinkSchema.safeParse({ ...validLink, url: "tel:+201000000000" }).success,
+      createContactLinkSchema.safeParse({
+        ...validLink,
+        type: "phone",
+        url: "tel:+201000000000",
+      }).success,
     ).toBe(true);
     expect(
-      createContactLinkSchema.safeParse({ ...validLink, url: "mailto:hello@example.test" }).success,
+      createContactLinkSchema.safeParse({
+        ...validLink,
+        type: "email",
+        url: "mailto:hello@example.test",
+      }).success,
     ).toBe(true);
+  });
+
+  it("accepts every requested social channel with a secure URL", () => {
+    for (const type of ["whatsapp", "facebook", "instagram", "telegram", "youtube", "tiktok"]) {
+      expect(
+        createContactLinkSchema.safeParse({
+          ...validLink,
+          type,
+          url: `https://example.test/${type}`,
+        }).success,
+      ).toBe(true);
+    }
+  });
+
+  it("rejects a destination protocol that does not match the selected channel", () => {
+    expect(
+      createContactLinkSchema.safeParse({
+        ...validLink,
+        type: "phone",
+        url: "https://example.test/phone",
+      }).success,
+    ).toBe(false);
+    expect(
+      createContactLinkSchema.safeParse({
+        ...validLink,
+        type: "facebook",
+        url: "mailto:hello@example.test",
+      }).success,
+    ).toBe(false);
   });
 
   it("rejects script, insecure, and control-character URLs", () => {

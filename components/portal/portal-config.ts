@@ -10,6 +10,7 @@ export const portalConfig = {
       "control-center",
       "packages",
       "applications",
+      "teacher-applications",
       "subscriptions",
       "finance",
       "students",

@@ -17,6 +17,8 @@
 /output/playwright/
 /output/pdf/
 /output/lighthouse/
+/output/*.log
+/test-results/
 /tmp/pdfs/
 /tmp/k6-*.json
 *.dump

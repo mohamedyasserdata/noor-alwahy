@@ -3957,6 +3957,106 @@ export type Database = {
           },
         ];
       };
+      teacher_applications: {
+        Row: {
+          application_no: string;
+          availability: string;
+          consent_at: string;
+          consent_version: string;
+          contact_hash: string;
+          created_at: string;
+          cv_name: string | null;
+          cv_path: string | null;
+          email: string;
+          experience_years: number;
+          full_name: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id: string;
+          internal_notes: string | null;
+          invited_user_id: string | null;
+          phone: string;
+          qualifications: string;
+          request_ip_hash: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          source: string;
+          specialization: string;
+          status: string;
+          teaching_languages: string[];
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          application_no: string;
+          availability: string;
+          consent_at?: string;
+          consent_version: string;
+          contact_hash: string;
+          created_at?: string;
+          cv_name?: string | null;
+          cv_path?: string | null;
+          email: string;
+          experience_years: number;
+          full_name: string;
+          gender: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          internal_notes?: string | null;
+          invited_user_id?: string | null;
+          phone: string;
+          qualifications: string;
+          request_ip_hash: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          source?: string;
+          specialization: string;
+          status?: string;
+          teaching_languages: string[];
+          updated_at?: string;
+        };
+        Update: {
+          application_no?: string;
+          availability?: string;
+          consent_at?: string;
+          consent_version?: string;
+          contact_hash?: string;
+          created_at?: string;
+          cv_name?: string | null;
+          cv_path?: string | null;
+          email?: string;
+          experience_years?: number;
+          full_name?: string;
+          gender?: Database["public"]["Enums"]["gender_t"];
+          id?: string;
+          internal_notes?: string | null;
+          invited_user_id?: string | null;
+          phone?: string;
+          qualifications?: string;
+          request_ip_hash?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          source?: string;
+          specialization?: string;
+          status?: string;
+          teaching_languages?: string[];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_applications_invited_user_id_fkey";
+            columns: ["invited_user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_applications_reviewed_by_fkey";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teacher_assignments: {
         Row: {
           assigned_by: string;
@@ -5052,6 +5152,10 @@ export type Database = {
       };
       evaluate_intervention_rules: { Args: { p_at?: string }; Returns: number };
       expire_admin_export_jobs: { Args: { p_at?: string }; Returns: string[] };
+      finalize_teacher_application_invite: {
+        Args: { p_application_id: string; p_profile_id: string };
+        Returns: string;
+      };
       generate_sessions: {
         Args: { p_horizon_days?: number; p_window_start?: string };
         Returns: number;
@@ -5400,6 +5504,10 @@ export type Database = {
       };
       submit_application: {
         Args: { p_contact_hash: string; p_ip_hash: string; p_lookup_hash: string; p_payload: Json };
+        Returns: string;
+      };
+      submit_teacher_application: {
+        Args: { p_contact_hash: string; p_ip_hash: string; p_payload: Json };
         Returns: string;
       };
       suggest_teachers: {

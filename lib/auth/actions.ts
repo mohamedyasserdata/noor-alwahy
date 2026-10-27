@@ -71,7 +71,7 @@ export async function signOutAction(localeValue: string): Promise<never> {
   const supabase = await createClient();
 
   await supabase.auth.signOut({ scope: "local" });
-  redirectToAuth(locale, "login", "status", "signed_out");
+  redirect(`/${locale}` as Route);
 }
 
 export async function forgotPasswordAction(

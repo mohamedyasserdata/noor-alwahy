@@ -1,4 +1,4 @@
-import { Check, Clock3, MessageCircleMore, UsersRound } from "lucide-react";
+import { Check, Clock3, Globe2, MessageCircleMore, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicContactLinks } from "@/lib/contact-links/get-contact-links";
-import { getPublicPackages } from "@/lib/public-site/packages";
+import { setCountryOverrideAction } from "@/lib/public-site/actions";
+import { detectVisitorCountry } from "@/lib/public-site/country";
+import { getPublicCountries, getPublicPackages } from "@/lib/public-site/packages";
 
 type HomePackagesProps = {
   locale: AppLocale;
@@ -17,11 +19,18 @@ function localized(valueAr: string | null, valueEn: string | null, locale: AppLo
 }
 
 export async function HomePackages({ locale }: HomePackagesProps) {
-  const [packages, contactLinks, t] = await Promise.all([
-    getPublicPackages("ZZ"),
+  const detectedCountry = await detectVisitorCountry();
+  const [countries, packages, contactLinks, t, packageT] = await Promise.all([
+    getPublicCountries(),
+    getPublicPackages(detectedCountry),
     getPublicContactLinks(),
     getTranslations({ locale, namespace: "publicSite.home.packages" }),
+    getTranslations({ locale, namespace: "publicSite.packages" }),
   ]);
+  const selectedCountry = countries.some(({ code }) => code === detectedCountry)
+    ? detectedCountry
+    : "ZZ";
+  const country = countries.find(({ code }) => code === selectedCountry);
   const whatsapp = contactLinks.find((link) => link.type === "whatsapp");
   const numberLocale = locale === "ar" ? "ar-EG-u-nu-latn" : "en-US";
 
@@ -35,9 +44,36 @@ export async function HomePackages({ locale }: HomePackagesProps) {
             </h2>
             <p className="mt-4 text-lg leading-8 text-muted-foreground">{t("description")}</p>
           </div>
-          <p className="border-s-2 border-secondary ps-5 text-sm leading-7 font-bold text-primary lg:justify-self-end">
-            {t("pricingNote")}
-          </p>
+          <form
+            action={setCountryOverrideAction.bind(null, locale, `/${locale}`)}
+            className="grid gap-2 rounded-2xl border border-secondary/25 bg-card p-4 shadow-card sm:grid-cols-[minmax(11rem,1fr)_auto] sm:items-end"
+          >
+            <label
+              className="grid gap-2 text-sm font-bold text-primary"
+              htmlFor="home-package-country"
+            >
+              <span className="flex items-center gap-2">
+                <Globe2 className="size-4 text-secondary" aria-hidden="true" />
+                {packageT("countryLabel")}
+              </span>
+              <select
+                id="home-package-country"
+                name="country"
+                defaultValue={selectedCountry}
+                autoComplete="country"
+                className="min-h-11 rounded-xl border bg-background px-3 text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                {countries.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {localized(option.nameAr, option.nameEn, locale)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button type="submit" variant="gold">
+              {packageT("updateCountry")}
+            </Button>
+          </form>
         </div>
 
         {packages.length === 0 ? (
@@ -52,6 +88,11 @@ export async function HomePackages({ locale }: HomePackagesProps) {
         ) : (
           <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {packages.map((item) => {
+              const price = new Intl.NumberFormat(numberLocale, {
+                style: "currency",
+                currency: item.currency,
+                maximumFractionDigits: 2,
+              }).format(item.amount);
               const sessions = new Intl.NumberFormat(numberLocale).format(item.sessionsPerWeek);
               const minutes = new Intl.NumberFormat(numberLocale).format(item.durationMin);
 
@@ -62,12 +103,27 @@ export async function HomePackages({ locale }: HomePackagesProps) {
                 >
                   <div className="h-1.5 bg-gradient-to-r from-primary via-secondary to-primary" />
                   <div className="flex flex-1 flex-col p-7">
-                    <p className="text-sm font-extrabold text-secondary">
+                    <p className="text-sm font-extrabold text-[#7d500d] dark:text-secondary">
                       {localized(item.trackNameAr, item.trackNameEn, locale) || t("generalTrack")}
                     </p>
                     <h3 className="mt-2 text-2xl leading-9 font-black text-balance text-primary">
                       {localized(item.nameAr, item.nameEn, locale)}
                     </h3>
+                    <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-y border-secondary/15 py-4">
+                      <div>
+                        <p className="text-2xl font-black text-primary" dir="ltr">
+                          {price}
+                        </p>
+                        <p className="mt-1 text-xs font-bold text-muted-foreground">
+                          {packageT(`billing.${item.billingPeriod}`)}
+                        </p>
+                      </div>
+                      <p className="text-sm font-bold text-[#7d500d] dark:text-secondary">
+                        {country
+                          ? localized(country.nameAr, country.nameEn, locale)
+                          : packageT("fallbackCountry")}
+                      </p>
+                    </div>
                     <p className="mt-4 leading-8 text-muted-foreground">
                       {localized(item.descriptionAr, item.descriptionEn, locale) ||
                         t("defaultDescription")}
@@ -116,7 +172,7 @@ export async function HomePackages({ locale }: HomePackagesProps) {
                         <Button
                           asChild
                           size="lg"
-                          className="w-full bg-[#128C7E] text-white hover:bg-[#0f766e]"
+                          className="w-full bg-[#0f766e] text-white hover:bg-[#0b5f58]"
                         >
                           <a href={whatsapp.url} target="_blank" rel="noopener noreferrer">
                             <ContactChannelIcon type="whatsapp" />

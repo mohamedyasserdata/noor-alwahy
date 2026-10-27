@@ -1,15 +1,17 @@
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, MessagesSquare } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import {
   ContactChannelIcon,
   getContactChannelTheme,
 } from "@/components/contact/contact-channel-icon";
+import { StudentPageShell } from "@/components/student/student-page-shell";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
 
 type ContactLinksSectionProps = {
+  appearance?: "standard" | "student";
   locale: AppLocale;
 };
 
@@ -17,7 +19,10 @@ function localizedLabel(link: ContactLink, locale: AppLocale) {
   return locale === "en" && link.labelEn ? link.labelEn : link.labelAr;
 }
 
-export async function ContactLinksSection({ locale }: ContactLinksSectionProps) {
+export async function ContactLinksSection({
+  appearance = "standard",
+  locale,
+}: ContactLinksSectionProps) {
   const [links, settings, t] = await Promise.all([
     getPublicContactLinks(),
     getPublicAppSettings(),
@@ -25,20 +30,30 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
   ]);
   const supportHours = locale === "ar" ? settings.supportHours.ar : settings.supportHours.en;
 
-  return (
-    <section className="mx-auto w-full max-w-6xl" aria-labelledby="contact-links-title">
-      <header className="mx-auto max-w-3xl text-center">
-        <p className="mb-3 inline-flex min-h-8 items-center rounded-full border border-secondary/30 bg-secondary/12 px-3 text-xs font-extrabold tracking-wide text-primary">
-          {t("eyebrow")}
-        </p>
-        <h1
-          id="contact-links-title"
-          className="text-3xl font-black text-balance text-primary sm:text-4xl"
-        >
-          {t("title")}
-        </h1>
-        <p className="mt-4 leading-8 text-pretty text-muted-foreground">{t("description")}</p>
-      </header>
+  const content = (
+    <section
+      className={
+        appearance === "student"
+          ? "mx-auto w-full max-w-[94rem] rounded-[1.75rem] border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-7"
+          : "mx-auto w-full max-w-6xl"
+      }
+      aria-labelledby={appearance === "standard" ? "contact-links-title" : undefined}
+      aria-label={appearance === "student" ? t("title") : undefined}
+    >
+      {appearance === "standard" ? (
+        <header className="mx-auto max-w-3xl text-center">
+          <p className="mb-3 inline-flex min-h-8 items-center rounded-full border border-secondary/30 bg-secondary/12 px-3 text-xs font-extrabold tracking-wide text-primary">
+            {t("eyebrow")}
+          </p>
+          <h1
+            id="contact-links-title"
+            className="text-3xl font-black text-balance text-primary sm:text-4xl"
+          >
+            {t("title")}
+          </h1>
+          <p className="mt-4 leading-8 text-pretty text-muted-foreground">{t("description")}</p>
+        </header>
+      ) : null}
 
       {links.length === 0 ? (
         <div className="mt-8 rounded-3xl border border-dashed bg-card p-8 text-center shadow-card">
@@ -56,7 +71,9 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("empty.description")}</p>
         </div>
       ) : (
-        <ul className="mt-12 grid gap-x-8 gap-y-7 px-1 sm:grid-cols-2 xl:grid-cols-3">
+        <ul
+          className={`${appearance === "standard" ? "mt-12" : ""}grid gap-x-8 gap-y-7 px-1 sm:grid-cols-2 xl:grid-cols-3`}
+        >
           {links.map((link) => {
             const external = link.url.toLowerCase().startsWith("https://");
             const theme = getContactChannelTheme(link.type);
@@ -95,10 +112,27 @@ export async function ContactLinksSection({ locale }: ContactLinksSectionProps) 
         </ul>
       )}
 
-      <aside className="mx-auto mt-12 max-w-3xl rounded-2xl border border-secondary/25 bg-secondary/10 p-5 text-center">
+      <aside className="mx-auto mt-10 max-w-3xl rounded-2xl border border-secondary/25 bg-secondary/10 p-5 text-center">
         <h2 className="font-black text-primary">{t("support.title")}</h2>
         <p className="mt-2 text-sm leading-7 text-muted-foreground">{supportHours}</p>
       </aside>
     </section>
   );
+
+  if (appearance === "student") {
+    return (
+      <StudentPageShell
+        locale={locale}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        titleId="contact-links-title"
+        icon={MessagesSquare}
+      >
+        {content}
+      </StudentPageShell>
+    );
+  }
+
+  return content;
 }

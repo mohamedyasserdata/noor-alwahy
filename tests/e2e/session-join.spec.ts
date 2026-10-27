@@ -11,8 +11,6 @@ test("US-073 next-session card releases Zoom details only in the join window", a
     await signInAs(page, "en", "student");
     await expect(page.getByRole("heading", { name: "Your next session" })).toBeVisible();
     await expect(page.getByText("Available now")).toBeVisible();
-    await expect(page.getByText("join-meeting-id")).toBeVisible();
-    await expect(page.getByText("join-passcode")).toBeVisible();
     const studentJoin = page.getByRole("link", { name: "Join session" });
     await expect(studentJoin).toHaveAttribute("href", fixture.joinUrl);
 
@@ -20,6 +18,7 @@ test("US-073 next-session card releases Zoom details only in the join window", a
     await expect(page.getByRole("heading", { name: "حصتك القادمة" })).toBeVisible();
     await expect(page.getByText("متاحة الآن")).toBeVisible();
     await expect(page.getByText("join-meeting-id")).toBeVisible();
+    await expect(page.getByText("join-passcode")).toBeVisible();
     await expect(page.getByRole("link", { name: "الانضمام إلى الحصة" })).toHaveAttribute(
       "href",
       fixture.joinUrl,

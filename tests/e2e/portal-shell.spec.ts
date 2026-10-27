@@ -43,10 +43,21 @@ for (const locale of [
       await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(portal.title[locale.code]);
       await expect(page.getByTestId("portal-sidebar")).toBeHidden();
-      await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
-      await expect(
-        page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
-      ).toHaveCount(1);
+      if (portal.id === "student") {
+        await expect(page.getByTestId("student-portal-header")).toBeVisible();
+        await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
+        await expect(
+          page
+            .getByTestId("portal-navigation-top")
+            .filter({ visible: true })
+            .locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      } else {
+        await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+        await expect(
+          page.getByTestId("portal-navigation-bottom").locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      }
 
       await expectNoHorizontalOverflow(page);
       await expectTouchTargets(page);
@@ -67,11 +78,22 @@ for (const locale of [
     for (const portal of portals) {
       await signInAs(page, locale.code, portal.id);
       await page.goto(`/${locale.code}/${portal.id}/${portal.section}`);
-      await expect(page.getByTestId("portal-sidebar")).toBeVisible();
-      await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
-      await expect(
-        page.getByTestId("portal-navigation-sidebar").locator('a[aria-current="page"]'),
-      ).toHaveCount(1);
+      if (portal.id === "student") {
+        await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
+        await expect(page.getByTestId("student-portal-header")).toBeVisible();
+        await expect(
+          page
+            .getByTestId("portal-navigation-top")
+            .filter({ visible: true })
+            .locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      } else {
+        await expect(page.getByTestId("portal-sidebar")).toBeVisible();
+        await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
+        await expect(
+          page.getByTestId("portal-navigation-sidebar").locator('a[aria-current="page"]'),
+        ).toHaveCount(1);
+      }
       await expectNoHorizontalOverflow(page);
       await expectTouchTargets(page);
     }

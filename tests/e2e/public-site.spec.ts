@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import AxeBuilder from "@axe-core/playwright";
 import { randomUUID } from "node:crypto";
 
 const locales = [
@@ -113,10 +114,13 @@ for (const locale of locales) {
         expect((await page.request.get("/apple-icon.png")).ok()).toBe(true);
       }
       await expect(
-        page.getByText(locale.code === "ar" ? "الباقات والأسعار" : "Packages & prices", {
-          exact: true,
+        page.getByRole("heading", {
+          name:
+            locale.code === "ar"
+              ? "رحلة قرآنية ملهمة تبدأ من هنا"
+              : "An inspiring Quran journey begins right here",
         }),
-      ).toHaveCount(0);
+      ).toBeVisible();
       await expect(page.locator('a[href$="#packages"]').first()).toHaveText(
         locale.code === "ar" ? "الباقات" : "Packages",
       );
@@ -126,13 +130,23 @@ for (const locale of locales) {
         hasText: expectedPackageName,
       });
       await expect(homePackageCard).toBeVisible();
-      await expect(homePackageCard).not.toContainText("900");
-      await expect(homePackageCard).not.toContainText(/EGP|ج\.م/);
+      await expect(homePackageCard).toContainText("900");
+      await expect(homePackageCard).toContainText(/EGP|ج\.م/);
       const packageAction = homePackageCard.getByRole("link");
       await expect(packageAction).toHaveCount(1);
       expect(await packageAction.getAttribute("href")).toMatch(
         /(?:whatsapp|wa\.me|\/(?:ar|en)\/contact)/i,
       );
+
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      if (viewport.name === "mobile") {
+        await page.locator("header summary").click();
+      }
+      const themeToggle = page.locator('[data-testid="theme-toggle"]:visible');
+      await themeToggle.click();
+      await expect(page.locator("html")).toHaveClass(/dark/);
+      await themeToggle.click();
+      await expect(page.locator("html")).not.toHaveClass(/dark/);
 
       const hiddenPricingResponse = await page.goto(`/${locale.code}/packages`);
       expect(hiddenPricingResponse?.status()).toBe(404);
@@ -157,7 +171,10 @@ for (const locale of locales) {
       }
 
       await page.goto(`/${locale.code}/tracks?source=public-test`);
-      await page.locator(`nav a[lang="${locale.other}"]`).click();
+      if (viewport.name === "mobile") {
+        await page.locator("header summary").click();
+      }
+      await page.locator(`nav a[lang="${locale.other}"]:visible`).click();
       await expect(page).toHaveURL(new RegExp(`/${locale.other}/tracks\\?source=public-test$`));
       expect(renderedScriptWarnings).toEqual([]);
     });

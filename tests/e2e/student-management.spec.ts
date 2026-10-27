@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 
 import { signInAs } from "./helpers/auth";
 
 test("US-011 to US-013 admin manages and exports an audited student record", async ({ page }) => {
   test.setTimeout(90_000);
-  const name = "Student Directory E2E";
-  const updatedName = "Student Directory E2E Updated";
+  const suffix = randomUUID().slice(0, 8);
+  const name = `Student Directory E2E ${suffix}`;
+  const updatedName = `Student Directory E2E Updated ${suffix}`;
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/students");
