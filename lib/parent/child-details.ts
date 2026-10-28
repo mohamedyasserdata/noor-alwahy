@@ -3,6 +3,7 @@ import "server-only";
 import { DateTime } from "luxon";
 import { connection } from "next/server";
 
+import { summarizeStudentAttendance } from "@/lib/attendance/student-rate";
 import { getGuardianPortalContext } from "@/lib/parent/children";
 import { createClient } from "@/lib/supabase/server";
 
@@ -57,20 +58,9 @@ export async function getGuardianChildDetails(studentId: string) {
       const attendance = relation(session.attendance);
       return attendance ? [{ session, attendance }] : [];
     });
-  const eligibleAttendance = attendanceRows.filter(({ attendance }) =>
-    ["present", "late", "student_absent", "student_excused"].includes(attendance.status),
+  const attendanceSummary = summarizeStudentAttendance(
+    attendanceRows.map(({ attendance }) => attendance.status),
   );
-  const present = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "present",
-  ).length;
-  const late = eligibleAttendance.filter(({ attendance }) => attendance.status === "late").length;
-  const absent = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "student_absent",
-  ).length;
-  const excused = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "student_excused",
-  ).length;
-
   const upcomingRows = sessions
     .filter((session) => DateTime.fromISO(session.ends_at) >= now)
     .toSorted((left, right) => left.scheduled_at.localeCompare(right.scheduled_at))
@@ -130,14 +120,7 @@ export async function getGuardianChildDetails(studentId: string) {
     child,
     attendance: {
       periodDays: 30,
-      total: eligibleAttendance.length,
-      present,
-      late,
-      absent,
-      excused,
-      rate: eligibleAttendance.length
-        ? Math.round(((present + late) * 10000) / eligibleAttendance.length) / 100
-        : null,
+      ...attendanceSummary,
       records: attendanceRows.slice(0, 16).map(({ session, attendance }) => ({
         id: session.id,
         scheduledAt: session.scheduled_at,

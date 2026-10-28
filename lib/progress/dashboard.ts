@@ -3,7 +3,9 @@ import "server-only";
 import { DateTime } from "luxon";
 import { connection } from "next/server";
 
+import { summarizeStudentAttendance } from "@/lib/attendance/student-rate";
 import { createClient } from "@/lib/supabase/server";
+import type { AttendanceStatus } from "@/lib/validators/attendance";
 
 const criteria = [
   "memorization",
@@ -92,16 +94,12 @@ export async function getStudentProgressDashboard(requestedStudentId?: string) {
     score: number | null;
     homework: string | null;
   }> = [];
-  let attendanceTotal = 0;
-  let attendancePresent = 0;
+  const attendanceStatuses: AttendanceStatus[] = [];
   for (const session of sessionsResult.data ?? []) {
     const when = DateTime.fromISO(session.scheduled_at).setZone(student.timezone);
     const evaluation = relation(session.evaluation);
     const attendance = relation(session.attendance);
-    if (attendance) {
-      attendanceTotal += 1;
-      if (attendance.status === "present" || attendance.status === "late") attendancePresent += 1;
-    }
+    if (attendance) attendanceStatuses.push(attendance.status);
     if (!evaluation?.is_locked) continue;
     const bucket = when >= currentStart ? "current" : "previous";
     const scores =
@@ -152,6 +150,7 @@ export async function getStudentProgressDashboard(requestedStudentId?: string) {
   });
   const today = now.toISODate() ?? "";
   const due = progress.filter((row) => row.next_review_due && row.next_review_due <= today);
+  const attendance = summarizeStudentAttendance(attendanceStatuses);
 
   return {
     student: { id: student.id, name: student.full_name },
@@ -161,9 +160,7 @@ export async function getStudentProgressDashboard(requestedStudentId?: string) {
       percent: Math.round((mastered.length / 604) * 10000) / 100,
       weeklySpeed,
       expectedCompletion,
-      attendanceRate: attendanceTotal
-        ? Math.round((attendancePresent * 10000) / attendanceTotal) / 100
-        : null,
+      attendanceRate: attendance.rate,
     },
     radar,
     curve,
