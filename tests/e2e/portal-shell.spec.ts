@@ -11,7 +11,7 @@ const portals = [
   {
     id: "teacher",
     section: "today",
-    title: { ar: "حصصي اليوم", en: "My sessions today" },
+    title: { ar: "لوحة المعلم", en: "Teacher dashboard" },
   },
   {
     id: "student",

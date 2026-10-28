@@ -11,10 +11,10 @@ const sections = [
   "attendance",
   "evaluations",
   "reports",
-  "availability",
-  "zoom",
+  "notifications",
+  "requests",
   "earnings",
-  "exams",
+  "profile",
 ] as const;
 
 test("teacher portal keeps every section usable and captures the completed interface", async ({
@@ -41,11 +41,21 @@ test("teacher portal keeps every section usable and captures the completed inter
     });
   }
 
+  await page.goto("/ar/teacher/profile");
+  const displayName = await page.locator("#teacher-display-name").inputValue();
+  await page.locator("#teacher-display-name").fill(displayName);
+  await page.getByRole("button", { name: "حفظ الإعدادات" }).click();
+  await expect(page).toHaveURL(/profileStatus=saved/);
+  await expect(page.getByText("حُفظت إعدادات الملف الشخصي.", { exact: true })).toBeVisible();
+
   for (const width of [360, 768] as const) {
     await page.setViewportSize({ width, height: 900 });
+    for (const section of sections) {
+      await page.goto(`/ar/teacher/${section}`);
+      await expect(page.locator("main h1").first()).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+    }
     await page.goto("/ar/teacher/today");
-    await expect(page.locator("main h1").first()).toBeVisible();
-    await expectNoHorizontalOverflow(page);
     await page.screenshot({
       path: join(output, `ar-today-${width}.png`),
       fullPage: true,
