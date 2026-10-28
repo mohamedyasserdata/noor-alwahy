@@ -99,7 +99,8 @@ function readPayload(value: unknown): NotificationPayload {
     bodyAr: typeof payload.body_ar === "string" ? payload.body_ar : undefined,
     bodyEn: typeof payload.body_en === "string" ? payload.body_en : undefined,
     href:
-      typeof payload.action_href === "string" && /^\/(ar|en)\/admin\//.test(payload.action_href)
+      typeof payload.action_href === "string" &&
+      /^\/(ar|en)\/(admin|teacher|student|parent)\//.test(payload.action_href)
         ? payload.action_href
         : undefined,
   };

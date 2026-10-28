@@ -14,6 +14,7 @@ type AccountMenuProps = {
     timezone: string;
   };
   compact?: boolean;
+  placement?: "sidebar" | "topbar";
   labels: {
     accountSettings: string;
     closeHint: string;
@@ -26,7 +27,13 @@ type AccountMenuProps = {
   locale: AppLocale;
 };
 
-export function AccountMenu({ account, compact = false, labels, locale }: AccountMenuProps) {
+export function AccountMenu({
+  account,
+  compact = false,
+  labels,
+  locale,
+  placement = "sidebar",
+}: AccountMenuProps) {
   return (
     <details
       className={cn("group relative", compact ? "size-11 shrink-0" : "w-full")}
@@ -64,7 +71,9 @@ export function AccountMenu({ account, compact = false, labels, locale }: Accoun
           "z-50 overflow-hidden rounded-2xl border bg-card shadow-[0_1rem_3rem_-1rem_rgb(15_37_71_/_0.38)]",
           compact
             ? "fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4.5rem)] w-auto sm:absolute sm:inset-x-auto sm:end-0 sm:top-[calc(100%+0.5rem)] sm:w-[22rem]"
-            : "absolute inset-x-0 bottom-[calc(100%+0.5rem)] w-[min(22rem,calc(100vw-1.5rem))]",
+            : placement === "topbar"
+              ? "absolute end-0 top-[calc(100%+0.5rem)] w-[min(22rem,calc(100vw-1.5rem))]"
+              : "absolute inset-x-0 bottom-[calc(100%+0.5rem)] w-[min(22rem,calc(100vw-1.5rem))]",
         )}
         aria-label={labels.accountSettings}
       >

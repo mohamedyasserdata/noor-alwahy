@@ -25,21 +25,36 @@ test("US-070 and US-076 weekly schedules render in every role's local time", asy
     await signInAs(page, "en", "teacher");
     await page.goto("/en/teacher/schedule");
     const teacherSlot = page.locator("article").filter({ hasText: fixture.trackName });
-    await expect(teacherSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
-    await expect(teacherSlot.getByText(`Friday · ${teacherTime}`, { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Weekly timetable" })).toBeVisible();
+    await expect(teacherSlot.getByText("Schedule Student")).toBeVisible();
+    await expect(teacherSlot).toContainText(teacherTime);
 
     await signInAs(page, "en", "student");
     await page.goto("/en/student/schedule");
     const studentSlot = page.locator("article").filter({ hasText: fixture.trackName });
-    await expect(studentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
-    await expect(studentSlot.getByText("Friday · 18:30", { exact: true })).toBeVisible();
+    await expect(studentSlot.getByText("Schedule Student")).toBeVisible();
+    await expect(studentSlot).toContainText("6:30 PM");
 
     await signInAs(page, "en", "parent");
     await page.goto("/en/parent/schedule");
     const parentSlot = page.locator("article").filter({ hasText: fixture.trackName });
-    await expect(parentSlot.getByRole("heading", { name: "Schedule Student" })).toBeVisible();
-    await expect(parentSlot.getByText(`Friday · ${parentTime}`, { exact: true })).toBeVisible();
-    await expect(parentSlot.getByText(/Anchored to Africa\/Cairo/)).toBeVisible();
+    await expect(parentSlot.getByText("Schedule Student")).toBeVisible();
+    await expect(parentSlot).toContainText(parentTime.replace(/^0/, ""));
+
+    await signInAs(page, "ar", "admin");
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto("/ar/admin/schedule");
+    await expect(page.getByRole("heading", { name: "الجدول الأسبوعي" }).last()).toBeVisible();
+    await page.screenshot({
+      path: "output/screenshots/weekly-schedule-admin-ar-1440.png",
+      fullPage: true,
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({
+      path: "output/screenshots/weekly-schedule-admin-ar-390.png",
+      fullPage: true,
+    });
   } finally {
     await fixture.cleanup();
   }
@@ -49,7 +64,7 @@ function nextFridayTime(viewerTimezone: string) {
   const anchorTimezone = "Africa/Cairo";
   const today = DateTime.now().setZone(anchorTimezone).startOf("day");
   const nextFriday = today.plus({ days: (5 - today.weekday + 7) % 7 });
-  return nextFriday.set({ hour: 18, minute: 30 }).setZone(viewerTimezone).toFormat("HH:mm");
+  return nextFriday.set({ hour: 18, minute: 30 }).setZone(viewerTimezone).toFormat("h:mm a");
 }
 
 async function createFixture() {

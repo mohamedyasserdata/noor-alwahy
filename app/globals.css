@@ -217,6 +217,296 @@
     border-color: rgb(201 162 75 / 0.2);
   }
 
+  .admin-workspace {
+    background-color: #f5f0e6;
+    background-image:
+      radial-gradient(circle at 8% 5%, rgb(199 164 90 / 0.13), transparent 24rem),
+      radial-gradient(circle at 92% 88%, rgb(16 31 59 / 0.055), transparent 30rem),
+      linear-gradient(30deg, rgb(199 164 90 / 0.025) 12%, transparent 12.5%, transparent 87%);
+    background-size:
+      auto,
+      auto,
+      4rem 7rem;
+  }
+
+  .dark .admin-workspace {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 8% 5%, rgb(216 185 104 / 0.09), transparent 24rem),
+      radial-gradient(circle at 92% 88%, rgb(107 127 153 / 0.08), transparent 30rem);
+  }
+
+  .teacher-workspace {
+    background-color: #f5f0e6;
+    background-image:
+      radial-gradient(circle at 10% 6%, rgb(199 164 90 / 0.13), transparent 25rem),
+      radial-gradient(circle at 90% 92%, rgb(16 31 59 / 0.06), transparent 30rem),
+      linear-gradient(30deg, rgb(199 164 90 / 0.025) 12%, transparent 12.5%, transparent 87%);
+    background-size:
+      auto,
+      auto,
+      4rem 7rem;
+  }
+
+  .dark .teacher-workspace {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 10% 6%, rgb(216 185 104 / 0.09), transparent 25rem),
+      radial-gradient(circle at 90% 92%, rgb(107 127 153 / 0.08), transparent 30rem);
+  }
+
+  .teacher-page {
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .teacher-page > :first-child {
+    margin-block-start: 0;
+  }
+
+  .teacher-page :where(section, article, form)[class*="border"],
+  .teacher-page [data-slot="card"] {
+    border-color: rgb(199 164 90 / 0.24);
+    border-radius: 1.25rem;
+    box-shadow: 0 1rem 2.75rem -2rem rgb(16 31 59 / 0.22);
+  }
+
+  .dark .teacher-page :where(section, article, form)[class*="border"],
+  .dark .teacher-page [data-slot="card"] {
+    border-color: rgb(216 185 104 / 0.22);
+  }
+
+  .teacher-page :where(input, select, textarea) {
+    min-height: 2.75rem;
+    border-radius: 0.8rem;
+  }
+
+  .teacher-page :where(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
+  .teacher-reference-page,
+  .teacher-page > section {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+  }
+
+  .teacher-page-header {
+    min-height: 4.75rem;
+  }
+
+  .teacher-panel,
+  .teacher-metric-card {
+    box-shadow: 0 1rem 2.5rem -2rem rgb(16 31 59 / 0.2);
+  }
+
+  .teacher-page :where(table) {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .teacher-page :where(thead tr) {
+    background: rgb(245 240 230 / 0.75);
+    color: var(--muted-foreground);
+  }
+
+  .dark .teacher-page :where(thead tr) {
+    background: rgb(23 54 95 / 0.72);
+  }
+
+  .teacher-page :where(tbody tr) {
+    transition-property: background-color;
+    transition-duration: 160ms;
+  }
+
+  .teacher-page :where(tbody tr:hover) {
+    background-color: rgb(199 164 90 / 0.07);
+  }
+
+  [data-testid="portal-shell-teacher"] [data-testid="portal-navigation-sidebar"] {
+    padding-inline: 0.75rem;
+    scrollbar-color: rgb(199 164 90 / 0.55) transparent;
+    scrollbar-width: thin;
+  }
+
+  [data-testid="portal-shell-teacher"]
+    [data-testid="portal-navigation-sidebar"]
+    a[aria-current="page"] {
+    background: linear-gradient(135deg, #efd079, #c7a45a);
+    color: #101f3b;
+    box-shadow: 0 0.75rem 1.75rem -1.15rem rgb(125 80 13 / 0.5);
+  }
+
+  [data-testid="portal-shell-teacher"]
+    [data-testid="portal-navigation-sidebar"]
+    a[aria-current="page"]
+    svg {
+    color: #101f3b;
+  }
+
+  @media (max-width: 48rem) {
+    .teacher-page-header {
+      min-height: 0;
+    }
+
+    .teacher-page :where(section, article, form)[class*="border"],
+    .teacher-page [data-slot="card"] {
+      border-radius: 1rem;
+    }
+
+    .teacher-page :where(table) {
+      font-size: 0.78rem;
+    }
+  }
+
+  .admin-page {
+    min-width: 0;
+  }
+
+  .admin-page > :first-child {
+    margin-block-start: 0;
+  }
+
+  .admin-page :where(section, article, form)[class*="border"],
+  .admin-page [data-slot="card"] {
+    border-color: rgb(199 164 90 / 0.24);
+    border-radius: 1.25rem;
+    box-shadow: 0 1rem 2.75rem -2rem rgb(16 31 59 / 0.24);
+  }
+
+  .dark .admin-page :where(section, article, form)[class*="border"],
+  .dark .admin-page [data-slot="card"] {
+    border-color: rgb(216 185 104 / 0.22);
+  }
+
+  .admin-page :where(input, select, textarea) {
+    min-height: 2.75rem;
+    border-radius: 0.8rem;
+  }
+
+  .admin-page select {
+    color: var(--foreground);
+    background-color: var(--card);
+  }
+
+  .admin-page :where(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
+  .admin-page :where(table) {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .admin-page :where(thead tr) {
+    background: rgb(16 31 59 / 0.95);
+    color: #fffdf8;
+  }
+
+  .admin-page :where(thead th:first-child) {
+    border-start-start-radius: 0.8rem;
+  }
+
+  .admin-page :where(thead th:last-child) {
+    border-start-end-radius: 0.8rem;
+  }
+
+  .admin-page :where(tbody tr) {
+    transition-property: background-color;
+    transition-duration: 160ms;
+  }
+
+  .admin-page :where(tbody tr:hover) {
+    background-color: rgb(199 164 90 / 0.08);
+  }
+
+  .admin-dashboard > header {
+    border: 0;
+    padding: 0;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: center;
+    border-top-width: 1px;
+    padding: 1.25rem;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card > p,
+  .admin-dashboard-metrics .admin-metric-card > div {
+    grid-column: 2;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card > p:first-of-type {
+    margin-top: 0;
+  }
+
+  .admin-dashboard-metrics .admin-metric-icon {
+    grid-row: 1 / span 2;
+    color: #101f3b;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card:nth-child(4n + 1) .admin-metric-icon {
+    background: #dff3e7;
+    color: #16844f;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card:nth-child(4n + 2) .admin-metric-icon {
+    background: #fff0d1;
+    color: #a76600;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card:nth-child(4n + 3) .admin-metric-icon {
+    background: #dfedff;
+    color: #2563b8;
+  }
+
+  .admin-dashboard-metrics .admin-metric-card:nth-child(4n + 4) .admin-metric-icon {
+    background: #eee4ff;
+    color: #6d3bc1;
+  }
+
+  [data-testid="portal-shell-admin"] [data-testid="portal-navigation-sidebar"] {
+    padding-inline: 0.75rem;
+    scrollbar-color: rgb(199 164 90 / 0.55) transparent;
+    scrollbar-width: thin;
+  }
+
+  [data-testid="portal-shell-admin"]
+    [data-testid="portal-navigation-sidebar"]
+    a[aria-current="page"] {
+    background: linear-gradient(135deg, #d7b65f, #c7a45a);
+    color: #101f3b;
+    box-shadow: 0 0.75rem 1.75rem -1.15rem rgb(125 80 13 / 0.55);
+  }
+
+  [data-testid="portal-shell-admin"]
+    [data-testid="portal-navigation-sidebar"]
+    a[aria-current="page"]
+    svg {
+    color: #101f3b;
+  }
+
+  [data-testid="portal-shell-admin"] .admin-nav-group + .admin-nav-group {
+    margin-block-start: 0.25rem;
+    border-block-start: 1px solid rgb(199 164 90 / 0.14);
+  }
+
+  @media (max-width: 48rem) {
+    .admin-page :where(section, article, form)[class*="border"],
+    .admin-page [data-slot="card"] {
+      border-radius: 1rem;
+    }
+
+    .admin-page :where(table) {
+      font-size: 0.78rem;
+    }
+  }
+
   @media (max-width: 40rem) {
     .student-page-content {
       margin-block-start: -2.5rem;

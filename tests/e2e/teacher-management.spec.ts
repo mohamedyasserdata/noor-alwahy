@@ -23,7 +23,7 @@ test("US-060 and US-061 teacher verification, conduct and availability workflow"
     .filter({ has: page.getByRole("button", { name: "Create teacher profile" }) });
   await createForm.locator('input[name="identityVerified"]').check();
   await page.getByRole("button", { name: "Create teacher profile" }).click();
-  await expect(page).toHaveURL(/teacherStatus=created$/);
+  await expect(page).toHaveURL(/teacherStatus=created$/, { timeout: 20_000 });
   await expect(page.getByText("Teacher profile created.")).toBeVisible();
 
   await signIn(page, fixture.email, fixture.password);

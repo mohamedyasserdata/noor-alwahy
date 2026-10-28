@@ -1,4 +1,11 @@
-import { CalendarRange, Target, UsersRound } from "lucide-react";
+import {
+  BookOpenCheck,
+  CalendarRange,
+  CheckCircle2,
+  Search,
+  Target,
+  UsersRound,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -8,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { TeacherMetricCard } from "@/components/teacher/teacher-page-ui";
 import type { AppLocale } from "@/i18n/routing";
 import { saveMemorizationPlanAction } from "@/lib/memorization-plans/actions";
 import { getTeacherStudentPlans } from "@/lib/memorization-plans/queries";
@@ -27,6 +35,14 @@ export async function TeacherMemorizationPlansSection({
     searchParams,
   ]);
   const saved = query.planStatus === "saved";
+  const requestedSearch = typeof query.q === "string" ? query.q.trim() : "";
+  const visibleStudents = requestedSearch
+    ? students.filter((student) =>
+        `${student.studentName} ${student.studentNumber}`
+          .toLocaleLowerCase(locale)
+          .includes(requestedSearch.toLocaleLowerCase(locale)),
+      )
+    : students;
   const error =
     query.planError === "invalid_fields"
       ? "invalid_fields"
@@ -34,18 +50,24 @@ export async function TeacherMemorizationPlansSection({
         ? "request_failed"
         : "";
   const today = new Date().toISOString().slice(0, 10);
+  const configuredCount = students.filter((student) => student.plan).length;
+  const followUpCount = students.filter(
+    (student) => student.plan && Number(student.adherence?.weekly_adherence_percent ?? 0) < 100,
+  ).length;
 
   return (
-    <section className="mx-auto w-full max-w-5xl" aria-labelledby="memorization-plans-title">
+    <section className="teacher-reference-page" aria-labelledby="memorization-plans-title">
       <header className="max-w-3xl">
-        <p className="mb-3 text-sm font-black text-secondary">{t("teacher.eyebrow")}</p>
+        <p className="mb-1 text-sm font-black text-secondary">{t("teacher.eyebrow")}</p>
         <h1
           id="memorization-plans-title"
-          className="text-3xl font-black text-balance text-primary sm:text-4xl"
+          className="text-2xl font-black text-balance text-primary sm:text-3xl"
         >
           {t("teacher.title")}
         </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("teacher.description")}</p>
+        <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+          {t("teacher.description")}
+        </p>
       </header>
 
       {saved ? (
@@ -59,7 +81,28 @@ export async function TeacherMemorizationPlansSection({
         </Alert>
       ) : null}
 
-      <div className="mt-8 flex items-center justify-between gap-3 border-b pb-5">
+      <div className="teacher-metrics-grid mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <TeacherMetricCard
+          icon={UsersRound}
+          label={t("teacher.studentsTitle")}
+          value={students.length}
+          tone="green"
+        />
+        <TeacherMetricCard
+          icon={CheckCircle2}
+          label={t("teacher.configured")}
+          value={configuredCount}
+        />
+        <TeacherMetricCard
+          icon={BookOpenCheck}
+          label={t("teacher.notConfigured")}
+          value={students.length - configuredCount}
+          tone="gold"
+        />
+        <TeacherMetricCard icon={Target} label={t("weekly")} value={followUpCount} tone="violet" />
+      </div>
+
+      <div className="mt-5 flex items-center justify-between gap-3 border-b pb-4">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-2xl bg-primary text-secondary">
             <UsersRound className="size-5" aria-hidden="true" />
@@ -69,10 +112,82 @@ export async function TeacherMemorizationPlansSection({
             <p className="text-sm text-muted-foreground">{t("teacher.studentsDescription")}</p>
           </div>
         </div>
-        <Badge variant="secondary">{t("studentCount", { count: students.length })}</Badge>
+        <Badge variant="secondary">{t("studentCount", { count: visibleStudents.length })}</Badge>
       </div>
 
-      {students.length === 0 ? (
+      <form className="mt-5 flex max-w-xl gap-2" method="get">
+        <Label htmlFor="teacher-student-search" className="sr-only">
+          {t("teacher.search")}
+        </Label>
+        <Input
+          id="teacher-student-search"
+          name="q"
+          type="search"
+          defaultValue={requestedSearch}
+          placeholder={t("teacher.searchPlaceholder")}
+        />
+        <button
+          type="submit"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-primary px-4 font-bold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <Search className="size-4" aria-hidden="true" />
+          {t("teacher.search")}
+        </button>
+      </form>
+
+      {visibleStudents.length ? (
+        <div className="mt-5 overflow-x-auto rounded-2xl border bg-card shadow-card">
+          <table className="w-full min-w-[48rem] text-sm">
+            <thead>
+              <tr>
+                <th className="px-4 py-3 text-start">#</th>
+                <th className="px-4 py-3 text-start">{t("teacher.studentsTitle")}</th>
+                <th className="px-4 py-3 text-start">{t("teacher.configured")}</th>
+                <th className="px-4 py-3 text-start">{t("weekly")}</th>
+                <th className="px-4 py-3 text-start">{t("actions.update")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleStudents.map((student, index) => {
+                const percent = Number(student.adherence?.weekly_adherence_percent ?? 0);
+                return (
+                  <tr
+                    key={student.studentId}
+                    className="border-b border-secondary/15 last:border-0"
+                  >
+                    <td className="px-4 py-4 tabular-nums">{index + 1}</td>
+                    <td className="px-4 py-4">
+                      <p className="font-black text-primary">{student.studentName}</p>
+                      <p className="text-xs text-muted-foreground">{student.studentNumber}</p>
+                    </td>
+                    <td className="px-4 py-4">
+                      <Badge variant={student.plan ? "success" : "outline"}>
+                        {student.plan ? t("teacher.configured") : t("teacher.notConfigured")}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex min-w-40 items-center gap-2">
+                        <Progress value={percent} aria-label={t("progressLabel", { percent })} />
+                        <span className="font-black tabular-nums">{percent}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <a
+                        href={`#student-plan-${student.studentId}`}
+                        className="inline-flex min-h-11 items-center rounded-xl border border-secondary/45 px-4 font-bold text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                      >
+                        {t("actions.update")}
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      {visibleStudents.length === 0 ? (
         <Card className="mt-6 border-dashed shadow-none">
           <CardHeader>
             <CardTitle>{t("teacher.emptyTitle")}</CardTitle>
@@ -81,16 +196,32 @@ export async function TeacherMemorizationPlansSection({
         </Card>
       ) : (
         <div className="mt-6 grid gap-5">
-          {students.map((student) => {
+          {visibleStudents.map((student) => {
             const weeklyPercent = Number(student.adherence?.weekly_adherence_percent ?? 0);
             const monthlyPercent = Number(student.adherence?.monthly_adherence_percent ?? 0);
             return (
-              <Card key={student.studentId}>
+              <Card
+                key={student.studentId}
+                id={`student-plan-${student.studentId}`}
+                className="scroll-mt-24"
+              >
                 <CardHeader className="border-b sm:flex sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <CardTitle>{student.studentName}</CardTitle>
                     <CardDescription>
-                      {student.plan ? t("teacher.editDescription") : t("teacher.newDescription")}
+                      {student.track
+                        ? locale === "ar"
+                          ? student.track.name_ar
+                          : student.track.name_en || student.track.name_ar
+                        : t("teacher.trackMissing")}
+                      {" · "}
+                      {student.level
+                        ? locale === "ar"
+                          ? student.level.name_ar
+                          : student.level.name_en || student.level.name_ar
+                        : t("teacher.levelMissing")}
+                      {" · "}
+                      {student.studentNumber}
                     </CardDescription>
                   </div>
                   <Badge variant={student.plan ? "success" : "outline"}>

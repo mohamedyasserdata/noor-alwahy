@@ -47,19 +47,21 @@ export async function SessionEvaluationsSection({
 
   return (
     <section
-      className="mx-auto w-full max-w-6xl overflow-x-hidden"
+      className="teacher-reference-page overflow-x-hidden"
       aria-labelledby="session-evaluation-title"
     >
-      <header className="grid gap-5 border-b border-secondary/30 pb-7 lg:grid-cols-[1fr_17rem] lg:items-end">
+      <header className="grid gap-4 border-b border-secondary/20 pb-5 lg:grid-cols-[1fr_15rem] lg:items-end">
         <div className="max-w-3xl">
-          <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
           <h1
             id="session-evaluation-title"
-            className="text-3xl font-black text-balance text-primary sm:text-4xl"
+            className="text-2xl font-black text-balance text-primary sm:text-3xl"
           >
             {t("title")}
           </h1>
-          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+            {t("description")}
+          </p>
         </div>
         <div className="border-s-4 border-secondary bg-primary p-5 text-primary-foreground">
           <Clock3 className="size-5 text-secondary" aria-hidden="true" />

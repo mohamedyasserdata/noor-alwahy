@@ -26,6 +26,10 @@ export type PlanAdherence = Pick<
 export type TeacherStudentPlan = {
   studentId: string;
   studentName: string;
+  studentNumber: string;
+  status: Database["public"]["Enums"]["student_status"];
+  level: { name_ar: string; name_en: string | null } | null;
+  track: { name_ar: string; name_en: string | null } | null;
   plan: PlanRow | null;
   adherence: PlanAdherence | null;
 };
@@ -42,15 +46,33 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
 
   const { data: assignments, error: assignmentsError } = await supabase
     .from("teacher_assignments")
-    .select("student_id,students!teacher_assignments_student_id_fkey(full_name)")
+    .select(
+      "student_id,students!teacher_assignments_student_id_fkey(full_name,student_no,status,level:levels(name_ar,name_en,track:tracks(name_ar,name_en)))",
+    )
     .eq("teacher_id", teacher.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });
   if (assignmentsError) throw new Error("memorization_plans_unavailable");
 
-  const students = new Map<string, string>();
+  const students = new Map<
+    string,
+    {
+      name: string;
+      number: string;
+      status: Database["public"]["Enums"]["student_status"];
+      level: { name_ar: string; name_en: string | null } | null;
+      track: { name_ar: string; name_en: string | null } | null;
+    }
+  >();
   for (const assignment of assignments ?? []) {
-    students.set(assignment.student_id, assignment.students.full_name);
+    const level = assignment.students.level;
+    students.set(assignment.student_id, {
+      name: assignment.students.full_name,
+      number: assignment.students.student_no,
+      status: assignment.students.status,
+      level: level ? { name_ar: level.name_ar, name_en: level.name_en } : null,
+      track: level?.track ? { name_ar: level.track.name_ar, name_en: level.track.name_en } : null,
+    });
   }
   const studentIds = [...students.keys()];
   if (!studentIds.length) return [];
@@ -81,7 +103,11 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
   return studentIds
     .map((studentId) => ({
       studentId,
-      studentName: students.get(studentId) ?? "",
+      studentName: students.get(studentId)?.name ?? "",
+      studentNumber: students.get(studentId)?.number ?? "",
+      status: students.get(studentId)?.status ?? "active",
+      level: students.get(studentId)?.level ?? null,
+      track: students.get(studentId)?.track ?? null,
       plan: plans.get(studentId) ?? null,
       adherence: adherence.get(studentId) ?? null,
     }))

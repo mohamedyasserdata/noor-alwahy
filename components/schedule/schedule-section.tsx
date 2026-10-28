@@ -1,9 +1,10 @@
-import { CalendarClock, CalendarDays, Clock3, Globe2 } from "lucide-react";
+import { CalendarDays, Globe2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { CalendarExports } from "@/components/schedule/calendar-exports";
 import { SessionAdjustmentsSection } from "@/components/schedule/session-adjustments-section";
+import { WeeklyScheduleGrid } from "@/components/schedule/weekly-schedule-grid";
 import { StudentPageShell } from "@/components/student/student-page-shell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -38,18 +39,20 @@ export async function ScheduleSection({
       className={
         appearance === "student"
           ? "student-schedule-page mx-auto w-full max-w-[94rem] rounded-[1.75rem] border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-7"
-          : "mx-auto w-full max-w-7xl"
+          : "teacher-reference-page"
       }
       aria-labelledby={appearance === "standard" ? "schedule-title" : undefined}
       aria-label={appearance === "student" ? t("title") : undefined}
     >
       {appearance === "standard" ? (
         <header className="max-w-3xl">
-          <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
-          <h1 id="schedule-title" className="text-3xl font-black text-primary sm:text-4xl">
+          <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1 id="schedule-title" className="text-2xl font-black text-primary sm:text-3xl">
             {t("title")}
           </h1>
-          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+            {t("description")}
+          </p>
           <Badge className="mt-4" variant="outline">
             <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
           </Badge>
@@ -163,46 +166,22 @@ export async function ScheduleSection({
           urlLabel: t("exports.urlLabel"),
         }}
       />
-      <div className="mt-9 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {data.slots.length ? (
-          data.slots.map((slot) => (
-            <article key={slot.slot_id} className="rounded-3xl border bg-card p-5 shadow-card">
-              <div className="flex items-start justify-between gap-3">
-                <CalendarClock className="size-6 text-secondary" aria-hidden="true" />
-                <Badge variant="success">{t("weekly")}</Badge>
-              </div>
-              <h2 className="mt-4 text-xl font-black text-primary">{slot.student_name}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {slot.teacher_name} ·{" "}
-                {locale === "ar" ? slot.track_name_ar : (slot.track_name_en ?? slot.track_name_ar)}
-              </p>
-              <p className="mt-4 flex items-center gap-2 font-bold">
-                <Clock3 className="size-4" aria-hidden="true" />
-                {t(`weekdays.${slot.viewer?.weekday ?? slot.weekday}` as "weekdays.0")} ·{" "}
-                {slot.viewer?.time.slice(0, 5) ?? slot.local_start_time.slice(0, 5)}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t("durationValue", { count: slot.duration_min })}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">{data.timezone}</p>
-              {data.timezone !== slot.anchor_timezone ? (
-                <p className="mt-3 rounded-xl bg-accent/50 p-3 text-xs leading-6">
-                  {t("anchorNote", {
-                    timezone: slot.anchor_timezone,
-                    day: t(`weekdays.${slot.weekday}` as "weekdays.0"),
-                    time: slot.local_start_time.slice(0, 5),
-                  })}
-                </p>
-              ) : null}
-            </article>
-          ))
-        ) : (
-          <div className="rounded-2xl border border-dashed border-secondary/35 bg-[#fffaf0]/70 p-10 text-center text-muted-foreground md:col-span-2 xl:col-span-3 dark:bg-accent/20">
-            <CalendarDays className="mx-auto size-8 text-secondary" aria-hidden="true" />
-            <p className="mt-3">{t("empty")}</p>
-          </div>
-        )}
-      </div>
+      <WeeklyScheduleGrid
+        slots={data.slots}
+        locale={locale}
+        role={data.role}
+        timezone={data.timezone}
+        labels={{
+          title: t("grid.title"),
+          description: t("grid.description"),
+          lessonCount: t.raw("grid.lessonCount"),
+          lessonsAtTime: t.raw("grid.lessonsAtTime"),
+          student: t("grid.student"),
+          teacher: t("grid.teacher"),
+          empty: t("empty"),
+          weekdays: [0, 1, 2, 3, 4, 5, 6].map((day) => t(`weekdays.${day}` as "weekdays.0")),
+        }}
+      />
       {data.adjustments ? (
         <SessionAdjustmentsSection
           locale={locale}

@@ -123,6 +123,7 @@ export async function getTeacherTodaySessions() {
       reviewQueue: queuesByStudent.get(session.student_id) ?? [],
     })) satisfies TeacherTodaySession[],
     overview: {
+      assignedStudentCount: assignedStudents.length,
       absentStudents: data
         .filter((session) => one(session.attendance)?.status === "student_absent")
         .map((session) => session.students.full_name),
@@ -156,6 +157,59 @@ export async function getTeacherTodaySessions() {
           (queuesByStudent.get(assignment.student_id) ?? []).some((item) => item.is_overdue),
         )
         .map((assignment) => assignment.students.full_name),
+    },
+  };
+}
+
+export async function getTeacherAttendanceHistory(days = 30) {
+  await connection();
+  const supabase = await createClient();
+  const [{ data: profile, error: profileError }, { data: teacher, error: teacherError }] =
+    await Promise.all([
+      supabase.from("profiles").select("timezone").maybeSingle(),
+      supabase.from("teachers").select("id").maybeSingle(),
+    ]);
+  if (profileError || teacherError) throw new Error("teacher_attendance_unavailable");
+  if (!profile || !teacher) return null;
+
+  const now = DateTime.now().setZone(profile.timezone);
+  const from = now.minus({ days }).startOf("day").toUTC().toISO();
+  const { data, error } = await supabase
+    .from("sessions")
+    .select(
+      "id,scheduled_at,ends_at,duration_min,status,students!sessions_student_id_fkey(full_name),attendance(status,minutes,recorded_at,locked_at)",
+    )
+    .eq("teacher_id", teacher.id)
+    .gte("scheduled_at", from)
+    .lte("scheduled_at", now.endOf("day").toUTC().toISO())
+    .order("scheduled_at", { ascending: false });
+  if (error) throw new Error("teacher_attendance_unavailable");
+
+  const sessions = (data ?? []).map((session) => ({
+    id: session.id,
+    scheduledAt: session.scheduled_at,
+    endsAt: session.ends_at,
+    durationMin: session.duration_min,
+    sessionStatus: session.status,
+    studentName: session.students.full_name,
+    attendance: one(session.attendance),
+  }));
+  const recorded = sessions.filter((session) => session.attendance);
+  const attended = recorded.filter((session) =>
+    ["present", "late"].includes(session.attendance?.status ?? ""),
+  ).length;
+
+  return {
+    timezone: profile.timezone,
+    days,
+    sessions,
+    metrics: {
+      scheduled: sessions.length,
+      recorded: recorded.length,
+      pending: sessions.filter(
+        (session) => DateTime.fromISO(session.endsAt) < now && !session.attendance,
+      ).length,
+      adherence: recorded.length ? Math.round((attended / recorded.length) * 100) : null,
     },
   };
 }

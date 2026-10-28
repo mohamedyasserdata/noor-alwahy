@@ -107,6 +107,19 @@
     "admin": {
       "roleName": "Administration portal",
       "navigationLabel": "Administration portal sections",
+      "groups": {
+        "overview": "Overview",
+        "people": "People & requests",
+        "learning": "Learning & follow-up",
+        "students": "Students & enrollment",
+        "teachers": "Teachers & assignments",
+        "academics": "Academic operations",
+        "finance": "Finance & subscriptions",
+        "content": "Content & communication",
+        "system": "Administration & system",
+        "more": "More",
+        "allSections": "All administration sections"
+      },
       "sections": {
         "dashboard": {
           "label": "Overview",
@@ -163,6 +176,11 @@
           "title": "Weekly schedule",
           "description": "Set fixed weekly lesson times and review them in each viewer’s local time."
         },
+        "attendance": {
+          "label": "Attendance",
+          "title": "Attendance tracking",
+          "description": "Review approved attendance, absence, and lateness records."
+        },
         "evaluation": {
           "label": "Evaluation setup",
           "title": "Evaluation settings",
@@ -213,10 +231,14 @@
     "teacher": {
       "roleName": "Teacher portal",
       "navigationLabel": "Teacher portal sections",
+      "more": "More",
+      "allSections": "All teacher sections",
+      "search": "Search my students",
+      "searchPlaceholder": "Search your students…",
       "sections": {
         "today": {
-          "label": "Today",
-          "title": "Your teaching day",
+          "label": "Home",
+          "title": "Teacher dashboard",
           "description": "A clear starting point for today’s sessions and tasks for students assigned to you."
         },
         "evaluations": {
@@ -229,10 +251,25 @@
           "title": "Assigned students",
           "description": "Follow only the students you are authorized to teach, without exposing records outside your scope."
         },
+        "attendance": {
+          "label": "Attendance",
+          "title": "Attendance register",
+          "description": "Record your session outcomes and review saved entries under the approved lock policy."
+        },
         "reports": {
           "label": "Reports",
           "title": "Progress reports",
           "description": "Prepare and review progress reports before approval and release to authorized viewers."
+        },
+        "notifications": {
+          "label": "Notifications",
+          "title": "Notifications",
+          "description": "Session changes and official instructions that need your attention."
+        },
+        "requests": {
+          "label": "Change requests",
+          "title": "Change & makeup requests",
+          "description": "Review schedule changes and follow the approved action channel."
         },
         "availability": {
           "label": "Availability",
@@ -240,7 +277,7 @@
           "description": "Manage available teaching times so the administration can build a suitable schedule."
         },
         "schedule": {
-          "label": "Schedule",
+          "label": "My schedule",
           "title": "Teaching schedule",
           "description": "See assigned weekly lessons in your local time zone."
         },
@@ -250,9 +287,14 @@
           "description": "Keep your permanent approved meeting link ready for assigned lessons."
         },
         "earnings": {
-          "label": "My earnings",
+          "label": "Earnings",
           "title": "My earnings and statements",
           "description": "Review counted sessions, monthly statements, and each statement's approval and payment status."
+        },
+        "profile": {
+          "label": "My profile",
+          "title": "My profile",
+          "description": "Account settings and core preferences."
         },
         "exams": {
           "label": "Exams",
@@ -1130,9 +1172,9 @@
     }
   },
   "teacherToday": {
-    "eyebrow": "Daily attendance register",
-    "title": "My sessions today",
-    "description": "Record each result in one click. Credit, pay, and makeup policy are applied automatically.",
+    "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+    "title": "Teacher dashboard",
+    "description": "Your sessions, students, and tasks that need attention in one place.",
     "dayTitle": "Today’s schedule",
     "sessionCount": "{count, plural, one {# session} other {# sessions}}",
     "duration": "{count} minutes",
@@ -1142,8 +1184,14 @@
     "awaitingAttendance": "Awaiting attendance",
     "chooseResult": "Choose the session result",
     "recorded": "The result is fixed and its credit and pay effects have been applied.",
+    "completeEvaluation": "Complete evaluation",
+    "evaluationComplete": "Evaluation complete",
     "saving": "Recording…",
     "overview": {
+      "sessions": "Today's sessions",
+      "students": "My students",
+      "assigned": "Students currently assigned to you",
+      "evaluations": "Pending evaluations",
       "absent": "Absent today",
       "late": "Late today",
       "tasks": "Pending tasks",
@@ -1180,6 +1228,40 @@
       "active_subscription_required": "No active subscription covers this session.",
       "profile_missing": "Your teacher profile has not been created yet.",
       "request_failed": "Attendance could not be recorded. No partial effects were saved."
+    }
+  },
+  "teacherAttendance": {
+    "eyebrow": "Session follow-up",
+    "title": "Attendance register",
+    "description": "Review saved session outcomes and spot ended sessions that still need attendance.",
+    "recordToday": "Record today's attendance",
+    "missing": "Your teacher profile has not been created yet.",
+    "historyTitle": "Last {days} days",
+    "empty": "No sessions fall within this period.",
+    "pending": "Not recorded",
+    "minutes": "{count} minutes",
+    "timezone": "Times are shown in your time zone: {timezone}",
+    "metrics": {
+      "scheduled": "Scheduled sessions",
+      "recorded": "Saved outcomes",
+      "pending": "Need recording",
+      "adherence": "Attendance rate"
+    },
+    "table": {
+      "student": "Student",
+      "time": "Time",
+      "duration": "Duration",
+      "result": "Outcome",
+      "savedAt": "Saved at"
+    },
+    "statuses": {
+      "present": "Present",
+      "late": "Late",
+      "student_absent": "Student absent",
+      "student_excused": "Excused absence",
+      "teacher_absent": "Teacher absent",
+      "cancelled_teacher": "Teacher cancelled",
+      "cancelled_admin": "Administration cancelled"
     }
   },
   "attendanceReports": {
@@ -1224,6 +1306,14 @@
     "durationValue": "{count} minutes",
     "anchorNote": "Anchored to {timezone}: {day} at {time}",
     "empty": "No active weekly lessons are available.",
+    "grid": {
+      "title": "Weekly timetable",
+      "description": "Each lesson appears on its local day and time. Scroll horizontally on mobile to see the rest of the week.",
+      "lessonCount": "{count} weekly lessons",
+      "lessonsAtTime": "{count} lessons at this time",
+      "student": "Student",
+      "teacher": "Teacher"
+    },
     "exports": {
       "title": "Calendar export",
       "description": "Download your upcoming sessions or create a private subscription link for your calendar app.",
@@ -1456,6 +1546,10 @@
       "description": "Set realistic targets for your assigned students and follow mastered-page achievement automatically without manual totals.",
       "studentsTitle": "Assigned students",
       "studentsDescription": "Every change is saved within your current assignment scope.",
+      "search": "Search",
+      "searchPlaceholder": "Search by student name or number",
+      "trackMissing": "Track not set",
+      "levelMissing": "Level not set",
       "emptyTitle": "No students are currently assigned",
       "emptyDescription": "Memorization plans will appear after an active student is assigned to you.",
       "newDescription": "Create the first weekly and monthly target for this student.",
@@ -2415,10 +2509,12 @@
   },
   "adminDashboard": {
     "eyebrow": "Administration dashboard · unified data",
-    "title": "A complete academy overview",
-    "description": "Operational, learning, and financial indicators from the original records, with every currency kept separate.",
+    "title": "Administration overview",
+    "description": "A calm summary of what needs a decision or follow-up now, with full detail kept in its specialist section.",
     "period": "From {from} to {to}",
     "filters": {
+      "title": "Period and filters",
+      "description": "Open the filters only when you need to change the dashboard scope.",
       "from": "From date",
       "to": "To date",
       "country": "Country",
@@ -2426,6 +2522,26 @@
       "allCountries": "All countries",
       "allCurrencies": "All currencies",
       "apply": "Apply filters"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "description": "Work that currently needs an administration decision.",
+      "newApplications": "New enrollment applications",
+      "riskFlags": "Students needing follow-up",
+      "overdue": "Overdue balances"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "description": "Go directly to the most common administration tasks.",
+      "applications": "Review applications",
+      "subscriptions": "Manage subscriptions",
+      "schedule": "Open schedule",
+      "reports": "Review reports"
+    },
+    "analytics": {
+      "title": "Detailed analytics",
+      "description": "Financial and learning trends, audited activity, and risk indicators.",
+      "open": "Show details"
     },
     "metrics": {
       "students": "Active students",
@@ -3132,6 +3248,66 @@
         "title": "No matching teacher applications",
         "description": "Change the search or status filter, or wait for a new public application."
       }
+    }
+  },
+  "teacherReference": {
+    "notifications": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "Notifications",
+      "description": "Official changes and instructions that affect your teaching day.",
+      "metrics": {
+        "unread": "Unread",
+        "sessions": "Session alerts",
+        "instructions": "Admin instructions",
+        "latest": "Latest update"
+      },
+      "emptyValue": "None",
+      "all": "All notifications",
+      "markAll": "Mark all as read",
+      "markRead": "Mark as read",
+      "marking": "Saving…",
+      "open": "View",
+      "unread": "New",
+      "emptyTitle": "No notifications right now",
+      "emptyDescription": "Approved session changes and instructions will appear here when received."
+    },
+    "requests": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "Schedule changes & makeup",
+      "description": "Track session changes and makeup arrangements under the approved admin process.",
+      "historyTitle": "Previous changes",
+      "requestTitle": "Request a change or makeup",
+      "policyTitle": "Scheduling is managed by the administration",
+      "policyDescription": "Current permissions do not let teachers reschedule or create makeup sessions directly. Review your schedule and alerts, then use the official administration channel when needed so the decision is recorded and shared with every authorized party.",
+      "openSchedule": "View schedule",
+      "openNotifications": "View notifications",
+      "change": "Session schedule change",
+      "read": "Reviewed",
+      "new": "New",
+      "empty": "No schedule changes are present in your current notifications."
+    },
+    "profile": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "My profile",
+      "description": "Teacher settings and the account details you are allowed to edit.",
+      "detailsTitle": "Profile details",
+      "preferencesTitle": "Account preferences",
+      "displayName": "Display name",
+      "email": "Email address",
+      "language": "Preferred language",
+      "timezone": "Time zone",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "saved": "Profile settings saved.",
+      "saveError": "Settings could not be saved. Review the fields and try again.",
+      "missing": "The teacher profile could not be loaded.",
+      "notifications": "Session notifications",
+      "notificationsDetail": "Official alerts are managed from the notifications page.",
+      "appearance": "Interface appearance",
+      "appearanceDetail": "Use the theme control in the top bar.",
+      "languageDetail": "Change the interface language in the top bar or save the preference here.",
+      "account": "Account settings",
+      "accountDetail": "Change password and account protection from the account menu."
     }
   },
   "accessibility": {

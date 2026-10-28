@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   BookOpenCheck,
   CalendarDays,
   CheckCircle2,
@@ -11,6 +10,7 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { NextSessionCard } from "@/components/sessions/next-session-card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { recordAttendanceAction } from "@/lib/attendance/actions";
 import { getTeacherTodaySessions } from "@/lib/attendance/queries";
+import { getNextSessionCard } from "@/lib/sessions/next-session";
 import { attendanceStatuses, type AttendanceStatus } from "@/lib/validators/attendance";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
@@ -38,9 +39,10 @@ export async function TeacherTodaySection({
   locale: AppLocale;
   searchParams: Query;
 }) {
-  const [t, day, query] = await Promise.all([
+  const [t, day, nextSession, query] = await Promise.all([
     getTranslations({ locale, namespace: "teacherToday" }),
     getTeacherTodaySessions(),
+    getNextSessionCard(locale),
     searchParams,
   ]);
   const status = typeof query.attendanceStatus === "string" ? query.attendanceStatus : "";
@@ -64,16 +66,18 @@ export async function TeacherTodaySection({
   });
 
   return (
-    <section className="mx-auto w-full max-w-5xl" aria-labelledby="teacher-today-title">
+    <section className="teacher-reference-page" aria-labelledby="teacher-today-title">
       <header className="max-w-3xl">
-        <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
+        <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
         <h1
           id="teacher-today-title"
-          className="scroll-mt-24 text-3xl font-black text-balance text-primary sm:text-4xl"
+          className="scroll-mt-24 text-2xl font-black text-balance text-primary sm:text-3xl"
         >
           {t("title")}
         </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+        <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+          {t("description")}
+        </p>
       </header>
 
       {status === "saved" ? (
@@ -92,24 +96,26 @@ export async function TeacherTodaySection({
           {t("errors.profile_missing")}
         </Alert>
       ) : (
-        <div className="mt-8">
+        <div className="mt-5">
+          <NextSessionCard serverNowMs={nextSession.serverNowMs} session={nextSession.session} />
+
           <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <OverviewCard
-              icon={<AlertTriangle />}
-              label={t("overview.absent")}
-              value={day.overview.absentStudents.length}
-              detail={day.overview.absentStudents.join("، ") || t("overview.none")}
+              icon={<CalendarDays />}
+              label={t("overview.sessions")}
+              value={day.sessions.length}
+              detail={t("sessionCount", { count: day.sessions.length })}
             />
             <OverviewCard
-              icon={<Clock3 />}
-              label={t("overview.late")}
-              value={day.overview.lateStudents.length}
-              detail={day.overview.lateStudents.join("، ") || t("overview.none")}
+              icon={<UserRoundCheck />}
+              label={t("overview.students")}
+              value={day.overview.assignedStudentCount}
+              detail={t("overview.assigned")}
             />
             <OverviewCard
               icon={<ListChecks />}
-              label={t("overview.tasks")}
-              value={day.overview.pendingAttendance + day.overview.pendingEvaluations.length}
+              label={t("overview.evaluations")}
+              value={day.overview.pendingEvaluations.length}
               detail={t("overview.tasksDetail", {
                 attendance: day.overview.pendingAttendance,
                 evaluations: day.overview.pendingEvaluations.length,
@@ -219,9 +225,21 @@ export async function TeacherTodaySection({
                         </Card>
 
                         {session.attendance ? (
-                          <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                            {t("recorded")}
-                          </p>
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-success/8 p-3">
+                            <p className="text-sm leading-6 text-muted-foreground">
+                              {t("recorded")}
+                            </p>
+                            {session.evaluationLocked ? (
+                              <Badge variant="success">{t("evaluationComplete")}</Badge>
+                            ) : (
+                              <Link
+                                href={`/teacher/evaluations?sessionId=${session.id}`}
+                                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-black text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                              >
+                                {t("completeEvaluation")}
+                              </Link>
+                            )}
+                          </div>
                         ) : (
                           <div className="mt-5">
                             <p className="text-sm font-bold text-foreground">{t("chooseResult")}</p>
