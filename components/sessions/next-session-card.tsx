@@ -56,10 +56,14 @@ export function NextSessionCard({
     }
 
     return (
-      <article className="mt-8 rounded-3xl border border-dashed bg-card p-6 sm:p-8">
-        <CalendarClock className="size-7 text-secondary" aria-hidden="true" />
-        <h2 className="mt-5 text-xl font-black text-primary">{t("emptyTitle")}</h2>
-        <p className="mt-2 leading-7 text-muted-foreground">{t("emptyDescription")}</p>
+      <article className="rounded-3xl border border-dashed border-secondary/40 bg-card/96 p-6 text-center shadow-card backdrop-blur sm:p-8">
+        <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-secondary/14 text-secondary ring-1 ring-secondary/25">
+          <CalendarClock className="size-7" aria-hidden="true" />
+        </span>
+        <h2 className="mt-4 text-xl font-black text-primary">{t("emptyTitle")}</h2>
+        <p className="mx-auto mt-2 max-w-xl leading-7 text-muted-foreground">
+          {t("emptyDescription")}
+        </p>
       </article>
     );
   }
@@ -160,88 +164,95 @@ function LiveSessionCard({
   }
 
   return (
-    <article className="relative mt-8 overflow-hidden rounded-3xl border bg-card shadow-card">
-      <div className="absolute inset-y-0 start-0 w-1.5 bg-secondary" aria-hidden="true" />
-      <div className="grid gap-7 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-center">
-        <div>
+    <article className="relative overflow-hidden rounded-3xl border border-secondary/30 bg-card/96 shadow-soft backdrop-blur">
+      <div className="absolute inset-y-0 start-0 w-1 bg-secondary" aria-hidden="true" />
+      <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(13rem,1.15fr)_minmax(11rem,0.9fr)_minmax(10rem,0.8fr)_minmax(13rem,0.95fr)] lg:items-center lg:divide-x lg:divide-border/70 lg:divide-x-reverse">
+        <div className="min-w-0 lg:px-4">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="grid size-12 place-items-center rounded-2xl bg-primary text-secondary">
+            <span className="grid size-11 place-items-center rounded-2xl bg-secondary/15 text-secondary ring-1 ring-secondary/20">
               <Video className="size-5" aria-hidden="true" />
             </span>
             <Badge variant={windowState.phase === "open" ? "success" : "outline"}>
               {t(`states.${windowState.phase}`)}
             </Badge>
           </div>
-          <h2 className="mt-6 text-2xl font-black text-primary sm:text-3xl">{t("cardTitle")}</h2>
-          <p className="mt-3 flex items-center gap-2 font-bold text-foreground">
-            <CalendarClock className="size-4 text-secondary" aria-hidden="true" />
-            {session.dateLabel} · {session.timeLabel}
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">{session.timezone}</p>
-          <dl className="mt-5 grid gap-2 text-sm sm:grid-cols-2">
-            {session.studentName ? (
-              <div>
-                <dt className="text-muted-foreground">{t("student")}</dt>
-                <dd className="font-bold text-primary">{session.studentName}</dd>
-              </div>
-            ) : null}
-            {session.teacherName ? (
-              <div>
-                <dt className="text-muted-foreground">{t("teacher")}</dt>
-                <dd className="font-bold text-primary">{session.teacherName}</dd>
-              </div>
-            ) : null}
-          </dl>
-          {windowState.canJoin && (session.meetingId || session.passcode) ? (
-            <dl className="mt-5 grid gap-2 rounded-2xl bg-accent/55 p-4 text-sm sm:grid-cols-2">
-              {session.meetingId ? (
-                <div>
-                  <dt className="text-muted-foreground">{t("meetingId")}</dt>
-                  <dd className="font-bold" dir="ltr">
-                    {session.meetingId}
-                  </dd>
-                </div>
-              ) : null}
-              {session.passcode ? (
-                <div>
-                  <dt className="text-muted-foreground">{t("passcode")}</dt>
-                  <dd className="font-bold" dir="ltr">
-                    {session.passcode}
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          ) : null}
+          <h2 className="mt-3 truncate text-xl font-black text-primary">{t("cardTitle")}</h2>
         </div>
 
-        <div className="rounded-3xl bg-primary p-5 text-primary-foreground sm:p-6">
-          <Clock3 className="size-6 text-secondary" aria-hidden="true" />
-          <p className="mt-4 text-sm text-primary-foreground/75">{countdownLabel}</p>
-          <p className="mt-1 text-3xl font-black tabular-nums" aria-live="polite" dir="ltr">
-            {windowState.phase === "closed"
-              ? "00:00:00"
-              : formatCountdown(windowState.remainingSeconds)}
+        <div className="min-w-0 lg:px-5">
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CalendarClock className="size-4 shrink-0 text-secondary" aria-hidden="true" />
+            {t("dateAndTime")}
           </p>
-          <div className="mt-5">
+          <p className="mt-1 font-black text-primary">{session.dateLabel}</p>
+          <p className="mt-1 text-sm font-bold text-foreground tabular-nums" dir="ltr">
+            {session.timeLabel}
+          </p>
+        </div>
+
+        <div className="min-w-0 lg:px-5">
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <UserRound className="size-4 shrink-0 text-secondary" aria-hidden="true" />
+            {t("teacher")}
+          </p>
+          <p className="mt-1 truncate font-black text-primary">
+            {session.teacherName ?? t("teacherPending")}
+          </p>
+          <p className="mt-1 truncate text-xs text-muted-foreground">{session.timezone}</p>
+        </div>
+
+        <div className="rounded-2xl bg-primary p-4 text-primary-foreground lg:ms-2">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs text-primary-foreground/75">{countdownLabel}</p>
+              <p className="mt-1 text-xl font-black tabular-nums" aria-live="polite" dir="ltr">
+                {windowState.phase === "closed"
+                  ? "00:00:00"
+                  : formatCountdown(windowState.remainingSeconds)}
+              </p>
+            </div>
+            <Clock3 className="size-5 shrink-0 text-secondary" aria-hidden="true" />
+          </div>
+          <div className="mt-3">
             {canOpen && session.joinUrl ? (
-              <Button asChild variant="gold" size="lg" className="w-full">
+              <Button asChild variant="gold" className="w-full">
                 <a href={session.joinUrl} target="_blank" rel="noopener noreferrer">
                   <Video aria-hidden="true" /> {t("join")}
                 </a>
               </Button>
             ) : (
-              <Button disabled variant="gold" size="lg" className="w-full">
+              <Button disabled variant="gold" className="w-full">
                 <Video aria-hidden="true" />
                 {windowState.canJoin ? t("preparing") : t("join")}
               </Button>
             )}
           </div>
-          <p className="mt-4 flex items-start gap-2 text-xs leading-6 text-primary-foreground/70">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-secondary" aria-hidden="true" />
-            {t("privacy")}
-          </p>
         </div>
       </div>
+      {windowState.canJoin && (session.meetingId || session.passcode) ? (
+        <dl className="mx-5 mb-5 grid gap-3 rounded-2xl bg-accent/45 p-4 text-sm sm:grid-cols-2 sm:px-6">
+          {session.meetingId ? (
+            <div>
+              <dt className="text-muted-foreground">{t("meetingId")}</dt>
+              <dd className="font-bold" dir="ltr">
+                {session.meetingId}
+              </dd>
+            </div>
+          ) : null}
+          {session.passcode ? (
+            <div>
+              <dt className="text-muted-foreground">{t("passcode")}</dt>
+              <dd className="font-bold" dir="ltr">
+                {session.passcode}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
+      <p className="flex items-start gap-2 border-t border-secondary/15 px-5 py-3 text-xs leading-6 text-muted-foreground sm:px-6">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-secondary" aria-hidden="true" />
+        {t("privacy")}
+      </p>
     </article>
   );
 }
