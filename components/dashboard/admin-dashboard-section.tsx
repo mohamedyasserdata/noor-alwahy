@@ -41,6 +41,11 @@ export async function AdminDashboardSection({
     getAdminDashboardData({ from, to, country, currency }),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+  const lastUpdated = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(today);
+  const metricHelp = dashboardMetricHelp[locale];
   const exportParams = new URLSearchParams({ locale, from, to, country, currency });
   return (
     <section
@@ -115,21 +120,33 @@ export async function AdminDashboardSection({
           icon={<Users />}
           label={t("metrics.students")}
           value={number.format(data.totals.students)}
+          meta={metricHelp.students}
+          updated={lastUpdated}
+          href="/admin/students"
         />
         <Metric
           icon={<GraduationCap />}
           label={t("metrics.teachers")}
           value={number.format(data.totals.teachers)}
+          meta={metricHelp.teachers}
+          updated={lastUpdated}
+          href="/admin/teachers"
         />
         <Metric
           icon={<UserRoundCheck />}
           label={t("metrics.subscriptions")}
           value={number.format(data.totals.active_subscriptions)}
+          meta={metricHelp.subscriptions}
+          updated={lastUpdated}
+          href="/admin/subscriptions"
         />
         <Metric
           icon={<CalendarCheck2 />}
           label={t("metrics.attendanceToday")}
           value={percent(data.totals.today_attendance, number)}
+          meta={metricHelp.attendance}
+          updated={lastUpdated}
+          href="/admin/attendance"
         />
       </div>
 
@@ -349,7 +366,21 @@ function ActionRow({ href, label, value }: { href: string; label: string; value:
     </Link>
   );
 }
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Metric({
+  icon,
+  label,
+  value,
+  meta,
+  updated,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  meta?: { definition: string; calculation: string; period: string; records: string };
+  updated?: string;
+  href?: string;
+}) {
   return (
     <article className="admin-metric-card border bg-card p-5 shadow-card">
       <span className="admin-metric-icon grid size-12 place-items-center rounded-full bg-primary text-secondary [&>svg]:size-5">
@@ -359,9 +390,80 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
       <p className="mt-1 text-3xl font-black text-primary" dir="auto">
         {value}
       </p>
+      {meta ? (
+        <details className="mt-3 text-xs text-muted-foreground">
+          <summary className="cursor-pointer font-black text-primary">{meta.period}</summary>
+          <p className="mt-2 leading-5">{meta.definition}</p>
+          <p className="mt-1 leading-5">{meta.calculation}</p>
+          <p className="mt-1">{updated}</p>
+          {href ? (
+            <Link
+              href={href}
+              className="mt-2 inline-block font-black text-[#7d500d] underline dark:text-secondary"
+            >
+              {meta.records}
+            </Link>
+          ) : null}
+        </details>
+      ) : null}
     </article>
   );
 }
+
+const dashboardMetricHelp = {
+  ar: {
+    students: {
+      definition: "عدد الطلاب غير المؤرشفين في النظام.",
+      calculation: "عدّ سجلات الطلاب النشطة في نطاق الفلاتر.",
+      period: "لقطة حالية",
+      records: "عرض سجلات الطلاب",
+    },
+    teachers: {
+      definition: "عدد المدرسين النشطين.",
+      calculation: "عدّ ملفات المدرسين النشطة في نطاق الفلاتر.",
+      period: "لقطة حالية",
+      records: "عرض سجلات المدرسين",
+    },
+    subscriptions: {
+      definition: "الاشتراكات السارية الآن.",
+      calculation: "عدّ الاشتراكات ذات الحالة النشطة داخل النطاق.",
+      period: "لقطة حالية",
+      records: "عرض سجلات الاشتراكات",
+    },
+    attendance: {
+      definition: "نسبة حضور الطلاب في حصص اليوم المؤهلة.",
+      calculation: "الحضور والمتأخر ÷ حالات الطالب المؤهلة × 100.",
+      period: "اليوم",
+      records: "عرض سجلات الحضور",
+    },
+  },
+  en: {
+    students: {
+      definition: "Students currently not archived.",
+      calculation: "Count of active student records in the selected scope.",
+      period: "Current snapshot",
+      records: "View student records",
+    },
+    teachers: {
+      definition: "Teachers currently active.",
+      calculation: "Count of active teacher profiles in the selected scope.",
+      period: "Current snapshot",
+      records: "View teacher records",
+    },
+    subscriptions: {
+      definition: "Subscriptions currently in force.",
+      calculation: "Count of subscriptions with active status in scope.",
+      period: "Current snapshot",
+      records: "View subscription records",
+    },
+    attendance: {
+      definition: "Student attendance for today's eligible sessions.",
+      calculation: "Present and late divided by student-responsible outcomes × 100.",
+      period: "Today",
+      records: "View attendance records",
+    },
+  },
+} as const;
 function MoneyMetric({
   icon,
   label,

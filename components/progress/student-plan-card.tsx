@@ -50,6 +50,12 @@ export async function StudentPlanCard({
         </Badge>
       </CardHeader>
       <CardContent className="grid gap-6 pt-5 sm:grid-cols-2 sm:pt-6">
+        <p className="text-sm leading-6 text-muted-foreground sm:col-span-2">
+          {locale === "ar"
+            ? "تقدم الخطة الحالية يقارن ما أُنجز بهدف هذه الخطة فقط، ولا يساوي إجمالي الصفحات المتقنة."
+            : "Current-plan progress compares achievement with this plan's target only; it is not the total mastered-page count."}
+          {plan.starts_on && plan.ends_on ? ` ${plan.starts_on} — ${plan.ends_on}` : ""}
+        </p>
         <PlanProgress
           label={t("weekly")}
           achieved={plan.weekly_achieved_pages ?? 0}

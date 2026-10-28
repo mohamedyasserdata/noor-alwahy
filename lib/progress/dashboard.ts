@@ -161,6 +161,7 @@ export async function getStudentProgressDashboard(requestedStudentId?: string) {
       weeklySpeed,
       expectedCompletion,
       attendanceRate: attendance.rate,
+      updatedAt: now.toISO() ?? new Date().toISOString(),
     },
     radar,
     curve,

@@ -20,11 +20,22 @@ type Data = Awaited<ReturnType<typeof getStudentProgressDashboard>>;
 const labels = {
   ar: {
     title: "ملخص رحلتك",
-    pages: "صفحة متقنة",
+    pages: "الصفحات المتقنة",
     juz: "أجزاء مكتملة",
-    percent: "من المصحف",
-    speed: "صفحة أسبوعيًا",
-    expected: "الإتمام المتوقع",
+    percent: "نسبة الإتقان الكلية",
+    speed: "سرعة آخر أربعة أسابيع",
+    expected: "التاريخ التقديري للانتهاء",
+    estimate: "تقدير يتغير حسب سرعة التقدم، وليس موعدًا مؤكدًا.",
+    requiredTitle: "المطلوب في الحفظ والمراجعة",
+    additionalTitle: "الرسوم والتاريخ والتفاصيل الإضافية",
+    definitions: {
+      pages: "عدد صفحات المصحف المسجلة بحالة متقن.",
+      juz: "الأجزاء التي أصبحت كل صفحاتها متقنة.",
+      percent: "الصفحات المتقنة ÷ 604 صفحة.",
+      speed: "الصفحات التي أتقنت خلال آخر 28 يومًا ÷ 4.",
+    },
+    periods: { all: "منذ بدء السجل", fourWeeks: "آخر أربعة أسابيع" },
+    updated: "آخر تحديث: {date}",
     attendance: "الحضور",
     radar: "ملف التقييم",
     current: "الشهر الحالي",
@@ -44,11 +55,22 @@ const labels = {
   },
   en: {
     title: "Your journey at a glance",
-    pages: "mastered pages",
+    pages: "Mastered pages",
     juz: "completed juz",
-    percent: "of the Quran",
-    speed: "pages per week",
-    expected: "Expected completion",
+    percent: "Overall mastery share",
+    speed: "Four-week progress speed",
+    expected: "Estimated completion date",
+    estimate: "An estimate that changes with progress speed, not a guaranteed date.",
+    requiredTitle: "Memorisation and review due",
+    additionalTitle: "Charts, history, and additional details",
+    definitions: {
+      pages: "Quran pages currently recorded as mastered.",
+      juz: "Juz whose tracked pages are all mastered.",
+      percent: "Mastered pages divided by 604 Quran pages.",
+      speed: "Pages first mastered in the last 28 days divided by four.",
+    },
+    periods: { all: "Since records began", fourWeeks: "Last four weeks" },
+    updated: "Last updated: {date}",
     attendance: "Attendance",
     radar: "Evaluation profile",
     current: "Current month",
@@ -80,6 +102,10 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
   const t = labels[locale];
   const current = Object.values(data.radar.current);
   const previous = Object.values(data.radar.previous);
+  const updatedAt = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(data.metrics.updatedAt));
   return (
     <div className="student-progress-dashboard mt-6 grid gap-6">
       <section aria-labelledby="journey-summary-title">
@@ -90,22 +116,50 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
           </h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={data.metrics.masteredPages} label={t.pages} icon={BookMarked} tone="blue" />
-          <Stat value={data.metrics.completedJuz} label={t.juz} icon={Award} tone="gold" />
+          <Stat
+            value={data.metrics.masteredPages}
+            label={t.pages}
+            icon={BookMarked}
+            tone="blue"
+            definition={t.definitions.pages}
+            period={t.periods.all}
+            updated={t.updated.replace("{date}", updatedAt)}
+          />
+          <Stat
+            value={data.metrics.completedJuz}
+            label={t.juz}
+            icon={Award}
+            tone="gold"
+            definition={t.definitions.juz}
+            period={t.periods.all}
+            updated={t.updated.replace("{date}", updatedAt)}
+          />
           <Stat
             value={`${data.metrics.percent}%`}
             label={t.percent}
             icon={Gauge}
             tone="violet"
             progressValue={data.metrics.percent}
+            definition={t.definitions.percent}
+            period={t.periods.all}
+            updated={t.updated.replace("{date}", updatedAt)}
           />
-          <Stat value={data.metrics.weeklySpeed} label={t.speed} icon={TrendingUp} tone="green" />
+          <Stat
+            value={data.metrics.weeklySpeed}
+            label={t.speed}
+            icon={TrendingUp}
+            tone="green"
+            definition={t.definitions.speed}
+            period={t.periods.fourWeeks}
+            updated={t.updated.replace("{date}", updatedAt)}
+          />
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Detail
             icon={<TrendingUp />}
             label={t.expected}
             value={data.metrics.expectedCompletion ?? t.noData}
+            note={t.estimate}
           />
           <Detail
             icon={<Award />}
@@ -117,74 +171,91 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title={t.radar} icon={<Sparkles />}>
-          <RadarChart
-            labels={t.criteria}
-            current={current}
-            previous={previous}
-            currentLabel={t.current}
-            previousLabel={t.previous}
-          />
-        </Panel>
-        <Panel title={t.curve} icon={<TrendingUp />}>
-          <ProgressCurve points={data.curve} emptyLabel={t.noData} />
-        </Panel>
-      </div>
+      <section aria-labelledby="student-required-title" className="grid gap-4 sm:grid-cols-2">
+        <h2 id="student-required-title" className="col-span-full text-xl font-black text-primary">
+          {t.requiredTitle}
+        </h2>
+        <Detail
+          icon={<BookMarked />}
+          label={t.review}
+          value={`${t.due}: ${data.review.due} · ${t.overdue}: ${data.review.overdue}`}
+        />
+        <Detail icon={<FileText />} label={t.homework} value={data.homework ?? t.noData} />
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
-        <Panel title={t.history} icon={<CalendarClock />}>
-          {data.history.length ? (
-            <ol className="divide-y">
-              {data.history.map((item) => (
-                <li key={item.id} className="flex items-center justify-between gap-4 py-3">
-                  <span className="text-sm text-muted-foreground tabular-nums">{item.date}</span>
-                  <strong className="text-primary tabular-nums">
-                    {item.score == null ? t.noData : `${item.score}%`}
-                  </strong>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-muted-foreground">{t.noData}</p>
-          )}
-        </Panel>
-        <div className="grid gap-4">
-          <Detail
-            icon={<BookMarked />}
-            label={t.review}
-            value={`${t.due}: ${data.review.due} · ${t.overdue}: ${data.review.overdue}`}
-          />
-          <Detail icon={<FileText />} label={t.homework} value={data.homework ?? t.noData} />
-          {data.latestReport ? (
-            <div className="rounded-3xl border bg-card p-5">
-              <p className="font-black text-primary">{t.report}</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {data.latestReport.period_start} — {data.latestReport.period_end}
-              </p>
-              <Button asChild className="mt-4" variant="outline">
-                <Link href={`/api/pdf/reports/${data.latestReport.id}?locale=${locale}`}>
-                  {t.download}
-                </Link>
-              </Button>
+      <details open className="rounded-3xl border border-secondary/20 bg-card/40 p-4">
+        <summary className="cursor-pointer font-black text-primary lg:text-xl">
+          {t.additionalTitle}
+        </summary>
+        <div className="mt-5 grid gap-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Panel title={t.radar} icon={<Sparkles />}>
+              <RadarChart
+                labels={t.criteria}
+                current={current}
+                previous={previous}
+                currentLabel={t.current}
+                previousLabel={t.previous}
+              />
+            </Panel>
+            <Panel title={t.curve} icon={<TrendingUp />}>
+              <ProgressCurve points={data.curve} emptyLabel={t.noData} />
+            </Panel>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
+            <Panel title={t.history} icon={<CalendarClock />}>
+              {data.history.length ? (
+                <ol className="divide-y">
+                  {data.history.map((item) => (
+                    <li key={item.id} className="flex items-center justify-between gap-4 py-3">
+                      <span className="text-sm text-muted-foreground tabular-nums">
+                        {item.date}
+                      </span>
+                      <strong className="text-primary tabular-nums">
+                        {item.score == null ? t.noData : `${item.score}%`}
+                      </strong>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-muted-foreground">{t.noData}</p>
+              )}
+            </Panel>
+            <div className="grid gap-4">
+              {data.latestReport ? (
+                <div className="rounded-3xl border bg-card p-5">
+                  <p className="font-black text-primary">{t.report}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {data.latestReport.period_start} — {data.latestReport.period_end}
+                  </p>
+                  <Button asChild className="mt-4" variant="outline">
+                    <Link href={`/api/pdf/reports/${data.latestReport.id}?locale=${locale}`}>
+                      {t.download}
+                    </Link>
+                  </Button>
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </div>
-      </div>
+          </div>
 
-      <Panel title={t.badges} icon={<Award />}>
-        <div className="flex flex-wrap gap-3">
-          {data.badges.completedJuz.map((juz) => (
-            <Badge key={juz} variant="secondary">
-              {locale === "ar" ? `إتمام الجزء ${juz}` : `Juz ${juz} completed`}
-            </Badge>
-          ))}
-          {data.badges.weeklyConsistency ? <Badge variant="success">{t.consistency}</Badge> : null}
-          {!data.badges.completedJuz.length && !data.badges.weeklyConsistency ? (
-            <span className="text-muted-foreground">{t.noData}</span>
-          ) : null}
+          <Panel title={t.badges} icon={<Award />}>
+            <div className="flex flex-wrap gap-3">
+              {data.badges.completedJuz.map((juz) => (
+                <Badge key={juz} variant="secondary">
+                  {locale === "ar" ? `إتمام الجزء ${juz}` : `Juz ${juz} completed`}
+                </Badge>
+              ))}
+              {data.badges.weeklyConsistency ? (
+                <Badge variant="success">{t.consistency}</Badge>
+              ) : null}
+              {!data.badges.completedJuz.length && !data.badges.weeklyConsistency ? (
+                <span className="text-muted-foreground">{t.noData}</span>
+              ) : null}
+            </div>
+          </Panel>
         </div>
-      </Panel>
+      </details>
     </div>
   );
 }
@@ -195,12 +266,18 @@ function Stat({
   progressValue,
   tone,
   value,
+  definition,
+  period,
+  updated,
 }: {
   icon: LucideIcon;
   label: string;
   progressValue?: number;
   tone: "blue" | "gold" | "green" | "violet";
   value: string | number;
+  definition: string;
+  period: string;
+  updated: string;
 }) {
   const tones = {
     blue: "border-[#bfd8fb] bg-[#f1f7ff] text-[#1f5c9e]",
@@ -236,17 +313,35 @@ function Stat({
       <div>
         <strong className="block text-3xl font-black text-primary tabular-nums">{value}</strong>
         <span className="mt-1 block text-sm text-muted-foreground">{label}</span>
+        <details className="mt-2 text-xs text-muted-foreground">
+          <summary className="cursor-pointer font-bold text-primary">{period}</summary>
+          <p className="mt-1 leading-5">{definition}</p>
+          <p className="mt-1">{updated}</p>
+        </details>
       </div>
     </article>
   );
 }
-function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Detail({
+  icon,
+  label,
+  value,
+  note,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  note?: string;
+}) {
   return (
     <div className="flex gap-3 rounded-2xl border bg-card p-5">
       <span className="mt-0.5 text-secondary [&>svg]:size-5">{icon}</span>
       <div>
         <p className="text-sm font-bold text-primary">{label}</p>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">{value}</p>
+        {note ? (
+          <p className="mt-1 text-xs font-bold text-[#8a5b12] dark:text-secondary">{note}</p>
+        ) : null}
       </div>
     </div>
   );
