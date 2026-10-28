@@ -64,12 +64,26 @@ export async function AdminReportsSection({
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-lg font-black text-primary">{report.studentName}</h2>
                   <Badge variant={report.status === "visible" ? "success" : "secondary"}>
-                    {report.status}
+                    {reportStatusInfo(report.status, locale).label}
                   </Badge>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {report.teacherName} · {report.periodStart} — {report.periodEnd}
                 </p>
+                <dl className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                  <StatusDetail
+                    label={ar ? "المرحلة" : "Stage"}
+                    value={reportStatusInfo(report.status, locale).stage}
+                  />
+                  <StatusDetail
+                    label={ar ? "من يراه الآن" : "Visible to"}
+                    value={reportStatusInfo(report.status, locale).audience}
+                  />
+                  <StatusDetail
+                    label={ar ? "الإجراء التالي" : "Next action"}
+                    value={reportStatusInfo(report.status, locale).next}
+                  />
+                </dl>
               </div>
               <div className="flex flex-wrap gap-2">
                 {report.status === "approved" ? (
@@ -132,6 +146,64 @@ export async function AdminReportsSection({
       />
     </section>
   );
+}
+
+function StatusDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="font-bold text-primary">{label}</dt>
+      <dd className="mt-0.5">{value}</dd>
+    </div>
+  );
+}
+
+function reportStatusInfo(status: string, locale: AppLocale) {
+  const info = {
+    ar: {
+      draft: ["مسودة", "مسودة", "المدرس والإدارة", "استكمالها ثم اعتمادها"],
+      approved: [
+        "معتمد من المدرس",
+        "ينتظر الاعتماد",
+        "المدرس والإدارة",
+        "إرساله لمراجعة الإدارة أو نشره",
+      ],
+      admin_review: [
+        "قيد مراجعة الإدارة",
+        "ينتظر الاعتماد",
+        "الإدارة والمدرس",
+        "النشر للطالب والأسرة",
+      ],
+      visible: [
+        "منشور",
+        "منشور",
+        "الطالب وأولياء الأمور المرتبطون",
+        "لا إجراء؛ يمكن سحبه عند الحاجة",
+      ],
+    },
+    en: {
+      draft: ["Draft", "Draft", "Teacher and administration", "Complete and approve it"],
+      approved: [
+        "Teacher approved",
+        "Awaiting approval",
+        "Teacher and administration",
+        "Send to admin review or publish",
+      ],
+      admin_review: [
+        "Admin review",
+        "Awaiting approval",
+        "Administration and teacher",
+        "Publish to student and family",
+      ],
+      visible: [
+        "Published",
+        "Published",
+        "Student and linked guardians",
+        "No action; withdraw if needed",
+      ],
+    },
+  } as const;
+  const value = info[locale][status as keyof (typeof info)["en"]] ?? info[locale].draft;
+  return { label: value[0], stage: value[1], audience: value[2], next: value[3] };
 }
 
 function Transition({

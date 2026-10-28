@@ -3,6 +3,7 @@ import "server-only";
 import { connection } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { notificationPriority } from "@/lib/notifications/priority";
 
 export type NotificationItem = {
   id: string;
@@ -65,13 +66,19 @@ export async function getNotificationCenter(): Promise<NotificationCenterData | 
 
   return {
     userId: user.id,
-    items: (notificationResult.data ?? []).map((item) => ({
-      id: item.id,
-      type: item.type,
-      createdAt: item.created_at,
-      readAt: item.read_at,
-      payload: readPayload(item.payload),
-    })),
+    items: (notificationResult.data ?? [])
+      .map((item) => ({
+        id: item.id,
+        type: item.type,
+        createdAt: item.created_at,
+        readAt: item.read_at,
+        payload: readPayload(item.payload),
+      }))
+      .sort(
+        (left, right) =>
+          notificationPriority(left.type) - notificationPriority(right.type) ||
+          Date.parse(right.createdAt) - Date.parse(left.createdAt),
+      ),
     preferences: readPreferences(preferenceResult.data?.prefs),
   };
 }

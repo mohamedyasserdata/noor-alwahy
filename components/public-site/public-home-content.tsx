@@ -22,7 +22,7 @@ import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublishedTracks } from "@/lib/public-site/tracks";
 
-const copy = {
+export const publicHomeCopy = {
   ar: {
     tracks: {
       eyebrow: "المسارات التعليمية",
@@ -254,7 +254,7 @@ const teacherIcons = [GraduationCap, BookOpenCheck, Award] as const;
 const experienceIcons = [CalendarCheck2, BarChart3, FileChartColumnIncreasing] as const;
 
 export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
-  const t = copy[locale];
+  const t = publicHomeCopy[locale];
   const tracks = await getPublishedTracks();
 
   return (

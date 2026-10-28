@@ -397,7 +397,8 @@
       "title": "Important Alerts",
       "fallbackTitle": "An Alert Needs Attention",
       "followUp": "Open the notification centre for details.",
-      "empty": "There are no new alerts that need your attention."
+      "empty": "There are no new alerts that need your attention.",
+      "viewAll": "View all alerts"
     },
     "child": {
       "backHome": "Back to Home",

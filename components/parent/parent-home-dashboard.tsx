@@ -167,6 +167,9 @@ export async function ParentHomeDashboard({ locale }: { locale: AppLocale }) {
             ) : (
               <EmptyState text={t("alerts.empty")} compact />
             )}
+            <Button asChild variant="outline" className="mt-4 w-full border-secondary/40">
+              <Link href="/parent/notifications">{t("alerts.viewAll")}</Link>
+            </Button>
           </section>
         </div>
       </div>

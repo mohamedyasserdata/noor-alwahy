@@ -5,11 +5,10 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { publicHomeCopy } from "@/components/public-site/public-home-content";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { localizedMetadata } from "@/lib/seo/metadata";
-
-const questionKeys = ["format", "schedule", "teacher", "progress", "language", "privacy"] as const;
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/faq">): Promise<Metadata> {
   const { locale } = await params;
@@ -27,6 +26,7 @@ export default async function FaqPage({ params }: PageProps<"/[locale]/faq">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "publicSite.faq" });
+  const questions = publicHomeCopy[locale].faq.items;
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16 sm:py-20 lg:px-8">
@@ -41,10 +41,10 @@ export default async function FaqPage({ params }: PageProps<"/[locale]/faq">) {
       </header>
 
       <div className="mt-12 divide-y border-y">
-        {questionKeys.map((key, index) => (
-          <details key={key} className="group py-2" open={index === 0}>
+        {questions.map(([question, answer], index) => (
+          <details key={question} className="group py-2" open={index === 0}>
             <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-5 rounded-lg px-3 font-black text-primary hover:bg-accent/35 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
-              <span>{t(`items.${key}.question`)}</span>
+              <span>{question}</span>
               <span
                 className="text-2xl leading-none text-secondary transition-transform group-open:rotate-45 motion-reduce:transition-none"
                 aria-hidden="true"
@@ -52,9 +52,7 @@ export default async function FaqPage({ params }: PageProps<"/[locale]/faq">) {
                 +
               </span>
             </summary>
-            <p className="max-w-3xl px-3 pb-6 leading-8 text-muted-foreground">
-              {t(`items.${key}.answer`)}
-            </p>
+            <p className="max-w-3xl px-3 pb-6 leading-8 text-muted-foreground">{answer}</p>
           </details>
         ))}
       </div>
