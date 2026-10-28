@@ -20,7 +20,7 @@ import { HomePackages } from "@/components/public-site/home-packages";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
-import { getPublicPackages } from "@/lib/public-site/packages";
+import { getPublishedTracks } from "@/lib/public-site/tracks";
 
 const copy = {
   ar: {
@@ -255,15 +255,7 @@ const experienceIcons = [CalendarCheck2, BarChart3, FileChartColumnIncreasing] a
 
 export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
   const t = copy[locale];
-  const packages = await getPublicPackages("ZZ");
-  const tracks = Array.from(
-    new Map(
-      packages.map((item) => {
-        const name = locale === "en" && item.trackNameEn ? item.trackNameEn : item.trackNameAr;
-        return [name || t.tracks.general, item] as const;
-      }),
-    ).entries(),
-  );
+  const tracks = await getPublishedTracks();
 
   return (
     <>
@@ -280,39 +272,43 @@ export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
           />
           {tracks.length ? (
             <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {tracks.slice(0, 6).map(([name, item], index) => (
-                <article
-                  key={name}
-                  className="group relative overflow-hidden rounded-[1.25rem] border border-[#c7a45a]/25 bg-card p-7 shadow-card"
-                >
-                  <span className="grid size-12 place-items-center rounded-full bg-[#f6ead2] text-[#8a5b12] dark:bg-accent">
-                    <BookOpenCheck className="size-6" aria-hidden="true" />
-                  </span>
-                  <span
-                    className="absolute end-6 top-5 font-quran text-4xl text-secondary/30"
-                    aria-hidden="true"
+              {tracks.slice(0, 6).map((item, index) => {
+                const name =
+                  locale === "en" && item.nameEn ? item.nameEn : item.nameAr || t.tracks.general;
+                return (
+                  <article
+                    key={item.id}
+                    className="group relative overflow-hidden rounded-[1.25rem] border border-[#c7a45a]/25 bg-card p-7 shadow-card"
                   >
-                    {index + 1}
-                  </span>
-                  <h3 className="mt-6 text-xl font-black text-primary">{name}</h3>
-                  <p className="mt-3 line-clamp-3 leading-7 text-muted-foreground">
-                    {(locale === "en" && item.descriptionEn
-                      ? item.descriptionEn
-                      : item.descriptionAr) || t.tracks.description}
-                  </p>
-                  <p className="mt-5 text-sm font-bold text-primary">
-                    <span className="text-muted-foreground">{t.tracks.level}: </span>
-                    {audienceLabel(item.audience, t.audiences)}
-                  </p>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="mt-5 px-0 text-[#7d500d] dark:text-secondary"
-                  >
-                    <Link href="/tracks">{t.tracks.action}</Link>
-                  </Button>
-                </article>
-              ))}
+                    <span className="grid size-12 place-items-center rounded-full bg-[#f6ead2] text-[#8a5b12] dark:bg-accent">
+                      <BookOpenCheck className="size-6" aria-hidden="true" />
+                    </span>
+                    <span
+                      className="absolute end-6 top-5 font-quran text-4xl text-secondary/30"
+                      aria-hidden="true"
+                    >
+                      {index + 1}
+                    </span>
+                    <h3 className="mt-6 text-xl font-black text-primary">{name}</h3>
+                    <p className="mt-3 line-clamp-3 leading-7 text-muted-foreground">
+                      {(locale === "en" && item.descriptionEn
+                        ? item.descriptionEn
+                        : item.descriptionAr) || t.tracks.description}
+                    </p>
+                    <p className="mt-5 text-sm font-bold text-primary">
+                      <span className="text-muted-foreground">{t.tracks.level}: </span>
+                      {audienceLabel(item.audience, t.audiences)}
+                    </p>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="mt-5 px-0 text-[#7d500d] dark:text-secondary"
+                    >
+                      <Link href="/tracks">{t.tracks.action}</Link>
+                    </Button>
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <EmptyState icon={BookOpenCheck} text={t.tracks.empty} />

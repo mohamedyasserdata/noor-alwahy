@@ -5,6 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { ApplicationForm } from "@/components/applications/application-form";
 import type { AppLocale } from "@/i18n/routing";
 import { createPublicClient } from "@/lib/supabase/public";
+import { getPublishedTracks } from "@/lib/public-site/tracks";
 
 type ApplicationOptionsProps = { locale: AppLocale };
 
@@ -37,7 +38,7 @@ async function getApplicationOptions() {
 
   const supabase = createPublicClient();
   const [tracks, packages, countries] = await Promise.all([
-    supabase.from("tracks").select("id,name_ar,name_en").eq("is_active", true).order("sort_order"),
+    getPublishedTracks(),
     supabase
       .from("packages")
       .select("id,name_ar,name_en")
@@ -47,13 +48,17 @@ async function getApplicationOptions() {
     supabase.from("countries").select("code,name_ar,name_en").eq("is_enabled", true).order("code"),
   ]);
 
-  if (tracks.error || packages.error || countries.error) {
+  if (packages.error || countries.error) {
     throw new Error("application_options_unavailable");
   }
 
   return {
     countries: countries.data ?? [],
     packages: packages.data ?? [],
-    tracks: tracks.data ?? [],
+    tracks: tracks.map((track) => ({
+      id: track.id,
+      name_ar: track.nameAr,
+      name_en: track.nameEn,
+    })),
   };
 }

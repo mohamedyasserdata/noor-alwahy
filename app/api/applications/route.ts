@@ -20,10 +20,26 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
   const parsed = publicApplicationSchema.safeParse(input);
-  if (!parsed.success) return Response.json({ error: "invalid_fields" }, { status: 400 });
+  if (!parsed.success)
+    return Response.json(
+      { error: "invalid_fields", field_errors: parsed.error.flatten().fieldErrors },
+      { status: 400 },
+    );
   const ip = requesterIp(request);
   if (!(await verifyApplicationCaptcha(parsed.data.captcha_token, ip)))
     return Response.json({ error: "captcha_failed" }, { status: 400 });
+
+  const admin = createAdminClient();
+  if (parsed.data.track_id) {
+    const { count, error: trackError } = await admin
+      .from("packages")
+      .select("id", { count: "exact", head: true })
+      .eq("track_id", parsed.data.track_id)
+      .eq("is_published", true)
+      .eq("is_active", true);
+    if (trackError || !count)
+      return Response.json({ error: "selection_unavailable" }, { status: 400 });
+  }
 
   const identifier = lookupIdentifier(parsed.data.contact_email, parsed.data.contact_phone);
   const contact = parsed.data.contact_email || parsed.data.contact_phone.replace(/\D/g, "");
@@ -33,7 +49,6 @@ export async function POST(request: Request) {
     consent: undefined,
     consent_version: legalDocumentVersion,
   };
-  const admin = createAdminClient();
   const { data, error } = await admin.rpc("submit_application", {
     p_payload: payload,
     p_lookup_hash: applicationHash(identifier.value),

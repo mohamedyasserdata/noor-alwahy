@@ -36,4 +36,10 @@ describe("public application validation", () => {
     expect(
       publicApplicationSchema.safeParse({ ...valid, preferred_teacher_gender: "female" }).success,
     ).toBe(false));
+  it("accepts only searchable IANA time zones", () => {
+    expect(publicApplicationSchema.safeParse({ ...valid, timezone: "UTC" }).success).toBe(true);
+    expect(publicApplicationSchema.safeParse({ ...valid, timezone: "Cairo time" }).success).toBe(
+      false,
+    );
+  });
 });

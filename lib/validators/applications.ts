@@ -26,7 +26,7 @@ export const publicApplicationSchema = z
       .trim()
       .toUpperCase()
       .regex(/^[A-Z]{2}$/),
-    timezone: z.string().trim().min(1).max(100),
+    timezone: z.string().trim().min(1).max(100).refine(isIanaTimezone, "timezone_invalid"),
     track_id: z.union([z.uuid(), z.literal("")]),
     package_id: z.union([z.uuid(), z.literal("")]),
     self_level: z.enum(["beginner", "intermediate", "advanced", "memorizing"]),
@@ -59,3 +59,12 @@ export const applicationStatusLookupSchema = z.object({
   identifier: z.string().trim().min(4).max(254),
   locale: z.enum(["ar", "en"]),
 });
+
+function isIanaTimezone(value: string) {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: value }).format();
+    return value === "UTC" || Intl.supportedValuesOf("timeZone").includes(value);
+  } catch {
+    return false;
+  }
+}

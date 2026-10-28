@@ -1692,6 +1692,19 @@
     "title": "Begin your Quran learning journey",
     "description": "A clear form that takes under five minutes. We will review the student's needs and contact you with the right next step.",
     "loading": "Preparing the application form…",
+    "stepsLabel": "Application steps",
+    "steps": {
+      "1": "Student and track",
+      "2": "Schedule and required details",
+      "3": "Review before submission"
+    },
+    "continue": "Continue",
+    "back": "Back",
+    "fieldError": "Review this field.",
+    "guardianRequired": "Enter the guardian name for a student under 18.",
+    "contactRequired": "Enter an email address or phone number.",
+    "timezoneInvalid": "Choose a valid IANA time zone from the list.",
+    "timezonePreview": "Current local time: {time}",
     "studentSection": "Student and contact details",
     "studentName": "Student name",
     "age": "Age",
@@ -1729,6 +1742,7 @@
     "phoneHint": "Use the last four phone digits with the application number.",
     "emailHint": "Use your email with the application number.",
     "trackApplication": "Track application status",
+    "nextStep": "Next: use the application number and your verification detail to follow the status.",
     "levels": {
       "beginner": "Beginner",
       "intermediate": "Intermediate",
@@ -1873,6 +1887,7 @@
       "description": "The track sets the direction. The personal plan then adjusts the amount of learning and review to the student’s level and available time.",
       "listLabel": "Academy learning tracks",
       "focusLabel": "What it focuses on",
+      "empty": "No learning tracks are currently published.",
       "items": {
         "memorization": {
           "title": "Memorization and review",
