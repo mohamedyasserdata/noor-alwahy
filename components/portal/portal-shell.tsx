@@ -36,6 +36,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
   const isHorizontalPortal = portal === "student" || portal === "parent";
   const isAdminPortal = portal === "admin";
+  const isTeacherPortal = portal === "teacher";
   const accountLabels = {
     accountSettings: t("account.accountSettings"),
     closeHint: t("account.closeHint"),
@@ -57,10 +58,11 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
         "min-h-svh",
         isHorizontalPortal && "bg-[#fbf8ef] dark:bg-background",
         isAdminPortal && "admin-workspace",
+        isTeacherPortal && "teacher-workspace",
       )}
       data-testid={`portal-shell-${portal}`}
     >
-      {!isHorizontalPortal && !isAdminPortal && notificationCenter ? (
+      {!isHorizontalPortal && !isAdminPortal && !isTeacherPortal && notificationCenter ? (
         <NotificationCenter initialData={notificationCenter} portal={portal} />
       ) : null}
       {isHorizontalPortal ? (
@@ -104,22 +106,29 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
         <aside
           className={cn(
             "inset-block-0 fixed start-0 z-30 hidden h-svh flex-col overflow-hidden border-e bg-card/95 shadow-card backdrop-blur min-[769px]:flex",
-            isAdminPortal
+            isAdminPortal || isTeacherPortal
               ? "w-[17rem] border-secondary/20 bg-[#fffdf8]/98 dark:bg-card/98"
               : "w-72",
           )}
           data-testid="portal-sidebar"
         >
-          <div className={cn("shrink-0 border-b", isAdminPortal ? "px-4 py-3" : "px-5 py-5")}>
+          <div
+            className={cn(
+              "shrink-0 border-b",
+              isAdminPortal || isTeacherPortal ? "px-4 py-3" : "px-5 py-5",
+            )}
+          >
             <BrandMark
               label={academyName}
               logoPath={settings.academyProfile.logoPath}
-              className={cn(isAdminPortal && "min-h-14 [&>span:first-child]:size-11")}
-              labelClassName={cn(isAdminPortal && "text-base leading-6")}
+              className={cn(
+                (isAdminPortal || isTeacherPortal) && "min-h-14 [&>span:first-child]:size-11",
+              )}
+              labelClassName={cn((isAdminPortal || isTeacherPortal) && "text-base leading-6")}
             />
           </div>
 
-          {!isAdminPortal ? (
+          {!isAdminPortal && !isTeacherPortal ? (
             <div className="relative mx-5 my-6 shrink-0 overflow-hidden rounded-t-[7rem] rounded-b-2xl border border-secondary/35 bg-background px-5 pt-9 pb-5 text-center">
               <span
                 className="absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-secondary to-transparent"
@@ -132,13 +141,15 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
               <p className="text-xs font-extrabold tracking-[0.12em] text-secondary uppercase">
                 {t("workspaceLabel")}
               </p>
-              <p className="mt-1 text-lg font-black text-primary">{t(`${portal}.roleName`)}</p>
+              <p className="mt-1 text-lg font-black text-primary">
+                {t(portal === "student" ? "student.roleName" : "parent.roleName")}
+              </p>
             </div>
           ) : null}
 
           <PortalNavigation portal={portal} variant="sidebar" />
 
-          {!isAdminPortal ? (
+          {!isAdminPortal && !isTeacherPortal ? (
             <div className="mt-auto grid shrink-0 gap-3 border-t p-4">
               <AccountMenu account={account} labels={accountLabels} locale={locale} />
               <ThemeToggle
@@ -156,14 +167,15 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
       <div
         className={cn(
           "min-h-svh",
-          !isHorizontalPortal && !isAdminPortal && "min-[769px]:ps-72",
+          !isHorizontalPortal && !isAdminPortal && !isTeacherPortal && "min-[769px]:ps-72",
           isAdminPortal && "min-[769px]:ps-[17rem]",
+          isTeacherPortal && "min-[769px]:ps-[17rem]",
         )}
       >
-        {isAdminPortal ? (
+        {isAdminPortal || isTeacherPortal ? (
           <header
             className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b border-secondary/20 bg-[#fffdf8]/94 shadow-[0_0.35rem_1.5rem_-1.2rem_rgb(16_31_59_/_0.25)] backdrop-blur-xl min-[769px]:min-h-18 min-[769px]:justify-end min-[769px]:px-6 dark:bg-card/94"
-            data-testid="admin-portal-topbar"
+            data-testid={`${portal}-portal-topbar`}
           >
             <BrandMark
               label={academyName}
@@ -197,7 +209,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
             </div>
           </header>
         ) : null}
-        {!isHorizontalPortal && !isAdminPortal ? (
+        {!isHorizontalPortal && !isAdminPortal && !isTeacherPortal ? (
           <header className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b bg-background/92 pe-14 backdrop-blur min-[769px]:hidden">
             <BrandMark
               label={academyName}
@@ -225,7 +237,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
             "min-h-[calc(100svh-4rem)] w-full",
             isHorizontalPortal
               ? "min-h-svh overflow-hidden"
-              : isAdminPortal
+              : isAdminPortal || isTeacherPortal
                 ? "mx-auto max-w-[112rem] px-3 pt-5 pb-28 min-[769px]:min-h-[calc(100svh-4.5rem)] min-[769px]:px-6 min-[769px]:pt-7 min-[769px]:pb-10 sm:px-5 xl:px-8"
                 : "mx-auto max-w-[96rem] px-4 pt-7 pb-28 min-[769px]:min-h-svh min-[769px]:px-10 min-[769px]:pt-12 min-[769px]:pb-12 sm:px-6 sm:pt-10 xl:px-14",
           )}

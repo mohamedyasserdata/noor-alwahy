@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   BookOpenCheck,
   CalendarDays,
   CheckCircle2,
@@ -11,6 +10,7 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { NextSessionCard } from "@/components/sessions/next-session-card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { recordAttendanceAction } from "@/lib/attendance/actions";
 import { getTeacherTodaySessions } from "@/lib/attendance/queries";
+import { getNextSessionCard } from "@/lib/sessions/next-session";
 import { attendanceStatuses, type AttendanceStatus } from "@/lib/validators/attendance";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
@@ -38,9 +39,10 @@ export async function TeacherTodaySection({
   locale: AppLocale;
   searchParams: Query;
 }) {
-  const [t, day, query] = await Promise.all([
+  const [t, day, nextSession, query] = await Promise.all([
     getTranslations({ locale, namespace: "teacherToday" }),
     getTeacherTodaySessions(),
+    getNextSessionCard(locale),
     searchParams,
   ]);
   const status = typeof query.attendanceStatus === "string" ? query.attendanceStatus : "";
@@ -93,23 +95,25 @@ export async function TeacherTodaySection({
         </Alert>
       ) : (
         <div className="mt-8">
+          <NextSessionCard serverNowMs={nextSession.serverNowMs} session={nextSession.session} />
+
           <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <OverviewCard
-              icon={<AlertTriangle />}
-              label={t("overview.absent")}
-              value={day.overview.absentStudents.length}
-              detail={day.overview.absentStudents.join("، ") || t("overview.none")}
+              icon={<CalendarDays />}
+              label={t("overview.sessions")}
+              value={day.sessions.length}
+              detail={t("sessionCount", { count: day.sessions.length })}
             />
             <OverviewCard
-              icon={<Clock3 />}
-              label={t("overview.late")}
-              value={day.overview.lateStudents.length}
-              detail={day.overview.lateStudents.join("، ") || t("overview.none")}
+              icon={<UserRoundCheck />}
+              label={t("overview.students")}
+              value={day.overview.assignedStudentCount}
+              detail={t("overview.assigned")}
             />
             <OverviewCard
               icon={<ListChecks />}
-              label={t("overview.tasks")}
-              value={day.overview.pendingAttendance + day.overview.pendingEvaluations.length}
+              label={t("overview.evaluations")}
+              value={day.overview.pendingEvaluations.length}
               detail={t("overview.tasksDetail", {
                 attendance: day.overview.pendingAttendance,
                 evaluations: day.overview.pendingEvaluations.length,

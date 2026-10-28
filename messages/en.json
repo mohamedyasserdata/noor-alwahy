@@ -196,6 +196,11 @@
           "title": "Exams and grades",
           "description": "Create exams, enter calculated grades, and approve results."
         },
+        "attendance": {
+          "label": "Attendance",
+          "title": "Attendance register",
+          "description": "Record your session outcomes and review saved entries under the approved lock policy."
+        },
         "reports": {
           "label": "Reports",
           "title": "Report review",
@@ -231,6 +236,8 @@
     "teacher": {
       "roleName": "Teacher portal",
       "navigationLabel": "Teacher portal sections",
+      "more": "More",
+      "allSections": "All teacher sections",
       "sections": {
         "today": {
           "label": "Today",
@@ -1162,6 +1169,10 @@
     "recorded": "The result is fixed and its credit and pay effects have been applied.",
     "saving": "Recording…",
     "overview": {
+      "sessions": "Today's sessions",
+      "students": "My students",
+      "assigned": "Students currently assigned to you",
+      "evaluations": "Pending evaluations",
       "absent": "Absent today",
       "late": "Late today",
       "tasks": "Pending tasks",
@@ -1198,6 +1209,40 @@
       "active_subscription_required": "No active subscription covers this session.",
       "profile_missing": "Your teacher profile has not been created yet.",
       "request_failed": "Attendance could not be recorded. No partial effects were saved."
+    }
+  },
+  "teacherAttendance": {
+    "eyebrow": "Session follow-up",
+    "title": "Attendance register",
+    "description": "Review saved session outcomes and spot ended sessions that still need attendance.",
+    "recordToday": "Record today's attendance",
+    "missing": "Your teacher profile has not been created yet.",
+    "historyTitle": "Last {days} days",
+    "empty": "No sessions fall within this period.",
+    "pending": "Not recorded",
+    "minutes": "{count} minutes",
+    "timezone": "Times are shown in your time zone: {timezone}",
+    "metrics": {
+      "scheduled": "Scheduled sessions",
+      "recorded": "Saved outcomes",
+      "pending": "Need recording",
+      "adherence": "Attendance rate"
+    },
+    "table": {
+      "student": "Student",
+      "time": "Time",
+      "duration": "Duration",
+      "result": "Outcome",
+      "savedAt": "Saved at"
+    },
+    "statuses": {
+      "present": "Present",
+      "late": "Late",
+      "student_absent": "Student absent",
+      "student_excused": "Excused absence",
+      "teacher_absent": "Teacher absent",
+      "cancelled_teacher": "Teacher cancelled",
+      "cancelled_admin": "Administration cancelled"
     }
   },
   "attendanceReports": {
@@ -1482,6 +1527,10 @@
       "description": "Set realistic targets for your assigned students and follow mastered-page achievement automatically without manual totals.",
       "studentsTitle": "Assigned students",
       "studentsDescription": "Every change is saved within your current assignment scope.",
+      "search": "Search",
+      "searchPlaceholder": "Search by student name or number",
+      "trackMissing": "Track not set",
+      "levelMissing": "Level not set",
       "emptyTitle": "No students are currently assigned",
       "emptyDescription": "Memorization plans will appear after an active student is assigned to you.",
       "newDescription": "Create the first weekly and monthly target for this student.",

@@ -1,4 +1,4 @@
-import { CalendarRange, Target, UsersRound } from "lucide-react";
+import { CalendarRange, Search, Target, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -27,6 +27,14 @@ export async function TeacherMemorizationPlansSection({
     searchParams,
   ]);
   const saved = query.planStatus === "saved";
+  const requestedSearch = typeof query.q === "string" ? query.q.trim() : "";
+  const visibleStudents = requestedSearch
+    ? students.filter((student) =>
+        `${student.studentName} ${student.studentNumber}`
+          .toLocaleLowerCase(locale)
+          .includes(requestedSearch.toLocaleLowerCase(locale)),
+      )
+    : students;
   const error =
     query.planError === "invalid_fields"
       ? "invalid_fields"
@@ -69,10 +77,30 @@ export async function TeacherMemorizationPlansSection({
             <p className="text-sm text-muted-foreground">{t("teacher.studentsDescription")}</p>
           </div>
         </div>
-        <Badge variant="secondary">{t("studentCount", { count: students.length })}</Badge>
+        <Badge variant="secondary">{t("studentCount", { count: visibleStudents.length })}</Badge>
       </div>
 
-      {students.length === 0 ? (
+      <form className="mt-5 flex max-w-xl gap-2" method="get">
+        <Label htmlFor="teacher-student-search" className="sr-only">
+          {t("teacher.search")}
+        </Label>
+        <Input
+          id="teacher-student-search"
+          name="q"
+          type="search"
+          defaultValue={requestedSearch}
+          placeholder={t("teacher.searchPlaceholder")}
+        />
+        <button
+          type="submit"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-primary px-4 font-bold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <Search className="size-4" aria-hidden="true" />
+          {t("teacher.search")}
+        </button>
+      </form>
+
+      {visibleStudents.length === 0 ? (
         <Card className="mt-6 border-dashed shadow-none">
           <CardHeader>
             <CardTitle>{t("teacher.emptyTitle")}</CardTitle>
@@ -81,7 +109,7 @@ export async function TeacherMemorizationPlansSection({
         </Card>
       ) : (
         <div className="mt-6 grid gap-5">
-          {students.map((student) => {
+          {visibleStudents.map((student) => {
             const weeklyPercent = Number(student.adherence?.weekly_adherence_percent ?? 0);
             const monthlyPercent = Number(student.adherence?.monthly_adherence_percent ?? 0);
             return (
@@ -90,7 +118,19 @@ export async function TeacherMemorizationPlansSection({
                   <div>
                     <CardTitle>{student.studentName}</CardTitle>
                     <CardDescription>
-                      {student.plan ? t("teacher.editDescription") : t("teacher.newDescription")}
+                      {student.track
+                        ? locale === "ar"
+                          ? student.track.name_ar
+                          : student.track.name_en || student.track.name_ar
+                        : t("teacher.trackMissing")}
+                      {" · "}
+                      {student.level
+                        ? locale === "ar"
+                          ? student.level.name_ar
+                          : student.level.name_en || student.level.name_ar
+                        : t("teacher.levelMissing")}
+                      {" · "}
+                      {student.studentNumber}
                     </CardDescription>
                   </div>
                   <Badge variant={student.plan ? "success" : "outline"}>

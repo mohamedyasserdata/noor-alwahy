@@ -80,7 +80,7 @@ export function NotificationCenter({
             typeof item.payload === "object" &&
             "action_href" in item.payload &&
             typeof item.payload.action_href === "string" &&
-            /^\/(ar|en)\/admin\//.test(item.payload.action_href)
+            /^\/(ar|en)\/(admin|teacher|student|parent)\//.test(item.payload.action_href)
               ? item.payload.action_href
               : undefined,
         },

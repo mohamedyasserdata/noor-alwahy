@@ -236,6 +236,54 @@
       radial-gradient(circle at 92% 88%, rgb(107 127 153 / 0.08), transparent 30rem);
   }
 
+  .teacher-workspace {
+    background-color: #f5f0e6;
+    background-image:
+      radial-gradient(circle at 10% 6%, rgb(199 164 90 / 0.13), transparent 25rem),
+      radial-gradient(circle at 90% 92%, rgb(16 31 59 / 0.06), transparent 30rem),
+      linear-gradient(30deg, rgb(199 164 90 / 0.025) 12%, transparent 12.5%, transparent 87%);
+    background-size:
+      auto,
+      auto,
+      4rem 7rem;
+  }
+
+  .dark .teacher-workspace {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 10% 6%, rgb(216 185 104 / 0.09), transparent 25rem),
+      radial-gradient(circle at 90% 92%, rgb(107 127 153 / 0.08), transparent 30rem);
+  }
+
+  .teacher-page {
+    min-width: 0;
+  }
+
+  .teacher-page > :first-child {
+    margin-block-start: 0;
+  }
+
+  .teacher-page :where(section, article, form)[class*="border"],
+  .teacher-page [data-slot="card"] {
+    border-color: rgb(199 164 90 / 0.24);
+    border-radius: 1.25rem;
+    box-shadow: 0 1rem 2.75rem -2rem rgb(16 31 59 / 0.22);
+  }
+
+  .dark .teacher-page :where(section, article, form)[class*="border"],
+  .dark .teacher-page [data-slot="card"] {
+    border-color: rgb(216 185 104 / 0.22);
+  }
+
+  .teacher-page :where(input, select, textarea) {
+    min-height: 2.75rem;
+    border-radius: 0.8rem;
+  }
+
+  .teacher-page :where(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
   .admin-page {
     min-width: 0;
   }

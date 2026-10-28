@@ -212,6 +212,65 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
     );
   }
 
+  if (portal === "teacher" && variant === "bottom") {
+    const primarySections = ["today", "schedule", "students", "attendance"] as const;
+    const moreSections = sections.filter(
+      (section) => !primarySections.includes(section as (typeof primarySections)[number]),
+    );
+
+    return (
+      <nav
+        aria-label={t("navigationLabel")}
+        data-testid="portal-navigation-bottom"
+        className="grid h-full grid-cols-5 items-stretch"
+      >
+        {primarySections
+          .slice(0, 2)
+          .map((section) => renderSection(section as (typeof sections)[number]))}
+        <details className="group/mobile-nav relative min-w-0">
+          <summary
+            className="relative flex h-full min-h-11 cursor-pointer touch-manipulation list-none flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-bold text-muted-foreground marker:hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden"
+            data-testid="teacher-mobile-more"
+          >
+            <Menu className="size-5" aria-hidden="true" />
+            <span>{t("more")}</span>
+          </summary>
+          <section className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[68svh] overflow-y-auto rounded-2xl border border-secondary/25 bg-card p-4 shadow-[0_1.25rem_3.5rem_-1rem_rgb(16_31_59_/_0.42)]">
+            <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
+              <h2 className="font-black text-primary">{t("allSections")}</h2>
+              <span className="text-xs text-muted-foreground">{moreSections.length}</span>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {moreSections.map((section) => {
+                const Icon = sectionIcons[section] ?? BookOpenCheck;
+                const isActive = activeSection === section;
+                return (
+                  <Link
+                    key={section}
+                    href={`/teacher/${section}`}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-14 items-center gap-2 rounded-xl border px-3 py-2 text-start text-sm font-bold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                      isActive
+                        ? "border-secondary bg-secondary/15 text-primary"
+                        : "border-secondary/15 bg-background/55 text-muted-foreground hover:bg-accent/55 hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="size-5 shrink-0" aria-hidden="true" />
+                    <span className="min-w-0">{t(`sections.${section}.label`)}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </details>
+        {primarySections
+          .slice(2)
+          .map((section) => renderSection(section as (typeof sections)[number]))}
+      </nav>
+    );
+  }
+
   return (
     <nav
       aria-label={t("navigationLabel")}
