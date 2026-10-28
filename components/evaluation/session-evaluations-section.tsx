@@ -36,7 +36,8 @@ export async function SessionEvaluationsSection({
     data.sessions.find(
       (session) => session.id === requestedSession && !session.evaluation?.is_locked,
     ) ?? data.sessions.find((session) => !session.evaluation?.is_locked);
-  const saved = query.evaluationStatus === "saved";
+  const locked = query.evaluationStatus === "locked";
+  const draftSaved = query.evaluationStatus === "draft_saved";
   const requestedError = typeof query.evaluationError === "string" ? query.evaluationError : "";
   const error = errorCodes.includes(requestedError as (typeof errorCodes)[number])
     ? requestedError
@@ -70,9 +71,14 @@ export async function SessionEvaluationsSection({
         </div>
       </header>
 
-      {saved ? (
+      {locked ? (
         <Alert variant="success" className="mt-6" aria-live="polite">
           {t("saved", { score: String(query.score ?? "—"), rating: String(query.rating ?? "—") })}
+        </Alert>
+      ) : null}
+      {draftSaved ? (
+        <Alert variant="success" className="mt-6" aria-live="polite">
+          {t("draftSaved")}
         </Alert>
       ) : null}
       {error ? (
@@ -131,7 +137,8 @@ export async function SessionEvaluationsSection({
                 sessionId={selected.id}
                 settings={data.settings}
                 surahs={data.surahs}
-                clearSavedDraft={saved}
+                initialDraft={selected.evaluation?.draft}
+                studentName={selected.studentName}
               />
             </>
           )}

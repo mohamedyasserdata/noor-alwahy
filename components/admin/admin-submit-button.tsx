@@ -12,6 +12,7 @@ type AdminSubmitButtonProps = {
   pendingLabel: string;
   variant?: "gold" | "outline" | "destructive";
   confirmation?: SensitiveActionConfirmation;
+  formAction?: (formData: FormData) => void | Promise<void>;
 };
 
 export type SensitiveActionKind =
@@ -51,6 +52,7 @@ export function AdminSubmitButton({
   pendingLabel,
   variant = "gold",
   confirmation,
+  formAction,
 }: AdminSubmitButtonProps) {
   const { pending } = useFormStatus();
   const t = useTranslations("sensitiveActionConfirmation");
@@ -98,7 +100,13 @@ export function AdminSubmitButton({
 
   return (
     <>
-      <Button ref={buttonRef} type="submit" variant={variant} disabled={pending}>
+      <Button
+        ref={buttonRef}
+        type="submit"
+        variant={variant}
+        disabled={pending}
+        formAction={formAction}
+      >
         {pending ? (
           <>
             <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" />

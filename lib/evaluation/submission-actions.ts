@@ -9,7 +9,19 @@ import { requireRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
 import { scoresFromFormData, sessionEvaluationSchema } from "@/lib/validators/session-evaluation";
 
-export async function submitSessionEvaluationAction(localeValue: string, formData: FormData) {
+export async function saveSessionEvaluationDraftAction(localeValue: string, formData: FormData) {
+  return persistSessionEvaluation(localeValue, formData, false);
+}
+
+export async function lockSessionEvaluationAction(localeValue: string, formData: FormData) {
+  return persistSessionEvaluation(localeValue, formData, true);
+}
+
+async function persistSessionEvaluation(
+  localeValue: string,
+  formData: FormData,
+  lock: boolean,
+): Promise<never> {
   const locale = routing.locales.includes(localeValue as AppLocale)
     ? (localeValue as AppLocale)
     : routing.defaultLocale;
@@ -76,7 +88,7 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
         decision: value.decision,
         homework: value.homework ? { text: value.homework } : null,
         family_note: value.familyNote || null,
-        is_locked: true,
+        is_locked: lock,
         created_by: user.id,
       },
       { onConflict: "session_id" },
@@ -94,13 +106,13 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
   }
 
   revalidatePath(`/${locale}/teacher/evaluations`);
-  redirect(
-    `/${locale}/teacher/evaluations?${new URLSearchParams({
-      evaluationStatus: "saved",
-      score: String(data.total_score),
-      rating: String(data.rating),
-    })}` as Route,
-  );
+  const query = new URLSearchParams({
+    evaluationStatus: lock ? "locked" : "draft_saved",
+    sessionId: value.sessionId,
+    score: String(data.total_score),
+    rating: String(data.rating),
+  });
+  redirect(`/${locale}/teacher/evaluations?${query}` as Route);
 }
 
 function go(locale: AppLocale, key: string, value: string, formData: FormData): never {

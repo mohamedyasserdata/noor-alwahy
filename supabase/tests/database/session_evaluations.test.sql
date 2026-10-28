@@ -21,36 +21,30 @@ insert into public.tracks (id, code, name_ar, name_en)
 values ('e9100000-0000-4000-8000-000000000001', 'evaluation-test', 'اختبار التقييم', 'Evaluation test');
 
 insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
-values
-  ('e9200000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now()),
-  ('e9200000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
+values ('e9200000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
 
 insert into public.teacher_tracks (teacher_id, track_id)
 values
-  ('e9200000-0000-4000-8000-000000000001', 'e9100000-0000-4000-8000-000000000001'),
+  ('20000000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001'),
   ('e9200000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001');
 
 insert into public.students (id, profile_id, full_name, gender, timezone)
-values
-  ('e9300000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'Evaluation Student', 'male', 'Africa/Cairo'),
-  ('e9300000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000002', 'Other Student', 'male', 'Africa/Cairo');
+values ('e9300000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000002', 'Other Student', 'male', 'Africa/Cairo');
 
-insert into public.guardians (id, profile_id)
-values ('e9400000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000004');
 insert into public.student_guardians (student_id, guardian_id, relation, is_primary)
-values ('e9300000-0000-4000-8000-000000000001', 'e9400000-0000-4000-8000-000000000001', 'parent', true);
+values ('20000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000004', 'parent', true);
 
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, assigned_by, reason)
 values
-  ('e9500000-0000-4000-8000-000000000001', 'e9300000-0000-4000-8000-000000000001', 'e9200000-0000-4000-8000-000000000001', 'e9100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Evaluation test'),
+  ('e9500000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Evaluation test'),
   ('e9500000-0000-4000-8000-000000000002', 'e9300000-0000-4000-8000-000000000002', 'e9200000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Other evaluation test');
 
 insert into public.sessions (id, assignment_id, student_id, teacher_id, scheduled_at, duration_min, status)
 select
   ('e9800000-0000-4000-8000-' || lpad(series::text, 12, '0'))::uuid,
   'e9500000-0000-4000-8000-000000000001',
-  'e9300000-0000-4000-8000-000000000001',
-  'e9200000-0000-4000-8000-000000000001',
+  '20000000-0000-4000-8000-000000000003',
+  '20000000-0000-4000-8000-000000000002',
   '2031-01-01 08:00+00'::timestamptz + series * interval '1 day',
   30,
   'held'
@@ -113,13 +107,13 @@ reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
-select is((select count(*)::integer from public.session_evaluations), 9, 'the student reads their own evaluations');
+select is((select count(*)::integer from public.session_evaluations), 1, 'the student reads only their locked evaluations');
 select is_empty($$delete from public.session_evaluations where id = 'ea000000-0000-4000-8000-000000000001' returning id$$, 'a student cannot reach evaluations for deletion');
 reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
-select is((select count(*)::integer from public.session_evaluations), 9, 'the guardian reads their childs evaluations');
+select is((select count(*)::integer from public.session_evaluations), 1, 'the guardian reads only their childs locked evaluations');
 reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal1"}', true);

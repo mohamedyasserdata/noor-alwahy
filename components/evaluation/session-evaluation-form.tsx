@@ -1,21 +1,19 @@
 "use client";
 
-import { Minus, Plus, Save, ShieldCheck } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, Minus, Plus, Save, ShieldCheck } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
-import {
-  evaluationDraftStorageKey,
-  evaluationDraftVersion,
-  parseEvaluationDraft,
-  type EvaluationDraft,
-} from "@/lib/evaluation/draft";
+import { evaluationDraftVersion, type EvaluationDraft } from "@/lib/evaluation/draft";
 import { calculateEvaluationScorePreview } from "@/lib/evaluation/score-preview";
-import { submitSessionEvaluationAction } from "@/lib/evaluation/submission-actions";
+import {
+  lockSessionEvaluationAction,
+  saveSessionEvaluationDraftAction,
+} from "@/lib/evaluation/submission-actions";
 import type { EvaluationTypeSettings } from "@/lib/evaluation/settings";
 import type { EvaluationSessionType } from "@/lib/validators/evaluation-settings";
 import { cn } from "@/lib/utils";
@@ -32,45 +30,38 @@ export function SessionEvaluationForm({
   sessionId,
   settings,
   surahs,
-  clearSavedDraft,
+  initialDraft,
+  studentName,
 }: {
   locale: AppLocale;
   sessionId: string;
   settings: EvaluationTypeSettings[];
   surahs: Surah[];
-  clearSavedDraft: boolean;
+  initialDraft?: EvaluationDraft | null;
+  studentName: string;
 }) {
-  const storageKey = evaluationDraftStorageKey(sessionId);
-  const [draft, setDraft] = useState<EvaluationDraft>(() => createInitialDraft(settings));
-  const [restored, setRestored] = useState(false);
+  const [draft, setDraft] = useState<EvaluationDraft>(
+    () => initialDraft ?? createInitialDraft(settings),
+  );
+  const [baseline] = useState<EvaluationDraft>(() => initialDraft ?? createInitialDraft(settings));
+  const [reviewing, setReviewing] = useState(false);
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const draftRef = useRef(draft);
   const activeSettings = settings.find((entry) => entry.sessionType === draft.sessionType)!;
   const fromSurah = surahs.find((surah) => surah.id === draft.fromSurah) ?? surahs[0]!;
   const toSurah = surahs.find((surah) => surah.id === draft.toSurah) ?? surahs[0]!;
 
-  useEffect(() => {
-    if (clearSavedDraft) {
-      localStorage.removeItem(storageKey);
-      return;
-    }
-    const saved = parseEvaluationDraft(localStorage.getItem(storageKey));
-    if (!saved) return;
-    const timeout = window.setTimeout(() => {
-      draftRef.current = saved;
-      setDraft(saved);
-      setRestored(true);
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [clearSavedDraft, storageKey]);
-
   function updateDraft(updater: (current: EvaluationDraft) => EvaluationDraft) {
     const next = updater(draftRef.current);
     draftRef.current = next;
     setDraft(next);
-    if (!clearSavedDraft) {
-      localStorage.setItem(storageKey, JSON.stringify(next));
-    }
+    setReviewing(false);
   }
+
+  const changedFields = useMemo(
+    () => evaluationChangedFields(baseline, draft, locale),
+    [baseline, draft, locale],
+  );
 
   const preview = useMemo(() => {
     try {
@@ -99,7 +90,7 @@ export function SessionEvaluationForm({
   const isArabic = locale === "ar";
   const text = isArabic
     ? {
-        restored: "استُعيدت مسودتك المحفوظة على هذا الجهاز.",
+        restored: "استُعيدت المسودة المحفوظة في النظام، ويمكنك استكمالها من أي جهاز.",
         type: "نوع الجلسة",
         range: "نطاق التلاوة",
         from: "من",
@@ -122,12 +113,22 @@ export function SessionEvaluationForm({
         familyNote: "ملاحظة للأسرة",
         preview: "المؤشر اللحظي",
         authoritative: "النتيجة النهائية تحسبها قاعدة البيانات عند الحفظ.",
-        save: "حفظ التقييم وقَفله",
-        saving: "جارٍ الحفظ والقفل…",
-        local: "تُحفظ المسودة تلقائيًا على هذا الجهاز حتى الاعتماد.",
+        saveDraft: "حفظ المسودة",
+        savingDraft: "جارٍ حفظ المسودة…",
+        review: "مراجعة التقييم",
+        lock: "قفل التقييم نهائيًا",
+        locking: "جارٍ القفل…",
+        server: "تُحفظ المسودة في النظام ولا يراها الطالب أو ولي الأمر قبل القفل.",
+        reviewTitle: "ملخص ما سيُقفل",
+        reviewDescription: "راجع النتيجة والنطاق والقرار والتغييرات قبل القفل النهائي.",
+        changed: "التغييرات منذ آخر حفظ",
+        unchanged: "لا توجد تغييرات غير محفوظة مقارنة بآخر مسودة محملة.",
+        score: "النتيجة المتوقعة",
+        decisionSummary: "القرار",
+        rangeSummary: "النطاق",
       }
     : {
-        restored: "Your draft on this device was restored.",
+        restored: "The draft saved in the system was restored. You can continue it on any device.",
         type: "Session type",
         range: "Recitation range",
         from: "From",
@@ -150,9 +151,20 @@ export function SessionEvaluationForm({
         familyNote: "Family note",
         preview: "Live indicator",
         authoritative: "The database calculates the final result when saved.",
-        save: "Save and lock evaluation",
-        saving: "Saving and locking…",
-        local: "The draft is saved automatically on this device until submission.",
+        saveDraft: "Save draft",
+        savingDraft: "Saving draft…",
+        review: "Review evaluation",
+        lock: "Lock evaluation permanently",
+        locking: "Locking…",
+        server:
+          "The draft is saved in the system and stays hidden from the student and guardian until locked.",
+        reviewTitle: "Summary to be locked",
+        reviewDescription: "Review the result, range, decision, and changes before the final lock.",
+        changed: "Changes since the last save",
+        unchanged: "There are no unsaved changes compared with the last loaded draft.",
+        score: "Expected result",
+        decisionSummary: "Decision",
+        rangeSummary: "Range",
       };
 
   function changeType(sessionType: EvaluationSessionType) {
@@ -193,13 +205,13 @@ export function SessionEvaluationForm({
   }
 
   return (
-    <form action={submitSessionEvaluationAction.bind(null, locale)} className="grid gap-7">
+    <form action={saveSessionEvaluationDraftAction.bind(null, locale)} className="grid gap-7">
       <input type="hidden" name="sessionId" value={sessionId} />
       <input type="hidden" name="sessionType" value={draft.sessionType} />
       {Object.entries(draft.scores).map(([code, score]) => (
         <input key={code} type="hidden" name={`score:${code}`} value={score} />
       ))}
-      {restored ? (
+      {initialDraft ? (
         <p className="text-sm font-bold text-success" aria-live="polite">
           {text.restored}
         </p>
@@ -417,13 +429,139 @@ export function SessionEvaluationForm({
           </p>
           <p className="mt-1 text-xs text-primary-foreground/65">
             <Save className="me-1 inline size-3" aria-hidden="true" />
-            {text.local}
+            {text.server}
           </p>
         </div>
-        <AdminSubmitButton label={text.save} pendingLabel={text.saving} variant="gold" />
+        <div className="flex flex-col gap-2 sm:items-stretch">
+          <AdminSubmitButton
+            label={text.saveDraft}
+            pendingLabel={text.savingDraft}
+            variant="outline"
+          />
+          <Button
+            type="button"
+            variant="gold"
+            onClick={() => {
+              setReviewing(true);
+              window.setTimeout(() => reviewHeadingRef.current?.focus(), 0);
+            }}
+          >
+            <Eye aria-hidden="true" />
+            {text.review}
+          </Button>
+        </div>
       </div>
+
+      {reviewing ? (
+        <section className="grid gap-5 rounded-2xl border-2 border-secondary bg-secondary/10 p-5">
+          <div>
+            <h2 ref={reviewHeadingRef} tabIndex={-1} className="text-xl font-black text-primary">
+              {text.reviewTitle}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{text.reviewDescription}</p>
+          </div>
+          <dl className="grid gap-3 sm:grid-cols-3">
+            <SummaryItem
+              label={text.score}
+              value={
+                preview
+                  ? `${preview.totalScore}% · ${ratingLabels[locale][preview.rating - 1]}`
+                  : "—"
+              }
+            />
+            <SummaryItem
+              label={text.rangeSummary}
+              value={`${isArabic ? fromSurah.nameAr : fromSurah.nameEn} ${draft.fromAyah} – ${isArabic ? toSurah.nameAr : toSurah.nameEn} ${draft.toAyah}`}
+            />
+            <SummaryItem label={text.decisionSummary} value={text[draft.decision]} />
+          </dl>
+          <div>
+            <h3 className="font-black text-primary">{text.changed}</h3>
+            {changedFields.length ? (
+              <ul className="mt-2 list-disc space-y-1 ps-5 text-sm">
+                {changedFields.map((field) => (
+                  <li key={field}>{field}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">{text.unchanged}</p>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <AdminSubmitButton
+              label={text.lock}
+              pendingLabel={text.locking}
+              variant="destructive"
+              formAction={lockSessionEvaluationAction.bind(null, locale)}
+              confirmation={{
+                kind: "lockEvaluation",
+                record: studentName,
+                details: [{ label: "status", value: preview ? `${preview.totalScore}%` : "—" }],
+              }}
+            />
+          </div>
+        </section>
+      ) : null}
     </form>
   );
+}
+
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-card p-4">
+      <dt className="text-sm font-bold text-muted-foreground">{label}</dt>
+      <dd className="mt-1 font-black text-primary">{value}</dd>
+    </div>
+  );
+}
+
+function evaluationChangedFields(
+  baseline: EvaluationDraft,
+  current: EvaluationDraft,
+  locale: AppLocale,
+) {
+  const labels =
+    locale === "ar"
+      ? {
+          sessionType: "نوع الجلسة",
+          range: "نطاق التلاوة",
+          scores: "درجات المعايير",
+          errors: "الأخطاء والمساعدة",
+          details: "القرار والواجب وملاحظة الأسرة",
+        }
+      : {
+          sessionType: "Session type",
+          range: "Recitation range",
+          scores: "Criterion scores",
+          errors: "Errors and assistance",
+          details: "Decision, homework, and family note",
+        };
+  const changed: string[] = [];
+  if (baseline.sessionType !== current.sessionType) changed.push(labels.sessionType);
+  if (
+    baseline.fromSurah !== current.fromSurah ||
+    baseline.fromAyah !== current.fromAyah ||
+    baseline.toSurah !== current.toSurah ||
+    baseline.toAyah !== current.toAyah
+  )
+    changed.push(labels.range);
+  if (JSON.stringify(baseline.scores) !== JSON.stringify(current.scores))
+    changed.push(labels.scores);
+  if (
+    baseline.errorsMajor !== current.errorsMajor ||
+    baseline.errorsMinor !== current.errorsMinor ||
+    baseline.promptsCount !== current.promptsCount ||
+    baseline.forgotCount !== current.forgotCount
+  )
+    changed.push(labels.errors);
+  if (
+    baseline.weakTags !== current.weakTags ||
+    baseline.decision !== current.decision ||
+    baseline.homework !== current.homework ||
+    baseline.familyNote !== current.familyNote
+  )
+    changed.push(labels.details);
+  return changed;
 }
 
 function Counter({

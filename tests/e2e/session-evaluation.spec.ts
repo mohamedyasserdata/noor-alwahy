@@ -5,7 +5,8 @@ import { expect, test } from "@playwright/test";
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
 
-test("P4-T04 teacher restores a local draft and locks a mobile session evaluation", async ({
+test("P4-T04 teacher restores a server draft on another device, reviews it, and confirms the lock", async ({
+  browser,
   page,
 }) => {
   test.setTimeout(120_000);
@@ -30,22 +31,54 @@ test("P4-T04 teacher restores a local draft and locks a mobile session evaluatio
 
   const startedAt = Date.now();
   await page.getByLabel("Homework").fill("Review Al-Fatihah twice");
-  await page.reload();
-  await expect(page.getByText("Your draft on this device was restored.")).toBeVisible();
-  await expect(page.getByLabel("Homework")).toHaveValue("Review Al-Fatihah twice");
-
-  const excellentButtons = await page.getByRole("radio", { name: "5 - Excellent" }).all();
-  for (const button of excellentButtons) await button.click();
-  await page.getByRole("button", { name: "Save and lock evaluation" }).click();
-
-  await expect(page).toHaveURL(/evaluationStatus=saved/);
-  await expect(page.getByText(/evaluation was saved and locked/i)).toBeVisible();
-  expect(Date.now() - startedAt).toBeLessThan(120_000);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
+  await page.getByRole("button", { name: "Save draft" }).click();
+  await expect(page).toHaveURL(/evaluationStatus=draft_saved/);
+  await expect(page.getByText(/draft was saved in the system/i)).toBeVisible();
 
   const db = databaseClient();
+  const { data: savedDraft, error: draftError } = await db
+    .from("session_evaluations")
+    .select("is_locked,homework")
+    .eq("session_id", fixture.sessionId)
+    .single();
+  if (draftError) throw draftError;
+  expect(savedDraft.is_locked).toBe(false);
+  expect(savedDraft.homework).toEqual({ text: "Review Al-Fatihah twice" });
+
+  const secondDevice = await browser.newContext({
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000",
+  });
+  const secondPage = await secondDevice.newPage();
+  await signInAs(secondPage, "en", "teacher");
+  await secondPage.goto(`/en/teacher/evaluations?sessionId=${fixture.sessionId}`);
+  await expect(secondPage.getByText("The draft saved in the system was restored.")).toBeVisible();
+  await expect(secondPage.getByLabel("Homework")).toHaveValue("Review Al-Fatihah twice");
+
+  const excellentButtons = await secondPage.getByRole("radio", { name: "5 - Excellent" }).all();
+  for (const button of excellentButtons) await button.click();
+  await secondPage.getByRole("button", { name: "Review evaluation" }).click();
+  await expect(secondPage.getByRole("heading", { name: "Summary to be locked" })).toBeFocused();
+  await secondPage.getByRole("button", { name: "Lock evaluation permanently" }).click();
+
+  const { data: beforeConfirmation, error: beforeError } = await db
+    .from("session_evaluations")
+    .select("is_locked")
+    .eq("session_id", fixture.sessionId)
+    .single();
+  if (beforeError) throw beforeError;
+  expect(beforeConfirmation.is_locked).toBe(false);
+
+  const confirmation = secondPage.getByRole("dialog", { name: "Lock this evaluation?" });
+  await expect(confirmation).toContainText(fixture.studentName);
+  await confirmation.getByRole("button", { name: "Lock evaluation permanently" }).click();
+
+  await expect(secondPage).toHaveURL(/evaluationStatus=locked/);
+  await expect(secondPage.getByText(/evaluation was saved and locked/i)).toBeVisible();
+  expect(Date.now() - startedAt).toBeLessThan(120_000);
+  expect(
+    await secondPage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+  ).toBe(true);
+
   const { data, error } = await db
     .from("session_evaluations")
     .select("is_locked,total_score,rating,from_ayah_id,to_ayah_id,homework")
@@ -58,6 +91,7 @@ test("P4-T04 teacher restores a local draft and locks a mobile session evaluatio
   expect(data.from_ayah_id).toBe(1);
   expect(data.to_ayah_id).toBe(7);
   expect(data.homework).toEqual({ text: "Review Al-Fatihah twice" });
+  await secondDevice.close();
 });
 
 async function createFixture() {
