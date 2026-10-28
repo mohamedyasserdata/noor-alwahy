@@ -11,6 +11,9 @@ import { TeacherReportsSection } from "@/components/reports/teacher-reports-sect
 import { TeacherAvailabilitySection } from "@/components/teacher/teacher-availability-section";
 import { TeacherTodaySection } from "@/components/teacher/teacher-today-section";
 import { TeacherAttendanceSection } from "@/components/teacher/teacher-attendance-section";
+import { TeacherChangeRequestsSection } from "@/components/teacher/teacher-change-requests-section";
+import { TeacherNotificationsSection } from "@/components/teacher/teacher-notifications-section";
+import { TeacherProfileSection } from "@/components/teacher/teacher-profile-section";
 import { TeacherEarningsSection } from "@/components/payouts/teacher-earnings-section";
 import { TeacherZoomSection } from "@/components/teacher/teacher-zoom-section";
 import { routing } from "@/i18n/routing";
@@ -43,6 +46,10 @@ export default async function TeacherSectionPage({
     content = <TeacherAttendanceSection locale={locale} />;
   } else if (section === "reports") {
     content = <TeacherReportsSection locale={locale} searchParams={searchParams} />;
+  } else if (section === "notifications") {
+    content = <TeacherNotificationsSection locale={locale} />;
+  } else if (section === "requests") {
+    content = <TeacherChangeRequestsSection locale={locale} />;
   } else if (section === "availability") {
     content = <TeacherAvailabilitySection locale={locale} searchParams={searchParams} />;
   } else if (section === "schedule") {
@@ -51,6 +58,8 @@ export default async function TeacherSectionPage({
     content = <TeacherZoomSection locale={locale} searchParams={searchParams} />;
   } else if (section === "earnings") {
     content = <TeacherEarningsSection locale={locale} />;
+  } else if (section === "profile") {
+    content = <TeacherProfileSection locale={locale} searchParams={searchParams} />;
   } else {
     content = <PortalSectionRoute params={params} portal="teacher" />;
   }

@@ -25,17 +25,19 @@ export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }
   });
 
   return (
-    <section className="mx-auto w-full max-w-6xl" aria-labelledby="teacher-attendance-title">
+    <section className="teacher-reference-page" aria-labelledby="teacher-attendance-title">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-3xl">
-          <p className="mb-2 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
           <h1
             id="teacher-attendance-title"
-            className="text-3xl font-black text-primary sm:text-4xl"
+            className="text-2xl font-black text-primary sm:text-3xl"
           >
             {t("title")}
           </h1>
-          <p className="mt-3 leading-7 text-muted-foreground">{t("description")}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+            {t("description")}
+          </p>
         </div>
         <Link
           href="/teacher/today"
@@ -45,7 +47,7 @@ export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }
         </Link>
       </header>
 
-      <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="teacher-metrics-grid mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
           icon={<CalendarCheck />}
           label={t("metrics.scheduled")}
@@ -68,7 +70,7 @@ export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }
         />
       </div>
 
-      <Card className="mt-7 overflow-hidden">
+      <Card className="mt-5 overflow-hidden">
         <CardHeader className="border-b">
           <CardTitle>{t("historyTitle", { days: history.days })}</CardTitle>
         </CardHeader>

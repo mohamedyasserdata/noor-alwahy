@@ -39,18 +39,20 @@ export async function ScheduleSection({
       className={
         appearance === "student"
           ? "student-schedule-page mx-auto w-full max-w-[94rem] rounded-[1.75rem] border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-7"
-          : "mx-auto w-full max-w-7xl"
+          : "teacher-reference-page"
       }
       aria-labelledby={appearance === "standard" ? "schedule-title" : undefined}
       aria-label={appearance === "student" ? t("title") : undefined}
     >
       {appearance === "standard" ? (
         <header className="max-w-3xl">
-          <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
-          <h1 id="schedule-title" className="text-3xl font-black text-primary sm:text-4xl">
+          <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1 id="schedule-title" className="text-2xl font-black text-primary sm:text-3xl">
             {t("title")}
           </h1>
-          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+            {t("description")}
+          </p>
           <Badge className="mt-4" variant="outline">
             <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
           </Badge>

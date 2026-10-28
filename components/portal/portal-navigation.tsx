@@ -2,10 +2,12 @@
 
 import {
   BadgeCheck,
+  Bell,
   Banknote,
   BookOpenCheck,
   CalendarDays,
   CalendarCheck,
+  CalendarClock,
   ChartNoAxesCombined,
   ChevronDown,
   ClipboardList,
@@ -62,9 +64,12 @@ const sectionIcons = {
   attendance: CalendarCheck,
   evaluation: Scale,
   evaluations: BookOpenCheck,
+  notifications: Bell,
+  requests: CalendarClock,
   exams: ClipboardList,
   zoom: Link2,
   earnings: WalletCards,
+  profile: Settings,
   certificates: BadgeCheck,
   children: Users,
   billing: Banknote,
@@ -105,6 +110,19 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
           },
         ]
       : null;
+  const teacherPrimarySections = [
+    "today",
+    "schedule",
+    "students",
+    "attendance",
+    "evaluations",
+    "reports",
+    "notifications",
+    "requests",
+    "earnings",
+    "profile",
+  ] as const;
+  const teacherToolSections = ["availability", "zoom", "exams"] as const;
 
   const renderSection = (section: (typeof sections)[number]) => {
     const Icon = sectionIcons[section] ?? BookOpenCheck;
@@ -319,7 +337,36 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
               );
             }),
           ]
-        : sections.map(renderSection)}
+        : portal === "teacher" && isSidebar
+          ? [
+              ...teacherPrimarySections.map((section) =>
+                renderSection(section as (typeof sections)[number]),
+              ),
+              <details
+                key="teacher-tools"
+                className="group/nav mt-1 rounded-xl border-t border-secondary/15 pt-1"
+                open={
+                  teacherToolSections.includes(
+                    activeSection as (typeof teacherToolSections)[number],
+                  ) || undefined
+                }
+              >
+                <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-black text-muted-foreground marker:hidden hover:bg-accent/55 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+                  <Command className="size-5 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0 flex-1">{t("more")}</span>
+                  <ChevronDown
+                    className="size-4 transition-transform group-open/nav:rotate-180 motion-reduce:transition-none"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <div className="ms-5 mt-1 grid gap-1 border-s border-secondary/20 ps-2">
+                  {teacherToolSections.map((section) =>
+                    renderSection(section as (typeof sections)[number]),
+                  )}
+                </div>
+              </details>,
+            ]
+          : sections.map(renderSection)}
     </nav>
   );
 }

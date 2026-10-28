@@ -1,7 +1,15 @@
-import { BarChart3, CheckCircle2, Download, FilePenLine, ShieldCheck } from "lucide-react";
+import {
+  BarChart3,
+  CheckCircle2,
+  Download,
+  FileClock,
+  FilePenLine,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { TeacherMetricCard } from "@/components/teacher/teacher-page-ui";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,19 +123,26 @@ export async function TeacherReportsSection({
   const t = copy[locale];
   const status = typeof query.reportStatus === "string" ? query.reportStatus : "";
   const error = typeof query.reportError === "string" ? query.reportError : "";
+  const approvedCount = data.reports.filter(
+    (report) => report.status === "approved" || report.status === "visible",
+  ).length;
+  const reviewCount = data.reports.filter((report) => report.status === "admin_review").length;
+  const draftCount = data.reports.filter((report) => report.status === "draft").length;
 
   return (
-    <section className="mx-auto w-full max-w-6xl" aria-labelledby="teacher-reports-title">
-      <header className="grid gap-6 border-b pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
+    <section className="teacher-reference-page" aria-labelledby="teacher-reports-title">
+      <header className="grid gap-4 border-b border-secondary/20 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="max-w-3xl">
-          <p className="mb-3 text-sm font-black text-secondary">{t.eyebrow}</p>
+          <p className="mb-1 text-sm font-black text-secondary">{t.eyebrow}</p>
           <h1
             id="teacher-reports-title"
-            className="text-3xl font-black text-balance text-primary sm:text-4xl"
+            className="text-2xl font-black text-balance text-primary sm:text-3xl"
           >
             {t.title}
           </h1>
-          <p className="mt-4 leading-8 text-muted-foreground">{t.description}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+            {t.description}
+          </p>
         </div>
         <div className="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 text-sm font-bold text-primary">
           <ShieldCheck className="size-5 text-secondary" aria-hidden="true" />
@@ -148,11 +163,33 @@ export async function TeacherReportsSection({
         </Alert>
       ) : null}
 
-      <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.6fr)]">
-        <aside className="self-start rounded-3xl bg-primary p-6 text-primary-foreground shadow-lg xl:sticky xl:top-6">
+      <div className="teacher-metrics-grid mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <TeacherMetricCard
+          icon={CheckCircle2}
+          label={t.status.approved}
+          value={approvedCount}
+          tone="green"
+        />
+        <TeacherMetricCard
+          icon={ShieldCheck}
+          label={t.status.admin_review}
+          value={reviewCount}
+          tone="gold"
+        />
+        <TeacherMetricCard icon={FilePenLine} label={t.status.draft} value={draftCount} />
+        <TeacherMetricCard
+          icon={FileClock}
+          label={t.listTitle}
+          value={data.reports.length}
+          tone="violet"
+        />
+      </div>
+
+      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(22rem,0.9fr)_minmax(0,1.35fr)]">
+        <aside className="self-start rounded-2xl border bg-card p-5 text-foreground shadow-card xl:sticky xl:top-24">
           <FilePenLine className="size-8 text-secondary" aria-hidden="true" />
-          <h2 className="mt-5 text-2xl font-black">{t.newTitle}</h2>
-          <p className="mt-2 text-sm leading-7 text-primary-foreground/75">{t.newHint}</p>
+          <h2 className="mt-4 text-xl font-black text-primary">{t.newTitle}</h2>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">{t.newHint}</p>
           <ReportForm locale={locale} students={data.students} templates={data.templates} t={t} />
         </aside>
 

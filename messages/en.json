@@ -237,8 +237,8 @@
       "searchPlaceholder": "Search your students…",
       "sections": {
         "today": {
-          "label": "Today",
-          "title": "Your teaching day",
+          "label": "Home",
+          "title": "Teacher dashboard",
           "description": "A clear starting point for today’s sessions and tasks for students assigned to you."
         },
         "evaluations": {
@@ -261,13 +261,23 @@
           "title": "Progress reports",
           "description": "Prepare and review progress reports before approval and release to authorized viewers."
         },
+        "notifications": {
+          "label": "Notifications",
+          "title": "Notifications",
+          "description": "Session changes and official instructions that need your attention."
+        },
+        "requests": {
+          "label": "Change requests",
+          "title": "Change & makeup requests",
+          "description": "Review schedule changes and follow the approved action channel."
+        },
         "availability": {
           "label": "Availability",
           "title": "Teaching availability",
           "description": "Manage available teaching times so the administration can build a suitable schedule."
         },
         "schedule": {
-          "label": "Schedule",
+          "label": "My schedule",
           "title": "Teaching schedule",
           "description": "See assigned weekly lessons in your local time zone."
         },
@@ -277,9 +287,14 @@
           "description": "Keep your permanent approved meeting link ready for assigned lessons."
         },
         "earnings": {
-          "label": "My earnings",
+          "label": "Earnings",
           "title": "My earnings and statements",
           "description": "Review counted sessions, monthly statements, and each statement's approval and payment status."
+        },
+        "profile": {
+          "label": "My profile",
+          "title": "My profile",
+          "description": "Account settings and core preferences."
         },
         "exams": {
           "label": "Exams",
@@ -1157,9 +1172,9 @@
     }
   },
   "teacherToday": {
-    "eyebrow": "Daily attendance register",
-    "title": "My sessions today",
-    "description": "Record each result in one click. Credit, pay, and makeup policy are applied automatically.",
+    "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+    "title": "Teacher dashboard",
+    "description": "Your sessions, students, and tasks that need attention in one place.",
     "dayTitle": "Today’s schedule",
     "sessionCount": "{count, plural, one {# session} other {# sessions}}",
     "duration": "{count} minutes",
@@ -3233,6 +3248,66 @@
         "title": "No matching teacher applications",
         "description": "Change the search or status filter, or wait for a new public application."
       }
+    }
+  },
+  "teacherReference": {
+    "notifications": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "Notifications",
+      "description": "Official changes and instructions that affect your teaching day.",
+      "metrics": {
+        "unread": "Unread",
+        "sessions": "Session alerts",
+        "instructions": "Admin instructions",
+        "latest": "Latest update"
+      },
+      "emptyValue": "None",
+      "all": "All notifications",
+      "markAll": "Mark all as read",
+      "markRead": "Mark as read",
+      "marking": "Saving…",
+      "open": "View",
+      "unread": "New",
+      "emptyTitle": "No notifications right now",
+      "emptyDescription": "Approved session changes and instructions will appear here when received."
+    },
+    "requests": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "Schedule changes & makeup",
+      "description": "Track session changes and makeup arrangements under the approved admin process.",
+      "historyTitle": "Previous changes",
+      "requestTitle": "Request a change or makeup",
+      "policyTitle": "Scheduling is managed by the administration",
+      "policyDescription": "Current permissions do not let teachers reschedule or create makeup sessions directly. Review your schedule and alerts, then use the official administration channel when needed so the decision is recorded and shared with every authorized party.",
+      "openSchedule": "View schedule",
+      "openNotifications": "View notifications",
+      "change": "Session schedule change",
+      "read": "Reviewed",
+      "new": "New",
+      "empty": "No schedule changes are present in your current notifications."
+    },
+    "profile": {
+      "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
+      "title": "My profile",
+      "description": "Teacher settings and the account details you are allowed to edit.",
+      "detailsTitle": "Profile details",
+      "preferencesTitle": "Account preferences",
+      "displayName": "Display name",
+      "email": "Email address",
+      "language": "Preferred language",
+      "timezone": "Time zone",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "saved": "Profile settings saved.",
+      "saveError": "Settings could not be saved. Review the fields and try again.",
+      "missing": "The teacher profile could not be loaded.",
+      "notifications": "Session notifications",
+      "notificationsDetail": "Official alerts are managed from the notifications page.",
+      "appearance": "Interface appearance",
+      "appearanceDetail": "Use the theme control in the top bar.",
+      "languageDetail": "Change the interface language in the top bar or save the preference here.",
+      "account": "Account settings",
+      "accountDetail": "Change password and account protection from the account menu."
     }
   },
   "accessibility": {

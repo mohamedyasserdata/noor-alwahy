@@ -66,16 +66,18 @@ export async function TeacherTodaySection({
   });
 
   return (
-    <section className="mx-auto w-full max-w-5xl" aria-labelledby="teacher-today-title">
+    <section className="teacher-reference-page" aria-labelledby="teacher-today-title">
       <header className="max-w-3xl">
-        <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
+        <p className="mb-1 text-sm font-black text-secondary">{t("eyebrow")}</p>
         <h1
           id="teacher-today-title"
-          className="scroll-mt-24 text-3xl font-black text-balance text-primary sm:text-4xl"
+          className="scroll-mt-24 text-2xl font-black text-balance text-primary sm:text-3xl"
         >
           {t("title")}
         </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+        <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
+          {t("description")}
+        </p>
       </header>
 
       {status === "saved" ? (
@@ -94,7 +96,7 @@ export async function TeacherTodaySection({
           {t("errors.profile_missing")}
         </Alert>
       ) : (
-        <div className="mt-8">
+        <div className="mt-5">
           <NextSessionCard serverNowMs={nextSession.serverNowMs} session={nextSession.session} />
 
           <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
