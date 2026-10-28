@@ -196,11 +196,6 @@
           "title": "Exams and grades",
           "description": "Create exams, enter calculated grades, and approve results."
         },
-        "attendance": {
-          "label": "Attendance",
-          "title": "Attendance register",
-          "description": "Record your session outcomes and review saved entries under the approved lock policy."
-        },
         "reports": {
           "label": "Reports",
           "title": "Report review",
@@ -238,6 +233,8 @@
       "navigationLabel": "Teacher portal sections",
       "more": "More",
       "allSections": "All teacher sections",
+      "search": "Search my students",
+      "searchPlaceholder": "Search your students…",
       "sections": {
         "today": {
           "label": "Today",
@@ -253,6 +250,11 @@
           "label": "My students",
           "title": "Assigned students",
           "description": "Follow only the students you are authorized to teach, without exposing records outside your scope."
+        },
+        "attendance": {
+          "label": "Attendance",
+          "title": "Attendance register",
+          "description": "Record your session outcomes and review saved entries under the approved lock policy."
         },
         "reports": {
           "label": "Reports",
@@ -1167,6 +1169,8 @@
     "awaitingAttendance": "Awaiting attendance",
     "chooseResult": "Choose the session result",
     "recorded": "The result is fixed and its credit and pay effects have been applied.",
+    "completeEvaluation": "Complete evaluation",
+    "evaluationComplete": "Evaluation complete",
     "saving": "Recording…",
     "overview": {
       "sessions": "Today's sessions",

@@ -223,9 +223,21 @@ export async function TeacherTodaySection({
                         </Card>
 
                         {session.attendance ? (
-                          <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                            {t("recorded")}
-                          </p>
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-success/8 p-3">
+                            <p className="text-sm leading-6 text-muted-foreground">
+                              {t("recorded")}
+                            </p>
+                            {session.evaluationLocked ? (
+                              <Badge variant="success">{t("evaluationComplete")}</Badge>
+                            ) : (
+                              <Link
+                                href={`/teacher/evaluations?sessionId=${session.id}`}
+                                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-black text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                              >
+                                {t("completeEvaluation")}
+                              </Link>
+                            )}
+                          </div>
                         ) : (
                           <div className="mt-5">
                             <p className="text-sm font-bold text-foreground">{t("chooseResult")}</p>

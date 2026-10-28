@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Search } from "lucide-react";
 import { Suspense } from "react";
 
 import { AccountMenu } from "@/components/account/account-menu";
@@ -174,7 +175,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
       >
         {isAdminPortal || isTeacherPortal ? (
           <header
-            className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b border-secondary/20 bg-[#fffdf8]/94 shadow-[0_0.35rem_1.5rem_-1.2rem_rgb(16_31_59_/_0.25)] backdrop-blur-xl min-[769px]:min-h-18 min-[769px]:justify-end min-[769px]:px-6 dark:bg-card/94"
+            className="safe-header sticky top-0 z-20 flex min-h-16 items-center justify-between gap-2 border-b border-secondary/20 bg-[#fffdf8]/94 shadow-[0_0.35rem_1.5rem_-1.2rem_rgb(16_31_59_/_0.25)] backdrop-blur-xl min-[769px]:min-h-18 min-[769px]:px-6 dark:bg-card/94"
             data-testid={`${portal}-portal-topbar`}
           >
             <BrandMark
@@ -183,6 +184,30 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
               className="shrink-0 min-[769px]:hidden"
               labelClassName="sr-only min-[440px]:not-sr-only min-[440px]:text-base"
             />
+            {isTeacherPortal ? (
+              <form
+                action={`/${locale}/teacher/students`}
+                className="relative hidden w-full max-w-sm min-[769px]:block"
+                role="search"
+              >
+                <label htmlFor="teacher-quick-search" className="sr-only">
+                  {t("teacher.search")}
+                </label>
+                <Search
+                  className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-secondary"
+                  aria-hidden="true"
+                />
+                <input
+                  id="teacher-quick-search"
+                  name="q"
+                  type="search"
+                  placeholder={t("teacher.searchPlaceholder")}
+                  className="min-h-11 w-full rounded-full border border-secondary/25 bg-card ps-10 pe-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </form>
+            ) : (
+              <span className="hidden min-[769px]:block" aria-hidden="true" />
+            )}
             <div className="flex items-center gap-2">
               {notificationCenter ? (
                 <NotificationCenter initialData={notificationCenter} portal={portal} inline />

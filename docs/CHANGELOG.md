@@ -82,3 +82,13 @@
   مع تحقق Zod صريح من وجود أحد الإصدارين.
 - أضيف معرّف اختبار ثابت لإصدار Data API حتى يتحقق اختبار smoke من نتيجة Server Component
   نفسها، لا من تحميل الصفحة فقط.
+
+# 2026-10-28 — Teacher portal completion
+
+- Unified every teacher page under the approved navy, gold, and cream workspace design.
+- Added an attendance register, real student search and academic context, direct
+  attendance-to-evaluation flow, responsive teacher navigation, and a safe teacher error boundary.
+- Fixed notification deep links for teacher, student, and parent portals while preserving the
+  existing same-origin route allowlist.
+- Added Playwright coverage and delivery screenshots for all teacher sections at 360, 768, and
+  1440 pixels.
