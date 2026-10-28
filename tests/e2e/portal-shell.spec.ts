@@ -6,7 +6,7 @@ const portals = [
   {
     id: "admin",
     section: "dashboard",
-    title: { ar: "نظرة شاملة على الأكاديمية", en: "A complete academy overview" },
+    title: { ar: "لوحة المتابعة", en: "Administration overview" },
   },
   {
     id: "teacher",
@@ -145,7 +145,7 @@ test("account settings panel stays inside the mobile viewport", async ({ page })
   await expectNoHorizontalOverflow(page);
 });
 
-test("admin sidebar scrolls on laptop-height viewports", async ({ page }) => {
+test("admin sidebar groups stay reachable on laptop-height viewports", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1226, height: 668 });
   await signInAs(page, "ar", "admin");
@@ -153,6 +153,9 @@ test("admin sidebar scrolls on laptop-height viewports", async ({ page }) => {
 
   const navigation = page.getByTestId("portal-navigation-sidebar");
   await expect(navigation).toBeVisible();
+  await navigation.locator("details").evaluateAll((details) => {
+    for (const detail of details) (detail as HTMLDetailsElement).open = true;
+  });
   await expect
     .poll(() => navigation.evaluate((element) => element.scrollHeight > element.clientHeight))
     .toBe(true);

@@ -107,6 +107,19 @@
     "admin": {
       "roleName": "Administration portal",
       "navigationLabel": "Administration portal sections",
+      "groups": {
+        "overview": "Overview",
+        "people": "People & requests",
+        "learning": "Learning & follow-up",
+        "students": "Students & enrollment",
+        "teachers": "Teachers & assignments",
+        "academics": "Academic operations",
+        "finance": "Finance & subscriptions",
+        "content": "Content & communication",
+        "system": "Administration & system",
+        "more": "More",
+        "allSections": "All administration sections"
+      },
       "sections": {
         "dashboard": {
           "label": "Overview",
@@ -162,6 +175,11 @@
           "label": "Schedule",
           "title": "Weekly schedule",
           "description": "Set fixed weekly lesson times and review them in each viewer’s local time."
+        },
+        "attendance": {
+          "label": "Attendance",
+          "title": "Attendance tracking",
+          "description": "Review approved attendance, absence, and lateness records."
         },
         "evaluation": {
           "label": "Evaluation setup",
@@ -1224,6 +1242,14 @@
     "durationValue": "{count} minutes",
     "anchorNote": "Anchored to {timezone}: {day} at {time}",
     "empty": "No active weekly lessons are available.",
+    "grid": {
+      "title": "Weekly timetable",
+      "description": "Each lesson appears on its local day and time. Scroll horizontally on mobile to see the rest of the week.",
+      "lessonCount": "{count} weekly lessons",
+      "lessonsAtTime": "{count} lessons at this time",
+      "student": "Student",
+      "teacher": "Teacher"
+    },
     "exports": {
       "title": "Calendar export",
       "description": "Download your upcoming sessions or create a private subscription link for your calendar app.",
@@ -2415,10 +2441,12 @@
   },
   "adminDashboard": {
     "eyebrow": "Administration dashboard · unified data",
-    "title": "A complete academy overview",
-    "description": "Operational, learning, and financial indicators from the original records, with every currency kept separate.",
+    "title": "Administration overview",
+    "description": "A calm summary of what needs a decision or follow-up now, with full detail kept in its specialist section.",
     "period": "From {from} to {to}",
     "filters": {
+      "title": "Period and filters",
+      "description": "Open the filters only when you need to change the dashboard scope.",
       "from": "From date",
       "to": "To date",
       "country": "Country",
@@ -2426,6 +2454,26 @@
       "allCountries": "All countries",
       "allCurrencies": "All currencies",
       "apply": "Apply filters"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "description": "Work that currently needs an administration decision.",
+      "newApplications": "New enrollment applications",
+      "riskFlags": "Students needing follow-up",
+      "overdue": "Overdue balances"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "description": "Go directly to the most common administration tasks.",
+      "applications": "Review applications",
+      "subscriptions": "Manage subscriptions",
+      "schedule": "Open schedule",
+      "reports": "Review reports"
+    },
+    "analytics": {
+      "title": "Detailed analytics",
+      "description": "Financial and learning trends, audited activity, and risk indicators.",
+      "open": "Show details"
     },
     "metrics": {
       "students": "Active students",
