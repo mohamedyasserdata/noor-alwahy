@@ -12,7 +12,7 @@ export default async function ApplyPage({ params }: { params: Promise<{ locale: 
   const t = await getTranslations({ locale, namespace: "applicationsPublic" });
 
   return (
-    <main className="min-h-screen bg-background px-4 py-12 sm:px-6">
+    <main id="main-content" className="min-h-screen bg-background px-4 py-12 sm:px-6">
       <header className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-black text-secondary">{t("eyebrow")}</p>
         <h1 className="mt-3 text-4xl font-black text-primary">{t("title")}</h1>

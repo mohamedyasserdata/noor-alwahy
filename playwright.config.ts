@@ -12,7 +12,7 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  globalTimeout: 10 * 60 * 1000,
+  globalTimeout: 15 * 60 * 1000,
   reporter: [
     [process.env.CI ? "line" : "list"],
     ["html", { open: "never", outputFolder: "output/playwright/report" }],

@@ -13,9 +13,16 @@ const statusSchema = z.object({
   PUBLISHABLE_KEY: z.string().regex(/^sb_publishable_[A-Za-z0-9_-]+$/),
   SERVICE_ROLE_KEY: z.string().min(1),
 });
-const localSupabaseEnv = ensureLocalSupabase();
+const runtimeEnvSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.url({ protocol: /^https?$/ }),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+});
+const nextCommand = process.argv[2] === "build" ? "build" : "dev";
+const nextArgs = nextCommand === "build" ? process.argv.slice(3) : process.argv.slice(2);
+const localSupabaseEnv = resolveSupabaseEnv();
 const localChromium = findLocalChromium();
-const child = spawn(process.execPath, [nextCli, "dev", ...process.argv.slice(2)], {
+const child = spawn(process.execPath, [nextCli, nextCommand, ...nextArgs], {
   env: {
     ...process.env,
     ...localSupabaseEnv,
@@ -23,6 +30,11 @@ const child = spawn(process.execPath, [nextCli, "dev", ...process.argv.slice(2)]
   },
   stdio: "inherit",
 });
+
+function resolveSupabaseEnv() {
+  const configured = runtimeEnvSchema.safeParse(process.env);
+  return configured.success ? configured.data : ensureLocalSupabase();
+}
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => child.kill(signal));
@@ -40,7 +52,7 @@ function ensureLocalSupabase() {
     const startResult = runSupabase(["start", "--output-format", "json", "--log-level", "error"]);
     if (startResult.status !== 0) {
       throw new Error(
-        "Could not start local Supabase. Start Docker Desktop, wait until it is ready, then run pnpm dev again.",
+        `Could not start local Supabase. Start Docker Desktop, wait until it is ready, then run pnpm ${nextCommand} again.`,
       );
     }
     status = readLocalSupabaseStatus();
@@ -48,7 +60,7 @@ function ensureLocalSupabase() {
 
   if (!status) {
     throw new Error(
-      "Local Supabase started without returning valid connection details. Run pnpm supabase:stop, then pnpm supabase:start, and retry pnpm dev.",
+      `Local Supabase started without returning valid connection details. Run pnpm supabase:stop, then pnpm supabase:start, and retry pnpm ${nextCommand}.`,
     );
   }
 
