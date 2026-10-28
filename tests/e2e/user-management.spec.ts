@@ -43,11 +43,13 @@ test("US-012/013 admin creates, audits, disables, reactivates, and invites accou
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/users");
-  await page
-    .locator("div.rounded-2xl")
-    .filter({ hasText: directEmail })
-    .getByRole("button", { name: "Disable" })
-    .click();
+  const disableCard = page.locator("div.rounded-2xl").filter({ hasText: directEmail });
+  await disableCard.getByRole("button", { name: "Disable" }).click();
+  const disableDialog = page.getByRole("dialog", { name: "Disable this account?" });
+  await expect(disableDialog).toBeVisible();
+  await expect(disableDialog).toContainText(directEmail);
+  await expect(page).not.toHaveURL(/status=disabled/);
+  await disableDialog.getByRole("button", { name: "Disable" }).click();
   await expect(page).toHaveURL(/\/en\/admin\/users\?status=disabled$/);
 
   await page.context().clearCookies();

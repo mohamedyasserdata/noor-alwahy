@@ -79,12 +79,18 @@ export async function AdminReportsSection({
                       id={report.id}
                       status="admin_review"
                       label={ar ? "إرسال للمراجعة" : "Send to review"}
+                      record={`${report.studentName} · ${report.periodStart} — ${report.periodEnd}`}
+                      audience={ar ? "الإدارة فقط" : "Administration only"}
                     />
                     <Transition
                       locale={locale}
                       id={report.id}
                       status="visible"
                       label={ar ? "نشر للأسرة" : "Publish to family"}
+                      record={`${report.studentName} · ${report.periodStart} — ${report.periodEnd}`}
+                      audience={
+                        ar ? "الطالب وأولياء الأمور المرتبطون" : "Student and linked guardians"
+                      }
                     />
                   </>
                 ) : null}
@@ -94,6 +100,10 @@ export async function AdminReportsSection({
                     id={report.id}
                     status="visible"
                     label={ar ? "نشر للأسرة" : "Publish to family"}
+                    record={`${report.studentName} · ${report.periodStart} — ${report.periodEnd}`}
+                    audience={
+                      ar ? "الطالب وأولياء الأمور المرتبطون" : "Student and linked guardians"
+                    }
                   />
                 ) : null}
                 {report.status === "visible" ? (
@@ -102,6 +112,8 @@ export async function AdminReportsSection({
                     id={report.id}
                     status="draft"
                     label={ar ? "سحب إلى مسودة" : "Withdraw to draft"}
+                    record={`${report.studentName} · ${report.periodStart} — ${report.periodEnd}`}
+                    audience={ar ? "الإدارة والمدرس فقط" : "Administration and teacher only"}
                   />
                 ) : null}
               </div>
@@ -127,11 +139,15 @@ function Transition({
   id,
   status,
   label,
+  record,
+  audience,
 }: {
   locale: AppLocale;
   id: string;
   status: "admin_review" | "visible" | "draft";
   label: string;
+  record: string;
+  audience: string;
 }) {
   return (
     <form action={transitionReportAction.bind(null, locale)}>
@@ -141,6 +157,18 @@ function Transition({
         label={label}
         pendingLabel="…"
         variant={status === "visible" ? "gold" : "outline"}
+        confirmation={
+          status === "visible" || status === "draft"
+            ? {
+                kind: status === "visible" ? "publishReport" : "withdrawReport",
+                record,
+                details: [
+                  { label: "audience", value: audience },
+                  { label: "status", value: label },
+                ],
+              }
+            : undefined
+        }
       />
     </form>
   );

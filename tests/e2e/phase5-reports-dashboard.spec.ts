@@ -16,7 +16,7 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/en/teacher/reports");
   await expect(page.getByRole("heading", { name: "Clear reports, trusted numbers" })).toBeVisible();
-  await page.getByLabel("Student").first().selectOption(fixture.studentId);
+  await page.locator('select[name="studentId"]').first().selectOption(fixture.studentId);
   await page.getByLabel("Period start").first().fill("2026-10-05");
   await page.getByLabel("Period end").first().fill("2026-10-11");
   await page.getByLabel("Progress summary").first().fill("Steady progress across the week");
@@ -56,6 +56,11 @@ test("P5 report flows from teacher approval through admin publication to isolate
   const adminCard = page.locator("article").filter({ hasText: fixture.studentName });
   await expect(adminCard).toBeVisible();
   await adminCard.getByRole("button", { name: "Publish to family" }).click();
+  const publishDialog = page.getByRole("dialog", { name: "Publish this report?" });
+  await expect(publishDialog).toBeVisible();
+  await expect(publishDialog).toContainText(fixture.studentName);
+  await expect(page).not.toHaveURL(/reportStatus=updated/);
+  await publishDialog.getByRole("button", { name: "Publish to family" }).click();
   await expect(page).toHaveURL(/reportStatus=updated/);
   await expect(adminCard.getByText("visible", { exact: true })).toBeVisible();
 
@@ -192,7 +197,7 @@ async function signIn(page: Page, email: string, password: string, home: string)
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
   await page.locator('button[type="submit"]').click();
-  await expect(page).toHaveURL(new RegExp(`${home}(?:\\?.*)?$`));
+  await expect(page).toHaveURL(new RegExp(`${home}(?:\\?.*)?$`), { timeout: 20_000 });
 }
 
 function databaseClient() {

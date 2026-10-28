@@ -265,6 +265,11 @@ function StudentRow({
               label={t("actions.archive")}
               pendingLabel={t("actions.archiving")}
               variant="destructive"
+              confirmation={{
+                kind: "archiveRecord",
+                record: `${student.fullName} · ${student.studentNo}`,
+                details: [{ label: "status", value: t("statuses.archived") }],
+              }}
             />
           </form>
         ) : null}

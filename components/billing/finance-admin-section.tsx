@@ -143,6 +143,9 @@ export async function FinanceAdminSection({
                                   <Decision
                                     locale={locale}
                                     paymentId={payment.id}
+                                    record={invoice.invoice_no}
+                                    amount={String(payment.amount)}
+                                    currency={payment.currency}
                                     decision="confirmed"
                                     label={t("confirm")}
                                     pending={t("confirming")}
@@ -151,6 +154,9 @@ export async function FinanceAdminSection({
                                   <Decision
                                     locale={locale}
                                     paymentId={payment.id}
+                                    record={invoice.invoice_no}
+                                    amount={String(payment.amount)}
+                                    currency={payment.currency}
                                     decision="rejected"
                                     label={t("reject")}
                                     pending={t("rejecting")}
@@ -234,7 +240,18 @@ export async function FinanceAdminSection({
                             className="min-h-20 rounded-xl border bg-card p-3"
                           />
                         </div>
-                        <AdminSubmitButton label={t("record")} pendingLabel={t("recording")} />
+                        <AdminSubmitButton
+                          label={t("record")}
+                          pendingLabel={t("recording")}
+                          confirmation={{
+                            kind: "recordPayment",
+                            record: invoice.invoice_no,
+                            details: [
+                              { label: "amount", fieldName: "amount" },
+                              { label: "currency", value: invoice.currency },
+                            ],
+                          }}
+                        />
                       </div>
                     </form>
                   ) : null}
@@ -258,6 +275,9 @@ export async function FinanceAdminSection({
 function Decision({
   locale,
   paymentId,
+  record,
+  amount,
+  currency,
   decision,
   label,
   pending,
@@ -265,6 +285,9 @@ function Decision({
 }: {
   locale: AppLocale;
   paymentId: string;
+  record: string;
+  amount: string;
+  currency: string;
   decision: "confirmed" | "rejected";
   label: string;
   pending: string;
@@ -278,6 +301,14 @@ function Decision({
         label={label}
         pendingLabel={pending}
         variant={icon === "reject" ? "destructive" : "outline"}
+        confirmation={{
+          kind: decision === "confirmed" ? "confirmPayment" : "rejectPayment",
+          record,
+          details: [
+            { label: "amount", value: amount },
+            { label: "currency", value: currency },
+          ],
+        }}
       />
     </form>
   );

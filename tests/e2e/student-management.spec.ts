@@ -48,6 +48,11 @@ test("US-011 to US-013 admin manages and exports an audited student record", asy
 
   const updatedRow = page.locator("li").filter({ hasText: updatedName });
   await updatedRow.getByRole("button", { name: "Archive" }).click();
+  const archiveDialog = page.getByRole("dialog", { name: "Archive this record?" });
+  await expect(archiveDialog).toBeVisible();
+  await expect(archiveDialog).toContainText(updatedName);
+  await expect(page).not.toHaveURL(/studentStatus=archived/);
+  await archiveDialog.getByRole("button", { name: "Archive" }).click();
   await expect(page).toHaveURL(/studentStatus=archived$/);
   await expect(page.getByText("The student was archived successfully.")).toBeVisible();
   await page.locator("#student-status").selectOption("archived");

@@ -3310,6 +3310,59 @@
       "accountDetail": "Change password and account protection from the account menu."
     }
   },
+  "sensitiveActionConfirmation": {
+    "eyebrow": "Review required",
+    "record": "Record",
+    "cancel": "Go back",
+    "details": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "audience": "Audience",
+      "status": "Resulting status",
+      "reason": "Reason",
+      "period": "Period"
+    },
+    "titles": {
+      "confirmPayment": "Confirm this payment or refund?",
+      "rejectPayment": "Reject this payment record?",
+      "recordPayment": "Record this financial transaction?",
+      "approvePayout": "Approve this teacher payout?",
+      "payPayout": "Mark this teacher payout as paid?",
+      "addExpense": "Record this expense?",
+      "publishReport": "Publish this report?",
+      "withdrawReport": "Withdraw this report from the family?",
+      "publishAnnouncement": "Publish this announcement?",
+      "archiveAnnouncement": "Archive this announcement?",
+      "publishTemplate": "Publish and lock this template version?",
+      "archiveTemplate": "Archive this template?",
+      "disableAccount": "Disable this account?",
+      "archiveRecord": "Archive this record?",
+      "publishCertificateTemplate": "Publish and lock this certificate template?",
+      "revokeCertificate": "Revoke this certificate?",
+      "lockExamResult": "Lock this exam result?",
+      "lockEvaluation": "Lock this evaluation?"
+    },
+    "consequences": {
+      "confirmPayment": "The transaction becomes confirmed and financial ledgers and receipts may be updated. Corrections require a separate reversal.",
+      "rejectPayment": "The pending transaction will be rejected and will not count as a confirmed payment.",
+      "recordPayment": "A new payment or refund record will be created for later confirmation.",
+      "approvePayout": "The payout will move to approved and its payable amount will be fixed for the next step.",
+      "payPayout": "The payout will be recorded as paid using the supplied reference. Do not continue until the transfer is complete.",
+      "addExpense": "The expense will be added to financial reports in its stated currency.",
+      "publishReport": "The report will become visible to the student and linked guardians.",
+      "withdrawReport": "The report will stop being visible to the student and linked guardians.",
+      "publishAnnouncement": "The announcement will become visible to its configured audience.",
+      "archiveAnnouncement": "The announcement will leave the active published list while its audit history remains.",
+      "publishTemplate": "This version becomes immutable and available for approved use.",
+      "archiveTemplate": "The template will no longer be active; previously published versions remain in history.",
+      "disableAccount": "The user will lose access until an administrator reactivates the account.",
+      "archiveRecord": "The record leaves active workflows but remains retained according to current rules.",
+      "publishCertificateTemplate": "This template version becomes immutable and can be used for certificate issuance.",
+      "revokeCertificate": "The certificate will fail public verification and the revocation reason will be retained.",
+      "lockExamResult": "The result becomes final and cannot be edited through the normal grading flow.",
+      "lockEvaluation": "The evaluation becomes final and visible according to current permissions; unlocking remains restricted."
+    }
+  },
   "accessibility": {
     "skipToContent": "Skip to main content"
   }

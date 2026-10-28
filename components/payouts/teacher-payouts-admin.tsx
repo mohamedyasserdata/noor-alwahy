@@ -238,7 +238,22 @@ export async function TeacherPayoutsAdmin({ locale }: { locale: AppLocale }) {
                   <form action={transitionPayoutAction.bind(null, locale)}>
                     <input type="hidden" name="payoutId" value={payout.id} />
                     <input type="hidden" name="action" value="approve" />
-                    <AdminSubmitButton label={t("approve")} pendingLabel={t("approving")} />
+                    <AdminSubmitButton
+                      label={t("approve")}
+                      pendingLabel={t("approving")}
+                      confirmation={{
+                        kind: "approvePayout",
+                        record: payout.payout_no,
+                        details: [
+                          { label: "amount", value: String(payout.net) },
+                          { label: "currency", value: payout.currency },
+                          {
+                            label: "period",
+                            value: `${payout.period_start} — ${payout.period_end}`,
+                          },
+                        ],
+                      }}
+                    />
                   </form>
                 ) : null}
               </div>
@@ -281,7 +296,22 @@ export async function TeacherPayoutsAdmin({ locale }: { locale: AppLocale }) {
                     className="min-w-52 flex-1"
                     required
                   />
-                  <AdminSubmitButton label={t("markPaid")} pendingLabel={t("markingPaid")} />
+                  <AdminSubmitButton
+                    label={t("markPaid")}
+                    pendingLabel={t("markingPaid")}
+                    confirmation={{
+                      kind: "payPayout",
+                      record: payout.payout_no,
+                      details: [
+                        { label: "amount", value: String(payout.net) },
+                        { label: "currency", value: payout.currency },
+                        {
+                          label: "period",
+                          value: `${payout.period_start} — ${payout.period_end}`,
+                        },
+                      ],
+                    }}
+                  />
                 </form>
               ) : null}
             </article>

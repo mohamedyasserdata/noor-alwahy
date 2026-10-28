@@ -176,6 +176,15 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
                     label={user.isActive ? t("actions.disable") : t("actions.activate")}
                     pendingLabel={t("actions.pending")}
                     variant={user.isActive ? "destructive" : "outline"}
+                    confirmation={
+                      user.isActive
+                        ? {
+                            kind: "disableAccount",
+                            record: `${user.fullName} · ${user.email}`,
+                            details: [{ label: "status", value: t("actions.disable") }],
+                          }
+                        : undefined
+                    }
                   />
                 </form>
               </div>

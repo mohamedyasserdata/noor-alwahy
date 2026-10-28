@@ -326,6 +326,11 @@ export async function CertificateAdminSection({
                             variant="destructive"
                             label={t("actions.confirmRevoke")}
                             pendingLabel={t("actions.revoking")}
+                            confirmation={{
+                              kind: "revokeCertificate",
+                              record: `${certificate.serial_no} · ${certificate.student?.full_name ?? t("unknownStudent")}`,
+                              details: [{ label: "reason", fieldName: "reason" }],
+                            }}
                           />
                         </form>
                       </details>
