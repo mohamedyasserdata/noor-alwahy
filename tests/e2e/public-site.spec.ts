@@ -79,6 +79,7 @@ test.beforeAll(async () => {
 for (const locale of locales) {
   for (const viewport of viewports) {
     test(`${locale.code} public site stays accessible at ${viewport.name}`, async ({ page }) => {
+      test.setTimeout(90_000);
       const renderedScriptWarnings: string[] = [];
       page.on("console", (message) => {
         if (message.text().includes("Encountered a script tag while rendering React component")) {
@@ -137,6 +138,22 @@ for (const locale of locales) {
       expect(await packageAction.getAttribute("href")).toMatch(
         /(?:whatsapp|wa\.me|\/(?:ar|en)\/contact)/i,
       );
+
+      if (locale.code === "ar" && viewport.name === "mobile") {
+        await page.goto("/ar#packages");
+        const priceForm = page.locator("#packages form");
+        await priceForm.getByLabel("دولة السعر").selectOption("SA");
+        await priceForm.getByRole("button", { name: "تحديث السعر" }).click();
+        await expect(homePackageCard.getByText(/40\.00\s+US\$/)).toBeVisible();
+        await expect(page).toHaveURL(/\/ar#packages$/);
+        expect(await page.evaluate(() => location.hash)).toBe("#packages");
+        expect(
+          await priceForm.evaluate((form) => Math.abs(form.getBoundingClientRect().top)),
+        ).toBeLessThan(page.viewportSize()!.height);
+        await priceForm.getByLabel("دولة السعر").selectOption("EG");
+        await priceForm.getByRole("button", { name: "تحديث السعر" }).click();
+        await expect(homePackageCard).toContainText("900");
+      }
 
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       if (viewport.name === "mobile") {
