@@ -22,6 +22,7 @@ export async function AttendanceReportSection({
     searchParams,
   ]);
   const filters = parseAttendanceReportFilters(params);
+  const requestedStudent = typeof params.student === "string" ? params.student : "";
   let rows = null;
 
   try {
@@ -30,10 +31,14 @@ export async function AttendanceReportSection({
     // The role and AAL2 boundary is enforced again inside the database RPC.
   }
 
-  const teachers = rows?.filter((row) => row.entity_type === "teacher") ?? [];
-  const students = rows?.filter((row) => row.entity_type === "student") ?? [];
-  const scheduled = rows?.reduce((total, row) => total + Number(row.scheduled_count), 0) ?? 0;
-  const attended = rows?.reduce((total, row) => total + Number(row.attended_count), 0) ?? 0;
+  const visibleRows = requestedStudent
+    ? rows?.filter((row) => row.entity_type === "student" && row.entity_id === requestedStudent)
+    : rows;
+  const teachers = visibleRows?.filter((row) => row.entity_type === "teacher") ?? [];
+  const students = visibleRows?.filter((row) => row.entity_type === "student") ?? [];
+  const scheduled =
+    visibleRows?.reduce((total, row) => total + Number(row.scheduled_count), 0) ?? 0;
+  const attended = visibleRows?.reduce((total, row) => total + Number(row.attended_count), 0) ?? 0;
 
   return (
     <section className="mx-auto w-full max-w-7xl min-w-0" aria-labelledby="attendance-report-title">
@@ -53,6 +58,7 @@ export async function AttendanceReportSection({
         className="mt-8 grid min-w-0 gap-4 rounded-3xl border bg-card p-5 shadow-card sm:grid-cols-[1fr_1fr_auto] sm:items-end"
         data-testid="attendance-report-filters"
       >
+        {requestedStudent ? <input type="hidden" name="student" value={requestedStudent} /> : null}
         <label className="grid min-w-0 gap-2 text-sm font-bold" htmlFor="report-period">
           {t("filters.period")}
           <select

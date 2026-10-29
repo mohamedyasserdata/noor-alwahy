@@ -60,6 +60,7 @@ export function AdminSubmitButton({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const allowSubmit = useRef(false);
   const titleId = useId();
+  const [confirmationReady, setConfirmationReady] = useState(!confirmation);
   const [details, setDetails] = useState<
     Array<{ label: ConfirmationDetail["label"]; value: string }>
   >([]);
@@ -89,6 +90,12 @@ export function AdminSubmitButton({
     return () => form.removeEventListener("submit", intercept);
   }, [confirmation]);
 
+  useEffect(() => {
+    if (!confirmation) return;
+    const timer = window.setTimeout(() => setConfirmationReady(true), 0);
+    return () => window.clearTimeout(timer);
+  }, [confirmation]);
+
   function confirmSubmission() {
     const form = buttonRef.current?.form;
     if (!form || !buttonRef.current) return;
@@ -104,7 +111,7 @@ export function AdminSubmitButton({
         ref={buttonRef}
         type="submit"
         variant={variant}
-        disabled={pending}
+        disabled={pending || !confirmationReady}
         formAction={formAction}
       >
         {pending ? (

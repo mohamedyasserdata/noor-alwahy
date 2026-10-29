@@ -18,6 +18,10 @@ export async function AdminReportsSection({
   searchParams: Search;
 }) {
   const [reports, query] = await Promise.all([getAdminReports(), searchParams]);
+  const requestedStudent = typeof query.student === "string" ? query.student : "";
+  const visibleReports = requestedStudent
+    ? reports.filter((report) => report.studentId === requestedStudent)
+    : reports;
   const ar = locale === "ar";
   const today = new Date();
   const defaultFrom = new Date(today);
@@ -54,8 +58,8 @@ export async function AdminReportsSection({
         </Alert>
       ) : null}
       <div className="mt-8 grid gap-4">
-        {reports.length ? (
-          reports.map((report) => (
+        {visibleReports.length ? (
+          visibleReports.map((report) => (
             <article
               key={report.id}
               className="grid gap-5 rounded-3xl border bg-card p-5 sm:grid-cols-[1fr_auto] sm:items-center"

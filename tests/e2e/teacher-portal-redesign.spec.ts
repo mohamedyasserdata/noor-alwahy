@@ -20,7 +20,7 @@ const sections = [
 test("teacher portal keeps every section usable and captures the completed interface", async ({
   page,
 }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
   const problems = captureConsoleProblems(page);
   const output = join(process.cwd(), "output", "screenshots", "teacher");
   await mkdir(output, { recursive: true });

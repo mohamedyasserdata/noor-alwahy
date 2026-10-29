@@ -6,6 +6,7 @@ import {
   Target,
   UsersRound,
 } from "lucide-react";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -229,6 +230,52 @@ export async function TeacherMemorizationPlansSection({
                   </Badge>
                 </CardHeader>
                 <CardContent className="pt-5 sm:pt-6">
+                  <div className="mb-6 grid gap-3 rounded-xl border border-secondary/20 bg-background/60 p-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <StudentContextValue
+                      label={locale === "ar" ? "الهدف الحالي" : "Current goal"}
+                      value={
+                        student.plan
+                          ? locale === "ar"
+                            ? `${student.plan.weekly_target_pages} صفحة أسبوعيًا`
+                            : `${student.plan.weekly_target_pages} pages weekly`
+                          : "—"
+                      }
+                    />
+                    <StudentContextValue
+                      label={locale === "ar" ? "آخر تقييم مقفل" : "Latest locked evaluation"}
+                      value={
+                        student.context.lastEvaluation == null
+                          ? "—"
+                          : `${student.context.lastEvaluation}%`
+                      }
+                    />
+                    <StudentContextValue
+                      label={locale === "ar" ? "آخر حضور" : "Latest attendance"}
+                      value={contextLabel(student.context.lastAttendance, locale, "attendance")}
+                    />
+                    <StudentContextValue
+                      label={locale === "ar" ? "حالة التقرير" : "Report status"}
+                      value={contextLabel(student.context.reportStatus, locale, "report")}
+                    />
+                    <nav
+                      className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-4"
+                      aria-label={locale === "ar" ? "إجراءات الطالب" : "Student actions"}
+                    >
+                      {[
+                        ["evaluations", locale === "ar" ? "التقييم" : "Evaluation"],
+                        ["attendance", locale === "ar" ? "الحضور" : "Attendance"],
+                        ["reports", locale === "ar" ? "التقرير" : "Report"],
+                      ].map(([section, label]) => (
+                        <Link
+                          key={section}
+                          href={`/${locale}/teacher/${section}?student=${student.studentId}`}
+                          className="rounded-lg border px-3 py-2 text-xs font-black text-primary underline-offset-2 hover:underline"
+                        >
+                          {label}
+                        </Link>
+                      ))}
+                    </nav>
+                  </div>
                   {student.plan ? (
                     <div className="mb-6 grid gap-4 rounded-xl bg-muted/55 p-4 sm:grid-cols-2">
                       <Adherence
@@ -301,6 +348,33 @@ export async function TeacherMemorizationPlansSection({
       )}
     </section>
   );
+}
+
+function StudentContextValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-bold text-muted-foreground">{label}</p>
+      <p className="mt-1 font-black text-primary">{value}</p>
+    </div>
+  );
+}
+
+function contextLabel(value: string | null, locale: AppLocale, kind: "attendance" | "report") {
+  const ar = locale === "ar";
+  if (!value) return kind === "report" ? (ar ? "مطلوب" : "Required") : "—";
+  const labels: Record<string, [string, string]> = {
+    present: ["حاضر", "Present"],
+    late: ["متأخر", "Late"],
+    student_absent: ["غياب طالب", "Student absent"],
+    excused_absence: ["غياب بعذر", "Excused absence"],
+    teacher_absent: ["غياب المدرس", "Teacher absent"],
+    cancelled: ["ملغاة", "Cancelled"],
+    draft: ["مسودة — للمعلم فقط", "Draft — teacher only"],
+    approved: ["ينتظر مراجعة الإدارة", "Awaiting admin review"],
+    admin_review: ["قيد مراجعة الإدارة", "Under admin review"],
+    visible: ["منشور للأسرة", "Published to family"],
+  };
+  return labels[value]?.[ar ? 0 : 1] ?? value;
 }
 
 function PlanInput({

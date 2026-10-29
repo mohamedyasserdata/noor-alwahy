@@ -33,7 +33,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { useSearchParams, useSelectedLayoutSegment } from "next/navigation";
 
 import { portalConfig, type PortalId } from "@/components/portal/portal-config";
 import { Link } from "@/i18n/navigation";
@@ -83,6 +83,8 @@ type PortalNavigationProps = {
 
 export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   const activeSection = useSelectedLayoutSegment();
+  const searchParams = useSearchParams();
+  const selectedStudent = portal === "parent" ? searchParams.get("student") : null;
   const t = useTranslations(`portals.${portal}`);
   const sections = portalConfig[portal].sections;
   const isSidebar = variant === "sidebar";
@@ -131,7 +133,11 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
     return (
       <Link
         key={section}
-        href={`/${portal}/${section}`}
+        href={
+          selectedStudent
+            ? { pathname: `/${portal}/${section}`, query: { student: selectedStudent } }
+            : `/${portal}/${section}`
+        }
         aria-current={isActive ? "page" : undefined}
         className={cn(
           "group relative flex min-h-11 touch-manipulation items-center font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none",

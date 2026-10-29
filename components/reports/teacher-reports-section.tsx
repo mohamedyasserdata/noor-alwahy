@@ -59,6 +59,9 @@ const copy = {
     evaluation: "متوسط التقييم",
     noData: "لا بيانات",
     download: "تنزيل PDF",
+    preparedFromEvaluation: "تم تجهيز هذه الحقول من آخر تقييم مقفل. راجعها وعدّلها قبل الحفظ.",
+    visibility: "الرؤية الحالية",
+    nextStep: "الخطوة التالية",
     status: {
       draft: "مسودة",
       approved: "معتمد",
@@ -103,6 +106,10 @@ const copy = {
     evaluation: "Evaluation average",
     noData: "No data",
     download: "Download PDF",
+    preparedFromEvaluation:
+      "These fields were prepared from the latest locked evaluation. Review and edit them before saving.",
+    visibility: "Current visibility",
+    nextStep: "Next step",
     status: {
       draft: "Draft",
       approved: "Approved",
@@ -123,6 +130,10 @@ export async function TeacherReportsSection({
   const t = copy[locale];
   const status = typeof query.reportStatus === "string" ? query.reportStatus : "";
   const error = typeof query.reportError === "string" ? query.reportError : "";
+  const selectedStudentId =
+    typeof query.student === "string" && data.students.some(({ id }) => id === query.student)
+      ? query.student
+      : "";
   const approvedCount = data.reports.filter(
     (report) => report.status === "approved" || report.status === "visible",
   ).length;
@@ -190,7 +201,13 @@ export async function TeacherReportsSection({
           <FilePenLine className="size-8 text-secondary" aria-hidden="true" />
           <h2 className="mt-4 text-xl font-black text-primary">{t.newTitle}</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{t.newHint}</p>
-          <ReportForm locale={locale} students={data.students} templates={data.templates} t={t} />
+          <ReportForm
+            locale={locale}
+            students={data.students}
+            templates={data.templates}
+            t={t}
+            selectedStudentId={selectedStudentId}
+          />
         </aside>
 
         <div>
@@ -236,6 +253,7 @@ export async function TeacherReportsSection({
                       </Button>
                     </div>
                   </div>
+                  <ReportStageSummary status={report.status} locale={locale} t={t} />
                   <div className="grid grid-cols-3 divide-x border-b text-center divide-x-reverse">
                     <Metric label={t.pages} value={String(report.body.metrics.mastered_pages)} />
                     <Metric
@@ -299,13 +317,19 @@ function ReportForm({
   templates,
   t,
   report,
+  selectedStudentId = "",
 }: {
   locale: AppLocale;
-  students: { id: string; name: string }[];
+  students: Awaited<ReturnType<typeof getTeacherReportsData>>["students"];
   templates: Awaited<ReturnType<typeof getTeacherReportsData>>["templates"];
   t: T;
   report?: Report;
+  selectedStudentId?: string;
 }) {
+  const selectedStudent = students.find(({ id }) => id === selectedStudentId);
+  const prepared = !report
+    ? prepareEvaluationNarrative(selectedStudent?.latestEvaluation ?? null, locale)
+    : null;
   const fieldClass =
     "min-h-28 w-full resize-y rounded-xl border bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring";
   return (
@@ -334,7 +358,7 @@ function ReportForm({
           <select
             id={`student-${report?.id ?? "new"}`}
             name="studentId"
-            defaultValue={report?.student_id ?? ""}
+            defaultValue={report?.student_id ?? selectedStudentId}
             disabled={Boolean(report)}
             required
             className="h-11 w-full rounded-xl border bg-background px-3 text-sm text-foreground disabled:opacity-70"
@@ -383,13 +407,18 @@ function ReportForm({
           <textarea
             id={`${name}-${report?.id ?? "new"}`}
             name={name}
-            defaultValue={report?.body[name] ?? ""}
+            defaultValue={report?.body[name] ?? prepared?.[name] ?? ""}
             required
             maxLength={2000}
             className={fieldClass}
           />
         </Field>
       ))}
+      {prepared ? (
+        <p className="rounded-xl border border-secondary/25 bg-secondary/5 p-3 text-xs leading-6 font-bold text-muted-foreground">
+          {t.preparedFromEvaluation}
+        </p>
+      ) : null}
       <div className="flex justify-end">
         <Button type="submit" variant={report ? "default" : "gold"}>
           {report ? t.save : t.save}
@@ -397,6 +426,102 @@ function ReportForm({
       </div>
     </form>
   );
+}
+
+type LatestEvaluation = Awaited<
+  ReturnType<typeof getTeacherReportsData>
+>["students"][number]["latestEvaluation"];
+
+function prepareEvaluationNarrative(evaluation: LatestEvaluation, locale: AppLocale) {
+  if (!evaluation) return null;
+  const ar = locale === "ar";
+  const homework =
+    evaluation.homework &&
+    typeof evaluation.homework === "object" &&
+    !Array.isArray(evaluation.homework) &&
+    typeof evaluation.homework.text === "string"
+      ? evaluation.homework.text
+      : "";
+  const weakTags = Array.isArray(evaluation.weak_tags)
+    ? evaluation.weak_tags.filter((tag): tag is string => typeof tag === "string").join("، ")
+    : "";
+  const scores =
+    evaluation.scores && typeof evaluation.scores === "object" && !Array.isArray(evaluation.scores)
+      ? evaluation.scores
+      : {};
+  const strongCriteria = Object.entries(scores)
+    .filter((entry): entry is [string, number] => typeof entry[1] === "number" && entry[1] >= 4)
+    .map(([key]) => evaluationCriterionLabel(key, locale));
+  const improvementCriteria = Object.entries(scores)
+    .filter((entry): entry is [string, number] => typeof entry[1] === "number" && entry[1] <= 2)
+    .map(([key]) => evaluationCriterionLabel(key, locale));
+  const score = `${evaluation.total_score}%`;
+  const decision = evaluation.decision
+    ? ({
+        passed: ar ? "اجتاز" : "Passed",
+        repeat: ar ? "إعادة" : "Repeat",
+        next: ar ? "الانتقال للتالي" : "Move forward",
+      }[evaluation.decision] ?? evaluation.decision)
+    : null;
+  return {
+    summary: ar
+      ? `نتيجة آخر تقييم مقفل: ${score}${decision ? ` · القرار: ${decision}` : ""}.`
+      : `Latest locked evaluation: ${score}${decision ? ` · Decision: ${decision}` : ""}.`,
+    strengths:
+      strongCriteria.join("، ") ||
+      (ar ? "راجع جوانب الأداء الجيدة في التقييم." : "Review the strong areas in the evaluation."),
+    improve:
+      [...improvementCriteria, ...(weakTags ? [weakTags] : [])].join("، ") ||
+      (ar
+        ? `الأخطاء الكبرى: ${evaluation.errors_major}، الأخطاء الصغرى: ${evaluation.errors_minor}.`
+        : `Major errors: ${evaluation.errors_major}; minor errors: ${evaluation.errors_minor}.`),
+    plan: homework,
+    recommendation: evaluation.family_note ?? "",
+  };
+}
+
+function evaluationCriterionLabel(key: string, locale: AppLocale) {
+  const labels: Record<string, [string, string]> = {
+    memorization: ["الحفظ", "Memorization"],
+    tajweed_applied: ["تطبيق التجويد", "Applied Tajweed"],
+    makharij: ["المخارج والصفات", "Makharij and Sifat"],
+    waqf_ibtida: ["الوقف والابتداء", "Waqf and Ibtida"],
+    fluency: ["الطلاقة", "Fluency"],
+    linking_mutashabihat: ["ربط المتشابهات", "Linking Mutashabihat"],
+    commitment: ["الالتزام", "Commitment"],
+    theory_understanding: ["الفهم النظري", "Theory Understanding"],
+  };
+  return labels[key]?.[locale === "ar" ? 0 : 1] ?? key;
+}
+
+function ReportStageSummary({ status, locale, t }: { status: string; locale: AppLocale; t: T }) {
+  const info = teacherReportStatusInfo(status, locale);
+  return (
+    <div className="grid gap-3 border-b bg-background/45 p-4 text-sm sm:grid-cols-2 sm:px-6">
+      <Narrative label={t.visibility} value={info.audience} />
+      <Narrative label={t.nextStep} value={info.next} />
+    </div>
+  );
+}
+
+function teacherReportStatusInfo(status: string, locale: AppLocale) {
+  const ar = locale === "ar";
+  if (status === "draft")
+    return {
+      audience: ar ? "المعلم فقط — مسودة غير منشورة" : "Teacher only — unpublished draft",
+      next: ar ? "مراجعة التقرير ثم اعتماده" : "Review and approve the report",
+    };
+  if (status === "approved" || status === "admin_review")
+    return {
+      audience: ar ? "المعلم والإدارة — ينتظر الاعتماد" : "Teacher and admin — awaiting review",
+      next: ar ? "مراجعة الإدارة ثم النشر" : "Admin review, then publication",
+    };
+  return {
+    audience: ar
+      ? "الطالب وولي الأمر والمعلم والإدارة — منشور"
+      : "Student, guardian, teacher and admin — published",
+    next: ar ? "متابعة الملاحظات في الفترة القادمة" : "Follow up in the next period",
+  };
 }
 
 function Field({

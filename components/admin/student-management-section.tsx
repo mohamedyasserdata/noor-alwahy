@@ -1,4 +1,6 @@
-import { Archive, Download, GraduationCap, Search, UserRoundPlus, UsersRound } from "lucide-react";
+import { Download, GraduationCap, Search, UserRoundPlus, UsersRound } from "lucide-react";
+import type { Route } from "next";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -8,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TimezoneField } from "@/components/time/timezone-field";
 import type { AppLocale } from "@/i18n/routing";
 import { archiveStudentAction, saveStudentAction } from "@/lib/students/actions";
 import {
@@ -16,6 +19,7 @@ import {
   saveGuardianLinkAction,
 } from "@/lib/students/family-actions";
 import { getStudentFamily, type StudentFamily } from "@/lib/students/student-family";
+import { getAdminStudentContext } from "@/lib/students/student-context";
 import {
   getStudentDirectory,
   getStudentForEditing,
@@ -33,10 +37,11 @@ const textareaClass =
 export async function StudentManagementSection({ locale, searchParams }: Props) {
   const query = await searchParams;
   const selectedId = typeof query.student === "string" ? query.student : null;
-  const [directory, selected, family, t] = await Promise.all([
+  const [directory, selected, family, context, t] = await Promise.all([
     getStudentDirectory(query, locale),
     selectedId ? getStudentForEditing(selectedId, locale) : Promise.resolve(null),
     selectedId ? getStudentFamily(selectedId) : Promise.resolve(null),
+    selectedId ? getAdminStudentContext(selectedId) : Promise.resolve(null),
     getTranslations({ locale, namespace: "studentManagement" }),
   ]);
   const notice = getNotice(query, t);
@@ -179,7 +184,13 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
           {directory.students.length ? (
             <ul className="mt-6 grid gap-3">
               {directory.students.map((student) => (
-                <StudentRow key={student.id} student={student} locale={locale} t={t} />
+                <StudentRow
+                  key={student.id}
+                  student={student}
+                  locale={locale}
+                  query={query}
+                  t={t}
+                />
               ))}
             </ul>
           ) : (
@@ -221,7 +232,15 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
 
       {selected ? (
         <div className="mt-6 grid gap-6">
-          <ProfileSkeleton student={selected} t={t} />
+          {context ? (
+            <StudentContextSummary
+              student={selected}
+              context={context}
+              locale={locale}
+              query={query}
+              t={t}
+            />
+          ) : null}
           {family ? (
             <FamilyManagement locale={locale} student={selected} family={family} t={t} />
           ) : null}
@@ -234,10 +253,12 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
 function StudentRow({
   student,
   locale,
+  query,
   t,
 }: {
   student: StudentListItem;
   locale: AppLocale;
+  query: Record<string, string | string[] | undefined>;
   t: Translation;
 }) {
   return (
@@ -256,7 +277,9 @@ function StudentRow({
       </div>
       <div className="flex flex-wrap gap-2">
         <Button asChild variant="outline" size="sm">
-          <a href={`/${locale}/admin/students?student=${student.id}`}>{t("actions.open")}</a>
+          <Link href={studentDirectoryHref(locale, query, { student: student.id })}>
+            {t("actions.open")}
+          </Link>
         </Button>
         {student.status !== "archived" ? (
           <form action={archiveStudentAction.bind(null, locale)}>
@@ -375,13 +398,11 @@ function StudentForm({
             dir="ltr"
             maxLength={2}
           />
-          <Field
+          <TimezoneField
             id="student-timezone"
-            name="timezone"
             label={t("fields.timezone")}
-            defaultValue={student?.timezone ?? "Africa/Cairo"}
-            dir="ltr"
-            required
+            initialValue={student?.timezone ?? "Africa/Cairo"}
+            locale={locale}
           />
         </div>
         <div className="grid gap-2">
@@ -422,46 +443,152 @@ function StudentForm({
   );
 }
 
-function ProfileSkeleton({
+function StudentContextSummary({
   student,
+  context,
+  locale,
+  query,
   t,
 }: {
   student: NonNullable<Awaited<ReturnType<typeof getStudentForEditing>>>;
+  context: Awaited<ReturnType<typeof getAdminStudentContext>>;
+  locale: AppLocale;
+  query: Record<string, string | string[] | undefined>;
   t: Translation;
 }) {
-  const tabs = [
-    "data",
-    "assignments",
-    "schedule",
-    "attendance",
-    "progress",
-    "grades",
-    "finance",
-    "certificates",
-  ] as const;
+  const ar = locale === "ar";
+  const report = context.latestReport;
+  const subscription = context.subscription;
   return (
     <article className="mt-6 rounded-3xl border bg-card p-6 shadow-card sm:p-7">
-      <div className="flex items-center gap-3">
-        <Archive className="size-6 text-secondary" aria-hidden="true" />
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-black text-primary">
             {t("profile.title", { name: student.fullName })}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t("profile.description")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {ar
+              ? "ملخص الطالب مع روابط إلى السجلات المفلترة."
+              : "Student summary with links to filtered records."}
+          </p>
         </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={studentDirectoryHref(locale, query, { student: null })}>
+            {ar ? "العودة إلى النتائج" : "Back to results"}
+          </Link>
+        </Button>
       </div>
-      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {tabs.map((tab, index) => (
-          <li key={tab} className="rounded-xl border bg-background/60 p-4">
-            <p className="font-black text-primary">{t(`profile.tabs.${tab}`)}</p>
-            <p className="mt-2 text-xs leading-6 text-muted-foreground">
-              {index === 0 ? t("profile.available") : t("profile.later")}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <SummaryValue
+          label={ar ? "المسار والمستوى" : "Track and level"}
+          value={[student.trackName, student.levelName].filter(Boolean).join(" · ") || "—"}
+        />
+        <SummaryValue
+          label={ar ? "المعلم الحالي" : "Current teacher"}
+          value={context.teacherName ?? "—"}
+        />
+        <SummaryValue
+          label={ar ? "الحضور" : "Attendance"}
+          value={
+            context.attendance.rate == null
+              ? "—"
+              : `${context.attendance.rate}% (${context.attendance.total})`
+          }
+        />
+        <SummaryValue
+          label={ar ? "التقدم" : "Progress"}
+          value={
+            ar
+              ? `${context.progress.masteredPages} صفحة متقنة · ${context.progress.percent}%`
+              : `${context.progress.masteredPages} mastered pages · ${context.progress.percent}%`
+          }
+        />
+        <SummaryValue
+          label={ar ? "آخر تقرير" : "Latest report"}
+          value={
+            report ? `${reportStatusLabel(report.status, locale)} · ${report.period_start}` : "—"
+          }
+        />
+        <SummaryValue
+          label={ar ? "حالة الاشتراك" : "Subscription status"}
+          value={
+            subscription
+              ? `${subscriptionStatusLabel(subscription.status, locale)} · ${subscription.current_period_end}`
+              : "—"
+          }
+        />
+      </dl>
+      <nav
+        className="mt-5 flex flex-wrap gap-2"
+        aria-label={ar ? "سجلات الطالب" : "Student records"}
+      >
+        <ContextLink href={`/${locale}/admin/assignments?studentId=${student.id}` as Route}>
+          {ar ? "الإسناد" : "Assignment"}
+        </ContextLink>
+        <ContextLink href={`/${locale}/admin/attendance?student=${student.id}` as Route}>
+          {ar ? "الحضور" : "Attendance"}
+        </ContextLink>
+        <ContextLink href={`/${locale}/admin/reports?student=${student.id}` as Route}>
+          {ar ? "التقارير" : "Reports"}
+        </ContextLink>
+        <ContextLink href={`/${locale}/admin/subscriptions?student=${student.id}` as Route}>
+          {ar ? "الاشتراك" : "Subscription"}
+        </ContextLink>
+      </nav>
     </article>
   );
+}
+
+function SummaryValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border bg-background/60 p-4">
+      <dt className="text-xs font-bold text-muted-foreground">{label}</dt>
+      <dd className="mt-2 font-black text-primary">{value}</dd>
+    </div>
+  );
+}
+
+function ContextLink({ href, children }: { href: Route; children: React.ReactNode }) {
+  return (
+    <Button asChild variant="outline" size="sm">
+      <Link href={href}>{children}</Link>
+    </Button>
+  );
+}
+
+function reportStatusLabel(status: string, locale: AppLocale) {
+  const labels: Record<string, [string, string]> = {
+    draft: ["مسودة", "Draft"],
+    approved: ["ينتظر المراجعة", "Awaiting review"],
+    admin_review: ["قيد المراجعة", "Under review"],
+    visible: ["منشور", "Published"],
+  };
+  return labels[status]?.[locale === "ar" ? 0 : 1] ?? status;
+}
+
+function subscriptionStatusLabel(status: string, locale: AppLocale) {
+  const labels: Record<string, [string, string]> = {
+    trial: ["تجريبي", "Trial"],
+    active: ["نشط", "Active"],
+    paused: ["متوقف مؤقتًا", "Paused"],
+    cancelled: ["ملغي", "Cancelled"],
+    expired: ["منتهي", "Expired"],
+  };
+  return labels[status]?.[locale === "ar" ? 0 : 1] ?? status;
+}
+
+function studentDirectoryHref(
+  locale: AppLocale,
+  query: Record<string, string | string[] | undefined>,
+  change: { student: string | null },
+) {
+  const params = new URLSearchParams();
+  for (const key of ["q", "status", "level", "country", "page"] as const) {
+    const value = query[key];
+    if (typeof value === "string" && value) params.set(key, value);
+  }
+  if (change.student) params.set("student", change.student);
+  return `/${locale}/admin/students?${params}` as Route;
 }
 
 function FamilyManagement({

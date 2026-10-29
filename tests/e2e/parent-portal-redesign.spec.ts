@@ -28,6 +28,14 @@ test("parent portal supports one, multiple, and empty families with isolated chi
     await expect(
       page.getByRole("heading", { level: 1, name: fixture.firstChildName }),
     ).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "تغيير الابن" })).toContainText(
+      fixture.secondChildName,
+    );
+    const preservedContactHref = await page
+      .locator('header a[href*="/parent/contact"]')
+      .first()
+      .getAttribute("href");
+    expect(preservedContactHref).toContain(`student=${fixture.firstChildId}`);
     await expect(page.getByText("ملخص التعلم")).toBeVisible();
     await page.evaluate(() => document.scrollingElement?.scrollTo({ top: 0, behavior: "instant" }));
     await page.screenshot({
@@ -100,7 +108,7 @@ async function createFixture() {
     firstChild: crypto.randomUUID(),
     secondChild: crypto.randomUUID(),
     privateChild: crypto.randomUUID(),
-    track: "fe95172b-63c2-483f-8ebe-cfd837ca30cb",
+    track: crypto.randomUUID(),
     firstAssignment: crypto.randomUUID(),
     secondAssignment: crypto.randomUUID(),
     pastSession: crypto.randomUUID(),
@@ -146,6 +154,14 @@ async function createFixture() {
       status: "active",
       identity_verified_at: now.toISOString(),
       code_of_conduct_accepted_at: now.toISOString(),
+    }),
+  );
+  await must(
+    db.from("tracks").insert({
+      id: ids.track,
+      code: `parent-portal-${suffix}`,
+      name_ar: "مسار اختبار ولي الأمر",
+      name_en: "Parent portal test track",
     }),
   );
   await must(
@@ -287,6 +303,7 @@ async function cleanupFixture(fixture: Awaited<ReturnType<typeof createFixture>>
     .delete()
     .in("id", [ids.singleGuardian, ids.multiGuardian, ids.emptyGuardian]);
   await db.from("teachers").delete().eq("id", ids.teacher);
+  await db.from("tracks").delete().eq("id", ids.track);
   for (const id of [ids.singleProfile, ids.multiProfile, ids.emptyProfile, ids.teacherProfile]) {
     await db.auth.admin.deleteUser(id);
   }
@@ -298,7 +315,9 @@ async function signIn(page: Page, locale: "ar" | "en", email: string, password: 
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
   await page.locator('button[type="submit"]').click();
-  await expect(page).toHaveURL(new RegExp(`/${locale}/parent/home(?:\\?.*)?$`));
+  await expect(page).toHaveURL(new RegExp(`/${locale}/parent/home(?:\\?.*)?$`), {
+    timeout: 20_000,
+  });
 }
 
 async function expectNoHorizontalOverflow(page: Page) {

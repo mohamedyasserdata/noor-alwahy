@@ -10,6 +10,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TimezoneField } from "@/components/time/timezone-field";
 import type { AppLocale } from "@/i18n/routing";
 import { saveScheduleSlotAction } from "@/lib/schedules/actions";
 import { getScheduleWorkspace, relation } from "@/lib/schedules/management";
@@ -133,13 +134,13 @@ export async function ScheduleSection({
               required
             />
           </div>
-          <div className="grid gap-2 lg:col-span-2">
-            <Label htmlFor="schedule-timezone">{t("anchorTimezone")}</Label>
-            <Input
+          <div className="lg:col-span-2">
+            <TimezoneField
               id="schedule-timezone"
               name="anchorTimezone"
-              defaultValue="Africa/Cairo"
-              required
+              label={t("anchorTimezone")}
+              initialValue="Africa/Cairo"
+              locale={locale}
             />
           </div>
           <div className="lg:col-span-3">

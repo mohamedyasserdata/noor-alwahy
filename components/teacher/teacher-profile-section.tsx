@@ -6,6 +6,7 @@ import { TeacherPageHeader, TeacherPanel } from "@/components/teacher/teacher-pa
 import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TimezoneField } from "@/components/time/timezone-field";
 import type { AppLocale } from "@/i18n/routing";
 import { saveTeacherProfileAction } from "@/lib/account/teacher-profile-actions";
 import { getTeacherProfileSettings } from "@/lib/account/teacher-profile";
@@ -79,15 +80,12 @@ export async function TeacherProfileSection({
                 <option value="en">English</option>
               </select>
             </Field>
-            <Field label={t("timezone")} id="teacher-timezone">
-              <Input
-                id="teacher-timezone"
-                name="timezone"
-                defaultValue={data.profile.timezone}
-                autoComplete="off"
-                required
-              />
-            </Field>
+            <TimezoneField
+              id="teacher-timezone"
+              label={t("timezone")}
+              initialValue={data.profile.timezone}
+              locale={locale}
+            />
             <div className="sm:col-span-2 sm:flex sm:justify-end">
               <AdminSubmitButton label={t("save")} pendingLabel={t("saving")} />
             </div>

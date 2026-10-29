@@ -125,6 +125,31 @@ export async function ParentChildProfile({
                 </Badge>
               ) : null}
             </div>
+            {context.children.length > 1 ? (
+              <nav
+                className="mt-4 flex flex-wrap gap-2"
+                aria-label={locale === "ar" ? "تغيير الابن" : "Change child"}
+              >
+                {context.children.map((child) => (
+                  <Link
+                    key={child.id}
+                    href={{
+                      pathname: "/parent/children",
+                      query: { student: child.id, view: activeTab },
+                    }}
+                    aria-current={child.id === selected.id ? "true" : undefined}
+                    className={cn(
+                      "rounded-full border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      child.id === selected.id
+                        ? "border-secondary bg-secondary/15 text-primary"
+                        : "bg-card/75 text-muted-foreground hover:text-primary",
+                    )}
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+              </nav>
+            ) : null}
           </header>
         </div>
       </section>

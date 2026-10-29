@@ -32,6 +32,11 @@ export type TeacherStudentPlan = {
   track: { name_ar: string; name_en: string | null } | null;
   plan: PlanRow | null;
   adherence: PlanAdherence | null;
+  context: {
+    lastEvaluation: number | null;
+    lastAttendance: string | null;
+    reportStatus: string | null;
+  };
 };
 
 export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
@@ -77,7 +82,7 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
   const studentIds = [...students.keys()];
   if (!studentIds.length) return [];
 
-  const [plansResult, adherenceResult] = await Promise.all([
+  const [plansResult, adherenceResult, sessionsResult, reportsResult] = await Promise.all([
     supabase
       .from("memorization_plans")
       .select("id,student_id,weekly_target_pages,monthly_target_pages,starts_on,ends_on")
@@ -88,8 +93,20 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
         "student_id,weekly_target_pages,monthly_target_pages,weekly_achieved_pages,monthly_achieved_pages,weekly_adherence_percent,monthly_adherence_percent,starts_on,ends_on",
       )
       .in("student_id", studentIds),
+    supabase
+      .from("sessions")
+      .select(
+        "student_id,scheduled_at,attendance(status),evaluation:session_evaluations(total_score,is_locked)",
+      )
+      .in("student_id", studentIds)
+      .order("scheduled_at", { ascending: false }),
+    supabase
+      .from("reports")
+      .select("student_id,status,updated_at")
+      .in("student_id", studentIds)
+      .order("updated_at", { ascending: false }),
   ]);
-  if (plansResult.error || adherenceResult.error) {
+  if (plansResult.error || adherenceResult.error || sessionsResult.error || reportsResult.error) {
     throw new Error("memorization_plans_unavailable");
   }
 
@@ -99,6 +116,26 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
       .filter((row): row is typeof row & { student_id: string } => Boolean(row.student_id))
       .map((row) => [row.student_id, row]),
   );
+  const contexts = new Map<string, TeacherStudentPlan["context"]>();
+  for (const studentId of studentIds)
+    contexts.set(studentId, { lastEvaluation: null, lastAttendance: null, reportStatus: null });
+  for (const session of sessionsResult.data ?? []) {
+    const current = contexts.get(session.student_id);
+    if (!current) continue;
+    const attendance = Array.isArray(session.attendance)
+      ? session.attendance[0]
+      : session.attendance;
+    const evaluation = Array.isArray(session.evaluation)
+      ? session.evaluation[0]
+      : session.evaluation;
+    if (!current.lastAttendance && attendance) current.lastAttendance = attendance.status;
+    if (current.lastEvaluation == null && evaluation?.is_locked)
+      current.lastEvaluation = evaluation.total_score;
+  }
+  for (const report of reportsResult.data ?? []) {
+    const current = contexts.get(report.student_id);
+    if (current && !current.reportStatus) current.reportStatus = report.status;
+  }
 
   return studentIds
     .map((studentId) => ({
@@ -110,6 +147,7 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
       track: students.get(studentId)?.track ?? null,
       plan: plans.get(studentId) ?? null,
       adherence: adherence.get(studentId) ?? null,
+      context: contexts.get(studentId)!,
     }))
     .sort((left, right) => left.studentName.localeCompare(right.studentName));
 }

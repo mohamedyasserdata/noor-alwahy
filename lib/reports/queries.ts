@@ -42,7 +42,7 @@ export async function getTeacherReportsData() {
     return { students: [], reports: [], templates: [] };
   }
 
-  const [assignmentsResult, reportsResult, templateResult] = await Promise.all([
+  const [assignmentsResult, reportsResult, templateResult, evaluationsResult] = await Promise.all([
     supabase
       .from("teacher_assignments")
       .select("student_id,students!teacher_assignments_student_id_fkey(full_name)")
@@ -65,17 +65,42 @@ export async function getTeacherReportsData() {
       .eq("content_templates.status", "published")
       .not("published_at", "is", null)
       .order("version_no", { ascending: false }),
+    supabase
+      .from("sessions")
+      .select(
+        "student_id,scheduled_at,evaluation:session_evaluations!inner(total_score,rating,scores,errors_major,errors_minor,weak_tags,decision,homework,family_note,is_locked)",
+      )
+      .eq("teacher_id", teacher.id)
+      .eq("evaluation.is_locked", true)
+      .order("scheduled_at", { ascending: false }),
   ]);
-  if (assignmentsResult.error || reportsResult.error || templateResult.error)
+  if (
+    assignmentsResult.error ||
+    reportsResult.error ||
+    templateResult.error ||
+    evaluationsResult.error
+  )
     throw new Error("reports_unavailable");
 
   const students = new Map<string, string>();
   for (const assignment of assignmentsResult.data ?? []) {
     students.set(assignment.student_id, assignment.students.full_name);
   }
+  const latestEvaluation = new Map<
+    string,
+    NonNullable<(typeof evaluationsResult.data)[number]["evaluation"]>
+  >();
+  for (const session of evaluationsResult.data ?? []) {
+    if (!students.has(session.student_id) || latestEvaluation.has(session.student_id)) continue;
+    const evaluation = Array.isArray(session.evaluation)
+      ? session.evaluation[0]
+      : session.evaluation;
+    if (evaluation?.is_locked) latestEvaluation.set(session.student_id, evaluation);
+  }
+
   return {
     students: [...students]
-      .map(([id, name]) => ({ id, name }))
+      .map(([id, name]) => ({ id, name, latestEvaluation: latestEvaluation.get(id) ?? null }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     reports: (reportsResult.data ?? []).map((report) => {
       const body = bodySchema.safeParse(report.body);

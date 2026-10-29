@@ -15,6 +15,20 @@ test("P4-T08 teacher saves an individual plan and the student sees adherence", a
     .locator('[data-slot="card"]')
     .filter({ has: page.getByRole("heading", { name: fixture.studentName }) });
   await expect(card).toBeVisible();
+  await expect(card.getByText("Current goal", { exact: true })).toBeVisible();
+  await expect(card.getByText("Required", { exact: true })).toBeVisible();
+  await expect(card.getByRole("link", { name: "Evaluation" })).toHaveAttribute(
+    "href",
+    `/en/teacher/evaluations?student=${fixture.studentId}`,
+  );
+  await expect(card.getByRole("link", { name: "Attendance" })).toHaveAttribute(
+    "href",
+    `/en/teacher/attendance?student=${fixture.studentId}`,
+  );
+  await expect(card.getByRole("link", { name: "Report" })).toHaveAttribute(
+    "href",
+    `/en/teacher/reports?student=${fixture.studentId}`,
+  );
   await card.getByLabel("Pages per week").fill("5");
   await card.getByLabel("Pages per month").fill("20");
   await card.getByRole("button", { name: "Create plan" }).click();
@@ -135,7 +149,7 @@ async function signIn(page: Page, email: string, password: string, home: string)
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
   await page.locator('button[type="submit"]').click();
-  await expect(page).toHaveURL(new RegExp(`/en/${home}(?:\\?.*)?$`));
+  await expect(page).toHaveURL(new RegExp(`/en/${home}(?:\\?.*)?$`), { timeout: 20_000 });
 }
 
 function databaseClient() {

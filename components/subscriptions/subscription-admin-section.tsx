@@ -33,6 +33,10 @@ export async function SubscriptionAdminSection({
   const error = typeof query.subscriptionError === "string" ? query.subscriptionError : "";
   const alerts = typeof query.alerts === "string" ? query.alerts : "0";
   const invoices = typeof query.invoices === "string" ? query.invoices : "0";
+  const requestedStudent = typeof query.student === "string" ? query.student : "";
+  const visibleSubscriptions = requestedStudent
+    ? data.subscriptions.filter((subscription) => subscription.student_id === requestedStudent)
+    : data.subscriptions;
   const today = DateTime.utc().toISODate() ?? "";
   const localized = (value: { name_ar: string; name_en: string | null }) =>
     locale === "ar" ? value.name_ar : (value.name_en ?? value.name_ar);
@@ -82,7 +86,13 @@ export async function SubscriptionAdminSection({
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <FieldSelect id="subscription-student" name="studentId" label={t("student")} required>
+          <FieldSelect
+            id="subscription-student"
+            name="studentId"
+            label={t("student")}
+            defaultValue={requestedStudent}
+            required
+          >
             <option value="">{t("chooseStudent")}</option>
             {data.students.map((student) => (
               <option key={student.id} value={student.id}>
@@ -127,8 +137,8 @@ export async function SubscriptionAdminSection({
           <CreditCard className="size-5 text-secondary" aria-hidden="true" />
           <h2 className="text-xl font-black text-primary">{t("currentTitle")}</h2>
         </div>
-        {data.subscriptions.length ? (
-          data.subscriptions.map((subscription) => {
+        {visibleSubscriptions.length ? (
+          visibleSubscriptions.map((subscription) => {
             const student = Array.isArray(subscription.students)
               ? subscription.students[0]
               : subscription.students;
@@ -272,12 +282,14 @@ function FieldSelect({
   name,
   label,
   required,
+  defaultValue,
   children,
 }: {
   id: string;
   name: string;
   label: string;
   required?: boolean;
+  defaultValue?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -287,6 +299,7 @@ function FieldSelect({
         id={id}
         name={name}
         required={required}
+        defaultValue={defaultValue}
         className="min-h-11 rounded-xl border bg-background px-3"
       >
         {children}
