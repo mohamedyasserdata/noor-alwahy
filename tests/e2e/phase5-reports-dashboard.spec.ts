@@ -14,9 +14,15 @@ test("P5 report flows from teacher approval through admin publication to isolate
 
   await signIn(page, fixture.teacherEmail, fixture.password, "/en/teacher/today");
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/en/teacher/reports");
+  await page.goto(`/en/teacher/reports?student=${fixture.studentId}`);
   await expect(page.getByRole("heading", { name: "Clear reports, trusted numbers" })).toBeVisible();
-  await page.locator('select[name="studentId"]').first().selectOption(fixture.studentId);
+  await expect(page.locator('select[name="studentId"]').first()).toHaveValue(fixture.studentId);
+  await expect(page.getByText("Data from the latest locked evaluation")).toBeVisible();
+  await expect(page.getByLabel("Areas to improve").first()).toHaveValue("Daily review");
+  await expect(page.getByLabel("Next-period plan").first()).toHaveValue("Review four pages");
+  await expect(page.getByLabel("Recommendation for student and guardian").first()).toHaveValue(
+    "Keep the routine calm",
+  );
   await page.getByLabel("Period start").first().fill("2026-10-05");
   await page.getByLabel("Period end").first().fill("2026-10-11");
   await page.getByLabel("Progress summary").first().fill("Steady progress across the week");
@@ -62,7 +68,7 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await expect(page).not.toHaveURL(/reportStatus=updated/);
   await publishDialog.getByRole("button", { name: "Publish to family" }).click();
   await expect(page).toHaveURL(/reportStatus=updated/);
-  await expect(adminCard.getByText("visible", { exact: true })).toBeVisible();
+  await expect(adminCard.getByText("Published", { exact: true }).first()).toBeVisible();
 
   await signIn(page, fixture.parentEmail, fixture.password, "/en/parent/home");
   await page.goto(`/en/parent/children?student=${fixture.unrelatedStudentId}&view=reports`);
@@ -98,6 +104,8 @@ async function createFixture() {
     parent: crypto.randomUUID(),
     unrelatedStudent: crypto.randomUUID(),
     track: crypto.randomUUID(),
+    assignment: crypto.randomUUID(),
+    session: crypto.randomUUID(),
   };
   const teacherEmail = `p5-teacher-${suffix}@noor.local`;
   const studentEmail = `p5-student-${suffix}@noor.local`;
@@ -169,6 +177,7 @@ async function createFixture() {
       is_primary: true,
     }),
     db.from("teacher_assignments").insert({
+      id: ids.assignment,
       student_id: ids.student,
       teacher_id: ids.teacher,
       track_id: ids.track,
@@ -179,6 +188,39 @@ async function createFixture() {
     const { error } = await write;
     if (error) throw error;
   }
+  const scheduledAt = new Date("2026-10-06T08:00:00.000Z").toISOString();
+  const { error: sessionError } = await db.from("sessions").insert({
+    id: ids.session,
+    assignment_id: ids.assignment,
+    student_id: ids.student,
+    teacher_id: ids.teacher,
+    scheduled_at: scheduledAt,
+    duration_min: 30,
+    ends_at: new Date(Date.parse(scheduledAt) + 30 * 60_000).toISOString(),
+    status: "held",
+  });
+  if (sessionError) throw sessionError;
+  const teacherDb = createClient<Database>(
+    required("NEXT_PUBLIC_SUPABASE_URL"),
+    required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    { auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false } },
+  );
+  const { error: teacherAuthError } = await teacherDb.auth.signInWithPassword({
+    email: teacherEmail,
+    password,
+  });
+  if (teacherAuthError) throw teacherAuthError;
+  const { error: evaluationError } = await teacherDb.from("session_evaluations").insert({
+    session_id: ids.session,
+    created_by: ids.teacherProfile,
+    session_type: "new_memo",
+    scores: { memorization: 4 },
+    weak_tags: ["Daily review"],
+    homework: { text: "Review four pages" },
+    family_note: "Keep the routine calm",
+    is_locked: true,
+  });
+  if (evaluationError) throw evaluationError;
   return {
     password,
     teacherEmail,

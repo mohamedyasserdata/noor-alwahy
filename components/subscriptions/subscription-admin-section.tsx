@@ -24,10 +24,11 @@ export async function SubscriptionAdminSection({
   locale: AppLocale;
   searchParams: Query;
 }) {
-  const [t, data, query] = await Promise.all([
+  const query = await searchParams;
+  const selectedStudent = typeof query.student === "string" ? query.student : undefined;
+  const [t, data] = await Promise.all([
     getTranslations({ locale, namespace: "subscriptionAdmin" }),
-    getSubscriptionAdminData(),
-    searchParams,
+    getSubscriptionAdminData(selectedStudent),
   ]);
   const status = typeof query.subscriptionStatus === "string" ? query.subscriptionStatus : "";
   const error = typeof query.subscriptionError === "string" ? query.subscriptionError : "";
@@ -82,7 +83,13 @@ export async function SubscriptionAdminSection({
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <FieldSelect id="subscription-student" name="studentId" label={t("student")} required>
+          <FieldSelect
+            id="subscription-student"
+            name="studentId"
+            label={t("student")}
+            defaultValue={selectedStudent}
+            required
+          >
             <option value="">{t("chooseStudent")}</option>
             {data.students.map((student) => (
               <option key={student.id} value={student.id}>
@@ -272,12 +279,14 @@ function FieldSelect({
   name,
   label,
   required,
+  defaultValue,
   children,
 }: {
   id: string;
   name: string;
   label: string;
   required?: boolean;
+  defaultValue?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -287,6 +296,7 @@ function FieldSelect({
         id={id}
         name={name}
         required={required}
+        defaultValue={defaultValue}
         className="min-h-11 rounded-xl border bg-background px-3"
       >
         {children}

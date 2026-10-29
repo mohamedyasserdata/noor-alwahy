@@ -43,7 +43,7 @@ export default async function TeacherSectionPage({
   } else if (section === "students") {
     content = <TeacherMemorizationPlansSection locale={locale} searchParams={searchParams} />;
   } else if (section === "attendance") {
-    content = <TeacherAttendanceSection locale={locale} />;
+    content = <TeacherAttendanceSection locale={locale} searchParams={searchParams} />;
   } else if (section === "reports") {
     content = <TeacherReportsSection locale={locale} searchParams={searchParams} />;
   } else if (section === "notifications") {

@@ -32,6 +32,9 @@ export type TeacherStudentPlan = {
   track: { name_ar: string; name_en: string | null } | null;
   plan: PlanRow | null;
   adherence: PlanAdherence | null;
+  latestAttendance: { status: string; scheduledAt: string } | null;
+  latestEvaluation: { score: number | null; sessionId: string; scheduledAt: string } | null;
+  pendingReport: { id: string; status: "draft" | "approved" | "admin_review" } | null;
 };
 
 export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
@@ -77,7 +80,7 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
   const studentIds = [...students.keys()];
   if (!studentIds.length) return [];
 
-  const [plansResult, adherenceResult] = await Promise.all([
+  const [plansResult, adherenceResult, sessionsResult, reportsResult] = await Promise.all([
     supabase
       .from("memorization_plans")
       .select("id,student_id,weekly_target_pages,monthly_target_pages,starts_on,ends_on")
@@ -88,8 +91,23 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
         "student_id,weekly_target_pages,monthly_target_pages,weekly_achieved_pages,monthly_achieved_pages,weekly_adherence_percent,monthly_adherence_percent,starts_on,ends_on",
       )
       .in("student_id", studentIds),
+    supabase
+      .from("sessions")
+      .select(
+        "id,student_id,scheduled_at,attendance(status),evaluation:session_evaluations(total_score,is_locked)",
+      )
+      .in("student_id", studentIds)
+      .order("scheduled_at", { ascending: false })
+      .limit(300),
+    supabase
+      .from("reports")
+      .select("id,student_id,status,updated_at")
+      .eq("teacher_id", teacher.id)
+      .in("student_id", studentIds)
+      .in("status", ["draft", "approved", "admin_review"])
+      .order("updated_at", { ascending: false }),
   ]);
-  if (plansResult.error || adherenceResult.error) {
+  if (plansResult.error || adherenceResult.error || sessionsResult.error || reportsResult.error) {
     throw new Error("memorization_plans_unavailable");
   }
 
@@ -99,6 +117,40 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
       .filter((row): row is typeof row & { student_id: string } => Boolean(row.student_id))
       .map((row) => [row.student_id, row]),
   );
+  const latestAttendance = new Map<string, { status: string; scheduledAt: string }>();
+  const latestEvaluation = new Map<
+    string,
+    { score: number | null; sessionId: string; scheduledAt: string }
+  >();
+  for (const session of sessionsResult.data ?? []) {
+    const attendanceRow = one(session.attendance);
+    const evaluationRow = one(session.evaluation);
+    if (attendanceRow && !latestAttendance.has(session.student_id)) {
+      latestAttendance.set(session.student_id, {
+        status: attendanceRow.status,
+        scheduledAt: session.scheduled_at,
+      });
+    }
+    if (evaluationRow?.is_locked && !latestEvaluation.has(session.student_id)) {
+      latestEvaluation.set(session.student_id, {
+        score: evaluationRow.total_score,
+        sessionId: session.id,
+        scheduledAt: session.scheduled_at,
+      });
+    }
+  }
+  const pendingReports = new Map<
+    string,
+    { id: string; status: "draft" | "approved" | "admin_review" }
+  >();
+  for (const report of reportsResult.data ?? []) {
+    if (!pendingReports.has(report.student_id)) {
+      pendingReports.set(report.student_id, {
+        id: report.id,
+        status: report.status as "draft" | "approved" | "admin_review",
+      });
+    }
+  }
 
   return studentIds
     .map((studentId) => ({
@@ -110,8 +162,15 @@ export async function getTeacherStudentPlans(): Promise<TeacherStudentPlan[]> {
       track: students.get(studentId)?.track ?? null,
       plan: plans.get(studentId) ?? null,
       adherence: adherence.get(studentId) ?? null,
+      latestAttendance: latestAttendance.get(studentId) ?? null,
+      latestEvaluation: latestEvaluation.get(studentId) ?? null,
+      pendingReport: pendingReports.get(studentId) ?? null,
     }))
     .sort((left, right) => left.studentName.localeCompare(right.studentName));
+}
+
+function one<T>(value: T | T[] | null): T | null {
+  return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
 export async function getStudentMemorizationPlan(

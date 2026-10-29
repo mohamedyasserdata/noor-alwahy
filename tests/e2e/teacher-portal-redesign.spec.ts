@@ -41,6 +41,12 @@ test("teacher portal keeps every section usable and captures the completed inter
     });
   }
 
+  await page.goto("/ar/teacher/students");
+  await expect(page.getByText("الهدف الحالي").first()).toBeVisible();
+  await expect(page.getByText("آخر تقييم مقفل").first()).toBeVisible();
+  await expect(page.getByText("آخر حضور").first()).toBeVisible();
+  await expect(page.getByText("التقرير الجاري").first()).toBeVisible();
+
   await page.goto("/ar/teacher/profile");
   const displayName = await page.locator("#teacher-display-name").inputValue();
   await page.locator("#teacher-display-name").fill(displayName);

@@ -4,15 +4,17 @@ import { connection } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function getAdminReports() {
+export async function getAdminReports(studentId?: string) {
   await connection();
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("reports")
     .select(
       "id,period_type,period_start,period_end,status,approved_at,made_visible_at,students!reports_student_id_fkey(full_name),teachers!reports_teacher_id_fkey(profiles!teachers_profile_id_fkey(full_name))",
     )
     .order("updated_at", { ascending: false });
+  if (studentId) query = query.eq("student_id", studentId);
+  const { data, error } = await query;
   if (error) throw new Error("admin_reports_unavailable");
   return (data ?? []).map((report) => ({
     id: report.id,
