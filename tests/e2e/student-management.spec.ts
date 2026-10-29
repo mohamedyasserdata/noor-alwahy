@@ -22,7 +22,7 @@ test("US-011 to US-013 admin manages and exports an audited student record", asy
   await page.locator("#student-special").fill("Private E2E special note");
   await page.getByRole("button", { name: "Add student" }).click();
 
-  await expect(page).toHaveURL(/studentStatus=created$/, { timeout: 20_000 });
+  await expect(page).toHaveURL(/studentStatus=created$/);
   await expect(page.getByText("The student was added successfully.")).toBeVisible();
   const row = page.locator("li").filter({ hasText: name });
   await expect(row).toBeVisible();
@@ -38,23 +38,6 @@ test("US-011 to US-013 admin manages and exports an audited student record", asy
   await page.locator("#student-search").fill(updatedName);
   await page.getByRole("button", { name: "Apply filters" }).click();
   await expect(page.getByText(updatedName, { exact: true })).toBeVisible();
-
-  const filteredRow = page.locator("li").filter({ hasText: updatedName });
-  await filteredRow.getByRole("link", { name: "Open profile" }).click();
-  await expect(page).toHaveURL(/q=Student(?:\+|%20)Directory/);
-  await expect(page).toHaveURL(/student=[0-9a-f-]{36}/);
-  const context = page.getByTestId("admin-student-context");
-  await expect(context).toBeVisible();
-  await expect(context.getByRole("link", { name: "Open attendance" })).toHaveAttribute(
-    "href",
-    /\/en\/admin\/attendance\?student=[0-9a-f-]{36}/,
-  );
-  await expect(context.getByRole("link", { name: "Open reports" })).toHaveAttribute(
-    "href",
-    /\/en\/admin\/reports\?student=[0-9a-f-]{36}/,
-  );
-  await page.goBack();
-  await expect(page.locator("#student-search")).toHaveValue(updatedName);
 
   const exportResponse = await page.request.get(
     `/en/admin/students/export?q=${encodeURIComponent(updatedName)}`,

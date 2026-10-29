@@ -914,37 +914,9 @@
     },
     "profile": {
       "title": "Profile: {name}",
-      "description": "An operational summary and context-preserving links without duplicating section features.",
-      "missing": "Not available yet",
-      "masteredPages": "{count} mastered pages",
-      "trackAndLevel": "Track and level",
-      "latestReport": "Latest report",
-      "linksLabel": "Related student records",
-      "metrics": {
-        "teacher": "Current teacher",
-        "attendance": "Attendance over {days} days",
-        "progress": "Memorisation progress",
-        "subscription": "Subscription status"
-      },
-      "links": {
-        "assignment": "Open assignment",
-        "attendance": "Open attendance",
-        "reports": "Open reports",
-        "subscription": "Open subscription"
-      },
-      "reportStatuses": {
-        "draft": "Draft",
-        "approved": "Teacher approved",
-        "admin_review": "Admin review",
-        "visible": "Published to student and family"
-      },
-      "subscriptionStatuses": {
-        "trial": "Trial",
-        "active": "Active",
-        "paused": "Paused",
-        "expired": "Expired",
-        "cancelled": "Cancelled"
-      },
+      "description": "The profile is ready for the modules introduced in the next phases.",
+      "available": "Available now",
+      "later": "Enabled by a later planned task",
       "tabs": {
         "data": "Student data",
         "assignments": "Assignments",
@@ -1586,26 +1558,7 @@
       "editDescription": "Adjust the target or plan dates; achievement comes from locked evaluations.",
       "configured": "Active plan",
       "notConfigured": "Not configured",
-      "dateHint": "Leave the end date empty for an ongoing plan.",
-      "context": {
-        "goal": "Current goal",
-        "weeklyGoal": "{count} pages per week",
-        "lastEvaluation": "Latest locked evaluation",
-        "score": "{score}%",
-        "lastAttendance": "Latest attendance",
-        "pendingReport": "Report in progress",
-        "missing": "No data yet",
-        "noPendingReport": "No pending report",
-        "linksLabel": "Actions for {student}",
-        "openEvaluation": "Open evaluation",
-        "openAttendance": "Open attendance",
-        "openReport": "Open report",
-        "reportStatuses": {
-          "draft": "Draft needs completion",
-          "approved": "Approved and awaiting admin",
-          "admin_review": "Under admin review"
-        }
-      }
+      "dateHint": "Leave the end date empty for an ongoing plan."
     },
     "student": {
       "title": "Your memorization plan",
@@ -3425,29 +3378,6 @@
       "revokeCertificate": "The certificate will fail public verification and the revocation reason will be retained.",
       "lockExamResult": "The result becomes final and cannot be edited through the normal grading flow.",
       "lockEvaluation": "The evaluation becomes final and visible according to current permissions; unlocking remains restricted."
-    }
-  },
-  "teacherReports": {
-    "suggestions": {
-      "title": "Data from the latest locked evaluation",
-      "description": "Areas to improve, the plan, and the recommendation were prepared from the same evaluation data. Review and edit them before saving the report.",
-      "source": "Data source: session on {date}"
-    }
-  },
-  "portalErrors": {
-    "student": {
-      "eyebrow": "Student data could not be loaded",
-      "title": "The data is temporarily unavailable",
-      "description": "We could not load this page right now. No data was changed. Try again, or return home and reopen the section.",
-      "retry": "Try again",
-      "home": "Back to home"
-    },
-    "parent": {
-      "eyebrow": "Family data could not be loaded",
-      "title": "The data is temporarily unavailable",
-      "description": "We could not load this page right now. Child data and the current child selection were not changed. Try again, or return home.",
-      "retry": "Try again",
-      "home": "Back to home"
     }
   },
   "accessibility": {

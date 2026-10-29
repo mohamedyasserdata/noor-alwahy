@@ -8,18 +8,10 @@ import { Link } from "@/i18n/navigation";
 import { getTeacherAttendanceHistory } from "@/lib/attendance/queries";
 import type { AttendanceStatus } from "@/lib/validators/attendance";
 
-export async function TeacherAttendanceSection({
-  locale,
-  searchParams = Promise.resolve({}),
-}: {
-  locale: AppLocale;
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const query = await searchParams;
-  const selectedStudent = typeof query.student === "string" ? query.student : undefined;
+export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }) {
   const [t, history] = await Promise.all([
     getTranslations({ locale, namespace: "teacherAttendance" }),
-    getTeacherAttendanceHistory(30, selectedStudent),
+    getTeacherAttendanceHistory(),
   ]);
 
   if (!history) {

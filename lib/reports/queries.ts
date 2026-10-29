@@ -30,7 +30,7 @@ const bodySchema = z.object({
     .optional(),
 });
 
-export async function getTeacherReportsData(studentId?: string) {
+export async function getTeacherReportsData() {
   await connection();
   const supabase = await createClient();
   const { data: teacher, error: teacherError } = await supabase
@@ -39,29 +39,23 @@ export async function getTeacherReportsData(studentId?: string) {
     .maybeSingle();
   if (teacherError) throw new Error("reports_unavailable");
   if (!teacher) {
-    return { students: [], reports: [], templates: [], suggestion: null };
+    return { students: [], reports: [], templates: [] };
   }
 
-  let assignmentsQuery = supabase
-    .from("teacher_assignments")
-    .select("student_id,students!teacher_assignments_student_id_fkey(full_name)")
-    .eq("teacher_id", teacher.id)
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-  let reportsQuery = supabase
-    .from("reports")
-    .select(
-      "id,student_id,period_type,period_start,period_end,body,status,approved_at,updated_at,content_template_version_id",
-    )
-    .eq("teacher_id", teacher.id)
-    .order("period_start", { ascending: false });
-  if (studentId) {
-    assignmentsQuery = assignmentsQuery.eq("student_id", studentId);
-    reportsQuery = reportsQuery.eq("student_id", studentId);
-  }
   const [assignmentsResult, reportsResult, templateResult] = await Promise.all([
-    assignmentsQuery,
-    reportsQuery,
+    supabase
+      .from("teacher_assignments")
+      .select("student_id,students!teacher_assignments_student_id_fkey(full_name)")
+      .eq("teacher_id", teacher.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("reports")
+      .select(
+        "id,student_id,period_type,period_start,period_end,body,status,approved_at,updated_at,content_template_version_id",
+      )
+      .eq("teacher_id", teacher.id)
+      .order("period_start", { ascending: false }),
     supabase
       .from("content_template_versions")
       .select(
@@ -79,7 +73,6 @@ export async function getTeacherReportsData(studentId?: string) {
   for (const assignment of assignmentsResult.data ?? []) {
     students.set(assignment.student_id, assignment.students.full_name);
   }
-  const suggestion = studentId ? await getLatestEvaluationSuggestion(supabase, studentId) : null;
   return {
     students: [...students]
       .map(([id, name]) => ({ id, name }))
@@ -96,43 +89,5 @@ export async function getTeacherReportsData(studentId?: string) {
       nameAr: version.content_templates.name_ar,
       nameEn: version.content_templates.name_en,
     })),
-    suggestion,
   };
-}
-
-async function getLatestEvaluationSuggestion(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  studentId: string,
-) {
-  const { data, error } = await supabase
-    .from("sessions")
-    .select(
-      "id,scheduled_at,evaluation:session_evaluations(is_locked,weak_tags,homework,family_note)",
-    )
-    .eq("student_id", studentId)
-    .order("scheduled_at", { ascending: false })
-    .limit(24);
-  if (error) throw new Error("reports_unavailable");
-
-  for (const session of data ?? []) {
-    const evaluation = Array.isArray(session.evaluation)
-      ? session.evaluation[0]
-      : session.evaluation;
-    if (!evaluation?.is_locked) continue;
-    const homework =
-      evaluation.homework &&
-      typeof evaluation.homework === "object" &&
-      !Array.isArray(evaluation.homework) &&
-      typeof evaluation.homework.text === "string"
-        ? evaluation.homework.text
-        : "";
-    return {
-      sessionId: session.id,
-      scheduledAt: session.scheduled_at,
-      improve: evaluation.weak_tags.join(", "),
-      plan: homework,
-      recommendation: evaluation.family_note ?? "",
-    };
-  }
-  return null;
 }

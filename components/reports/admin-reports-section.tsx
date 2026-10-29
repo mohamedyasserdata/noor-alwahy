@@ -17,9 +17,7 @@ export async function AdminReportsSection({
   locale: AppLocale;
   searchParams: Search;
 }) {
-  const query = await searchParams;
-  const selectedStudent = typeof query.student === "string" ? query.student : undefined;
-  const reports = await getAdminReports(selectedStudent);
+  const [reports, query] = await Promise.all([getAdminReports(), searchParams]);
   const ar = locale === "ar";
   const today = new Date();
   const defaultFrom = new Date(today);

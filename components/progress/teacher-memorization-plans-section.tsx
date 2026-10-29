@@ -11,14 +11,12 @@ import { getTranslations } from "next-intl/server";
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { TeacherMetricCard } from "@/components/teacher/teacher-page-ui";
 import type { AppLocale } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
 import { saveMemorizationPlanAction } from "@/lib/memorization-plans/actions";
 import { getTeacherStudentPlans } from "@/lib/memorization-plans/queries";
 
@@ -31,9 +29,8 @@ export async function TeacherMemorizationPlansSection({
   locale: AppLocale;
   searchParams: Query;
 }) {
-  const [t, attendanceT, students, query] = await Promise.all([
+  const [t, students, query] = await Promise.all([
     getTranslations({ locale, namespace: "memorizationPlan" }),
-    getTranslations({ locale, namespace: "teacherAttendance" }),
     getTeacherStudentPlans(),
     searchParams,
   ]);
@@ -250,74 +247,6 @@ export async function TeacherMemorizationPlansSection({
                       />
                     </div>
                   ) : null}
-                  <div className="mb-6 grid gap-3 rounded-xl border bg-background/55 p-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <StudentContextItem
-                      label={t("teacher.context.goal")}
-                      value={
-                        student.plan
-                          ? t("teacher.context.weeklyGoal", {
-                              count: student.plan.weekly_target_pages,
-                            })
-                          : t("teacher.context.missing")
-                      }
-                    />
-                    <StudentContextItem
-                      label={t("teacher.context.lastEvaluation")}
-                      value={
-                        student.latestEvaluation?.score == null
-                          ? t("teacher.context.missing")
-                          : t("teacher.context.score", { score: student.latestEvaluation.score })
-                      }
-                    />
-                    <StudentContextItem
-                      label={t("teacher.context.lastAttendance")}
-                      value={
-                        student.latestAttendance
-                          ? attendanceT(
-                              `statuses.${student.latestAttendance.status}` as "statuses.present",
-                            )
-                          : t("teacher.context.missing")
-                      }
-                    />
-                    <StudentContextItem
-                      label={t("teacher.context.pendingReport")}
-                      value={
-                        student.pendingReport
-                          ? t(`teacher.context.reportStatuses.${student.pendingReport.status}`)
-                          : t("teacher.context.noPendingReport")
-                      }
-                    />
-                    <nav
-                      className="flex flex-wrap gap-2 border-t pt-3 sm:col-span-2 xl:col-span-4"
-                      aria-label={t("teacher.context.linksLabel", {
-                        student: student.studentName,
-                      })}
-                    >
-                      {student.latestEvaluation ? (
-                        <Button asChild variant="outline" size="sm">
-                          <Link
-                            href={`/teacher/evaluations?sessionId=${encodeURIComponent(student.latestEvaluation.sessionId)}`}
-                          >
-                            {t("teacher.context.openEvaluation")}
-                          </Link>
-                        </Button>
-                      ) : null}
-                      <Button asChild variant="outline" size="sm">
-                        <Link
-                          href={`/teacher/attendance?student=${encodeURIComponent(student.studentId)}`}
-                        >
-                          {t("teacher.context.openAttendance")}
-                        </Link>
-                      </Button>
-                      <Button asChild variant="outline" size="sm">
-                        <Link
-                          href={`/teacher/reports?student=${encodeURIComponent(student.studentId)}`}
-                        >
-                          {t("teacher.context.openReport")}
-                        </Link>
-                      </Button>
-                    </nav>
-                  </div>
                   <form
                     action={saveMemorizationPlanAction.bind(null, locale)}
                     className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
@@ -371,15 +300,6 @@ export async function TeacherMemorizationPlansSection({
         </div>
       )}
     </section>
-  );
-}
-
-function StudentContextItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs font-bold text-muted-foreground">{label}</p>
-      <p className="mt-1 font-black text-primary">{value}</p>
-    </div>
   );
 }
 

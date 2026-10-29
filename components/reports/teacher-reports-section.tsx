@@ -7,7 +7,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { TeacherMetricCard } from "@/components/teacher/teacher-page-ui";
@@ -120,12 +119,7 @@ export async function TeacherReportsSection({
   locale: AppLocale;
   searchParams: Search;
 }) {
-  const query = await searchParams;
-  const selectedStudent = typeof query.student === "string" ? query.student : undefined;
-  const [data, reportT] = await Promise.all([
-    getTeacherReportsData(selectedStudent),
-    getTranslations({ locale, namespace: "teacherReports.suggestions" }),
-  ]);
+  const [data, query] = await Promise.all([getTeacherReportsData(), searchParams]);
   const t = copy[locale];
   const status = typeof query.reportStatus === "string" ? query.reportStatus : "";
   const error = typeof query.reportError === "string" ? query.reportError : "";
@@ -196,20 +190,7 @@ export async function TeacherReportsSection({
           <FilePenLine className="size-8 text-secondary" aria-hidden="true" />
           <h2 className="mt-4 text-xl font-black text-primary">{t.newTitle}</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{t.newHint}</p>
-          <ReportForm
-            locale={locale}
-            students={data.students}
-            templates={data.templates}
-            t={t}
-            suggestion={data.suggestion}
-            suggestionCopy={{
-              title: reportT("title"),
-              description: reportT("description"),
-              source: reportT("source", {
-                date: data.suggestion?.scheduledAt.slice(0, 10) ?? "—",
-              }),
-            }}
-          />
+          <ReportForm locale={locale} students={data.students} templates={data.templates} t={t} />
         </aside>
 
         <div>
@@ -318,16 +299,12 @@ function ReportForm({
   templates,
   t,
   report,
-  suggestion,
-  suggestionCopy,
 }: {
   locale: AppLocale;
   students: { id: string; name: string }[];
   templates: Awaited<ReturnType<typeof getTeacherReportsData>>["templates"];
   t: T;
   report?: Report;
-  suggestion?: Awaited<ReturnType<typeof getTeacherReportsData>>["suggestion"];
-  suggestionCopy?: { title: string; description: string; source: string };
 }) {
   const fieldClass =
     "min-h-28 w-full resize-y rounded-xl border bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring";
@@ -357,7 +334,7 @@ function ReportForm({
           <select
             id={`student-${report?.id ?? "new"}`}
             name="studentId"
-            defaultValue={report?.student_id ?? (students.length === 1 ? students[0]?.id : "")}
+            defaultValue={report?.student_id ?? ""}
             disabled={Boolean(report)}
             required
             className="h-11 w-full rounded-xl border bg-background px-3 text-sm text-foreground disabled:opacity-70"
@@ -401,19 +378,12 @@ function ReportForm({
           suffix={report?.id ?? "new"}
         />
       </div>
-      {!report && suggestion && suggestionCopy ? (
-        <Alert>
-          <strong className="block text-primary">{suggestionCopy.title}</strong>
-          <span className="mt-1 block">{suggestionCopy.description}</span>
-          <span className="mt-1 block text-xs">{suggestionCopy.source}</span>
-        </Alert>
-      ) : null}
       {(["summary", "strengths", "improve", "plan", "recommendation"] as const).map((name) => (
         <Field key={name} label={t[name]} htmlFor={`${name}-${report?.id ?? "new"}`}>
           <textarea
             id={`${name}-${report?.id ?? "new"}`}
             name={name}
-            defaultValue={report?.body[name] ?? suggestionValue(suggestion, name)}
+            defaultValue={report?.body[name] ?? ""}
             required
             maxLength={2000}
             className={fieldClass}
@@ -427,14 +397,6 @@ function ReportForm({
       </div>
     </form>
   );
-}
-
-function suggestionValue(
-  suggestion: Awaited<ReturnType<typeof getTeacherReportsData>>["suggestion"] | undefined,
-  field: "summary" | "strengths" | "improve" | "plan" | "recommendation",
-) {
-  if (!suggestion || field === "summary" || field === "strengths") return "";
-  return suggestion[field];
 }
 
 function Field({

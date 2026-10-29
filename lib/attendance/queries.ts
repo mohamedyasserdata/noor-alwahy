@@ -161,7 +161,7 @@ export async function getTeacherTodaySessions() {
   };
 }
 
-export async function getTeacherAttendanceHistory(days = 30, studentId?: string) {
+export async function getTeacherAttendanceHistory(days = 30) {
   await connection();
   const supabase = await createClient();
   const [{ data: profile, error: profileError }, { data: teacher, error: teacherError }] =
@@ -174,22 +174,19 @@ export async function getTeacherAttendanceHistory(days = 30, studentId?: string)
 
   const now = DateTime.now().setZone(profile.timezone);
   const from = now.minus({ days }).startOf("day").toUTC().toISO();
-  let historyQuery = supabase
+  const { data, error } = await supabase
     .from("sessions")
     .select(
-      "id,student_id,scheduled_at,ends_at,duration_min,status,students!sessions_student_id_fkey(full_name),attendance(status,minutes,recorded_at,locked_at)",
+      "id,scheduled_at,ends_at,duration_min,status,students!sessions_student_id_fkey(full_name),attendance(status,minutes,recorded_at,locked_at)",
     )
     .eq("teacher_id", teacher.id)
     .gte("scheduled_at", from)
     .lte("scheduled_at", now.endOf("day").toUTC().toISO())
     .order("scheduled_at", { ascending: false });
-  if (studentId) historyQuery = historyQuery.eq("student_id", studentId);
-  const { data, error } = await historyQuery;
   if (error) throw new Error("teacher_attendance_unavailable");
 
   const sessions = (data ?? []).map((session) => ({
     id: session.id,
-    studentId: session.student_id,
     scheduledAt: session.scheduled_at,
     endsAt: session.ends_at,
     durationMin: session.duration_min,

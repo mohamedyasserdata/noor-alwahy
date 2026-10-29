@@ -1,16 +1,4 @@
-import {
-  ArrowUpRight,
-  BookOpenCheck,
-  CreditCard,
-  Download,
-  FileText,
-  GraduationCap,
-  Percent,
-  Search,
-  UserRoundCheck,
-  UserRoundPlus,
-  UsersRound,
-} from "lucide-react";
+import { Archive, Download, GraduationCap, Search, UserRoundPlus, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
@@ -28,7 +16,6 @@ import {
   saveGuardianLinkAction,
 } from "@/lib/students/family-actions";
 import { getStudentFamily, type StudentFamily } from "@/lib/students/student-family";
-import { getAdminStudentContext } from "@/lib/students/student-context";
 import {
   getStudentDirectory,
   getStudentForEditing,
@@ -46,11 +33,10 @@ const textareaClass =
 export async function StudentManagementSection({ locale, searchParams }: Props) {
   const query = await searchParams;
   const selectedId = typeof query.student === "string" ? query.student : null;
-  const [directory, selected, family, context, t] = await Promise.all([
+  const [directory, selected, family, t] = await Promise.all([
     getStudentDirectory(query, locale),
     selectedId ? getStudentForEditing(selectedId, locale) : Promise.resolve(null),
     selectedId ? getStudentFamily(selectedId) : Promise.resolve(null),
-    selectedId ? getAdminStudentContext(selectedId) : Promise.resolve(null),
     getTranslations({ locale, namespace: "studentManagement" }),
   ]);
   const notice = getNotice(query, t);
@@ -193,13 +179,7 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
           {directory.students.length ? (
             <ul className="mt-6 grid gap-3">
               {directory.students.map((student) => (
-                <StudentRow
-                  key={student.id}
-                  student={student}
-                  locale={locale}
-                  query={query}
-                  t={t}
-                />
+                <StudentRow key={student.id} student={student} locale={locale} t={t} />
               ))}
             </ul>
           ) : (
@@ -241,9 +221,7 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
 
       {selected ? (
         <div className="mt-6 grid gap-6">
-          {context ? (
-            <StudentContext locale={locale} student={selected} context={context} t={t} />
-          ) : null}
+          <ProfileSkeleton student={selected} t={t} />
           {family ? (
             <FamilyManagement locale={locale} student={selected} family={family} t={t} />
           ) : null}
@@ -256,12 +234,10 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
 function StudentRow({
   student,
   locale,
-  query,
   t,
 }: {
   student: StudentListItem;
   locale: AppLocale;
-  query: Record<string, string | string[] | undefined>;
   t: Translation;
 }) {
   return (
@@ -280,9 +256,7 @@ function StudentRow({
       </div>
       <div className="flex flex-wrap gap-2">
         <Button asChild variant="outline" size="sm">
-          <a href={`/${locale}/admin/students?${studentProfileQuery(query, student.id)}`}>
-            {t("actions.open")}
-          </a>
+          <a href={`/${locale}/admin/students?student=${student.id}`}>{t("actions.open")}</a>
         </Button>
         {student.status !== "archived" ? (
           <form action={archiveStudentAction.bind(null, locale)}>
@@ -448,35 +422,27 @@ function StudentForm({
   );
 }
 
-function StudentContext({
-  locale,
+function ProfileSkeleton({
   student,
-  context,
   t,
 }: {
-  locale: AppLocale;
   student: NonNullable<Awaited<ReturnType<typeof getStudentForEditing>>>;
-  context: Awaited<ReturnType<typeof getAdminStudentContext>>;
   t: Translation;
 }) {
-  const studentParam = encodeURIComponent(student.id);
-  const links = [
-    context.assignmentId
-      ? { key: "assignment", href: `/${locale}/admin/assignments?studentId=${studentParam}` }
-      : null,
-    { key: "attendance", href: `/${locale}/admin/attendance?student=${studentParam}` },
-    { key: "reports", href: `/${locale}/admin/reports?student=${studentParam}` },
-    { key: "subscription", href: `/${locale}/admin/subscriptions?student=${studentParam}` },
-  ].filter((item): item is { key: string; href: string } => Boolean(item));
-
+  const tabs = [
+    "data",
+    "assignments",
+    "schedule",
+    "attendance",
+    "progress",
+    "grades",
+    "finance",
+    "certificates",
+  ] as const;
   return (
-    <article
-      id="student-context"
-      data-testid="admin-student-context"
-      className="scroll-mt-24 rounded-3xl border bg-card p-6 shadow-card sm:p-7"
-    >
+    <article className="mt-6 rounded-3xl border bg-card p-6 shadow-card sm:p-7">
       <div className="flex items-center gap-3">
-        <UserRoundCheck className="size-6 text-secondary" aria-hidden="true" />
+        <Archive className="size-6 text-secondary" aria-hidden="true" />
         <div>
           <h2 className="text-xl font-black text-primary">
             {t("profile.title", { name: student.fullName })}
@@ -484,83 +450,17 @@ function StudentContext({
           <p className="mt-1 text-sm text-muted-foreground">{t("profile.description")}</p>
         </div>
       </div>
-      <dl className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <ContextMetric
-          icon={UserRoundCheck}
-          label={t("profile.metrics.teacher")}
-          value={context.teacherName ?? t("profile.missing")}
-        />
-        <ContextMetric
-          icon={Percent}
-          label={t("profile.metrics.attendance", { days: context.attendance.periodDays })}
-          value={context.attendance.rate === null ? "—" : `${context.attendance.rate}%`}
-        />
-        <ContextMetric
-          icon={BookOpenCheck}
-          label={t("profile.metrics.progress")}
-          value={t("profile.masteredPages", { count: context.progress.mastered })}
-        />
-        <ContextMetric
-          icon={CreditCard}
-          label={t("profile.metrics.subscription")}
-          value={
-            context.subscription
-              ? t(`profile.subscriptionStatuses.${context.subscription.status}`)
-              : t("profile.missing")
-          }
-        />
-      </dl>
-      <div className="mt-4 grid gap-3 rounded-2xl border bg-background/55 p-4 sm:grid-cols-2">
-        <div>
-          <p className="text-xs font-bold text-muted-foreground">{t("profile.trackAndLevel")}</p>
-          <p className="mt-1 font-black text-primary">
-            {[student.trackName, student.levelName].filter(Boolean).join(" · ") ||
-              t("profile.missing")}
-          </p>
-        </div>
-        <div>
-          <p className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-            <FileText className="size-4 text-secondary" aria-hidden="true" />
-            {t("profile.latestReport")}
-          </p>
-          <p className="mt-1 font-black text-primary">
-            {context.report
-              ? t(`profile.reportStatuses.${context.report.status}`)
-              : t("profile.missing")}
-          </p>
-        </div>
-      </div>
-      <nav className="mt-5 flex flex-wrap gap-2" aria-label={t("profile.linksLabel")}>
-        {links.map((link) => (
-          <Button key={link.key} asChild variant="outline" size="sm">
-            <a href={link.href}>
-              {t(`profile.links.${link.key}`)}
-              <ArrowUpRight className="rtl:-scale-x-100" aria-hidden="true" />
-            </a>
-          </Button>
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {tabs.map((tab, index) => (
+          <li key={tab} className="rounded-xl border bg-background/60 p-4">
+            <p className="font-black text-primary">{t(`profile.tabs.${tab}`)}</p>
+            <p className="mt-2 text-xs leading-6 text-muted-foreground">
+              {index === 0 ? t("profile.available") : t("profile.later")}
+            </p>
+          </li>
         ))}
-      </nav>
+      </ul>
     </article>
-  );
-}
-
-function ContextMetric({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof UserRoundCheck;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border bg-background/55 p-4">
-      <dt className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-        <Icon className="size-4 text-secondary" aria-hidden="true" />
-        {label}
-      </dt>
-      <dd className="mt-2 font-black text-primary">{value}</dd>
-    </div>
   );
 }
 
@@ -808,20 +708,6 @@ function Field(props: React.ComponentProps<typeof Input> & { label: string }) {
     </div>
   );
 }
-
-function studentProfileQuery(
-  query: Record<string, string | string[] | undefined>,
-  studentId: string,
-) {
-  const params = new URLSearchParams();
-  for (const key of ["q", "status", "level", "country", "page"] as const) {
-    const value = query[key];
-    if (typeof value === "string" && value) params.set(key, value);
-  }
-  params.set("student", studentId);
-  return params.toString();
-}
-
 function PageLink({
   locale,
   query,
