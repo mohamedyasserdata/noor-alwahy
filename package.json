@@ -28,7 +28,7 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
-    "db:test": "node scripts/run-local-db-tests.mjs",
+    "db:test": "supabase test db --local",
     "db:types": "node scripts/generate-database-types.mjs",
     "check:rls": "node scripts/check-rls.mjs",
     "quran:import": "node --no-warnings scripts/import-quran.ts",
