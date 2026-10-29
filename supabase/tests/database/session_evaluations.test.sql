@@ -21,15 +21,22 @@ insert into public.tracks (id, code, name_ar, name_en)
 values ('e9100000-0000-4000-8000-000000000001', 'evaluation-test', 'اختبار التقييم', 'Evaluation test');
 
 insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
-values ('e9200000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
+values
+  ('20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now()),
+  ('e9200000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000001', 'male', 'active', now(), now());
+
+insert into public.students (id, profile_id, full_name, gender, timezone)
+values
+  ('20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000003', 'Evaluation Student', 'male', 'Africa/Cairo'),
+  ('e9300000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000002', 'Other Student', 'male', 'Africa/Cairo');
+
+insert into public.guardians (id, profile_id)
+values ('20000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000004');
 
 insert into public.teacher_tracks (teacher_id, track_id)
 values
   ('20000000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001'),
   ('e9200000-0000-4000-8000-000000000002', 'e9100000-0000-4000-8000-000000000001');
-
-insert into public.students (id, profile_id, full_name, gender, timezone)
-values ('e9300000-0000-4000-8000-000000000002', 'e9000000-0000-4000-8000-000000000002', 'Other Student', 'male', 'Africa/Cairo');
 
 insert into public.student_guardians (student_id, guardian_id, relation, is_primary)
 values ('20000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000004', 'parent', true);
