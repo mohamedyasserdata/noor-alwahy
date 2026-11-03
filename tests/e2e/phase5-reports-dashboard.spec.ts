@@ -10,15 +10,33 @@ test("P5 report flows from teacher approval through admin publication to isolate
   page,
 }) => {
   test.setTimeout(180_000);
+  page.setDefaultTimeout(10_000);
+  page.setDefaultNavigationTimeout(20_000);
   const fixture = await createFixture();
+  const db = databaseClient();
 
   await signIn(page, fixture.teacherEmail, fixture.password, "/en/teacher/today");
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/en/teacher/reports");
   await expect(page.getByRole("heading", { name: "Clear reports, trusted numbers" })).toBeVisible();
-  await page.getByLabel("Student").first().selectOption(fixture.studentId);
-  await page.getByLabel("Period start").first().fill("2026-10-05");
-  await page.getByLabel("Period end").first().fill("2026-10-11");
+  await page.getByText("Create student reports in a batch", { exact: true }).click();
+  await page.getByRole("checkbox", { name: fixture.studentName }).check();
+  await page.getByRole("checkbox", { name: fixture.unrelatedStudentName }).check();
+  await page.locator("#batch-period-start").fill("2026-09-01");
+  await page.locator("#batch-period-end").fill("2026-09-07");
+  await page.getByRole("button", { name: "Create drafts" }).click();
+  await expect(page).toHaveURL(/reportStatus=batch_created/);
+  const { count: batchCount, error: batchError } = await db
+    .from("reports")
+    .select("id", { count: "exact", head: true })
+    .in("student_id", [fixture.studentId, fixture.unrelatedStudentId])
+    .eq("period_start", "2026-09-01");
+  if (batchError) throw batchError;
+  expect(batchCount).toBe(2);
+
+  await page.locator('select[name="studentId"]').first().selectOption(fixture.studentId);
+  await page.locator("#periodStart-new").fill("2026-10-05");
+  await page.locator("#periodEnd-new").fill("2026-10-11");
   await page.getByLabel("Progress summary").first().fill("Steady progress across the week");
   await page.getByLabel("Strengths").first().fill("Careful recitation and commitment");
   await page.getByLabel("Areas to improve").first().fill("Keep a daily review rhythm");
@@ -30,7 +48,10 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await page.getByRole("button", { name: "Save draft" }).first().click();
   await expect(page).toHaveURL(/reportStatus=saved/);
   await expect(page.getByText("Draft saved and metrics refreshed.")).toBeVisible();
-  const reportCard = page.locator("article").filter({ hasText: fixture.studentName });
+  const reportCard = page
+    .locator("article.overflow-hidden")
+    .filter({ hasText: fixture.studentName })
+    .filter({ hasText: "2026-10-05" });
   await expect(reportCard.getByText("Draft", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
@@ -48,16 +69,67 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await mkdir(pdfOutput, { recursive: true });
   await writeFile(join(pdfOutput, "report-phase5.pdf"), pdf);
 
-  await reportCard.getByRole("button", { name: "Approve report" }).click();
+  await reportCard.getByRole("button", { name: "Send to administration" }).click();
   await expect(page).toHaveURL(/reportStatus=approved/);
 
   await signInAs(page, "en", "admin");
   await page.goto("/en/admin/reports");
-  const adminCard = page.locator("article").filter({ hasText: fixture.studentName });
+  const adminCard = page
+    .locator("article")
+    .filter({ hasText: fixture.studentName })
+    .filter({ hasText: "2026-10-05" });
   await expect(adminCard).toBeVisible();
-  await adminCard.getByRole("button", { name: "Publish to family" }).click();
+  await expect(adminCard.getByText("Pending admin review", { exact: true })).toBeVisible();
+  await adminCard.getByLabel("Revision reason").fill("Clarify the next-period plan");
+  await adminCard.getByText("Review revision request", { exact: true }).click();
+  await adminCard.getByRole("button", { name: "Return to teacher" }).click();
   await expect(page).toHaveURL(/reportStatus=updated/);
-  await expect(adminCard.getByText("visible", { exact: true })).toBeVisible();
+
+  await signIn(page, fixture.teacherEmail, fixture.password, "/en/teacher/today");
+  await page.goto("/en/teacher/reports");
+  const returnedCard = page
+    .locator("article.overflow-hidden")
+    .filter({ hasText: fixture.studentName })
+    .filter({ hasText: "2026-10-05" });
+  await expect(returnedCard.getByText("Revision requested", { exact: true })).toBeVisible();
+  await expect(returnedCard.getByText("Clarify the next-period plan")).toBeVisible();
+  await returnedCard
+    .getByLabel("Next-period plan")
+    .fill("Memorise two pages and review six with the teacher");
+  await returnedCard.getByRole("button", { name: "Save draft" }).click();
+  await expect(page).toHaveURL(/reportStatus=saved/);
+  await returnedCard.getByRole("button", { name: "Send to administration" }).click();
+  await expect(page).toHaveURL(/reportStatus=approved/);
+
+  await signInAs(page, "en", "admin");
+  await page.goto("/en/admin/reports");
+  const finalAdminCard = page
+    .locator("article")
+    .filter({ hasText: fixture.studentName })
+    .filter({ hasText: "2026-10-05" });
+  await finalAdminCard
+    .getByLabel("Performance summary")
+    .fill("Steady progress across the week — reviewed by administration");
+  await finalAdminCard.getByText("Review approval and publication", { exact: true }).click();
+  await finalAdminCard.getByRole("button", { name: "Approve and publish" }).click();
+  await expect(page).toHaveURL(/reportStatus=updated/);
+  await expect(finalAdminCard.getByText("Approved and published", { exact: true })).toBeVisible();
+  await expect(finalAdminCard.getByText("Published version 1", { exact: true })).toBeVisible();
+
+  const { data: publishedReport, error: publishedError } = await db
+    .from("reports")
+    .select("id,published_version")
+    .eq("student_id", fixture.studentId)
+    .eq("period_start", "2026-10-05")
+    .single();
+  if (publishedError) throw publishedError;
+  expect(publishedReport.published_version).toBe(1);
+  const { count: versionCount, error: versionError } = await db
+    .from("report_versions")
+    .select("id", { count: "exact", head: true })
+    .eq("report_id", publishedReport.id);
+  if (versionError) throw versionError;
+  expect(versionCount).toBe(1);
 
   await signIn(page, fixture.parentEmail, fixture.password, "/en/parent/home");
   await page.goto(`/en/parent/children?student=${fixture.unrelatedStudentId}&view=reports`);
@@ -74,9 +146,9 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await writeFile(join(pdfOutput, "report-phase5-ar.pdf"), await arabicPdfResponse.body());
 
   await signIn(page, fixture.studentEmail, fixture.password, "/en/student/home");
-  await page.goto("/en/student/progress");
-  await expect(page.getByText("Your journey at a glance")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Download report" })).toBeVisible();
+  await page.goto("/en/student/reports");
+  await expect(page.getByRole("heading", { name: "Published reports" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View or download PDF" })).toBeVisible();
 });
 
 async function createFixture() {
@@ -169,6 +241,13 @@ async function createFixture() {
       track_id: ids.track,
       assigned_by: "10000000-0000-4000-8000-000000000001",
       reason: "Phase five browser gate",
+    }),
+    db.from("teacher_assignments").insert({
+      student_id: ids.unrelatedStudent,
+      teacher_id: ids.teacher,
+      track_id: ids.track,
+      assigned_by: "10000000-0000-4000-8000-000000000001",
+      reason: "Phase five batch isolation gate",
     }),
   ]) {
     const { error } = await write;

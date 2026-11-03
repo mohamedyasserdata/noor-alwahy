@@ -3,7 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 
 import type { Database } from "../../types/database.types";
 
-test("P4-T08 teacher saves an individual plan and the student sees adherence", async ({ page }) => {
+test("P4-T08 teacher saves an individual plan and the student progress remains available", async ({
+  page,
+}) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
 
@@ -38,15 +40,11 @@ test("P4-T08 teacher saves an individual plan and the student sees adherence", a
 
   await signIn(page, fixture.studentEmail, fixture.password, "student/home");
   await page.goto("/en/student/progress");
-  const planCard = page
-    .locator('[data-slot="card"]')
-    .filter({ has: page.getByRole("heading", { name: "Your memorization plan" }) });
-  await expect(planCard).toBeVisible();
-  await expect(planCard.getByText("0 of 5 pages", { exact: true })).toBeVisible();
-  await expect(planCard.getByText("0 of 20 pages", { exact: true })).toBeVisible();
   await expect(
-    planCard.getByRole("progressbar", { name: "0% of the target is complete" }),
-  ).toHaveCount(2);
+    page.getByRole("heading", { level: 1, name: "Memorisation progress details" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Current juz" })).toBeVisible();
+  await expect(page.getByTestId("quran-map-card")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );

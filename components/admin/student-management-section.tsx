@@ -2,6 +2,7 @@ import { Archive, Download, GraduationCap, Search, UserRoundPlus, UsersRound } f
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { AdminSavedViews } from "@/components/admin/admin-saved-views";
 import { StudentImportPanel } from "@/components/admin/student-import-panel";
 import { AuthNotice } from "@/components/auth/auth-notice";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +42,7 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
   ]);
   const notice = getNotice(query, t);
   const exportQuery = new URLSearchParams();
-  for (const key of ["q", "status", "level", "country"] as const) {
+  for (const key of ["q", "status", "level", "country", "workflow"] as const) {
     const value = directory.filters[key];
     if (value && value !== "all") exportQuery.set(key, String(value));
   }
@@ -70,6 +71,65 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
       <div className="mt-7">
         <AuthNotice message={notice.message} success={notice.success} />
       </div>
+
+      <nav
+        className="mt-7 grid gap-3 sm:grid-cols-3"
+        aria-label={locale === "ar" ? "مراحل الطلاب" : "Student workflow"}
+      >
+        {(
+          [
+            [
+              "all",
+              locale === "ar" ? "كل الطلاب" : "All students",
+              locale === "ar" ? "الملفات المسجلة" : "Registered records",
+            ],
+            [
+              "awaiting_assignment",
+              locale === "ar" ? "بانتظار التعيين" : "Awaiting assignment",
+              locale === "ar" ? "مقبولون بلا معلم حالي" : "Accepted without a current teacher",
+            ],
+            [
+              "assigned",
+              locale === "ar" ? "طلاب معيّنون" : "Assigned students",
+              locale === "ar" ? "لديهم تعيين حالي" : "Have a current assignment",
+            ],
+          ] as const
+        ).map(([value, label, description]) => {
+          const params = new URLSearchParams();
+          for (const key of ["q", "status", "level", "country"] as const) {
+            const current = query[key];
+            if (typeof current === "string" && current && current !== "all")
+              params.set(key, current);
+          }
+          if (value !== "all") params.set("workflow", value);
+          const active = directory.filters.workflow === value;
+          return (
+            <a
+              key={value}
+              href={`/${locale}/admin/students?${params}`}
+              aria-current={active ? "page" : undefined}
+              className={`rounded-2xl border p-4 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${active ? "border-secondary bg-secondary/10 shadow-card" : "bg-card hover:border-secondary/40"}`}
+            >
+              <span className="block font-black text-primary">{label}</span>
+              <span className="mt-1 block text-sm text-muted-foreground">{description}</span>
+            </a>
+          );
+        })}
+      </nav>
+
+      <AdminSavedViews
+        locale={locale}
+        pageKey="students"
+        currentParams={Object.fromEntries(
+          Object.entries({
+            q: directory.filters.q,
+            status: directory.filters.status,
+            level: directory.filters.level,
+            country: directory.filters.country,
+            workflow: directory.filters.workflow,
+          }).filter((entry): entry is [string, string] => Boolean(entry[1]) && entry[1] !== "all"),
+        )}
+      />
 
       <StudentImportPanel
         locale={locale}
@@ -113,6 +173,7 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
         method="get"
         className="mt-8 grid gap-3 rounded-2xl border bg-card p-4 shadow-card md:grid-cols-[minmax(12rem,1.4fr)_repeat(3,minmax(8rem,0.7fr))_auto]"
       >
+        <input type="hidden" name="workflow" value={directory.filters.workflow} />
         <div className="grid gap-2">
           <Label htmlFor="student-search">{t("filters.search")}</Label>
           <Input
@@ -255,8 +316,15 @@ function StudentRow({
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
+        <Button asChild size="sm">
+          <a href={`/${locale}/admin/students/${student.id}`}>
+            {locale === "ar" ? "الملف الشامل" : "Full profile"}
+          </a>
+        </Button>
         <Button asChild variant="outline" size="sm">
-          <a href={`/${locale}/admin/students?student=${student.id}`}>{t("actions.open")}</a>
+          <a href={`/${locale}/admin/students?student=${student.id}`}>
+            {locale === "ar" ? "تعديل البيانات" : "Edit details"}
+          </a>
         </Button>
         {student.status !== "archived" ? (
           <form action={archiveStudentAction.bind(null, locale)}>

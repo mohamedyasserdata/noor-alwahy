@@ -3,6 +3,7 @@
 import type { Route } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 import { routing, type AppLocale } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/require-role";
@@ -14,6 +15,8 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
     ? (localeValue as AppLocale)
     : routing.defaultLocale;
   const { user } = await requireRole("teacher", locale);
+  const intent = z.enum(["draft", "lock"]).safeParse(formData.get("intent"));
+  if (!intent.success) go(locale, "evaluationError", "invalid_fields", formData);
   const parsed = sessionEvaluationSchema.safeParse({
     sessionId: formData.get("sessionId"),
     sessionType: formData.get("sessionType"),
@@ -76,7 +79,7 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
         decision: value.decision,
         homework: value.homework ? { text: value.homework } : null,
         family_note: value.familyNote || null,
-        is_locked: true,
+        is_locked: intent.data === "lock",
         created_by: user.id,
       },
       { onConflict: "session_id" },
@@ -93,10 +96,13 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
     go(locale, "evaluationError", code, formData);
   }
 
-  revalidatePath(`/${locale}/teacher/evaluations`);
+  revalidatePath(`/${locale}/teacher/sessions/${value.sessionId}`);
+  revalidatePath(`/${locale}/teacher/students`);
+  revalidatePath(`/${locale}/student/progress`);
+  const evaluationStatus = intent.data === "lock" ? "saved" : "draft";
   redirect(
-    `/${locale}/teacher/evaluations?${new URLSearchParams({
-      evaluationStatus: "saved",
+    `/${locale}/teacher/sessions/${value.sessionId}?${new URLSearchParams({
+      evaluationStatus,
       score: String(data.total_score),
       rating: String(data.rating),
     })}` as Route,
@@ -105,10 +111,11 @@ export async function submitSessionEvaluationAction(localeValue: string, formDat
 
 function go(locale: AppLocale, key: string, value: string, formData: FormData): never {
   const sessionId = String(formData.get("sessionId") ?? "");
-  redirect(
-    `/${locale}/teacher/evaluations?${new URLSearchParams({
-      [key]: value,
-      ...(sessionId ? { sessionId } : {}),
-    })}` as Route,
-  );
+  const safeSessionId = z.uuid().safeParse(sessionId).success ? sessionId : "";
+  if (safeSessionId) {
+    redirect(
+      `/${locale}/teacher/sessions/${safeSessionId}?${new URLSearchParams({ [key]: value })}` as Route,
+    );
+  }
+  redirect(`/${locale}/teacher/students?${new URLSearchParams({ [key]: value })}` as Route);
 }

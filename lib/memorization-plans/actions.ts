@@ -21,7 +21,10 @@ export async function saveMemorizationPlanAction(localeValue: string, formData: 
     startsOn: formData.get("startsOn"),
     endsOn: formData.get("endsOn"),
   });
-  if (!parsed.success) go(locale, "invalid_fields");
+  const returnToProfile = formData.get("returnToProfile") === "true";
+  const requestedStudentId = String(formData.get("studentId") ?? "");
+  if (!parsed.success)
+    go(locale, "invalid_fields", returnToProfile ? requestedStudentId : undefined);
 
   const value = parsed.data;
   const supabase = await createClient();
@@ -30,7 +33,7 @@ export async function saveMemorizationPlanAction(localeValue: string, formData: 
     .select("id")
     .eq("student_id", value.studentId)
     .maybeSingle();
-  if (readError) go(locale, "request_failed");
+  if (readError) go(locale, "request_failed", returnToProfile ? value.studentId : undefined);
 
   const payload = {
     weekly_target_pages: value.weeklyTargetPages,
@@ -46,13 +49,20 @@ export async function saveMemorizationPlanAction(localeValue: string, formData: 
         student_id: value.studentId,
         created_by: user.id,
       });
-  if (result.error) go(locale, "request_failed");
+  if (result.error) go(locale, "request_failed", returnToProfile ? value.studentId : undefined);
 
   revalidatePath(`/${locale}/teacher/students`);
+  revalidatePath(`/${locale}/teacher/students/${value.studentId}`);
   revalidatePath(`/${locale}/student/progress`);
+  if (returnToProfile) {
+    redirect(`/${locale}/teacher/students/${value.studentId}?tab=plan&planStatus=saved` as Route);
+  }
   redirect(`/${locale}/teacher/students?planStatus=saved` as Route);
 }
 
-function go(locale: AppLocale, code: string): never {
+function go(locale: AppLocale, code: string, studentId?: string): never {
+  if (studentId) {
+    redirect(`/${locale}/teacher/students/${studentId}?tab=plan&planError=${code}` as Route);
+  }
   redirect(`/${locale}/teacher/students?planError=${code}` as Route);
 }

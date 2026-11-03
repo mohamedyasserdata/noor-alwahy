@@ -75,7 +75,12 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
             <BrandMark
               label={academyName}
               logoPath={settings.academyProfile.logoPath}
-              className="min-h-20 shrink-0 [&>span:first-child]:size-14"
+              className={cn(
+                "shrink-0",
+                portal === "student"
+                  ? "min-h-16 min-[980px]:min-h-20 [&>span:first-child]:size-11 min-[980px]:[&>span:first-child]:size-14"
+                  : "min-h-20 [&>span:first-child]:size-14",
+              )}
               labelClassName="hidden max-w-48 text-base leading-6 min-[560px]:block"
             />
 
@@ -88,17 +93,26 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
                 <NotificationCenter initialData={notificationCenter} portal={portal} inline />
               ) : null}
               <AccountMenu account={account} labels={accountLabels} locale={locale} compact />
-              <ThemeToggle
-                compact
-                enableDarkLabel={t("theme.enableDark")}
-                enableLightLabel={t("theme.enableLight")}
-              />
-              <Suspense fallback={<ControlFallback compact />}>
-                <LocaleSwitcher compact />
-              </Suspense>
+              <div className={cn(portal === "student" && "hidden min-[980px]:block")}>
+                <ThemeToggle
+                  compact
+                  enableDarkLabel={t("theme.enableDark")}
+                  enableLightLabel={t("theme.enableLight")}
+                />
+              </div>
+              <div className={cn(portal === "student" && "hidden min-[980px]:block")}>
+                <Suspense fallback={<ControlFallback compact />}>
+                  <LocaleSwitcher compact />
+                </Suspense>
+              </div>
             </div>
 
-            <div className="col-span-full min-w-0 border-t border-secondary/15 py-1.5 min-[980px]:hidden">
+            <div
+              className={cn(
+                "col-span-full min-w-0 border-t border-secondary/15 py-1.5 min-[980px]:hidden",
+                portal === "student" && "hidden",
+              )}
+            >
               <PortalNavigation portal={portal} variant="top" />
             </div>
           </div>
@@ -261,7 +275,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
           className={cn(
             "min-h-[calc(100svh-4rem)] w-full",
             isHorizontalPortal
-              ? "min-h-svh overflow-hidden"
+              ? cn("min-h-svh overflow-hidden", portal === "student" && "pb-24 min-[980px]:pb-0")
               : isAdminPortal || isTeacherPortal
                 ? "mx-auto max-w-[112rem] px-3 pt-5 pb-28 min-[769px]:min-h-[calc(100svh-4.5rem)] min-[769px]:px-6 min-[769px]:pt-7 min-[769px]:pb-10 sm:px-5 xl:px-8"
                 : "mx-auto max-w-[96rem] px-4 pt-7 pb-28 min-[769px]:min-h-svh min-[769px]:px-10 min-[769px]:pt-12 min-[769px]:pb-12 sm:px-6 sm:pt-10 xl:px-14",
@@ -271,9 +285,12 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
         </main>
       </div>
 
-      {!isHorizontalPortal ? (
+      {!isHorizontalPortal || portal === "student" ? (
         <div
-          className="safe-bottom fixed inset-x-0 bottom-0 z-30 h-[5.25rem] border-t bg-card/96 shadow-[0_-0.75rem_2rem_-1.5rem_rgb(15_37_71_/_0.28)] backdrop-blur min-[769px]:hidden"
+          className={cn(
+            "safe-bottom fixed inset-x-0 bottom-0 z-30 h-[5.25rem] border-t bg-card/96 shadow-[0_-0.75rem_2rem_-1.5rem_rgb(15_37_71_/_0.28)] backdrop-blur",
+            portal === "student" ? "min-[980px]:hidden" : "min-[769px]:hidden",
+          )}
           data-testid="portal-bottom-nav"
         >
           <PortalNavigation portal={portal} variant="bottom" />

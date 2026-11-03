@@ -2,7 +2,9 @@ import { Award, Download, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { StudentPageShell } from "@/components/student/student-page-shell";
+import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { getMyCertificates } from "@/lib/certificates/queries";
 
@@ -75,6 +77,9 @@ export async function StudentCertificatesSection({ locale }: { locale: AppLocale
               </span>
               <h2 className="mt-4 text-xl font-black text-primary">{t("student.emptyTitle")}</h2>
               <p className="mt-2 text-muted-foreground">{t("student.emptyDescription")}</p>
+              <Button asChild className="mt-5" variant="outline">
+                <Link href="/student/progress">{t("student.emptyAction")}</Link>
+              </Button>
             </div>
           )}
         </div>

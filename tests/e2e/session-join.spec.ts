@@ -83,6 +83,7 @@ async function createFixture() {
     ends_at: endsAt.toISOString(),
     duration_min: 30,
     zoom_override_url: joinUrl,
+    zoom_published_at: new Date().toISOString(),
     zoom_meeting_id: "join-meeting-id",
     zoom_passcode: "join-passcode",
   });

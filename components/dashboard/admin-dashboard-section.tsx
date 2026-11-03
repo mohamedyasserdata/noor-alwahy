@@ -16,9 +16,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TeacherCapacityForecast } from "@/components/dashboard/teacher-capacity-forecast";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
+import { getTeacherCapacityForecast } from "@/lib/admin/capacity-forecast";
 import { getAdminDashboardData, type AdminDashboardData } from "@/lib/dashboard/admin-dashboard";
+import { getAdminWorkQueue } from "@/lib/dashboard/admin-work-queue";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 export async function AdminDashboardSection({
@@ -36,9 +39,11 @@ export async function AdminDashboardSection({
   const to = dateValue(query.to, today.toISOString().slice(0, 10));
   const country = codeValue(query.country, 2);
   const currency = codeValue(query.currency, 3);
-  const [t, data] = await Promise.all([
+  const [t, data, workQueue, capacityForecast] = await Promise.all([
     getTranslations({ locale, namespace: "adminDashboard" }),
     getAdminDashboardData({ from, to, country, currency }),
+    getAdminWorkQueue(),
+    getTeacherCapacityForecast(),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const exportParams = new URLSearchParams({ locale, from, to, country, currency });
@@ -147,18 +152,40 @@ export async function AdminDashboardSection({
           <div className="mt-5 grid divide-y">
             <ActionRow
               href="/admin/applications"
-              label={t("attention.newApplications")}
-              value={number.format(data.totals.new_applications)}
+              label={locale === "ar" ? "طلبات التحاق جديدة" : "New student applications"}
+              value={number.format(workQueue.newApplications)}
             />
             <ActionRow
-              href="/admin/reports"
-              label={t("attention.riskFlags")}
-              value={number.format(data.riskFlags.length)}
+              href="/admin/students?workflow=awaiting_assignment"
+              label={
+                locale === "ar" ? "طلاب مقبولون بانتظار التعيين" : "Students awaiting assignment"
+              }
+              value={number.format(workQueue.awaitingAssignment)}
             />
             <ActionRow
-              href="/admin/finance"
-              label={t("attention.overdue")}
-              value={moneyValues(data.overdue, locale)}
+              href="/admin/reports?status=approved"
+              label={
+                locale === "ar" ? "تقارير تنتظر مراجعة الإدارة" : "Reports pending admin review"
+              }
+              value={number.format(workQueue.reportsPendingReview)}
+            />
+            <ActionRow
+              href="/admin/attendance"
+              label={
+                locale === "ar"
+                  ? "حصص تحتاج تسجيل حضور المعلم"
+                  : "Sessions missing teacher attendance"
+              }
+              value={number.format(workQueue.missingTeacherAttendance)}
+            />
+            <ActionRow
+              href="/admin/teacher-applications"
+              label={
+                locale === "ar"
+                  ? "طلبات معلمين تحتاج متابعة"
+                  : "Teacher applications requiring action"
+              }
+              value={number.format(workQueue.teacherApplications)}
             />
           </div>
         </section>
@@ -191,6 +218,8 @@ export async function AdminDashboardSection({
           </div>
         </section>
       </div>
+
+      <TeacherCapacityForecast locale={locale} data={capacityForecast} />
 
       <details className="admin-dashboard-analytics mt-7 overflow-hidden border bg-card/65 shadow-card">
         <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 marker:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
@@ -620,18 +649,6 @@ function Empty() {
 }
 function percent(value: number | null, number: Intl.NumberFormat) {
   return value == null ? "—" : `${number.format(value)}%`;
-}
-function moneyValues(values: { currency: string; amount: number }[], locale: AppLocale) {
-  if (!values.length) return "—";
-  return values
-    .map((row) =>
-      new Intl.NumberFormat(locale, {
-        style: "currency",
-        currency: row.currency,
-        maximumFractionDigits: 0,
-      }).format(row.amount),
-    )
-    .join(" · ");
 }
 function dateValue(value: string | string[] | undefined, fallback: string) {
   return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : fallback;

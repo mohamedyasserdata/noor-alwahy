@@ -24,8 +24,8 @@ export async function FamilyBillingSection({
     <section
       className={
         appearance === "student"
-          ? "student-billing-page mx-auto w-full max-w-[94rem]"
-          : "mx-auto w-full max-w-6xl"
+          ? "student-billing-page mx-auto flex w-full max-w-[94rem] flex-col"
+          : "mx-auto flex w-full max-w-6xl flex-col"
       }
       aria-labelledby={appearance === "standard" ? "billing-title" : undefined}
       aria-label={appearance === "student" ? t("title") : undefined}
@@ -40,15 +40,22 @@ export async function FamilyBillingSection({
         </header>
       ) : null}
       {data.statement.length ? (
-        <section
-          className="mt-8 rounded-3xl border bg-card p-5 shadow-card sm:p-7"
-          aria-labelledby="statement-title"
-        >
-          <h2 id="statement-title" className="text-xl font-black text-primary">
-            {t("statementTitle")}
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">{t("statementHint")}</p>
-          <div className="mt-5 overflow-x-auto">
+        <details className="group order-2 mt-5 rounded-3xl border bg-card shadow-card">
+          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 marker:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:px-7 [&::-webkit-details-marker]:hidden">
+            <span>
+              <span id="statement-title" className="block text-lg font-black text-primary">
+                {t("statementTitle")}
+              </span>
+              <span className="mt-1 block text-sm text-muted-foreground">{t("statementHint")}</span>
+            </span>
+            <span className="text-sm font-bold text-muted-foreground group-open:hidden">
+              {t("openStatement")}
+            </span>
+            <span className="hidden text-sm font-bold text-muted-foreground group-open:inline">
+              {t("closeStatement")}
+            </span>
+          </summary>
+          <div className="overflow-x-auto border-t p-5 sm:p-7">
             <table className="w-full min-w-[42rem] text-sm">
               <thead>
                 <tr className="border-b text-start text-muted-foreground">
@@ -87,9 +94,9 @@ export async function FamilyBillingSection({
               </tbody>
             </table>
           </div>
-        </section>
+        </details>
       ) : null}
-      <div className="mt-8 grid gap-5">
+      <div className="order-1 mt-5 grid gap-5">
         {data.invoices.length ? (
           data.invoices.map((invoice) => {
             const student = Array.isArray(invoice.students)

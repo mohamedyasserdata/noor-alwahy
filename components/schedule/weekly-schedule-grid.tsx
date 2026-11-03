@@ -67,6 +67,16 @@ export function WeeklyScheduleGrid({
       .setLocale(locale === "ar" ? "ar-EG" : "en-US")
       .toFormat("d LLL"),
   );
+  const mobileDays = labels.weekdays.flatMap((day, index) => {
+    const daySlots = slots
+      .filter((slot) => (slot.viewer?.weekday ?? slot.weekday) === index)
+      .toSorted((left, right) =>
+        (left.viewer?.time ?? left.local_start_time).localeCompare(
+          right.viewer?.time ?? right.local_start_time,
+        ),
+      );
+    return daySlots.length ? [{ day, date: dates[index], index, slots: daySlots }] : [];
+  });
 
   return (
     <section
@@ -95,7 +105,62 @@ export function WeeklyScheduleGrid({
         </div>
       </div>
 
-      <div className="overflow-x-auto overscroll-x-contain" tabIndex={0} aria-label={labels.title}>
+      <div className="grid gap-3 p-4 xl:hidden">
+        {mobileDays.map((day) => (
+          <section
+            key={day.index}
+            className={`overflow-hidden rounded-2xl border ${day.index === todayIndex ? "border-blue-300 bg-blue-50/45 dark:border-blue-800 dark:bg-blue-950/15" : "bg-background/45"}`}
+            aria-label={`${day.day} ${day.date}`}
+          >
+            <header className="flex items-center justify-between gap-3 border-b px-4 py-3">
+              <h3 className="font-black text-primary">{day.day}</h3>
+              <time className="text-sm text-muted-foreground">{day.date}</time>
+            </header>
+            <div className="grid gap-3 p-3">
+              {day.slots.map((slot) => {
+                const time = slot.viewer?.time ?? slot.local_start_time;
+                return (
+                  <article key={slot.slot_id} className="rounded-xl border bg-card p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="font-black text-primary">
+                          {locale === "ar"
+                            ? slot.track_name_ar
+                            : (slot.track_name_en ?? slot.track_name_ar)}
+                        </h4>
+                        <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                          <GraduationCap className="size-4 text-secondary" aria-hidden="true" />
+                          {slot.teacher_name}
+                        </p>
+                        {role !== "student" ? (
+                          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserRound className="size-4 text-secondary" aria-hidden="true" />
+                            {slot.student_name}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="shrink-0 text-end">
+                        <strong className="block text-primary tabular-nums" dir="ltr">
+                          {formatTime(time, locale)}
+                        </strong>
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {slot.duration_min} min
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div
+        className="hidden overflow-x-auto overscroll-x-contain xl:block"
+        tabIndex={0}
+        aria-label={labels.title}
+      >
         <div className="min-w-[68rem] p-3 sm:p-5">
           <div className="grid grid-cols-[5.5rem_repeat(7,minmax(8rem,1fr))] overflow-hidden rounded-2xl border bg-background/45">
             <div className="border-e border-b bg-primary/[0.035]" aria-hidden="true" />
@@ -152,13 +217,15 @@ export function WeeklyScheduleGrid({
                               ? slot.track_name_ar
                               : (slot.track_name_en ?? slot.track_name_ar)}
                           </h3>
-                          <p className="mt-1 flex items-start gap-1.5 text-xs leading-5 opacity-80">
-                            <UserRound className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-                            <span>
-                              <span className="sr-only">{labels.student}: </span>
-                              {slot.student_name}
-                            </span>
-                          </p>
+                          {role !== "student" ? (
+                            <p className="mt-1 flex items-start gap-1.5 text-xs leading-5 opacity-80">
+                              <UserRound className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+                              <span>
+                                <span className="sr-only">{labels.student}: </span>
+                                {slot.student_name}
+                              </span>
+                            </p>
+                          ) : null}
                           <p className="flex items-start gap-1.5 text-xs leading-5 opacity-80">
                             <GraduationCap
                               className="mt-0.5 size-3.5 shrink-0"

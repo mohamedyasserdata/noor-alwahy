@@ -45,7 +45,7 @@ export async function HomePackages({ locale }: HomePackagesProps) {
             <p className="mt-4 text-lg leading-8 text-muted-foreground">{t("description")}</p>
           </div>
           <form
-            action={setCountryOverrideAction.bind(null, locale, `/${locale}`)}
+            action={setCountryOverrideAction.bind(null, locale, `/${locale}#packages`)}
             className="grid gap-2 rounded-2xl border border-secondary/25 bg-card p-4 shadow-card sm:grid-cols-[minmax(11rem,1fr)_auto] sm:items-end"
           >
             <label
@@ -57,6 +57,7 @@ export async function HomePackages({ locale }: HomePackagesProps) {
                 {packageT("countryLabel")}
               </span>
               <select
+                key={selectedCountry}
                 id="home-package-country"
                 name="country"
                 defaultValue={selectedCountry}

@@ -27,15 +27,17 @@ test("US-060 and US-061 teacher verification, conduct and availability workflow"
   await expect(page.getByText("Teacher profile created.")).toBeVisible();
 
   await signIn(page, fixture.email, fixture.password);
-  await page.goto("/en/teacher/availability");
+  await page.goto("/en/teacher/profile?tab=availability");
   await page.getByRole("button", { name: "Accept conduct code" }).click();
-  await expect(page).toHaveURL(/availabilityStatus=conduct_accepted$/);
+  await expect(page).toHaveURL(
+    /teacher\/profile\?tab=availability&availabilityStatus=conduct_accepted$/,
+  );
   await expect(page.getByText("Conduct acceptance recorded.")).toBeVisible();
   await page.locator("#availability-weekday").selectOption("2");
   await page.locator("#availability-start").fill("09:00");
   await page.locator("#availability-end").fill("10:30");
   await page.getByRole("button", { name: "Send proposal" }).click();
-  await expect(page).toHaveURL(/availabilityStatus=proposed$/);
+  await expect(page).toHaveURL(/teacher\/profile\?tab=availability&availabilityStatus=proposed$/);
   await expect(page.getByText("Tuesday · 09:00–10:30")).toBeVisible();
   await expect(page.getByText("Awaiting review")).toBeVisible();
 

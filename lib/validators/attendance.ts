@@ -14,10 +14,37 @@ export const attendanceStatuses = [
 
 export const recordAttendanceSchema = z.object({
   sessionId: z.string().uuid(),
+  studentId: z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    z.string().uuid().optional(),
+  ),
   status: z.enum(attendanceStatuses),
+  correctionReason: z.preprocess(
+    (value) =>
+      value === null || (typeof value === "string" && value.trim() === "") ? undefined : value,
+    z.string().trim().min(2).max(1000).optional(),
+  ),
 });
 
 export type AttendanceStatus = (typeof attendanceStatuses)[number];
+
+export const teacherAttendanceStatuses = ["present", "late", "absent", "excused"] as const;
+
+export const recordTeacherAttendanceSchema = z.object({
+  sessionId: z.string().uuid(),
+  status: z.enum(teacherAttendanceStatuses),
+  minutes: z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    z.coerce.number().int().min(0).max(240).optional(),
+  ),
+  note: z.preprocess(
+    (value) =>
+      value === null || (typeof value === "string" && value.trim() === "") ? undefined : value,
+    z.string().trim().min(2).max(1000).optional(),
+  ),
+});
+
+export type TeacherAttendanceStatus = (typeof teacherAttendanceStatuses)[number];
 
 export const attendanceReportPeriods = ["daily", "weekly", "monthly"] as const;
 

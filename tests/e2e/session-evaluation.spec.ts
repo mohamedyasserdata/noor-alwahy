@@ -5,66 +5,114 @@ import { expect, test } from "@playwright/test";
 import type { Database } from "../../types/database.types";
 import { signInAs } from "./helpers/auth";
 
-test("P4-T04 teacher restores a local draft and locks a mobile session evaluation", async ({
+test("teacher restores a server draft on another device, reviews it, then publishes", async ({
+  browser,
   page,
 }) => {
   test.setTimeout(120_000);
   const fixture = await createFixture();
+  const secondContext = await browser.newContext();
+  try {
+    await signInAs(page, "en", "teacher");
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(`/en/teacher/sessions/${fixture.sessionId}`);
+    await expect(page.getByTestId("teacher-session-workspace")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: `Session with ${fixture.studentName}` }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Recitation & evaluation" })).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
-  await signInAs(page, "en", "teacher");
-  await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto(`/en/teacher/evaluations?sessionId=${fixture.sessionId}`);
-  await expect(page.getByRole("heading", { level: 1, name: "Session evaluation" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: fixture.studentName })).toBeVisible();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    const firstCriterion = page.getByRole("radiogroup").first();
+    const initialScore = firstCriterion.getByRole("radio", { checked: true });
+    await initialScore.focus();
+    await initialScore.press("End");
+    await expect(firstCriterion.getByRole("radio", { name: "5 - Excellent" })).toBeChecked();
+    await page.getByLabel("Homework").fill("Review Al-Fatihah twice");
+    const excellentButtons = await page.getByRole("radio", { name: "5 - Excellent" }).all();
+    for (const button of excellentButtons) await button.click();
+    await page.getByRole("button", { name: "Save draft" }).click();
+    await expect(page).toHaveURL(/evaluationStatus=draft/);
+    await expect(page.getByText(/draft was saved in the system/i)).toBeVisible();
 
-  const firstCriterion = page.getByRole("radiogroup").first();
-  const initialScore = firstCriterion.getByRole("radio", { checked: true });
-  await initialScore.focus();
-  await initialScore.press("End");
-  await expect(firstCriterion.getByRole("radio", { name: "5 - Excellent" })).toBeChecked();
-  await expect(firstCriterion.getByRole("radio", { name: "5 - Excellent" })).toBeFocused();
-  await expect(
-    page.getByText("Live indicator").locator("xpath=ancestor::*[@aria-live][1]"),
-  ).toHaveAttribute("aria-live", "polite");
+    const db = databaseClient();
+    const { data: draftRow, error: draftError } = await db
+      .from("session_evaluations")
+      .select("is_locked,homework")
+      .eq("session_id", fixture.sessionId)
+      .single();
+    if (draftError) throw draftError;
+    expect(draftRow.is_locked).toBe(false);
 
-  const startedAt = Date.now();
-  await page.getByLabel("Homework").fill("Review Al-Fatihah twice");
-  await page.reload();
-  await expect(page.getByText("Your draft on this device was restored.")).toBeVisible();
-  await expect(page.getByLabel("Homework")).toHaveValue("Review Al-Fatihah twice");
+    const studentDb = createClient<Database>(
+      required("NEXT_PUBLIC_SUPABASE_URL"),
+      required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    );
+    const { error: loginError } = await studentDb.auth.signInWithPassword({
+      email: fixture.studentEmail,
+      password: fixture.studentPassword,
+    });
+    if (loginError) throw loginError;
+    const hiddenDraft = await studentDb
+      .from("session_evaluations")
+      .select("id")
+      .eq("session_id", fixture.sessionId)
+      .maybeSingle();
+    if (hiddenDraft.error) throw hiddenDraft.error;
+    expect(hiddenDraft.data).toBeNull();
 
-  const excellentButtons = await page.getByRole("radio", { name: "5 - Excellent" }).all();
-  for (const button of excellentButtons) await button.click();
-  await page.getByRole("button", { name: "Save and lock evaluation" }).click();
+    const secondPage = await secondContext.newPage();
+    await signInAs(secondPage, "en", "teacher");
+    await secondPage.goto(`/en/teacher/sessions/${fixture.sessionId}`);
+    await expect(secondPage.getByText(/system draft was restored/i)).toBeVisible();
+    await expect(secondPage.getByLabel("Homework")).toHaveValue("Review Al-Fatihah twice");
+    await secondPage.getByRole("button", { name: "Review evaluation" }).click();
+    await expect(
+      secondPage.getByRole("heading", { name: "Evaluation summary before final approval" }),
+    ).toBeVisible();
+    await expect(
+      secondPage.getByRole("definition").filter({ hasText: "Review Al-Fatihah twice" }),
+    ).toBeVisible();
+    await secondPage.getByRole("button", { name: "Approve and publish" }).click();
+    await expect(secondPage).toHaveURL(/evaluationStatus=saved/);
+    await expect(secondPage.getByText(/evaluation was saved and locked/i)).toBeVisible();
+    expect(
+      await secondPage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
 
-  await expect(page).toHaveURL(/evaluationStatus=saved/);
-  await expect(page.getByText(/evaluation was saved and locked/i)).toBeVisible();
-  expect(Date.now() - startedAt).toBeLessThan(120_000);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
+    const { data, error } = await db
+      .from("session_evaluations")
+      .select("is_locked,total_score,rating,from_ayah_id,to_ayah_id,homework")
+      .eq("session_id", fixture.sessionId)
+      .single();
+    if (error) throw error;
+    expect(data.is_locked).toBe(true);
+    expect(data.total_score).toBe(100);
+    expect(data.rating).toBe(5);
+    expect(data.from_ayah_id).toBe(1);
+    expect(data.to_ayah_id).toBe(7);
+    expect(data.homework).toEqual({ text: "Review Al-Fatihah twice" });
 
-  const db = databaseClient();
-  const { data, error } = await db
-    .from("session_evaluations")
-    .select("is_locked,total_score,rating,from_ayah_id,to_ayah_id,homework")
-    .eq("session_id", fixture.sessionId)
-    .single();
-  if (error) throw error;
-  expect(data.is_locked).toBe(true);
-  expect(data.total_score).toBe(100);
-  expect(data.rating).toBe(5);
-  expect(data.from_ayah_id).toBe(1);
-  expect(data.to_ayah_id).toBe(7);
-  expect(data.homework).toEqual({ text: "Review Al-Fatihah twice" });
+    const visibleEvaluation = await studentDb
+      .from("session_evaluations")
+      .select("id,is_locked")
+      .eq("session_id", fixture.sessionId)
+      .single();
+    if (visibleEvaluation.error) throw visibleEvaluation.error;
+    expect(visibleEvaluation.data.is_locked).toBe(true);
+  } finally {
+    await secondContext.close();
+    await fixture.cleanup();
+  }
 });
 
 async function createFixture() {
   const db = databaseClient();
   const suffix = crypto.randomUUID().slice(0, 8);
   const studentName = `Evaluation Student ${suffix}`;
-  const studentUser = await createUser(db, `evaluation.student.${suffix}@test.local`, studentName);
+  const studentEmail = `evaluation.student.${suffix}@test.local`;
+  const studentPassword = "AcademyTest1!";
+  const studentUser = await createUser(db, studentEmail, studentName, studentPassword);
   const trackId = crypto.randomUUID();
   const studentId = crypto.randomUUID();
   const assignmentId = crypto.randomUUID();
@@ -137,16 +185,40 @@ async function createFixture() {
     status: "held",
   });
   if (sessionError) throw sessionError;
+  const { error: attendanceError } = await db.from("attendance").insert({
+    session_id: sessionId,
+    student_id: studentId,
+    status: "present",
+    minutes: 30,
+    recorded_by: "10000000-0000-4000-8000-000000000002",
+    locked_at: now,
+  });
+  if (attendanceError) throw attendanceError;
 
-  return { sessionId, studentName };
+  return {
+    sessionId,
+    studentEmail,
+    studentName,
+    studentPassword,
+    async cleanup() {
+      await db.from("session_evaluations").delete().eq("session_id", sessionId);
+      await db.from("attendance").delete().eq("session_id", sessionId);
+      await db.from("sessions").delete().eq("id", sessionId);
+      await db.from("teacher_assignments").delete().eq("id", assignmentId);
+      await db.from("students").delete().eq("id", studentId);
+      await db.from("teacher_tracks").delete().eq("track_id", trackId).eq("teacher_id", teacherId);
+      await db.from("tracks").delete().eq("id", trackId);
+      await db.auth.admin.deleteUser(studentUser);
+    },
+  };
 }
 
 type FixtureClient = ReturnType<typeof databaseClient>;
 
-async function createUser(db: FixtureClient, email: string, fullName: string) {
+async function createUser(db: FixtureClient, email: string, fullName: string, password: string) {
   const { data, error } = await db.auth.admin.createUser({
     email,
-    password: "AcademyTest1!",
+    password,
     email_confirm: true,
     app_metadata: { role: "student" },
     user_metadata: { full_name: fullName },

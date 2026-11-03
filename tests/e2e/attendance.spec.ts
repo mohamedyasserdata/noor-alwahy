@@ -9,7 +9,7 @@ test("US-080/081 teacher records attendance in one click with atomic effects", a
   const fixture = await createFixture();
 
   await signIn(page, fixture.teacherEmail, fixture.teacherPassword);
-  await expect(page.getByRole("heading", { name: "My sessions today" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Today’s schedule" })).toBeVisible();
   const sessionCard = page.locator("li").filter({ hasText: fixture.studentName });
   await expect(sessionCard).toBeVisible();
   await sessionCard.getByRole("button", { name: "Present" }).click();

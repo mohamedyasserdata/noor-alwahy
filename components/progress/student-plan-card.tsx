@@ -17,16 +17,7 @@ export async function StudentPlanCard({
   const t = await getTranslations({ locale, namespace: "memorizationPlan" });
 
   if (!plan) {
-    return (
-      <Card className="mt-8 border-dashed shadow-none">
-        <CardHeader>
-          <h2 className="text-lg font-extrabold tracking-tight text-primary">
-            {t("student.emptyTitle")}
-          </h2>
-          <CardDescription>{t("student.emptyDescription")}</CardDescription>
-        </CardHeader>
-      </Card>
-    );
+    return null;
   }
 
   const weeklyPercent = Number(plan.weekly_adherence_percent ?? 0);

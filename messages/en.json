@@ -277,7 +277,7 @@
           "description": "Manage available teaching times so the administration can build a suitable schedule."
         },
         "schedule": {
-          "label": "My schedule",
+          "label": "Sessions & schedule",
           "title": "Teaching schedule",
           "description": "See assigned weekly lessons in your local time zone."
         },
@@ -292,9 +292,9 @@
           "description": "Review counted sessions, monthly statements, and each statement's approval and payment status."
         },
         "profile": {
-          "label": "My profile",
-          "title": "My profile",
-          "description": "Account settings and core preferences."
+          "label": "Profile & settings",
+          "title": "Profile & settings",
+          "description": "Account, availability, and personal attendance in one place."
         },
         "exams": {
           "label": "Exams",
@@ -306,6 +306,8 @@
     "student": {
       "roleName": "Student portal",
       "navigationLabel": "Student portal sections",
+      "more": "More",
+      "moreTitle": "More pages and tools",
       "sections": {
         "home": {
           "label": "Home",
@@ -316,6 +318,11 @@
           "label": "Progress",
           "title": "Learning progress",
           "description": "A personal view of progress and the evaluations approved for you to see."
+        },
+        "reports": {
+          "label": "Reports",
+          "title": "Published reports",
+          "description": "View the periodic reports approved and published by administration."
         },
         "schedule": {
           "label": "Schedule",
@@ -369,6 +376,35 @@
           "description": "Reach the academy’s approved contact channels without creating an internal messaging system."
         }
       }
+    }
+  },
+  "studentHome": {
+    "welcome": "Welcome back, {name}",
+    "description": "Start with your next session, then review what needs your attention without distractions.",
+    "importantAlert": "Most important alert",
+    "notificationFallback": "An alert needs your attention",
+    "openAlert": "Open alert",
+    "summaryTitle": "Your progress at a glance",
+    "summaryDescription": "Only three indicators to show where you stand now.",
+    "openProgress": "View progress",
+    "weeklyPlan": "Weekly plan progress",
+    "masteredPages": "Mastered pages",
+    "attendance": "Attendance rate",
+    "percentValue": "{value}%",
+    "pending": "Being prepared",
+    "currentWork": "What to work on now",
+    "currentWorkDescription": "You have {count} reviews due. Check your homework before the next session.",
+    "nothingDue": "There are no overdue reviews or pending homework right now."
+  },
+  "studentExperience": {
+    "error": {
+      "title": "This page could not be loaded",
+      "description": "Check your connection and try again. Your current page is preserved, so you will not need to start over.",
+      "retry": "Try again",
+      "preserved": "Technical details stay hidden, and your account and selected page will not change."
+    },
+    "loading": {
+      "label": "Loading student data"
     }
   },
   "parentPortal": {
@@ -1235,12 +1271,27 @@
     "title": "Attendance register",
     "description": "Review saved session outcomes and spot ended sessions that still need attendance.",
     "recordToday": "Record today's attendance",
+    "studentOutcomesTitle": "Student attendance outcomes in your sessions",
     "missing": "Your teacher profile has not been created yet.",
     "historyTitle": "Last {days} days",
     "empty": "No sessions fall within this period.",
     "pending": "Not recorded",
     "minutes": "{count} minutes",
     "timezone": "Times are shown in your time zone: {timezone}",
+    "ownRegister": {
+      "title": "My attendance recorded by administration",
+      "description": "This is a separate register maintained by administration. You can review it here but cannot change it yourself.",
+      "empty": "Administration has not recorded attendance for you during the last 30 days.",
+      "session": "Student session: {student}",
+      "note": "Administration note: {note}",
+      "minutesMissing": "Duration not set",
+      "statuses": {
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "excused": "Excused absence"
+      }
+    },
     "metrics": {
       "scheduled": "Scheduled sessions",
       "recorded": "Saved outcomes",
@@ -1287,7 +1338,39 @@
     },
     "percentage": "{value}%",
     "empty": "No attendance activity falls within this period.",
-    "error": "The attendance report could not be loaded. Verify your MFA session and try again."
+    "error": "The attendance report could not be loaded. Verify your MFA session and try again.",
+    "teacherRegister": {
+      "title": "Teacher attendance register",
+      "description": "Record attendance for each completed session or correct it. Teachers cannot edit this register, and every correction is retained in the audit log.",
+      "session": "Session with {student} · {date}",
+      "pending": "Awaiting record",
+      "saved": "Teacher attendance was saved and the change was added to the audit log.",
+      "save": "Record attendance",
+      "correct": "Save correction",
+      "saving": "Saving…",
+      "empty": "No sessions ended during the last 30 days.",
+      "error": "The teacher attendance register could not be loaded.",
+      "fields": {
+        "status": "Teacher status",
+        "minutes": "Minutes attended",
+        "note": "Administration note",
+        "notePlaceholder": "Optional — reason for lateness or correction"
+      },
+      "statuses": {
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "excused": "Excused absence"
+      },
+      "errors": {
+        "invalid_fields": "Review the attendance status, minutes, and note.",
+        "teacher_attendance_session_not_found": "The session no longer exists.",
+        "teacher_attendance_session_not_ended": "Teacher attendance cannot be recorded before the session ends.",
+        "teacher_attendance_admin_required": "Only administration can perform this action.",
+        "teacher_attendance_correction_reason_required": "Enter a correction reason before saving the change.",
+        "request_failed": "Teacher attendance could not be saved. No partial change was stored."
+      }
+    }
   },
   "schedules": {
     "eyebrow": "Fixed weekly lessons",
@@ -1308,7 +1391,7 @@
     "empty": "No active weekly lessons are available.",
     "grid": {
       "title": "Weekly timetable",
-      "description": "Each lesson appears on its local day and time. Scroll horizontally on mobile to see the rest of the week.",
+      "description": "Each lesson appears on its local day and time, as a clear list on mobile and a weekly grid on larger screens.",
       "lessonCount": "{count} weekly lessons",
       "lessonsAtTime": "{count} lessons at this time",
       "student": "Student",
@@ -1329,7 +1412,13 @@
       "revoked": "The private calendar link was revoked.",
       "error": "The calendar link could not be updated. Try again.",
       "privacy": "Treat this link like a password. It contains no Zoom link or meeting credentials, and you can revoke it at any time.",
-      "urlLabel": "Private subscription URL"
+      "urlLabel": "Private subscription URL",
+      "openTools": "Open tools",
+      "closeTools": "Hide tools",
+      "confirmGenerate": "A new subscription link will be created and any previous link will stop working.",
+      "confirmRevoke": "The current subscription link will be revoked and calendar apps will no longer update through it.",
+      "confirm": "Confirm operation",
+      "cancel": "Go back"
     },
     "weekdays": {
       "0": "Sunday",
@@ -1364,6 +1453,17 @@
       "newTime": "New date and time",
       "timezoneNote": "Time is read in your zone: {timezone}",
       "saveReschedule": "Approve new time",
+      "participantsTitle": "Session students",
+      "individualSession": "Individual session",
+      "groupCount": "Group session · {count} students",
+      "primaryParticipant": "Primary student",
+      "addParticipant": "Add a student assigned to this teacher",
+      "chooseParticipant": "Choose student",
+      "participantIdentity": "Student identity",
+      "chooseParticipantIdentity": "Choose the same student",
+      "addParticipantButton": "Add to session",
+      "removeParticipant": "Remove {name} from the session",
+      "noEligibleParticipant": "No other student matches the track and gender and is assigned to this teacher.",
       "saving": "Approving…",
       "emptySessions": "There are no upcoming sessions to manage.",
       "makeupTitle": "Available makeup entitlements",
@@ -1384,7 +1484,9 @@
       "statuses": {
         "substitute_saved": "The substitute was approved and session participants were notified.",
         "makeup_saved": "The makeup session was created and linked to its entitlement.",
-        "rescheduled": "The replacement time was created and linked to the original session."
+        "rescheduled": "The replacement time was created and linked to the original session.",
+        "participant_added": "The student was added to the group session and can now access it.",
+        "participant_removed": "The student was removed and their session access was withdrawn."
       },
       "errors": {
         "invalid_fields": "Review the selected session, teacher, and time.",
@@ -1394,6 +1496,9 @@
         "conflict": "The teacher or student already has another session at that time.",
         "entitlement_unavailable": "The makeup entitlement has expired or was already used.",
         "session_not_adjustable": "The session is no longer scheduled or already has a replacement.",
+        "participant_assignment_invalid": "The student does not have a valid assignment to this session teacher.",
+        "session_participants_locked": "Participants cannot be changed after the session starts.",
+        "primary_participant_cannot_be_removed": "The primary student cannot be removed from the session.",
         "request_failed": "The change could not be approved. No partial changes were saved."
       }
     }
@@ -1584,11 +1689,117 @@
       "request_failed": "The memorization plan could not be saved. No partial change was kept."
     }
   },
+  "studentProgress": {
+    "goalTitle": "Your current goal",
+    "goalDescription": "The goal approved by your teacher for the current memorisation plan.",
+    "weeklyGoal": "Weekly goal",
+    "monthlyGoal": "Monthly goal",
+    "pagesValue": "{count} pages",
+    "title": "Progress summary",
+    "planProgress": "Weekly plan progress",
+    "pages": "mastered pages",
+    "speed": "pages per week over the last 4 weeks",
+    "expectedEstimate": "Estimated completion",
+    "estimateHint": "The completion date is an estimate that changes with your actual pace and approved plan. It is not guaranteed.",
+    "currentWork": "Memorisation and review due",
+    "review": "Review portion",
+    "reviewValue": "Due: {due} · Overdue: {overdue}",
+    "homework": "Current homework",
+    "analyticsTitle": "Performance analytics and details",
+    "open": "Show details",
+    "close": "Hide details",
+    "radar": "Evaluation profile",
+    "current": "Current month",
+    "previous": "Previous month",
+    "curve": "Memorisation curve",
+    "history": "Recent evaluations",
+    "report": "Latest published report",
+    "download": "Download report",
+    "badges": "Achievements",
+    "consistency": "Weekly consistency",
+    "completedJuzBadge": "Juz {juz} completed",
+    "percentValue": "{value}%",
+    "noData": "Not enough data yet",
+    "emptyStatus": "Where you are now",
+    "emptyTitle": "Your journey starts with a clear plan",
+    "emptyDescription": "Your teacher is preparing the right memorisation goal for you. In the meantime, explore the Quran map and choose any surah or juz.",
+    "emptyCurrentTitle": "Set your goal",
+    "emptyCurrentDescription": "Your teacher sets weekly and monthly targets that match your level.",
+    "emptyNextTitle": "See your progress",
+    "emptyNextDescription": "After the first locked evaluation, pages gain progress colours and your pace and review work appear.",
+    "criteria": [
+      "Memorisation",
+      "Tajweed",
+      "Makharij",
+      "Waqf",
+      "Performance",
+      "Linking",
+      "Commitment"
+    ]
+  },
+  "studentProgressOverview": {
+    "percent": "{value}%",
+    "surahCount": "{count, plural, =0 {No completed surahs} =1 {1 surah} other {# surahs}}",
+    "unknown": "Unspecified range",
+    "showLess": "Show summary",
+    "currentJuz": {
+      "eyebrow": "Active stage",
+      "title": "Current juz",
+      "label": "You are now progressing through",
+      "value": "Juz {juz}",
+      "progress": "Juz progress",
+      "pages": "Mastered pages",
+      "surahs": "Surah coverage"
+    },
+    "map": {
+      "title": "Quran map",
+      "description": "See your progress across all 30 juz and the details of every page.",
+      "open": "Open the complete Quran map",
+      "pages": "{completed} of {total} pages"
+    },
+    "history": {
+      "title": "Recitation history",
+      "showAll": "View full history",
+      "date": "Date",
+      "range": "Surah / pages",
+      "score": "Score",
+      "type": "Recitation type",
+      "note": "Teacher note",
+      "noNote": "No written note.",
+      "empty": "Your recitation history will appear after your teacher locks the first evaluation."
+    },
+    "review": {
+      "title": "Pages to review",
+      "description": "Pages that are due for review or need reinforcement.",
+      "badge": "Review",
+      "showAll": "View all ({count})",
+      "empty": "No pages are due for review right now."
+    },
+    "teacherNote": {
+      "title": "Teacher notes",
+      "empty": "The latest note shared by your teacher will appear after an evaluation is locked."
+    },
+    "sessionTypes": {
+      "new_memo": "New memorisation",
+      "near_review": "Near review",
+      "far_review": "Far review",
+      "recitation": "Recitation",
+      "tajweed": "Tajweed",
+      "tafsir": "Tafsir",
+      "other": "Learning session"
+    }
+  },
   "quranMap": {
-    "eyebrow": "Your memorization at a glance",
-    "title": "Quran progress map",
-    "description": "Follow {name}'s 604-page journey. Every locked evaluation updates this map automatically.",
+    "eyebrow": "My journey with the Quran",
+    "title": "Memorisation progress details",
+    "description": "{name}'s memorisation record, recitations, teacher notes, and pages that need review.",
+    "mapPageEyebrow": "Complete map",
+    "mapPageTitle": "Quran map",
+    "mapPageDescription": "Browse all 30 juz and open any page to see its memorisation status, latest review, and evaluation results.",
+    "backToProgress": "Back to progress details",
     "mapTitle": "Madinah Mushaf pages",
+    "journeyProgressLabel": "Quran pages mastered",
+    "journeyProgressValue": "{completed} of {total}",
     "pageCount": "{count} pages",
     "surahLabel": "Go to surah",
     "keyboardHint": "Use arrow keys to move page by page; Home and End jump to the edges.",
@@ -1596,8 +1807,11 @@
     "pageLabel": "Page {page}: {status}",
     "legendLabel": "Progress status legend",
     "summaryLabel": "Page status totals",
+    "allJuz": "All 30 juz",
     "juzTitle": "Jump to a juz",
     "juzLabel": "Juz {juz}",
+    "juzProgress": "Juz {juz}: {percent}% progress",
+    "mobileSelection": "Page {page} · Juz {juz} · {status}",
     "score": "{score}%",
     "statuses": {
       "mastered": "Mastered",
@@ -1612,7 +1826,8 @@
       "status": "Status",
       "firstMemorized": "First memorized",
       "lastReviewed": "Last reviewed",
-      "average": "Review average"
+      "average": "Review average",
+      "evaluations": "Evaluation count"
     }
   },
   "applicationCrm": {
@@ -2355,6 +2570,8 @@
     "statementDebit": "Debit",
     "statementCredit": "Credit",
     "statementBalance": "Balance",
+    "openStatement": "View statement",
+    "closeStatement": "Hide statement",
     "states": {
       "draft": "Draft",
       "issued": "Due",
@@ -2767,7 +2984,8 @@
       "revoked": "Revoked",
       "revokedNotice": "This certificate is revoked and cannot be downloaded.",
       "emptyTitle": "No certificates yet",
-      "emptyDescription": "Certificates will appear here as soon as the academy approves them."
+      "emptyDescription": "Certificates will appear here as soon as the academy approves them. View your progress to see your current achievements.",
+      "emptyAction": "View progress"
     }
   },
   "exams": {
@@ -3290,6 +3508,12 @@
       "eyebrow": "Teacher portal · Noor Al-Wahy Academy",
       "title": "My profile",
       "description": "Teacher settings and the account details you are allowed to edit.",
+      "tabsLabel": "Teacher profile sections",
+      "tabs": {
+        "account": "Account & preferences",
+        "availability": "Availability",
+        "attendance": "My attendance"
+      },
       "detailsTitle": "Profile details",
       "preferencesTitle": "Account preferences",
       "displayName": "Display name",

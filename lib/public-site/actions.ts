@@ -29,6 +29,9 @@ export async function setCountryOverrideAction(
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
+  if (returnPathValue === `/${locale}#packages`) {
+    return;
+  }
   const safeReturnPath = new RegExp(`^/${locale}/offer/[A-Za-z0-9_-]{16,128}$`).test(
     returnPathValue,
   )

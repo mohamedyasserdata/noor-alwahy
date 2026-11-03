@@ -3,6 +3,7 @@ import "server-only";
 import { DateTime } from "luxon";
 import { connection } from "next/server";
 
+import { calculateStudentAttendance } from "@/lib/attendance/rate";
 import { getGuardianPortalContext } from "@/lib/parent/children";
 import { createClient } from "@/lib/supabase/server";
 
@@ -57,19 +58,9 @@ export async function getGuardianChildDetails(studentId: string) {
       const attendance = relation(session.attendance);
       return attendance ? [{ session, attendance }] : [];
     });
-  const eligibleAttendance = attendanceRows.filter(({ attendance }) =>
-    ["present", "late", "student_absent", "student_excused"].includes(attendance.status),
+  const attendanceSummary = calculateStudentAttendance(
+    attendanceRows.map(({ attendance }) => ({ status: attendance.status })),
   );
-  const present = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "present",
-  ).length;
-  const late = eligibleAttendance.filter(({ attendance }) => attendance.status === "late").length;
-  const absent = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "student_absent",
-  ).length;
-  const excused = eligibleAttendance.filter(
-    ({ attendance }) => attendance.status === "student_excused",
-  ).length;
 
   const upcomingRows = sessions
     .filter((session) => DateTime.fromISO(session.ends_at) >= now)
@@ -130,14 +121,12 @@ export async function getGuardianChildDetails(studentId: string) {
     child,
     attendance: {
       periodDays: 30,
-      total: eligibleAttendance.length,
-      present,
-      late,
-      absent,
-      excused,
-      rate: eligibleAttendance.length
-        ? Math.round(((present + late) * 10000) / eligibleAttendance.length) / 100
-        : null,
+      total: attendanceSummary.total,
+      present: attendanceSummary.present,
+      late: attendanceSummary.late,
+      absent: attendanceSummary.absent,
+      excused: attendanceSummary.excused,
+      rate: attendanceSummary.rate,
       records: attendanceRows.slice(0, 16).map(({ session, attendance }) => ({
         id: session.id,
         scheduledAt: session.scheduled_at,

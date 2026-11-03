@@ -1,4 +1,4 @@
-import { CalendarSync, ClockArrowUp, UserRoundCog } from "lucide-react";
+import { CalendarSync, ClockArrowUp, UserRoundCog, Users, X } from "lucide-react";
 import { DateTime } from "luxon";
 import { getTranslations } from "next-intl/server";
 
@@ -11,6 +11,7 @@ import type { AppLocale } from "@/i18n/routing";
 import {
   assignSessionSubstituteAction,
   createMakeupSessionAction,
+  manageSessionParticipantAction,
   rescheduleSessionAction,
 } from "@/lib/schedules/actions";
 import type { getScheduleWorkspace } from "@/lib/schedules/management";
@@ -69,6 +70,21 @@ export async function SessionAdjustmentsSection({
             const teacher = one(session.teacher);
             const teacherProfile = teacher ? one(teacher.profile) : null;
             const assignment = one(session.assignment);
+            const participantIds = new Set(
+              session.participants.map((participant) => participant.student_id),
+            );
+            const eligibleParticipants = data.assignments.filter((candidate) => {
+              const candidateStudent = one(candidate.student);
+              const candidateTeacher = one(candidate.teacher);
+              const candidateTrack = one(candidate.track);
+              return (
+                candidateStudent &&
+                candidateTeacher?.id === teacher?.id &&
+                candidateStudent.gender === student?.gender &&
+                candidateTrack?.id === assignment?.track_id &&
+                !participantIds.has(candidateStudent.id)
+              );
+            });
             const eligibleTeachers = data.teachers.filter(
               (candidate) =>
                 candidate.id !== teacher?.id &&
@@ -168,6 +184,102 @@ export async function SessionAdjustmentsSection({
                       variant="outline"
                     />
                   </form>
+
+                  <section
+                    className="grid gap-4 border-t pt-5 sm:col-span-2"
+                    aria-label={t("participantsTitle")}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="flex items-center gap-2 font-black text-primary">
+                        <Users className="size-4 text-secondary" aria-hidden="true" />
+                        {t("participantsTitle")}
+                      </p>
+                      <Badge variant={session.format === "group" ? "secondary" : "outline"}>
+                        {session.format === "group"
+                          ? t("groupCount", { count: session.participants.length })
+                          : t("individualSession")}
+                      </Badge>
+                    </div>
+
+                    <ul className="flex flex-wrap gap-2">
+                      {session.participants.map((participant) => (
+                        <li
+                          key={participant.student_id}
+                          className="flex min-h-11 items-center gap-2 rounded-xl border bg-background px-3 py-2 text-sm font-bold"
+                        >
+                          <span>{participant.student.full_name}</span>
+                          {participant.is_primary ? (
+                            <Badge variant="outline">{t("primaryParticipant")}</Badge>
+                          ) : (
+                            <form action={manageSessionParticipantAction.bind(null, locale)}>
+                              <input type="hidden" name="sessionId" value={session.id} />
+                              <input
+                                type="hidden"
+                                name="studentId"
+                                value={participant.student_id}
+                              />
+                              <input
+                                type="hidden"
+                                name="assignmentId"
+                                value={participant.assignment_id ?? ""}
+                              />
+                              <button
+                                type="submit"
+                                name="action"
+                                value="remove"
+                                className="grid size-9 place-items-center rounded-lg text-destructive hover:bg-destructive/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                aria-label={t("removeParticipant", {
+                                  name: participant.student.full_name,
+                                })}
+                              >
+                                <X className="size-4" aria-hidden="true" />
+                              </button>
+                            </form>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {eligibleParticipants.length ? (
+                      <form
+                        action={manageSessionParticipantAction.bind(null, locale)}
+                        className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+                      >
+                        <input type="hidden" name="sessionId" value={session.id} />
+                        <input type="hidden" name="action" value="add" />
+                        <div className="grid gap-2">
+                          <Label htmlFor={`participant-${session.id}`}>{t("addParticipant")}</Label>
+                          <select
+                            id={`participant-${session.id}`}
+                            name="assignmentId"
+                            required
+                            className="min-h-11 w-full min-w-0 rounded-xl border bg-background px-3"
+                          >
+                            <option value="">{t("chooseParticipant")}</option>
+                            {eligibleParticipants.map((candidate) => {
+                              const candidateStudent = one(candidate.student);
+                              return candidateStudent ? (
+                                <option
+                                  key={candidate.id}
+                                  value={candidate.id}
+                                  data-student-id={candidateStudent.id}
+                                >
+                                  {candidateStudent.full_name}
+                                </option>
+                              ) : null;
+                            })}
+                          </select>
+                        </div>
+                        <AdminSubmitButton
+                          label={t("addParticipantButton")}
+                          pendingLabel={t("saving")}
+                          variant="outline"
+                        />
+                      </form>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{t("noEligibleParticipant")}</p>
+                    )}
+                  </section>
                 </div>
               </article>
             );

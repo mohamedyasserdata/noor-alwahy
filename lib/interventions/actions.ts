@@ -13,6 +13,32 @@ const transitionSchema = z.object({
   reason: z.string().trim().max(500),
 });
 
+const assignmentSchema = z.object({
+  caseId: z.uuid(),
+  assigneeId: z.uuid(),
+  dueAt: z.string().refine((value) => Number.isFinite(new Date(value).getTime()), "invalid_due_at"),
+});
+
+export async function assignInterventionCaseAction(locale: AppLocale, formData: FormData) {
+  await requireRole("admin", locale);
+  const input = assignmentSchema.parse({
+    caseId: formData.get("caseId"),
+    assigneeId: formData.get("assigneeId"),
+    dueAt: formData.get("dueAt"),
+  });
+  const dueAt = new Date(input.dueAt);
+  if (dueAt <= new Date()) throw new Error("intervention_due_at_future_required");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("assign_intervention_case", {
+    p_case: input.caseId,
+    p_assignee: input.assigneeId,
+    p_due_at: dueAt.toISOString(),
+  });
+  if (error) throw new Error("intervention_assignment_failed");
+  revalidatePath(`/${locale}/admin/control-center`);
+  revalidatePath(`/${locale}/admin/dashboard`);
+}
+
 const ruleSchema = z.object({
   ruleId: z.string().uuid(),
   ruleType: z.enum([

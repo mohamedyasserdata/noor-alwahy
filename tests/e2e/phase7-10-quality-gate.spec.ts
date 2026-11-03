@@ -4,7 +4,6 @@ import { signInAs } from "./helpers/auth";
 
 const protectedSections = [
   "finance",
-  "exams",
   "certificates",
   "reports",
   "announcements",

@@ -32,6 +32,16 @@ export async function getAssignmentWorkspace(raw: Record<string, string | string
   ]);
   if (studentsResult.error || tracksResult.error || assignmentsResult.error)
     throw new Error("assignment_workspace_unavailable");
+  const requestedStudentId = single(raw.studentId);
+  const requestedTrackId = single(raw.trackId);
+  const safeStudentId = (studentsResult.data ?? []).some(
+    (student) => student.id === requestedStudentId,
+  )
+    ? requestedStudentId
+    : undefined;
+  const safeTrackId = (tracksResult.data ?? []).some((track) => track.id === requestedTrackId)
+    ? requestedTrackId
+    : undefined;
   let suggestions: Awaited<ReturnType<typeof loadSuggestions>> = [];
   if (selected.success)
     suggestions = await loadSuggestions(selected.data.studentId, selected.data.trackId);
@@ -40,6 +50,8 @@ export async function getAssignmentWorkspace(raw: Record<string, string | string
     tracks: tracksResult.data ?? [],
     assignments: assignmentsResult.data ?? [],
     selection: selected.success ? selected.data : null,
+    requestedStudentId: safeStudentId,
+    requestedTrackId: safeTrackId,
     suggestions,
   };
 }

@@ -7,6 +7,7 @@ import { StudentCertificatesSection } from "@/components/certificates/student-ce
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
 import { QuranMapSection } from "@/components/progress/quran-map-section";
 import { ScheduleSection } from "@/components/schedule/schedule-section";
+import { StudentReportsSection } from "@/components/reports/student-reports-section";
 import { StudentHomeDashboard } from "@/components/student/student-home-dashboard";
 import { routing } from "@/i18n/routing";
 
@@ -18,8 +19,10 @@ export function generateStaticParams() {
 
 export default async function StudentSectionPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/student/[section]">) {
   const { locale, section } = await params;
+  const query = await searchParams;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -35,7 +38,14 @@ export default async function StudentSectionPage({
 
   if (section === "home") return <StudentHomeDashboard locale={locale} />;
 
-  if (section === "progress") return <QuranMapSection locale={locale} />;
+  if (section === "progress") {
+    const requestedView = typeof query.view === "string" ? query.view : "summary";
+    const view =
+      requestedView === "history" || requestedView === "review" ? requestedView : "summary";
+    return <QuranMapSection locale={locale} view={view} />;
+  }
+
+  if (section === "reports") return <StudentReportsSection locale={locale} />;
 
   if (section === "certificates") return <StudentCertificatesSection locale={locale} />;
 

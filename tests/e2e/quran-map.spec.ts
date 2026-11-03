@@ -14,10 +14,15 @@ test("P4-T07 student navigates all Quran pages and receives locked progress live
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/en/student/progress");
 
-  await expect(page.getByRole("heading", { level: 1, name: "Quran progress map" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Memorisation progress details" }),
+  ).toBeVisible();
+  await page.getByTestId("quran-map-card").click();
+  await expect(page).toHaveURL(/\/en\/student\/progress\/quran-map$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Quran map" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.locator("#quran-map-surah option")).toHaveCount(114);
-  await expect(page.getByRole("button", { name: /^Juz / })).toHaveCount(30);
+  await expect(page.getByTestId("quran-juz-button")).toHaveCount(30);
   const pageOne = page.getByRole("gridcell", { name: "Page 1: Not started" });
   await expect(pageOne).toBeVisible();
   await pageOne.focus();
@@ -50,11 +55,22 @@ test("P4-T07 student navigates all Quran pages and receives locked progress live
     true,
   );
 
+  await page.goto("/en/student/progress");
+  await expect(page.getByRole("heading", { name: "Recitation history" })).toBeVisible();
+  await expect(
+    page.getByText("Strong memorisation. Keep reviewing this page.").last(),
+  ).toBeVisible();
+  await expect(page.getByText("1 of 604 pages")).toBeVisible();
+  await page.getByRole("link", { name: "View full history" }).click();
+  await expect(page).toHaveURL(/\/en\/student\/progress\?view=history$/);
+  await expect(page.getByRole("link", { name: "Show summary" })).toBeVisible();
+
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/ar/student/progress");
+  await page.goto("/ar/student/progress/quran-map");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(page.getByRole("heading", { level: 1, name: "خريطة تقدّم المصحف" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "خريطة المصحف" })).toBeVisible();
   await expect(page.locator("#quran-map-surah option")).toHaveCount(114);
+  await expect(page.getByTestId("quran-juz-button")).toHaveCount(30);
   await expect(page.getByRole("gridcell", { name: /الصفحة [١1]: متقن/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
@@ -185,6 +201,7 @@ async function lockFirstPageEvaluation(fixture: Awaited<ReturnType<typeof create
     pages: 1,
     scores: { memorization: 5 },
     decision: "passed",
+    family_note: "Strong memorisation. Keep reviewing this page.",
     is_locked: true,
     created_by: fixture.teacherProfileId,
   });

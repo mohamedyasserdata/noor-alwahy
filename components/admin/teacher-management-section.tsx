@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
@@ -81,6 +82,11 @@ export async function TeacherManagementSection({
                       {t(`statuses.${teacher.status}` as "statuses.active")}
                     </Badge>
                   </div>
+                  <Button asChild className="mt-4" size="sm">
+                    <a href={`/${locale}/admin/teachers/${teacher.id}`}>
+                      {locale === "ar" ? "فتح ملف المعلم" : "Open teacher profile"}
+                    </a>
+                  </Button>
                   <TeacherForm
                     locale={locale}
                     t={t}

@@ -1,4 +1,14 @@
-import { ArrowUpLeft, BellRing, Check, CircleDot, Settings2, ShieldCheck, X } from "lucide-react";
+import {
+  ArrowUpLeft,
+  BellRing,
+  CalendarClock,
+  Check,
+  CircleDot,
+  Settings2,
+  ShieldCheck,
+  UserRoundCheck,
+  X,
+} from "lucide-react";
 import type { Route } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -9,11 +19,13 @@ import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import {
+  assignInterventionCaseAction,
   saveInterventionRuleAction,
   transitionInterventionAction,
 } from "@/lib/interventions/actions";
 import type {
   InterventionCenterData,
+  InterventionAssignee,
   InterventionFilters,
   InterventionRule,
 } from "@/lib/interventions/queries";
@@ -33,11 +45,13 @@ export async function InterventionCenter({
   data,
   rules,
   filters,
+  assignees,
 }: {
   locale: AppLocale;
   data: InterventionCenterData;
   rules: InterventionRule[];
   filters: InterventionFilters;
+  assignees: InterventionAssignee[];
 }) {
   const t = await getTranslations({ locale, namespace: "interventionCenter" });
   const totalPages = Math.max(1, Math.ceil(data.total / data.page_size));
@@ -134,6 +148,9 @@ export async function InterventionCenter({
                     {t(`statuses.${item.status}`)}
                   </Badge>
                   {item.escalated_at ? <Badge variant="destructive">{t("escalated")}</Badge> : null}
+                  {item.due_at && new Date(item.due_at) < new Date() ? (
+                    <Badge variant="destructive">{locale === "ar" ? "متأخرة" : "Overdue"}</Badge>
+                  ) : null}
                 </div>
                 <h3 className="mt-3 text-lg font-black text-primary">{item.subject_name}</h3>
                 <p className="mt-1 font-bold text-foreground">{t(`reasons.${item.reason_code}`)}</p>
@@ -142,6 +159,14 @@ export async function InterventionCenter({
                   <Meta label={t("lastSeen")} value={formatDate(locale, item.last_detected_at)} />
                   <Meta label={t("detections")} value={String(item.detection_count)} />
                   <Meta label={t("evidence")} value={formatEvidence(item.evidence, locale)} />
+                  <Meta
+                    label={locale === "ar" ? "المسؤول" : "Owner"}
+                    value={item.assignee_name ?? (locale === "ar" ? "غير معيّن" : "Unassigned")}
+                  />
+                  <Meta
+                    label={locale === "ar" ? "موعد المتابعة" : "Follow-up due"}
+                    value={item.due_at ? formatDate(locale, item.due_at) : "—"}
+                  />
                 </dl>
                 {item.disposition_reason ? (
                   <p className="mt-4 border-s-2 border-secondary ps-3 text-sm text-muted-foreground">
@@ -168,6 +193,48 @@ export async function InterventionCenter({
                   >
                     <Button type="submit" className="w-full">
                       <CircleDot aria-hidden="true" /> {t("acknowledge")}
+                    </Button>
+                  </form>
+                ) : null}
+                {item.status === "open" || item.status === "acknowledged" ? (
+                  <form
+                    action={assignInterventionCaseAction.bind(null, locale)}
+                    className="grid gap-2 rounded-xl border bg-muted/20 p-3"
+                  >
+                    <input type="hidden" name="caseId" value={item.id} />
+                    <Label htmlFor={`assignee-${item.id}`} className="flex items-center gap-2">
+                      <UserRoundCheck className="size-4 text-secondary" aria-hidden="true" />
+                      {locale === "ar" ? "مسؤول المتابعة" : "Follow-up owner"}
+                    </Label>
+                    <select
+                      id={`assignee-${item.id}`}
+                      name="assigneeId"
+                      defaultValue={item.assigned_to ?? ""}
+                      required
+                      className="min-h-11 rounded-lg border bg-background px-3 text-sm"
+                    >
+                      <option value="" disabled>
+                        {locale === "ar" ? "اختر مسؤولًا" : "Choose an owner"}
+                      </option>
+                      {assignees.map((assignee) => (
+                        <option key={assignee.id} value={assignee.id}>
+                          {assignee.fullName}
+                        </option>
+                      ))}
+                    </select>
+                    <Label htmlFor={`due-${item.id}`} className="flex items-center gap-2">
+                      <CalendarClock className="size-4 text-secondary" aria-hidden="true" />
+                      {locale === "ar" ? "موعد الاستحقاق" : "Due date"}
+                    </Label>
+                    <Input
+                      id={`due-${item.id}`}
+                      name="dueAt"
+                      type="datetime-local"
+                      defaultValue={item.due_at ? item.due_at.slice(0, 16) : tomorrowValue()}
+                      required
+                    />
+                    <Button type="submit" size="sm" variant="outline">
+                      {locale === "ar" ? "حفظ المسؤول والموعد" : "Save owner and due date"}
                     </Button>
                   </form>
                 ) : null}
@@ -446,6 +513,11 @@ function Meta({ label, value }: { label: string; value: string }) {
       <dd className="mt-1 break-words text-foreground">{value}</dd>
     </div>
   );
+}
+
+function tomorrowValue() {
+  const value = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  return value.toISOString().slice(0, 16);
 }
 
 function priorityColor(priority: number) {

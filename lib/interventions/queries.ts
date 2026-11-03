@@ -22,6 +22,9 @@ const caseSchema = z.object({
   detection_count: z.coerce.number().int().positive(),
   escalated_at: z.string().nullable(),
   disposition_reason: z.string().nullable(),
+  assigned_to: z.string().uuid().nullable().default(null),
+  assignee_name: z.string().nullable().default(null),
+  due_at: z.string().nullable().default(null),
 });
 
 const centerSchema = z.object({
@@ -51,6 +54,7 @@ const ruleSchema = z.object({
 export type InterventionCase = z.infer<typeof caseSchema>;
 export type InterventionCenterData = z.infer<typeof centerSchema>;
 export type InterventionRule = z.infer<typeof ruleSchema>;
+export type InterventionAssignee = { id: string; fullName: string };
 
 export type InterventionFilters = {
   status: "" | "open" | "acknowledged" | "resolved" | "dismissed";
@@ -62,7 +66,7 @@ export type InterventionFilters = {
 export async function getInterventionCenter(filters: InterventionFilters) {
   await connection();
   const supabase = await createClient();
-  const [{ data, error }, rulesResult] = await Promise.all([
+  const [{ data, error }, rulesResult, assignmentsResult, assigneesResult] = await Promise.all([
     supabase.rpc("get_intervention_center", {
       p_status: filters.status || undefined,
       p_priority: filters.priority ? Number(filters.priority) : undefined,
@@ -75,11 +79,40 @@ export async function getInterventionCenter(filters: InterventionFilters) {
       .select("id,rule_type,is_enabled,priority,thresholds,window_interval,cooldown_interval")
       .order("priority", { ascending: false })
       .order("rule_type"),
+    supabase
+      .from("intervention_cases")
+      .select(
+        "id,assigned_to,due_at,assignee:profiles!intervention_cases_assigned_to_fkey(full_name)",
+      ),
+    supabase
+      .from("profiles")
+      .select("id,full_name")
+      .eq("role", "admin")
+      .eq("is_active", true)
+      .order("full_name"),
   ]);
-  if (error || rulesResult.error) throw new Error("intervention_center_unavailable");
+  if (error || rulesResult.error || assignmentsResult.error || assigneesResult.error)
+    throw new Error("intervention_center_unavailable");
+  const parsedCenter = centerSchema.parse(data);
+  const ownership = new Map((assignmentsResult.data ?? []).map((item) => [item.id, item]));
   return {
-    center: centerSchema.parse(data),
+    center: {
+      ...parsedCenter,
+      rows: parsedCenter.rows.map((row) => {
+        const assignment = ownership.get(row.id);
+        return {
+          ...row,
+          assigned_to: assignment?.assigned_to ?? null,
+          assignee_name: one(assignment?.assignee)?.full_name ?? null,
+          due_at: assignment?.due_at ?? null,
+        };
+      }),
+    },
     rules: z.array(ruleSchema).parse(rulesResult.data ?? []),
+    assignees: (assigneesResult.data ?? []).map((profile) => ({
+      id: profile.id,
+      fullName: profile.full_name,
+    })) satisfies InterventionAssignee[],
   };
 }
 
@@ -104,4 +137,8 @@ export function parseInterventionFilters(query: Record<string, string | string[]
 
 function scalar(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
+}
+
+function one<T>(value: T | T[] | null | undefined): T | null {
+  return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
 }

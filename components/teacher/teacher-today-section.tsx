@@ -18,8 +18,9 @@ import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { recordAttendanceAction } from "@/lib/attendance/actions";
 import { getTeacherTodaySessions } from "@/lib/attendance/queries";
+import { studentAttendanceStatuses } from "@/lib/attendance/rate";
 import { getNextSessionCard } from "@/lib/sessions/next-session";
-import { attendanceStatuses, type AttendanceStatus } from "@/lib/validators/attendance";
+import type { AttendanceStatus } from "@/lib/validators/attendance";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
 const attendanceErrorCodes = [
@@ -120,6 +121,7 @@ export async function TeacherTodaySection({
                 attendance: day.overview.pendingAttendance,
                 evaluations: day.overview.pendingEvaluations.length,
               })}
+              href="/teacher/students?status=evaluation_pending"
             />
             <OverviewCard
               icon={<FileClock />}
@@ -191,6 +193,13 @@ export async function TeacherTodaySection({
                           )}
                         </div>
 
+                        <Link
+                          href={`/teacher/sessions/${session.id}`}
+                          className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-secondary/40 px-4 py-2 text-sm font-black text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        >
+                          {locale === "ar" ? "فتح مساحة الحصة" : "Open session workspace"}
+                        </Link>
+
                         <Card className="mt-5 shadow-none hover:shadow-none">
                           <CardHeader className="flex-row items-start justify-between gap-3 pb-3">
                             <div>
@@ -233,7 +242,7 @@ export async function TeacherTodaySection({
                               <Badge variant="success">{t("evaluationComplete")}</Badge>
                             ) : (
                               <Link
-                                href={`/teacher/evaluations?sessionId=${session.id}`}
+                                href={`/teacher/sessions/${session.id}`}
                                 className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-black text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                               >
                                 {t("completeEvaluation")}
@@ -244,7 +253,7 @@ export async function TeacherTodaySection({
                           <div className="mt-5">
                             <p className="text-sm font-bold text-foreground">{t("chooseResult")}</p>
                             <div className="mt-3 flex flex-wrap gap-2">
-                              {attendanceStatuses.map((attendanceStatus) => (
+                              {studentAttendanceStatuses.map((attendanceStatus) => (
                                 <form
                                   action={recordAttendanceAction.bind(null, locale)}
                                   key={attendanceStatus}
@@ -289,7 +298,7 @@ function OverviewCard({
   label: string;
   value: number;
   detail: string;
-  href?: "/teacher/reports";
+  href?: "/teacher/reports" | "/teacher/students?status=evaluation_pending";
 }) {
   const content = (
     <>
@@ -318,7 +327,6 @@ function OverviewCard({
 
 function buttonVariant(status: AttendanceStatus): "gold" | "outline" | "destructive" {
   if (status === "present") return "gold";
-  if (status === "teacher_absent" || status === "cancelled_teacher") return "destructive";
   return "outline";
 }
 

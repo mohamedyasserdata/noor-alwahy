@@ -31,25 +31,11 @@ export const portalConfig = {
   },
   teacher: {
     defaultSection: "today",
-    sections: [
-      "today",
-      "schedule",
-      "students",
-      "attendance",
-      "evaluations",
-      "reports",
-      "notifications",
-      "requests",
-      "availability",
-      "zoom",
-      "earnings",
-      "profile",
-      "exams",
-    ],
+    sections: ["today", "schedule", "students", "reports", "notifications", "earnings", "profile"],
   },
   student: {
     defaultSection: "home",
-    sections: ["home", "progress", "schedule", "billing", "certificates", "contact"],
+    sections: ["home", "progress", "schedule", "reports", "billing", "certificates", "contact"],
   },
   parent: {
     defaultSection: "home",

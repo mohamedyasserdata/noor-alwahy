@@ -23,6 +23,7 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     await expect(
       page.getByText("Africa/Cairo", { exact: true }).filter({ visible: true }).first(),
     ).toBeVisible();
+    await page.getByRole("heading", { name: "Calendar export" }).click();
 
     const download = await page.request.get("/api/calendar/download");
     expect(download.status()).toBe(200);
@@ -45,6 +46,8 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     await writeFile(resolve(pdfDir, "schedule-e2e.pdf"), pdf);
 
     await page.getByRole("button", { name: "Create private link" }).click();
+    await expect(page.getByText(/A new subscription link will be created/)).toBeVisible();
+    await page.getByRole("button", { name: "Confirm operation" }).click();
     await expect(page.getByText(/A new private link was created/)).toBeVisible();
     const input = page.locator("#calendar-subscription-url");
     const firstUrl = await input.inputValue();
@@ -56,6 +59,7 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     expect(await firstFeed.text()).toContain(`UID:${fixture.sessionId}@noor-alwahy`);
 
     await page.getByRole("button", { name: "Create private link" }).click();
+    await page.getByRole("button", { name: "Confirm operation" }).click();
     await expect(input).not.toHaveValue(firstUrl);
     const secondUrl = await input.inputValue();
     expect(secondUrl).not.toBe(firstUrl);
@@ -74,6 +78,8 @@ test("P3-T08 exports a safe iCal file and rotates a revocable private feed", asy
     expect(storedToken.token_hash).not.toBe(rawToken);
 
     await page.getByRole("button", { name: "Revoke link" }).click();
+    await expect(page.getByText(/current subscription link will be revoked/)).toBeVisible();
+    await page.getByRole("button", { name: "Confirm operation" }).click();
     await expect(page.getByText("The private calendar link was revoked.")).toBeVisible();
     expect((await page.request.get(secondUrl)).status()).toBe(404);
     expect(

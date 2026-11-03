@@ -129,6 +129,7 @@ async function createReportFixture() {
 
   const { error: attendanceError } = await db.from("attendance").insert({
     session_id: sessionId,
+    student_id: studentId,
     status: "present",
     minutes: 30,
     recorded_by: "10000000-0000-4000-8000-000000000001",

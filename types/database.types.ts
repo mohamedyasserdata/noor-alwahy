@@ -3,6 +3,45 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      admin_saved_views: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          page_key: string;
+          profile_id: string;
+          query_params: NonNullable<Json>;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          page_key: string;
+          profile_id: string;
+          query_params?: NonNullable<Json>;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          page_key?: string;
+          profile_id?: string;
+          query_params?: NonNullable<Json>;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "admin_saved_views_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       announcement_deliveries: {
         Row: {
           announcement_id: string;
@@ -286,12 +325,15 @@ export type Database = {
       };
       attendance: {
         Row: {
+          correction_reason: string | null;
+          id: string;
           locked_at: string | null;
           minutes: number | null;
           recorded_at: string;
           recorded_by: string;
           session_id: string;
           status: Database["public"]["Enums"]["attendance_status"];
+          student_id: string;
           student_joined_at: string | null;
           student_notice_at: string | null;
           teacher_joined_at: string | null;
@@ -299,24 +341,30 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          correction_reason?: string | null;
+          id?: string;
           locked_at?: string | null;
           minutes?: number | null;
           recorded_at?: string;
           recorded_by: string;
           session_id: string;
           status: Database["public"]["Enums"]["attendance_status"];
+          student_id: string;
           student_joined_at?: string | null;
           student_notice_at?: string | null;
           teacher_joined_at?: string | null;
           updated_at?: string;
         };
         Update: {
+          correction_reason?: string | null;
+          id?: string;
           locked_at?: string | null;
           minutes?: number | null;
           recorded_at?: string;
           recorded_by?: string;
           session_id?: string;
           status?: Database["public"]["Enums"]["attendance_status"];
+          student_id?: string;
           student_joined_at?: string | null;
           student_notice_at?: string | null;
           teacher_joined_at?: string | null;
@@ -333,15 +381,29 @@ export type Database = {
           {
             foreignKeyName: "attendance_session_id_fkey";
             columns: ["session_id"];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: "admin_operations_fact";
             referencedColumns: ["session_id"];
           },
           {
             foreignKeyName: "attendance_session_id_fkey";
             columns: ["session_id"];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "attendance_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "attendance_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
             referencedColumns: ["id"];
           },
         ];
@@ -1459,12 +1521,14 @@ export type Database = {
         Row: {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
+          assigned_to: string | null;
           created_at: string;
           dedupe_key: string;
           detection_count: number;
           dismissed_at: string | null;
           dismissed_by: string | null;
           disposition_reason: string | null;
+          due_at: string | null;
           escalated_at: string | null;
           evidence: NonNullable<Json>;
           first_detected_at: string;
@@ -1486,12 +1550,14 @@ export type Database = {
         Insert: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
+          assigned_to?: string | null;
           created_at?: string;
           dedupe_key: string;
           detection_count?: number;
           dismissed_at?: string | null;
           dismissed_by?: string | null;
           disposition_reason?: string | null;
+          due_at?: string | null;
           escalated_at?: string | null;
           evidence: NonNullable<Json>;
           first_detected_at: string;
@@ -1512,12 +1578,14 @@ export type Database = {
         Update: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
+          assigned_to?: string | null;
           created_at?: string;
           dedupe_key?: string;
           detection_count?: number;
           dismissed_at?: string | null;
           dismissed_by?: string | null;
           disposition_reason?: string | null;
+          due_at?: string | null;
           escalated_at?: string | null;
           evidence?: NonNullable<Json>;
           first_detected_at?: string;
@@ -1539,6 +1607,13 @@ export type Database = {
           {
             foreignKeyName: "intervention_cases_acknowledged_by_fkey";
             columns: ["acknowledged_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intervention_cases_assigned_to_fkey";
+            columns: ["assigned_to"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -2961,6 +3036,49 @@ export type Database = {
           },
         ];
       };
+      report_versions: {
+        Row: {
+          body_snapshot: NonNullable<Json>;
+          id: string;
+          published_at: string;
+          published_by: string;
+          report_id: string;
+          version_no: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          body_snapshot: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          published_by: string;
+          report_id: string;
+          version_no: number;
+        };
+        Update: {
+          body_snapshot?: NonNullable<Json>;
+          id?: string;
+          published_at?: string;
+          published_by?: string;
+          report_id?: string;
+          version_no?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "report_versions_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "report_versions_report_id_fkey";
+            columns: ["report_id"];
+            isOneToOne: false;
+            referencedRelation: "reports";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       reports: {
         Row: {
           approved_at: string | null;
@@ -2973,6 +3091,9 @@ export type Database = {
           period_end: string;
           period_start: string;
           period_type: string;
+          published_by: string | null;
+          published_version: number;
+          review_note: string | null;
           status: Database["public"]["Enums"]["report_status"];
           student_id: string;
           teacher_id: string;
@@ -2990,6 +3111,9 @@ export type Database = {
           period_end: string;
           period_start: string;
           period_type: string;
+          published_by?: string | null;
+          published_version?: number;
+          review_note?: string | null;
           status?: Database["public"]["Enums"]["report_status"];
           student_id: string;
           teacher_id: string;
@@ -3006,6 +3130,9 @@ export type Database = {
           period_end?: string;
           period_start?: string;
           period_type?: string;
+          published_by?: string | null;
+          published_version?: number;
+          review_note?: string | null;
           status?: Database["public"]["Enums"]["report_status"];
           student_id?: string;
           teacher_id?: string;
@@ -3017,6 +3144,13 @@ export type Database = {
             columns: ["content_template_version_id"];
             isOneToOne: false;
             referencedRelation: "content_template_versions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
@@ -3375,6 +3509,83 @@ export type Database = {
           },
         ];
       };
+      session_participants: {
+        Row: {
+          assignment_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          is_primary: boolean;
+          session_id: string;
+          student_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          assignment_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_primary?: boolean;
+          session_id: string;
+          student_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          assignment_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_primary?: boolean;
+          session_id?: string;
+          student_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_assignment_id_fkey";
+            columns: ["assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_participants_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_participants_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "session_participants_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "session_participants_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "session_participants_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sessions: {
         Row: {
           assignment_id: string | null;
@@ -3382,6 +3593,7 @@ export type Database = {
           duration_min: number;
           ended_at: string | null;
           ends_at: string;
+          format: string;
           id: string;
           kind: Database["public"]["Enums"]["session_kind"];
           makeup_of: string | null;
@@ -3397,6 +3609,8 @@ export type Database = {
           zoom_meeting_id: string | null;
           zoom_override_url: string | null;
           zoom_passcode: string | null;
+          zoom_published_at: string | null;
+          zoom_unpublished_at: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -3405,6 +3619,7 @@ export type Database = {
           duration_min: number;
           ended_at?: string | null;
           ends_at: string;
+          format?: string;
           id?: string;
           kind?: Database["public"]["Enums"]["session_kind"];
           makeup_of?: string | null;
@@ -3420,6 +3635,8 @@ export type Database = {
           zoom_meeting_id?: string | null;
           zoom_override_url?: string | null;
           zoom_passcode?: string | null;
+          zoom_published_at?: string | null;
+          zoom_unpublished_at?: string | null;
         };
         Update: {
           assignment_id?: string | null;
@@ -3427,6 +3644,7 @@ export type Database = {
           duration_min?: number;
           ended_at?: string | null;
           ends_at?: string;
+          format?: string;
           id?: string;
           kind?: Database["public"]["Enums"]["session_kind"];
           makeup_of?: string | null;
@@ -3442,6 +3660,8 @@ export type Database = {
           zoom_meeting_id?: string | null;
           zoom_override_url?: string | null;
           zoom_passcode?: string | null;
+          zoom_published_at?: string | null;
+          zoom_unpublished_at?: string | null;
         };
         Relationships: [
           {
@@ -4143,6 +4363,79 @@ export type Database = {
           },
         ];
       };
+      teacher_attendance: {
+        Row: {
+          id: string;
+          minutes: number | null;
+          note: string | null;
+          recorded_at: string;
+          recorded_by: string;
+          session_id: string;
+          status: string;
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          minutes?: number | null;
+          note?: string | null;
+          recorded_at?: string;
+          recorded_by: string;
+          session_id: string;
+          status: string;
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          minutes?: number | null;
+          note?: string | null;
+          recorded_at?: string;
+          recorded_by?: string;
+          session_id?: string;
+          status?: string;
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_attendance_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_attendance_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_operations_fact";
+            referencedColumns: ["session_id"];
+          },
+          {
+            foreignKeyName: "teacher_attendance_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: true;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_attendance_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_attendance_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teacher_availability: {
         Row: {
           created_at: string;
@@ -4433,6 +4726,73 @@ export type Database = {
             columns: ["track_id"];
             isOneToOne: false;
             referencedRelation: "tracks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      teacher_student_notes: {
+        Row: {
+          body: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          student_id: string;
+          teacher_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          student_id: string;
+          teacher_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          student_id?: string;
+          teacher_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "teacher_student_notes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_student_notes_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_student_risk_signals";
+            referencedColumns: ["student_id"];
+          },
+          {
+            foreignKeyName: "teacher_student_notes_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "teacher_student_notes_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_teacher_commitment";
+            referencedColumns: ["teacher_id"];
+          },
+          {
+            foreignKeyName: "teacher_student_notes_teacher_id_fkey";
+            columns: ["teacher_id"];
+            isOneToOne: false;
+            referencedRelation: "teachers";
             referencedColumns: ["id"];
           },
         ];
@@ -5054,6 +5414,10 @@ export type Database = {
       archive_admin_announcement: { Args: { p_id: string }; Returns: undefined };
       archive_content_template: { Args: { p_template: string }; Returns: undefined };
       archive_student: { Args: { p_student_id: string }; Returns: undefined };
+      assign_intervention_case: {
+        Args: { p_assignee: string; p_case: string; p_due_at: string };
+        Returns: undefined;
+      };
       assign_session_substitute: {
         Args: { p_scope: string; p_session_id: string; p_substitute_teacher_id: string };
         Returns: number;
@@ -5331,6 +5695,16 @@ export type Database = {
           student_id: string;
         }[];
       };
+      get_teacher_session_zoom: {
+        Args: { p_session_id: string };
+        Returns: {
+          is_published: boolean;
+          join_url: string;
+          published_at: string;
+          session_id: string;
+          unpublished_at: string;
+        }[];
+      };
       get_visible_schedule: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -5365,6 +5739,19 @@ export type Database = {
           status: Database["public"]["Enums"]["application_status"];
           updated_at: string;
         }[];
+      };
+      manage_session_participant: {
+        Args: {
+          p_action: string;
+          p_assignment_id: string;
+          p_session_id: string;
+          p_student_id: string;
+        };
+        Returns: undefined;
+      };
+      manage_session_zoom: {
+        Args: { p_action: string; p_join_url?: string; p_session_id: string };
+        Returns: undefined;
       };
       manage_teacher_assignment: {
         Args: {
@@ -5406,12 +5793,44 @@ export type Database = {
           p_teacher_joined_at?: string;
         };
         Returns: {
+          correction_reason: string | null;
+          id: string;
           locked_at: string | null;
           minutes: number | null;
           recorded_at: string;
           recorded_by: string;
           session_id: string;
           status: Database["public"]["Enums"]["attendance_status"];
+          student_id: string;
+          student_joined_at: string | null;
+          student_notice_at: string | null;
+          teacher_joined_at: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "attendance";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      record_student_attendance: {
+        Args: {
+          p_correction_reason?: string;
+          p_session_id: string;
+          p_status: Database["public"]["Enums"]["attendance_status"];
+          p_student_id: string;
+        };
+        Returns: {
+          correction_reason: string | null;
+          id: string;
+          locked_at: string | null;
+          minutes: number | null;
+          recorded_at: string;
+          recorded_by: string;
+          session_id: string;
+          status: Database["public"]["Enums"]["attendance_status"];
+          student_id: string;
           student_joined_at: string | null;
           student_notice_at: string | null;
           teacher_joined_at: string | null;
@@ -5425,6 +5844,26 @@ export type Database = {
         };
       };
       record_student_export: { Args: { p_count: number }; Returns: undefined };
+      record_teacher_attendance: {
+        Args: { p_minutes?: number; p_note?: string; p_session_id: string; p_status: string };
+        Returns: {
+          id: string;
+          minutes: number | null;
+          note: string | null;
+          recorded_at: string;
+          recorded_by: string;
+          session_id: string;
+          status: string;
+          teacher_id: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "teacher_attendance";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       remove_student_guardian: {
         Args: { p_guardian_id: string; p_student_id: string };
         Returns: undefined;
@@ -5562,6 +6001,10 @@ export type Database = {
       };
       update_public_app_settings: {
         Args: { p_academy_profile: Json; p_support_hours: Json };
+        Returns: undefined;
+      };
+      update_teacher_session_state: {
+        Args: { p_action: string; p_session_id: string };
         Returns: undefined;
       };
       upsert_student: { Args: { p_payload: Json }; Returns: string };

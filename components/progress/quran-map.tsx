@@ -55,12 +55,6 @@ export function QuranMap({
     }
     return result;
   }, [pages]);
-  const firstPageByJuz = useMemo(() => {
-    const result = new Map<number, number>();
-    for (const page of pages) if (!result.has(page.juz)) result.set(page.juz, page.page);
-    return result;
-  }, [pages]);
-
   const refreshProgress = useCallback(async () => {
     const { data, error } = await supabase
       .from("memorization_progress")
@@ -141,6 +135,23 @@ export function QuranMap({
   const selected = pages[selectedPage - 1];
   const selectedProgress = progressByPage.get(selectedPage);
   const counts = countStatuses(progressByPage);
+  const juzStats = useMemo(
+    () =>
+      Array.from({ length: 30 }, (_, index) => {
+        const juz = index + 1;
+        const juzPages = pages.filter((page) => page.juz === juz);
+        const mastered = juzPages.filter(
+          (page) => progressByPage.get(page.page)?.status === "mastered",
+        ).length;
+        return {
+          juz,
+          mastered,
+          total: juzPages.length,
+          firstPage: juzPages[0]?.page ?? 1,
+        };
+      }),
+    [pages, progressByPage],
+  );
 
   function selectAndReveal(page: number, focus = false) {
     const next = Math.max(1, Math.min(TOTAL_PAGES, page));
@@ -166,14 +177,31 @@ export function QuranMap({
   }
 
   return (
-    <div className="mt-8 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="mt-5 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-6">
       <Card className="min-w-0 overflow-hidden">
         <CardHeader className="gap-5 border-b bg-muted/35">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle>{t("mapTitle")}</CardTitle>
+            <h2 className="text-lg font-extrabold tracking-tight text-primary">{t("mapTitle")}</h2>
             <Badge variant="secondary">{t("pageCount", { count: TOTAL_PAGES })}</Badge>
           </div>
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="grid gap-2" aria-label={t("journeyProgressLabel")}>
+            <div className="flex items-center justify-between gap-4 text-sm">
+              <span className="font-bold text-primary">{t("journeyProgressLabel")}</span>
+              <span className="font-black text-[#815300] tabular-nums dark:text-[#f0c66d]">
+                {t("journeyProgressValue", {
+                  completed: numberFormat.format(counts.mastered),
+                  total: numberFormat.format(TOTAL_PAGES),
+                })}
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-secondary/15">
+              <div
+                className="h-full rounded-full bg-secondary transition-[width]"
+                style={{ width: `${(counts.mastered / TOTAL_PAGES) * 100}%` }}
+              />
+            </div>
+          </div>
+          <div className="grid gap-3">
             <label className="grid gap-1.5 text-sm font-bold" htmlFor="quran-map-surah">
               {t("surahLabel")}
               <select
@@ -191,8 +219,44 @@ export function QuranMap({
                 ))}
               </select>
             </label>
-            <p className="text-sm leading-6 text-muted-foreground">{t("keyboardHint")}</p>
           </div>
+          <div>
+            <p className="mb-2 text-sm font-black text-primary">{t("allJuz")}</p>
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-10 xl:grid-cols-15">
+              {juzStats.map((item) => {
+                const active = selected?.juz === item.juz;
+                const percent = item.total ? Math.round((item.mastered / item.total) * 100) : 0;
+                return (
+                  <button
+                    key={item.juz}
+                    type="button"
+                    data-testid="quran-juz-button"
+                    className={cn(
+                      "grid min-h-12 place-items-center rounded-xl border px-1 text-xs font-black transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
+                      active
+                        ? "border-[#c78a12] bg-[#fff3d8] text-[#9a5d00]"
+                        : "border-border bg-card text-primary hover:border-[#d9b15f] hover:bg-[#fffaf0] dark:hover:bg-muted",
+                    )}
+                    aria-pressed={active}
+                    onClick={() => selectAndReveal(item.firstPage, true)}
+                  >
+                    <span>{t("juzLabel", { juz: item.juz })}</span>
+                    <span className="text-[10px] text-muted-foreground">{percent}%</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <p className="hidden text-sm leading-6 text-muted-foreground md:block">
+            {t("keyboardHint")}
+          </p>
+          <p className="rounded-xl bg-background/75 p-3 text-sm font-bold text-primary xl:hidden">
+            {t("mobileSelection", {
+              page: numberFormat.format(selectedPage),
+              juz: numberFormat.format(selected?.juz ?? 1),
+              status: t(`statuses.${selectedProgress?.status ?? "not_started"}`),
+            })}
+          </p>
           <Legend />
         </CardHeader>
         <CardContent className="p-3 sm:p-4">
@@ -203,8 +267,7 @@ export function QuranMap({
             aria-rowcount={rowCount}
             aria-colcount={columns}
             data-realtime-status={realtimeStatus}
-            className="relative overflow-y-auto overscroll-contain rounded-xl border bg-background/55 p-2 focus-within:ring-2 focus-within:ring-ring"
-            style={{ height: VIEWPORT_HEIGHT }}
+            className="relative h-[22rem] overflow-y-auto overscroll-contain rounded-xl border bg-background/55 p-2 focus-within:ring-2 focus-within:ring-ring sm:h-[32.5rem]"
             onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
           >
             <div className="relative" style={{ height: rowCount * ROW_HEIGHT }}>
@@ -263,77 +326,85 @@ export function QuranMap({
 
       <aside className="grid content-start gap-5">
         <Card aria-live="polite">
-          <CardHeader>
+          <CardHeader className="border-b bg-muted/20 px-4 py-3 sm:px-6 sm:py-4">
             <CardTitle>{t("details.title", { page: selectedPage })}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <dl className="grid gap-4 text-sm">
-              <Detail label={t("details.surah")} value={surahRange(selected, surahById, locale)} />
-              <Detail
-                label={t("details.juz")}
-                value={selected ? numberFormat.format(selected.juz) : "—"}
-              />
-              <Detail
-                label={t("details.status")}
-                value={t(`statuses.${selectedProgress?.status ?? "not_started"}`)}
-              />
-              <Detail
-                label={t("details.firstMemorized")}
-                value={formatDate(selectedProgress?.first_memorized_at, locale)}
-              />
-              <Detail
-                label={t("details.lastReviewed")}
-                value={formatDate(selectedProgress?.last_reviewed_at, locale)}
-              />
-              <Detail
-                label={t("details.average")}
-                value={
-                  selectedProgress?.avg_score === null || selectedProgress?.avg_score === undefined
-                    ? "—"
-                    : t("score", { score: selectedProgress.avg_score })
-                }
-              />
-            </dl>
+          <CardContent className="p-4 sm:p-6">
+            <SelectedPageDetails
+              locale={locale}
+              numberFormat={numberFormat}
+              selected={selected}
+              selectedProgress={selectedProgress}
+              surahById={surahById}
+            />
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("juzTitle")}</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-5 gap-2">
-            {Array.from({ length: 30 }, (_, index) => index + 1).map((juz) => (
-              <button
-                key={juz}
-                type="button"
-                className="min-h-11 touch-manipulation rounded-lg border bg-card text-sm font-black tabular-nums hover:border-secondary hover:bg-secondary/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                aria-label={t("juzLabel", { juz })}
-                aria-pressed={selected?.juz === juz}
-                onClick={() => selectAndReveal(firstPageByJuz.get(juz) ?? 1, true)}
-              >
-                {numberFormat.format(juz)}
-              </button>
-            ))}
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-2 gap-3" aria-label={t("summaryLabel")}>
-          <Summary label={t("statuses.mastered")} value={numberFormat.format(counts.mastered)} />
-          <Summary
-            label={t("statuses.needs_review")}
-            value={numberFormat.format(counts.needs_review)}
-          />
-          <Summary
-            label={t("statuses.in_progress")}
-            value={numberFormat.format(counts.in_progress)}
-          />
-          <Summary
-            label={t("statuses.not_started")}
-            value={numberFormat.format(counts.not_started)}
-          />
-        </div>
+        {progress.length ? (
+          <div className="grid grid-cols-2 gap-3" aria-label={t("summaryLabel")}>
+            <Summary label={t("statuses.mastered")} value={numberFormat.format(counts.mastered)} />
+            <Summary
+              label={t("statuses.needs_review")}
+              value={numberFormat.format(counts.needs_review)}
+            />
+            <Summary
+              label={t("statuses.in_progress")}
+              value={numberFormat.format(counts.in_progress)}
+            />
+            <Summary
+              label={t("statuses.not_started")}
+              value={numberFormat.format(counts.not_started)}
+            />
+          </div>
+        ) : null}
       </aside>
     </div>
+  );
+}
+
+function SelectedPageDetails({
+  locale,
+  numberFormat,
+  selected,
+  selectedProgress,
+  surahById,
+}: {
+  locale: AppLocale;
+  numberFormat: Intl.NumberFormat;
+  selected: QuranMapPage | undefined;
+  selectedProgress: QuranMapProgress | undefined;
+  surahById: Map<number, QuranMapSurah>;
+}) {
+  const t = useTranslations("quranMap");
+  return (
+    <dl className="grid gap-x-5 gap-y-3 text-sm sm:grid-cols-2 xl:grid-cols-1">
+      <Detail label={t("details.surah")} value={surahRange(selected, surahById, locale)} />
+      <Detail label={t("details.juz")} value={selected ? numberFormat.format(selected.juz) : "—"} />
+      <Detail
+        label={t("details.status")}
+        value={t(`statuses.${selectedProgress?.status ?? "not_started"}`)}
+      />
+      <Detail
+        label={t("details.firstMemorized")}
+        value={formatDate(selectedProgress?.first_memorized_at, locale)}
+      />
+      <Detail
+        label={t("details.lastReviewed")}
+        value={formatDate(selectedProgress?.last_reviewed_at, locale)}
+      />
+      <Detail
+        label={t("details.average")}
+        value={
+          selectedProgress?.avg_score === null || selectedProgress?.avg_score === undefined
+            ? "—"
+            : t("score", { score: selectedProgress.avg_score })
+        }
+      />
+      <Detail
+        label={t("details.evaluations")}
+        value={numberFormat.format(selectedProgress?.review_count ?? 0)}
+      />
+    </dl>
   );
 }
 

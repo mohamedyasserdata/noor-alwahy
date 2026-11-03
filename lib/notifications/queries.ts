@@ -1,6 +1,7 @@
 import "server-only";
 
 import { connection } from "next/server";
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -44,37 +45,39 @@ const defaultPreferences: NotificationPreferences = {
   interventionEmail: true,
 };
 
-export async function getNotificationCenter(): Promise<NotificationCenterData | null> {
-  await connection();
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
-  if (!user) return null;
+export const getNotificationCenter = cache(
+  async function getNotificationCenter(): Promise<NotificationCenterData | null> {
+    await connection();
+    const supabase = await createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (!user) return null;
 
-  const [notificationResult, preferenceResult] = await Promise.all([
-    supabase
-      .from("notifications")
-      .select("id,type,payload,created_at,read_at")
-      .order("created_at", { ascending: false })
-      .limit(12),
-    supabase.from("notification_prefs").select("prefs").maybeSingle(),
-  ]);
-  if (notificationResult.error || preferenceResult.error) {
-    throw new Error("notifications_unavailable");
-  }
+    const [notificationResult, preferenceResult] = await Promise.all([
+      supabase
+        .from("notifications")
+        .select("id,type,payload,created_at,read_at")
+        .order("created_at", { ascending: false })
+        .limit(12),
+      supabase.from("notification_prefs").select("prefs").maybeSingle(),
+    ]);
+    if (notificationResult.error || preferenceResult.error) {
+      throw new Error("notifications_unavailable");
+    }
 
-  return {
-    userId: user.id,
-    items: (notificationResult.data ?? []).map((item) => ({
-      id: item.id,
-      type: item.type,
-      createdAt: item.created_at,
-      readAt: item.read_at,
-      payload: readPayload(item.payload),
-    })),
-    preferences: readPreferences(preferenceResult.data?.prefs),
-  };
-}
+    return {
+      userId: user.id,
+      items: (notificationResult.data ?? []).map((item) => ({
+        id: item.id,
+        type: item.type,
+        createdAt: item.created_at,
+        readAt: item.read_at,
+        payload: readPayload(item.payload),
+      })),
+      preferences: readPreferences(preferenceResult.data?.prefs),
+    };
+  },
+);
 
 function readPreferences(value: unknown): NotificationPreferences {
   if (!value || typeof value !== "object" || Array.isArray(value)) return defaultPreferences;

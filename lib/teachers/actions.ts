@@ -21,8 +21,14 @@ function localeOf(value: string): AppLocale {
 }
 
 function go(locale: AppLocale, portal: "admin" | "teacher", key: string, value: string): never {
+  const teacherPath = `/${locale}/teacher/profile?${new URLSearchParams({
+    tab: "availability",
+    [key]: value,
+  })}`;
   redirect(
-    `/${locale}/${portal}/${portal === "admin" ? "teachers" : "availability"}?${new URLSearchParams({ [key]: value })}` as Route,
+    (portal === "admin"
+      ? `/${locale}/admin/teachers?${new URLSearchParams({ [key]: value })}`
+      : teacherPath) as Route,
   );
 }
 
@@ -93,7 +99,7 @@ export async function reviewAvailabilityAction(
     .eq("status", "proposed");
   if (error) go(locale, "admin", "teacherError", "request_failed");
   revalidatePath(`/${locale}/admin/teachers`);
-  revalidatePath(`/${locale}/teacher/availability`);
+  revalidatePath(`/${locale}/teacher/profile`);
   go(locale, "admin", "teacherStatus", parsed.data.status);
 }
 
@@ -103,7 +109,7 @@ export async function acceptConductAction(localeValue: string): Promise<never> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("accept_teacher_code_of_conduct");
   if (error) go(locale, "teacher", "availabilityError", "request_failed");
-  revalidatePath(`/${locale}/teacher/availability`);
+  revalidatePath(`/${locale}/teacher/profile`);
   revalidatePath(`/${locale}/admin/teachers`);
   go(locale, "teacher", "availabilityStatus", "conduct_accepted");
 }
@@ -130,7 +136,7 @@ export async function proposeAvailabilityAction(
     end_time: parsed.data.endTime,
   });
   if (error) go(locale, "teacher", "availabilityError", "request_failed");
-  revalidatePath(`/${locale}/teacher/availability`);
+  revalidatePath(`/${locale}/teacher/profile`);
   revalidatePath(`/${locale}/admin/teachers`);
   go(locale, "teacher", "availabilityStatus", "proposed");
 }
@@ -151,7 +157,7 @@ export async function deleteAvailabilityAction(
     .delete()
     .eq("id", parsed.data.availabilityId);
   if (error) go(locale, "teacher", "availabilityError", "request_failed");
-  revalidatePath(`/${locale}/teacher/availability`);
+  revalidatePath(`/${locale}/teacher/profile`);
   revalidatePath(`/${locale}/admin/teachers`);
   go(locale, "teacher", "availabilityStatus", "deleted");
 }

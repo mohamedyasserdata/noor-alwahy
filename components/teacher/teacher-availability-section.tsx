@@ -19,9 +19,11 @@ type Query = Promise<Record<string, string | string[] | undefined>>;
 export async function TeacherAvailabilitySection({
   locale,
   searchParams,
+  embedded = false,
 }: {
   locale: AppLocale;
   searchParams: Query;
+  embedded?: boolean;
 }) {
   const [t, teacher, query] = await Promise.all([
     getTranslations({ locale, namespace: "teacherAvailability" }),
@@ -31,14 +33,19 @@ export async function TeacherAvailabilitySection({
   const status = typeof query.availabilityStatus === "string" ? query.availabilityStatus : "";
   const error = typeof query.availabilityError === "string" ? query.availabilityError : "";
   return (
-    <section className="mx-auto w-full max-w-5xl" aria-labelledby="availability-title">
-      <header className="max-w-3xl">
-        <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
-        <h1 id="availability-title" className="text-3xl font-black text-primary sm:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
-      </header>
+    <section
+      className={embedded ? "w-full" : "mx-auto w-full max-w-5xl"}
+      aria-labelledby={embedded ? undefined : "availability-title"}
+    >
+      {!embedded ? (
+        <header className="max-w-3xl">
+          <p className="mb-3 text-sm font-black text-secondary">{t("eyebrow")}</p>
+          <h1 id="availability-title" className="text-3xl font-black text-primary sm:text-4xl">
+            {t("title")}
+          </h1>
+          <p className="mt-4 leading-8 text-muted-foreground">{t("description")}</p>
+        </header>
+      ) : null}
       {status ? (
         <Alert className="mt-6" variant="success">
           {t(`notices.${status}` as "notices.proposed")}
@@ -54,7 +61,9 @@ export async function TeacherAvailabilitySection({
           {t("errors.profile_missing")}
         </Alert>
       ) : (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+        <div
+          className={`${embedded ? "mt-0" : "mt-8"} grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]`}
+        >
           <aside className="rounded-3xl bg-primary p-6 text-primary-foreground shadow-card">
             <BadgeCheck className="size-7 text-secondary" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-black">{t("conduct.title")}</h2>

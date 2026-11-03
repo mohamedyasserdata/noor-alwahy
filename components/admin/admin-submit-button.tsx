@@ -9,17 +9,21 @@ type AdminSubmitButtonProps = {
   label: string;
   pendingLabel: string;
   variant?: "gold" | "outline" | "destructive";
+  name?: string;
+  value?: string;
 };
 
 export function AdminSubmitButton({
   label,
   pendingLabel,
   variant = "gold",
+  name,
+  value,
 }: AdminSubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" variant={variant} disabled={pending}>
+    <Button type="submit" variant={variant} disabled={pending} name={name} value={value}>
       {pending ? (
         <>
           <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" />

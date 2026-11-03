@@ -8,9 +8,11 @@ import { WeeklyScheduleGrid } from "@/components/schedule/weekly-schedule-grid";
 import { StudentPageShell } from "@/components/student/student-page-shell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { saveScheduleSlotAction } from "@/lib/schedules/actions";
 import { getScheduleWorkspace, relation } from "@/lib/schedules/management";
 
@@ -25,10 +27,13 @@ export async function ScheduleSection({
   locale: AppLocale;
   searchParams?: Query;
 }) {
-  const [t, data, query] = await Promise.all([
+  const query = await searchParams;
+  const [t, data] = await Promise.all([
     getTranslations({ locale, namespace: "schedules" }),
-    getScheduleWorkspace(),
-    searchParams,
+    getScheduleWorkspace({
+      studentId: typeof query.studentId === "string" ? query.studentId : undefined,
+      teacherId: typeof query.teacherId === "string" ? query.teacherId : undefined,
+    }),
   ]);
   const status = typeof query.scheduleStatus === "string" ? query.scheduleStatus : "";
   const error = typeof query.scheduleError === "string" ? query.scheduleError : "";
@@ -67,6 +72,22 @@ export async function ScheduleSection({
       {status ? (
         <Alert className="mt-6" variant="success">
           {t("saved")}
+        </Alert>
+      ) : null}
+      {data.role === "admin" && (query.studentId || query.teacherId) ? (
+        <Alert className="mt-6 grid-cols-1" variant="default">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>
+              {locale === "ar"
+                ? "تعرض الصفحة الآن الجدول المرتبط بالملف المحدد."
+                : "The page is filtered to the selected profile."}
+            </span>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/admin/schedule">
+                {locale === "ar" ? "عرض الجدول الكامل" : "Show full schedule"}
+              </Link>
+            </Button>
+          </div>
         </Alert>
       ) : null}
       {error ? (
@@ -147,6 +168,69 @@ export async function ScheduleSection({
           </div>
         </form>
       ) : null}
+      <WeeklyScheduleGrid
+        slots={data.slots}
+        locale={locale}
+        role={data.role}
+        timezone={data.timezone}
+        labels={{
+          title: t("grid.title"),
+          description: t("grid.description"),
+          lessonCount: t.raw("grid.lessonCount"),
+          lessonsAtTime: t.raw("grid.lessonsAtTime"),
+          student: t("grid.student"),
+          teacher: t("grid.teacher"),
+          empty: t("empty"),
+          weekdays: [0, 1, 2, 3, 4, 5, 6].map((day) => t(`weekdays.${day}` as "weekdays.0")),
+        }}
+      />
+      {appearance === "standard" && data.role === "teacher" ? (
+        <section className="mt-6 rounded-2xl border bg-card p-4 shadow-card sm:p-5">
+          <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
+            <div>
+              <h2 className="text-lg font-black text-primary">
+                {locale === "ar" ? "الحصص القادمة" : "Upcoming sessions"}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {locale === "ar"
+                  ? "افتح مساحة الحصة لإدارة الرابط والحضور والتقييم."
+                  : "Open the session workspace to manage access, attendance, and evaluation."}
+              </p>
+            </div>
+            <Badge variant="secondary">{data.teacherSessions.length}</Badge>
+          </div>
+          {data.teacherSessions.length ? (
+            <ul className="mt-3 grid gap-2">
+              {data.teacherSessions.map((session) => (
+                <li
+                  key={session.id}
+                  className="flex flex-col gap-3 rounded-xl border border-secondary/15 bg-background/45 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-black text-primary">{session.student.full_name}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {new Intl.DateTimeFormat(locale, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                        timeZone: data.timezone,
+                      }).format(new Date(session.scheduled_at))}
+                    </p>
+                  </div>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/teacher/sessions/${session.id}`}>
+                      {locale === "ar" ? "فتح الحصة" : "Open session"}
+                    </Link>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              {locale === "ar" ? "لا توجد حصص قادمة." : "No upcoming sessions."}
+            </p>
+          )}
+        </section>
+      ) : null}
       <CalendarExports
         labels={{
           title: t("exports.title"),
@@ -164,22 +248,12 @@ export async function ScheduleSection({
           error: t("exports.error"),
           privacy: t("exports.privacy"),
           urlLabel: t("exports.urlLabel"),
-        }}
-      />
-      <WeeklyScheduleGrid
-        slots={data.slots}
-        locale={locale}
-        role={data.role}
-        timezone={data.timezone}
-        labels={{
-          title: t("grid.title"),
-          description: t("grid.description"),
-          lessonCount: t.raw("grid.lessonCount"),
-          lessonsAtTime: t.raw("grid.lessonsAtTime"),
-          student: t("grid.student"),
-          teacher: t("grid.teacher"),
-          empty: t("empty"),
-          weekdays: [0, 1, 2, 3, 4, 5, 6].map((day) => t(`weekdays.${day}` as "weekdays.0")),
+          openTools: t("exports.openTools"),
+          closeTools: t("exports.closeTools"),
+          confirmGenerate: t("exports.confirmGenerate"),
+          confirmRevoke: t("exports.confirmRevoke"),
+          confirm: t("exports.confirm"),
+          cancel: t("exports.cancel"),
         }}
       />
       {data.adjustments ? (

@@ -247,6 +247,7 @@ async function createFixture() {
   await must(
     db.from("attendance").insert({
       session_id: ids.pastSession,
+      student_id: ids.firstChild,
       status: "present",
       recorded_by: ids.teacherProfile,
       minutes: 30,

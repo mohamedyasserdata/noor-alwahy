@@ -37,6 +37,7 @@ export async function SessionEvaluationsSection({
       (session) => session.id === requestedSession && !session.evaluation?.is_locked,
     ) ?? data.sessions.find((session) => !session.evaluation?.is_locked);
   const saved = query.evaluationStatus === "saved";
+  const draftSaved = query.evaluationStatus === "draft";
   const requestedError = typeof query.evaluationError === "string" ? query.evaluationError : "";
   const error = errorCodes.includes(requestedError as (typeof errorCodes)[number])
     ? requestedError
@@ -75,6 +76,13 @@ export async function SessionEvaluationsSection({
           {t("saved", { score: String(query.score ?? "—"), rating: String(query.rating ?? "—") })}
         </Alert>
       ) : null}
+      {draftSaved ? (
+        <Alert variant="success" className="mt-6" aria-live="polite">
+          {locale === "ar"
+            ? "حُفظت المسودة في النظام ويمكن استكمالها من أي جهاز. لن تظهر للطالب أو ولي الأمر قبل الاعتماد."
+            : "The draft was saved in the system and can be continued on any device. It remains hidden from the student and parent until approval."}
+        </Alert>
+      ) : null}
       {error ? (
         <Alert variant="warning" className="mt-6" aria-live="polite">
           {t(`errors.${error}`)}
@@ -88,7 +96,7 @@ export async function SessionEvaluationsSection({
             {data.sessions.map((session) => (
               <Link
                 key={session.id}
-                href={`/teacher/evaluations?sessionId=${session.id}`}
+                href={`/teacher/sessions/${session.id}`}
                 aria-current={selected?.id === session.id ? "page" : undefined}
                 className={`min-w-64 rounded-xl border p-4 outline-none focus-visible:ring-2 focus-visible:ring-ring lg:min-w-0 ${selected?.id === session.id ? "border-primary bg-primary text-primary-foreground" : "bg-card"}`}
               >
@@ -132,6 +140,7 @@ export async function SessionEvaluationsSection({
                 settings={data.settings}
                 surahs={data.surahs}
                 clearSavedDraft={saved}
+                initialDraft={selected.evaluation?.draft}
               />
             </>
           )}

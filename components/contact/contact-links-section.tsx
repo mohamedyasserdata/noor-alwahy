@@ -112,10 +112,12 @@ export async function ContactLinksSection({
         </ul>
       )}
 
-      <aside className="mx-auto mt-10 max-w-3xl rounded-2xl border border-secondary/25 bg-secondary/10 p-5 text-center">
-        <h2 className="font-black text-primary">{t("support.title")}</h2>
-        <p className="mt-2 text-sm leading-7 text-muted-foreground">{supportHours}</p>
-      </aside>
+      {supportHours.trim() ? (
+        <aside className="mx-auto mt-10 max-w-3xl rounded-2xl border border-secondary/25 bg-secondary/10 p-5 text-center">
+          <h2 className="font-black text-primary">{t("support.title")}</h2>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">{supportHours}</p>
+        </aside>
+      ) : null}
     </section>
   );
 

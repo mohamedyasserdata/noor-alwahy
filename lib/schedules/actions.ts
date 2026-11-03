@@ -3,6 +3,7 @@
 import type { Route } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 import { routing, type AppLocale } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/require-role";
@@ -129,6 +130,67 @@ export async function rescheduleSessionAction(
 
   revalidateSchedulePortals(locale);
   go(locale, "adjustmentStatus", "rescheduled");
+}
+
+const participantSchema = z.object({
+  sessionId: z.uuid(),
+  studentId: z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    z.uuid().optional(),
+  ),
+  assignmentId: z.uuid(),
+  action: z.enum(["add", "remove"]),
+});
+
+export async function manageSessionParticipantAction(
+  localeValue: string,
+  formData: FormData,
+): Promise<never> {
+  const locale = normalizeLocale(localeValue);
+  await requireRole("admin", locale);
+  const parsed = participantSchema.safeParse({
+    sessionId: formData.get("sessionId"),
+    studentId: formData.get("studentId"),
+    assignmentId: formData.get("assignmentId"),
+    action: formData.get("action"),
+  });
+  if (!parsed.success) go(locale, "adjustmentError", "invalid_fields");
+
+  const supabase = await createClient();
+  let studentId = parsed.data.studentId;
+  if (parsed.data.action === "add") {
+    const { data: assignment, error: assignmentError } = await supabase
+      .from("teacher_assignments")
+      .select("student_id")
+      .eq("id", parsed.data.assignmentId)
+      .eq("status", "active")
+      .maybeSingle();
+    if (assignmentError || !assignment) go(locale, "adjustmentError", "invalid_fields");
+    studentId = assignment.student_id;
+  }
+  if (!studentId) go(locale, "adjustmentError", "invalid_fields");
+  const { error } = await supabase.rpc("manage_session_participant", {
+    p_session_id: parsed.data.sessionId,
+    p_student_id: studentId,
+    p_assignment_id: parsed.data.assignmentId,
+    p_action: parsed.data.action,
+  });
+  if (error) {
+    const code = [
+      "participant_assignment_invalid",
+      "session_participants_locked",
+      "primary_participant_cannot_be_removed",
+      "gender_mismatch",
+    ].find((item) => error.message.includes(item));
+    go(locale, "adjustmentError", code ?? "request_failed");
+  }
+
+  revalidateSchedulePortals(locale);
+  go(
+    locale,
+    "adjustmentStatus",
+    parsed.data.action === "add" ? "participant_added" : "participant_removed",
+  );
 }
 
 function normalizeLocale(localeValue: string): AppLocale {

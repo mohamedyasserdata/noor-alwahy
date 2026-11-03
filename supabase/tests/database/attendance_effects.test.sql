@@ -35,14 +35,18 @@ where key = 'attendance_policy';
 insert into auth.users (id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
   ('e7000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'attendance.substitute@test.local', '{"role":"teacher"}', '{"full_name":"Substitute Teacher"}', now(), now()),
-  ('e7000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'attendance.unrelated@test.local', '{"role":"teacher"}', '{"full_name":"Unrelated Teacher"}', now(), now());
+  ('e7000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'attendance.unrelated@test.local', '{"role":"teacher"}', '{"full_name":"Unrelated Teacher"}', now(), now()),
+  ('e7000000-0000-4000-8000-000000000010', 'authenticated', 'authenticated', 'attendance.admin@test.local', '{"role":"admin"}', '{"full_name":"Attendance Admin"}', now(), now()),
+  ('e7000000-0000-4000-8000-000000000011', 'authenticated', 'authenticated', 'attendance.teacher@test.local', '{"role":"teacher"}', '{"full_name":"Attendance Teacher"}', now(), now()),
+  ('e7000000-0000-4000-8000-000000000012', 'authenticated', 'authenticated', 'attendance.student@test.local', '{"role":"student"}', '{"full_name":"Attendance Student"}', now(), now()),
+  ('e7000000-0000-4000-8000-000000000013', 'authenticated', 'authenticated', 'attendance.parent@test.local', '{"role":"parent"}', '{"full_name":"Attendance Parent"}', now(), now());
 
 insert into public.tracks (id, code, name_ar, name_en)
 values ('e7100000-0000-4000-8000-000000000001', 'attendance-test', 'اختبار الحضور', 'Attendance test');
 
 insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
 values
-  ('e7200000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now()),
+  ('e7200000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000011', 'male', 'active', now(), now()),
   ('e7200000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000001', 'male', 'active', now(), now()),
   ('e7200000-0000-4000-8000-000000000003', 'e7000000-0000-4000-8000-000000000002', 'male', 'active', now(), now());
 
@@ -53,13 +57,13 @@ values
   ('e7200000-0000-4000-8000-000000000003', 'e7100000-0000-4000-8000-000000000001');
 
 insert into public.students (id, profile_id, full_name, gender, timezone)
-values ('e7300000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'Attendance Student', 'male', 'Africa/Cairo');
+values ('e7300000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000012', 'Attendance Student', 'male', 'Africa/Cairo');
 insert into public.guardians (id, profile_id)
-values ('e7400000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000004');
+values ('e7400000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000013');
 insert into public.student_guardians (student_id, guardian_id, is_primary)
 values ('e7300000-0000-4000-8000-000000000001', 'e7400000-0000-4000-8000-000000000001', true);
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, assigned_by, reason)
-values ('e7500000-0000-4000-8000-000000000001', 'e7300000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', 'e7100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Attendance test');
+values ('e7500000-0000-4000-8000-000000000001', 'e7300000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', 'e7100000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000010', 'Attendance test');
 
 insert into public.subscriptions (
   id, student_id, status, start_date, current_period_start, current_period_end,
@@ -75,8 +79,8 @@ values ('e7600000-0000-4000-8000-000000000001', 20, 'grant', 'attendance fixture
 
 insert into public.teacher_rates (id, teacher_id, rate_per_session, currency, valid_from, created_by)
 values
-  ('e7700000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', 100.00, 'EGP', '2026-01-01', '10000000-0000-4000-8000-000000000001'),
-  ('e7700000-0000-4000-8000-000000000002', 'e7200000-0000-4000-8000-000000000002', 150.00, 'EGP', '2026-01-01', '10000000-0000-4000-8000-000000000001');
+  ('e7700000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', 100.00, 'EGP', '2026-01-01', 'e7000000-0000-4000-8000-000000000010'),
+  ('e7700000-0000-4000-8000-000000000002', 'e7200000-0000-4000-8000-000000000002', 150.00, 'EGP', '2026-01-01', 'e7000000-0000-4000-8000-000000000010');
 
 insert into public.sessions (id, assignment_id, student_id, teacher_id, original_teacher_id, kind, makeup_of, scheduled_at, duration_min)
 values
@@ -94,7 +98,7 @@ values
   ('e7800000-0000-4000-8000-000000000012', 'e7500000-0000-4000-8000-000000000001', 'e7300000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', null, 'regular', null, '2026-10-12 08:00+00', 30),
   ('e7800000-0000-4000-8000-000000000013', 'e7500000-0000-4000-8000-000000000001', 'e7300000-0000-4000-8000-000000000001', 'e7200000-0000-4000-8000-000000000001', null, 'regular', null, '2026-10-13 08:00+00', 30);
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000001', 'present', null, '2026-10-01 08:00+00', 30, null)$$, 'actual teacher records present attendance');
@@ -115,16 +119,16 @@ select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-0000000
 set local role authenticated;
 select throws_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000002', 'late', null, null, 20, null)$$, '42501', 'attendance_forbidden', 'unrelated teacher cannot record attendance');
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000010","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select throws_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000002', 'late', null, null, 20, null)$$, '42501', 'attendance_forbidden', 'AAL1 administrator cannot record attendance');
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000012","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select throws_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000002', 'late', null, null, 20, null)$$, '42501', 'attendance_forbidden', 'student cannot record attendance');
 
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000002', 'late', '2026-10-02 08:08+00', '2026-10-02 08:00+00', 22, null)$$, 'late consumes and pays');
 reset role;
@@ -140,7 +144,7 @@ reset role;
 update public.subscriptions
 set policy_snapshot = jsonb_set(jsonb_set(policy_snapshot, '{student_no_show_consumes_credit}', 'false'), '{student_no_show_pays_teacher}', 'false')
 where id = 'e7600000-0000-4000-8000-000000000001';
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000004', 'student_absent', null, '2026-10-04 08:00+00', 30, null)$$, 'policy-free student absence records');
 reset role;
@@ -156,7 +160,7 @@ reset role;
 update public.subscriptions
 set policy_snapshot = jsonb_set(jsonb_set(policy_snapshot, '{student_no_show_consumes_credit}', 'true'), '{student_no_show_pays_teacher}', 'true')
 where id = 'e7600000-0000-4000-8000-000000000001';
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000006', 'student_excused', null, '2026-10-06 08:00+00', 30, '2026-10-06 07:00+00')$$, 'late excuse is treated as absence');
 reset role;
@@ -168,20 +172,20 @@ reset role;
 select is((select count(*)::integer from public.session_credit_ledger where session_id = 'e7800000-0000-4000-8000-000000000007'), 0, 'teacher absence does not consume');
 select is((select count(*)::integer from public.teacher_payout_items where session_id = 'e7800000-0000-4000-8000-000000000007'), 0, 'teacher absence does not pay');
 select is((select outside_period_cap from public.makeup_entitlements where source_session_id = 'e7800000-0000-4000-8000-000000000007'), true, 'teacher absence guarantees makeup outside cap');
-select ok((select count(*) >= 1 from public.notifications where type = 'teacher_absent' and user_id = '10000000-0000-4000-8000-000000000001'), 'teacher absence alerts administration');
+select ok((select count(*) >= 1 from public.notifications where type = 'teacher_absent' and user_id = 'e7000000-0000-4000-8000-000000000010'), 'teacher absence alerts administration');
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000008', 'cancelled_teacher', null, null, null, null)$$, 'teacher cancellation records');
 reset role;
 select is((select outside_period_cap from public.makeup_entitlements where source_session_id = 'e7800000-0000-4000-8000-000000000008'), true, 'teacher cancellation guarantees makeup');
 reset role;
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000010","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000009', 'cancelled_admin', null, null, null, null)$$, 'AAL2 administrator records administrative cancellation');
 select is((select outside_period_cap from public.makeup_entitlements where source_session_id = 'e7800000-0000-4000-8000-000000000009'), true, 'administrative cancellation defaults to makeup');
 reset role;
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000012', 'student_excused', null, null, null, '2026-10-11 18:00+00')$$, 'second timely excuse records');
 select is((select count(*)::integer from public.makeup_entitlements where subscription_id = 'e7600000-0000-4000-8000-000000000001' and not outside_period_cap), 2, 'makeup cap admits second entitlement');
@@ -196,7 +200,7 @@ select is((select teacher_id from public.teacher_payout_items where session_id =
 select is((select amount from public.teacher_payout_items where session_id = 'e7800000-0000-4000-8000-000000000010'), 150.00::numeric, 'substitute rate is snapshotted');
 reset role;
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000011","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select lives_ok($$select public.record_attendance('e7800000-0000-4000-8000-000000000011', 'present', null, '2026-10-11 08:00+00', 30, null)$$, 'completed makeup records');
 reset role;
@@ -210,11 +214,11 @@ select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-0000000
 set local role authenticated;
 select is((select count(*)::integer from public.attendance), 0, 'unrelated teacher reads no attendance');
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000012","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select is((select count(*)::integer from public.attendance), 13, 'student reads own attendance history');
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"e7000000-0000-4000-8000-000000000013","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select is((select count(*)::integer from public.attendance), 13, 'parent reads child attendance history');
 reset role;

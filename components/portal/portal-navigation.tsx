@@ -7,7 +7,6 @@ import {
   BookOpenCheck,
   CalendarDays,
   CalendarCheck,
-  CalendarClock,
   ChartNoAxesCombined,
   ChevronDown,
   ClipboardList,
@@ -17,7 +16,6 @@ import {
   FileChartColumn,
   GraduationCap,
   House,
-  Link2,
   Mail,
   Menu,
   Megaphone,
@@ -34,8 +32,11 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSelectedLayoutSegment } from "next/navigation";
+import { Suspense } from "react";
 
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { portalConfig, type PortalId } from "@/components/portal/portal-config";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -57,17 +58,13 @@ const sectionIcons = {
   reports: FileChartColumn,
   announcements: Megaphone,
   templates: Files,
-  availability: CalendarDays,
   home: House,
   progress: Sparkles,
   schedule: CalendarDays,
   attendance: CalendarCheck,
   evaluation: Scale,
-  evaluations: BookOpenCheck,
-  notifications: Bell,
-  requests: CalendarClock,
   exams: ClipboardList,
-  zoom: Link2,
+  notifications: Bell,
   earnings: WalletCards,
   profile: Settings,
   certificates: BadgeCheck,
@@ -84,6 +81,7 @@ type PortalNavigationProps = {
 export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   const activeSection = useSelectedLayoutSegment();
   const t = useTranslations(`portals.${portal}`);
+  const portalT = useTranslations("portals");
   const sections = portalConfig[portal].sections;
   const isSidebar = variant === "sidebar";
   const isTop = variant === "top";
@@ -114,15 +112,10 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
     "today",
     "schedule",
     "students",
-    "attendance",
-    "evaluations",
     "reports",
     "notifications",
-    "requests",
-    "earnings",
-    "profile",
   ] as const;
-  const teacherToolSections = ["availability", "zoom", "exams"] as const;
+  const teacherToolSections = ["earnings", "profile"] as const;
 
   const renderSection = (section: (typeof sections)[number]) => {
     const Icon = sectionIcons[section] ?? BookOpenCheck;
@@ -170,6 +163,48 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
       </Link>
     );
   };
+
+  if (portal === "student" && variant === "bottom") {
+    const primarySections = ["home", "progress", "schedule"] as const;
+    const moreSections = ["billing", "certificates", "contact"] as const;
+
+    return (
+      <nav
+        aria-label={t("navigationLabel")}
+        data-testid="portal-navigation-bottom"
+        className="grid h-full grid-cols-4 items-stretch"
+      >
+        {primarySections.map((section) => renderSection(section))}
+        <details className="group/mobile-nav relative min-w-0">
+          <summary
+            className="relative flex h-full min-h-11 cursor-pointer touch-manipulation list-none flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-bold text-muted-foreground marker:hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden"
+            data-testid="student-mobile-more"
+          >
+            <Menu className="size-5" aria-hidden="true" />
+            <span>{t("more")}</span>
+          </summary>
+          <section className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[68svh] overflow-y-auto rounded-2xl border border-secondary/25 bg-card p-4 shadow-[0_1.25rem_3.5rem_-1rem_rgb(16_31_59_/_0.42)]">
+            <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
+              <h2 className="font-black text-primary">{t("moreTitle")}</h2>
+              <span className="text-xs text-muted-foreground">{moreSections.length}</span>
+            </div>
+            <div className="mt-3 grid gap-2">
+              {moreSections.map((section) => renderSection(section))}
+            </div>
+            <div className="mt-4 flex items-center gap-2 border-t border-secondary/15 pt-4">
+              <ThemeToggle
+                enableDarkLabel={portalT("theme.enableDark")}
+                enableLightLabel={portalT("theme.enableLight")}
+              />
+              <Suspense fallback={<span className="block h-11 flex-1 rounded-lg border" />}>
+                <LocaleSwitcher />
+              </Suspense>
+            </div>
+          </section>
+        </details>
+      </nav>
+    );
+  }
 
   if (portal === "admin" && variant === "bottom") {
     const primarySections = ["dashboard", "applications", "schedule", "subscriptions"] as const;
@@ -231,7 +266,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   }
 
   if (portal === "teacher" && variant === "bottom") {
-    const primarySections = ["today", "schedule", "students", "attendance"] as const;
+    const primarySections = ["today", "schedule", "students", "reports"] as const;
     const moreSections = sections.filter(
       (section) => !primarySections.includes(section as (typeof primarySections)[number]),
     );

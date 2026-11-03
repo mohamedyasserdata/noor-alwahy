@@ -12,6 +12,7 @@ type StudentPageShellProps = {
   title: string;
   titleId: string;
   contentClassName?: string;
+  compact?: boolean;
 };
 
 export function StudentPageShell({
@@ -23,25 +24,43 @@ export function StudentPageShell({
   locale,
   title,
   titleId,
+  compact = false,
 }: StudentPageShellProps) {
   return (
-    <div className="student-home min-h-svh pb-12 sm:pb-16" data-testid="student-page-shell">
+    <div className="student-home min-h-svh pb-10 sm:pb-14" data-testid="student-page-shell">
       <div
-        className="relative min-h-[20rem] overflow-hidden bg-[url('/images/student/golden-quran-sunlit-mosque.png')] bg-cover bg-[position:38%_58%] sm:min-h-[21rem] lg:bg-[position:center_58%]"
+        className={cn(
+          "relative overflow-hidden",
+          compact
+            ? "border-b border-secondary/15 bg-card"
+            : "min-h-[12.5rem] bg-[url('/images/student/golden-quran-sunlit-mosque.png')] bg-cover bg-[position:34%_58%] sm:min-h-[15rem] lg:min-h-[17rem] lg:bg-[position:center_58%]",
+        )}
         aria-labelledby={titleId}
         data-testid="student-page-hero"
       >
+        {!compact ? (
+          <div
+            className="absolute inset-0 bg-linear-to-b from-[#fffaf0]/45 via-[#fffaf0]/82 to-[#fffaf0] lg:bg-linear-to-r lg:from-[#fffaf0]/18 lg:via-[#fffaf0]/55 lg:to-[#fffaf0]/98 dark:from-[#091a33]/55 dark:via-[#091a33]/88 dark:to-[#091a33] lg:dark:from-[#091a33]/24 lg:dark:via-[#091a33]/72 lg:dark:to-[#091a33]/98"
+            aria-hidden="true"
+          />
+        ) : null}
         <div
-          className="absolute inset-0 bg-linear-to-b from-[#fffaf0]/10 via-[#fffaf0]/58 to-[#fffaf0] lg:bg-linear-to-r lg:from-transparent lg:via-[#fffaf0]/38 lg:to-[#fffaf0]/96 dark:from-[#091a33]/30 dark:via-[#091a33]/78 dark:to-[#091a33] lg:dark:from-[#091a33]/18 lg:dark:via-[#091a33]/68 lg:dark:to-[#091a33]/96"
-          aria-hidden="true"
-        />
-        <div
-          className="relative mx-auto grid min-h-[20rem] w-full max-w-[100rem] items-end px-5 pt-14 pb-20 sm:min-h-[21rem] sm:px-8 lg:grid-cols-2 lg:items-center lg:px-12 lg:py-10"
-          dir="ltr"
+          className={cn(
+            "relative mx-auto w-full max-w-[100rem] px-5",
+            compact
+              ? "py-6 sm:px-8 sm:py-8 lg:px-12"
+              : "grid min-h-[12.5rem] items-end pt-7 pb-12 sm:min-h-[15rem] sm:px-8 sm:pb-16 lg:min-h-[17rem] lg:grid-cols-2 lg:items-center lg:px-12 lg:py-8",
+          )}
+          dir={compact ? (locale === "ar" ? "rtl" : "ltr") : "ltr"}
         >
-          <span aria-hidden="true" />
+          {!compact ? <span aria-hidden="true" /> : null}
           <header
-            className="max-w-2xl rounded-3xl bg-[#fffaf0]/76 p-5 backdrop-blur-[2px] sm:p-7 lg:bg-transparent lg:p-0 lg:backdrop-blur-none dark:bg-[#091a33]/76 lg:dark:bg-transparent"
+            className={cn(
+              "max-w-2xl",
+              compact
+                ? ""
+                : "rounded-2xl bg-[#fffaf0]/82 p-4 backdrop-blur-[2px] sm:p-5 lg:bg-transparent lg:p-0 lg:backdrop-blur-none dark:bg-[#091a33]/82 lg:dark:bg-transparent",
+            )}
             dir={locale === "ar" ? "rtl" : "ltr"}
           >
             <p className="flex items-center gap-2 text-sm font-black text-[#9a6512] sm:text-base dark:text-secondary">
@@ -50,11 +69,14 @@ export function StudentPageShell({
             </p>
             <h1
               id={titleId}
-              className="mt-2 text-4xl leading-tight font-black text-balance text-[#0b2b57] sm:text-5xl dark:text-primary"
+              className={cn(
+                "mt-1.5 leading-tight font-black text-balance text-[#0b2b57] dark:text-primary",
+                compact ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl lg:text-5xl",
+              )}
             >
               {title}
             </h1>
-            <p className="mt-3 max-w-2xl text-base leading-8 text-[#5d6f86] sm:text-lg dark:text-muted-foreground">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d6f86] sm:text-base sm:leading-7 dark:text-muted-foreground">
               {description}
             </p>
           </header>
@@ -63,7 +85,8 @@ export function StudentPageShell({
 
       <div
         className={cn(
-          "student-page-content relative z-10 mx-auto -mt-14 w-full max-w-[100rem] px-4 sm:px-6 lg:px-10",
+          "student-page-content relative z-10 mx-auto w-full max-w-[100rem] px-4 sm:px-6 lg:px-10",
+          compact ? "pt-5 sm:pt-6" : "-mt-7 sm:-mt-10",
           contentClassName,
         )}
       >

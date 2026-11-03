@@ -1,19 +1,14 @@
 "use client";
 
-import { Minus, Plus, Save, ShieldCheck } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Minus, Plus, Save, ShieldCheck } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
-import {
-  evaluationDraftStorageKey,
-  evaluationDraftVersion,
-  parseEvaluationDraft,
-  type EvaluationDraft,
-} from "@/lib/evaluation/draft";
+import { evaluationDraftVersion, type EvaluationDraft } from "@/lib/evaluation/draft";
 import { calculateEvaluationScorePreview } from "@/lib/evaluation/score-preview";
 import { submitSessionEvaluationAction } from "@/lib/evaluation/submission-actions";
 import type { EvaluationTypeSettings } from "@/lib/evaluation/settings";
@@ -33,43 +28,30 @@ export function SessionEvaluationForm({
   settings,
   surahs,
   clearSavedDraft,
+  returnToSession = false,
+  initialDraft,
 }: {
   locale: AppLocale;
   sessionId: string;
   settings: EvaluationTypeSettings[];
   surahs: Surah[];
   clearSavedDraft: boolean;
+  returnToSession?: boolean;
+  initialDraft?: EvaluationDraft | null;
 }) {
-  const storageKey = evaluationDraftStorageKey(sessionId);
-  const [draft, setDraft] = useState<EvaluationDraft>(() => createInitialDraft(settings));
-  const [restored, setRestored] = useState(false);
+  const [draft, setDraft] = useState<EvaluationDraft>(() =>
+    initialDraft && !clearSavedDraft ? initialDraft : createInitialDraft(settings),
+  );
+  const [reviewing, setReviewing] = useState(false);
   const draftRef = useRef(draft);
   const activeSettings = settings.find((entry) => entry.sessionType === draft.sessionType)!;
   const fromSurah = surahs.find((surah) => surah.id === draft.fromSurah) ?? surahs[0]!;
   const toSurah = surahs.find((surah) => surah.id === draft.toSurah) ?? surahs[0]!;
 
-  useEffect(() => {
-    if (clearSavedDraft) {
-      localStorage.removeItem(storageKey);
-      return;
-    }
-    const saved = parseEvaluationDraft(localStorage.getItem(storageKey));
-    if (!saved) return;
-    const timeout = window.setTimeout(() => {
-      draftRef.current = saved;
-      setDraft(saved);
-      setRestored(true);
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [clearSavedDraft, storageKey]);
-
   function updateDraft(updater: (current: EvaluationDraft) => EvaluationDraft) {
     const next = updater(draftRef.current);
     draftRef.current = next;
     setDraft(next);
-    if (!clearSavedDraft) {
-      localStorage.setItem(storageKey, JSON.stringify(next));
-    }
   }
 
   const preview = useMemo(() => {
@@ -99,7 +81,7 @@ export function SessionEvaluationForm({
   const isArabic = locale === "ar";
   const text = isArabic
     ? {
-        restored: "استُعيدت مسودتك المحفوظة على هذا الجهاز.",
+        restored: "استُعيدت المسودة المحفوظة في النظام ويمكنك استكمالها من أي جهاز.",
         type: "نوع الجلسة",
         range: "نطاق التلاوة",
         from: "من",
@@ -122,12 +104,18 @@ export function SessionEvaluationForm({
         familyNote: "ملاحظة للأسرة",
         preview: "المؤشر اللحظي",
         authoritative: "النتيجة النهائية تحسبها قاعدة البيانات عند الحفظ.",
-        save: "حفظ التقييم وقَفله",
-        saving: "جارٍ الحفظ والقفل…",
-        local: "تُحفظ المسودة تلقائيًا على هذا الجهاز حتى الاعتماد.",
+        saveDraft: "حفظ مسودة",
+        savingDraft: "جارٍ حفظ المسودة…",
+        review: "مراجعة التقييم",
+        backToEdit: "العودة للتعديل",
+        lock: "اعتماد التقييم ونشره",
+        locking: "جارٍ الاعتماد والنشر…",
+        reviewTitle: "ملخص التقييم قبل الاعتماد النهائي",
+        reviewHelp: "راجع النطاق والنتيجة والملاحظات. بعد الاعتماد سيظهر التقييم للطالب والأسرة.",
+        local: "المسودة تُحفظ في النظام ولا تظهر للطالب أو ولي الأمر قبل الاعتماد.",
       }
     : {
-        restored: "Your draft on this device was restored.",
+        restored: "Your system draft was restored and can be continued on another device.",
         type: "Session type",
         range: "Recitation range",
         from: "From",
@@ -150,9 +138,17 @@ export function SessionEvaluationForm({
         familyNote: "Family note",
         preview: "Live indicator",
         authoritative: "The database calculates the final result when saved.",
-        save: "Save and lock evaluation",
-        saving: "Saving and locking…",
-        local: "The draft is saved automatically on this device until submission.",
+        saveDraft: "Save draft",
+        savingDraft: "Saving draft…",
+        review: "Review evaluation",
+        backToEdit: "Back to editing",
+        lock: "Approve and publish",
+        locking: "Approving and publishing…",
+        reviewTitle: "Evaluation summary before final approval",
+        reviewHelp:
+          "Review the range, score, and notes. Approval publishes it to the student and family.",
+        local:
+          "The draft is stored in the system and hidden from the student and parent until approval.",
       };
 
   function changeType(sessionType: EvaluationSessionType) {
@@ -195,211 +191,239 @@ export function SessionEvaluationForm({
   return (
     <form action={submitSessionEvaluationAction.bind(null, locale)} className="grid gap-7">
       <input type="hidden" name="sessionId" value={sessionId} />
+      {returnToSession ? <input type="hidden" name="returnToSession" value="true" /> : null}
       <input type="hidden" name="sessionType" value={draft.sessionType} />
       {Object.entries(draft.scores).map(([code, score]) => (
         <input key={code} type="hidden" name={`score:${code}`} value={score} />
       ))}
-      {restored ? (
+      {initialDraft && !clearSavedDraft ? (
         <p className="text-sm font-bold text-success" aria-live="polite">
           {text.restored}
         </p>
       ) : null}
 
-      <fieldset>
-        <legend className="text-lg font-black text-primary">{text.type}</legend>
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-          {settings.map((entry) => (
-            <Button
-              key={entry.sessionType}
-              type="button"
-              variant={entry.sessionType === draft.sessionType ? "default" : "outline"}
-              aria-pressed={entry.sessionType === draft.sessionType}
-              onClick={() => changeType(entry.sessionType)}
-            >
-              {sessionTypeLabel(entry.sessionType, locale)}
-            </Button>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset className="grid gap-4 border-t pt-6">
-        <legend className="px-2 text-lg font-black text-primary">{text.range}</legend>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {(["from", "to"] as const).map((side) => {
-            const selected = side === "from" ? fromSurah : toSurah;
-            return (
-              <div key={side} className="grid gap-3 rounded-2xl bg-accent/35 p-4">
-                <p className="font-black text-primary">{text[side]}</p>
-                <Label htmlFor={`${side}-surah`}>{text.surah}</Label>
-                <select
-                  id={`${side}-surah`}
-                  name={`${side}Surah`}
-                  value={selected.id}
-                  onChange={(event) =>
-                    updateDraft((current) => ({
-                      ...current,
-                      [`${side}Surah`]: Number(event.target.value),
-                      [`${side}Ayah`]: 1,
-                    }))
-                  }
-                  className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  {surahs.map((surah) => (
-                    <option key={surah.id} value={surah.id}>
-                      {surah.id}. {isArabic ? surah.nameAr : surah.nameEn}
-                    </option>
-                  ))}
-                </select>
-                <Label htmlFor={`${side}-ayah`}>{text.ayah}</Label>
-                <Input
-                  id={`${side}-ayah`}
-                  name={`${side}Ayah`}
-                  type="number"
-                  min={1}
-                  max={selected.ayahCount}
-                  value={draft[`${side}Ayah`]}
-                  onChange={(event) =>
-                    updateDraft((current) => ({
-                      ...current,
-                      [`${side}Ayah`]: Number(event.target.value),
-                    }))
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      <fieldset className="border-t pt-6">
-        <legend className="px-2 text-lg font-black text-primary">{text.criteria}</legend>
-        <div className="mt-3 grid gap-4">
-          {activeSettings.criteria.map((criterion) => (
-            <div
-              key={criterion.code}
-              className="grid gap-3 border-b pb-4 sm:grid-cols-[minmax(10rem,1fr)_auto] sm:items-center"
-            >
-              <p className="font-bold text-foreground">
-                {isArabic ? criterion.nameAr : criterion.nameEn}
-              </p>
-              <div
-                className="grid grid-cols-5 gap-1"
-                role="radiogroup"
-                aria-label={isArabic ? criterion.nameAr : criterion.nameEn}
+      <div className={reviewing ? "hidden" : "contents"}>
+        <fieldset>
+          <legend className="text-lg font-black text-primary">{text.type}</legend>
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+            {settings.map((entry) => (
+              <Button
+                key={entry.sessionType}
+                type="button"
+                variant={entry.sessionType === draft.sessionType ? "default" : "outline"}
+                aria-pressed={entry.sessionType === draft.sessionType}
+                onClick={() => changeType(entry.sessionType)}
               >
-                {[1, 2, 3, 4, 5].map((score) => (
-                  <button
-                    key={score}
-                    type="button"
-                    role="radio"
-                    aria-checked={draft.scores[criterion.code] === score}
-                    aria-label={`${score} - ${ratingLabels[locale][score - 1]}`}
-                    tabIndex={draft.scores[criterion.code] === score ? 0 : -1}
-                    data-score={score}
-                    onKeyDown={(event) => handleScoreKey(event, criterion.code, score)}
-                    onClick={() =>
+                {sessionTypeLabel(entry.sessionType, locale)}
+              </Button>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="grid gap-4 border-t pt-6">
+          <legend className="px-2 text-lg font-black text-primary">{text.range}</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {(["from", "to"] as const).map((side) => {
+              const selected = side === "from" ? fromSurah : toSurah;
+              return (
+                <div key={side} className="grid gap-3 rounded-2xl bg-accent/35 p-4">
+                  <p className="font-black text-primary">{text[side]}</p>
+                  <Label htmlFor={`${side}-surah`}>{text.surah}</Label>
+                  <select
+                    id={`${side}-surah`}
+                    name={`${side}Surah`}
+                    value={selected.id}
+                    onChange={(event) =>
                       updateDraft((current) => ({
                         ...current,
-                        scores: { ...current.scores, [criterion.code]: score },
+                        [`${side}Surah`]: Number(event.target.value),
+                        [`${side}Ayah`]: 1,
                       }))
                     }
-                    className={cn(
-                      "min-h-11 min-w-11 rounded-lg border text-sm font-black focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
-                      draft.scores[criterion.code] === score
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "bg-card",
-                    )}
+                    className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
-                    {score}
-                  </button>
-                ))}
+                    {surahs.map((surah) => (
+                      <option key={surah.id} value={surah.id}>
+                        {surah.id}. {isArabic ? surah.nameAr : surah.nameEn}
+                      </option>
+                    ))}
+                  </select>
+                  <Label htmlFor={`${side}-ayah`}>{text.ayah}</Label>
+                  <Input
+                    id={`${side}-ayah`}
+                    name={`${side}Ayah`}
+                    type="number"
+                    min={1}
+                    max={selected.ayahCount}
+                    value={draft[`${side}Ayah`]}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        [`${side}Ayah`]: Number(event.target.value),
+                      }))
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <fieldset className="border-t pt-6">
+          <legend className="px-2 text-lg font-black text-primary">{text.criteria}</legend>
+          <div className="mt-3 grid gap-4">
+            {activeSettings.criteria.map((criterion) => (
+              <div
+                key={criterion.code}
+                className="grid gap-3 border-b pb-4 sm:grid-cols-[minmax(10rem,1fr)_auto] sm:items-center"
+              >
+                <p className="font-bold text-foreground">
+                  {isArabic ? criterion.nameAr : criterion.nameEn}
+                </p>
+                <div
+                  className="grid grid-cols-5 gap-1"
+                  role="radiogroup"
+                  aria-label={isArabic ? criterion.nameAr : criterion.nameEn}
+                >
+                  {[1, 2, 3, 4, 5].map((score) => (
+                    <button
+                      key={score}
+                      type="button"
+                      role="radio"
+                      aria-checked={draft.scores[criterion.code] === score}
+                      aria-label={`${score} - ${ratingLabels[locale][score - 1]}`}
+                      tabIndex={draft.scores[criterion.code] === score ? 0 : -1}
+                      data-score={score}
+                      onKeyDown={(event) => handleScoreKey(event, criterion.code, score)}
+                      onClick={() =>
+                        updateDraft((current) => ({
+                          ...current,
+                          scores: { ...current.scores, [criterion.code]: score },
+                        }))
+                      }
+                      className={cn(
+                        "min-h-11 min-w-11 rounded-lg border text-sm font-black focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
+                        draft.scores[criterion.code] === score
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "bg-card",
+                      )}
+                    >
+                      {score}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </fieldset>
+            ))}
+          </div>
+        </fieldset>
 
-      <fieldset className="border-t pt-6">
-        <legend className="px-2 text-lg font-black text-primary">{text.errors}</legend>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Counter
-            label={text.major}
-            name="errorsMajor"
-            value={draft.errorsMajor}
-            onChange={(value) => updateDraft((current) => ({ ...current, errorsMajor: value }))}
-          />
-          <Counter
-            label={text.minor}
-            name="errorsMinor"
-            value={draft.errorsMinor}
-            onChange={(value) => updateDraft((current) => ({ ...current, errorsMinor: value }))}
-          />
-          <Counter
-            label={text.prompts}
-            name="promptsCount"
-            value={draft.promptsCount}
-            onChange={(value) => updateDraft((current) => ({ ...current, promptsCount: value }))}
-          />
-          <Counter
-            label={text.forgot}
-            name="forgotCount"
-            value={draft.forgotCount}
-            onChange={(value) => updateDraft((current) => ({ ...current, forgotCount: value }))}
-          />
-        </div>
-      </fieldset>
+        <fieldset className="border-t pt-6">
+          <legend className="px-2 text-lg font-black text-primary">{text.errors}</legend>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Counter
+              label={text.major}
+              name="errorsMajor"
+              value={draft.errorsMajor}
+              onChange={(value) => updateDraft((current) => ({ ...current, errorsMajor: value }))}
+            />
+            <Counter
+              label={text.minor}
+              name="errorsMinor"
+              value={draft.errorsMinor}
+              onChange={(value) => updateDraft((current) => ({ ...current, errorsMinor: value }))}
+            />
+            <Counter
+              label={text.prompts}
+              name="promptsCount"
+              value={draft.promptsCount}
+              onChange={(value) => updateDraft((current) => ({ ...current, promptsCount: value }))}
+            />
+            <Counter
+              label={text.forgot}
+              name="forgotCount"
+              value={draft.forgotCount}
+              onChange={(value) => updateDraft((current) => ({ ...current, forgotCount: value }))}
+            />
+          </div>
+        </fieldset>
 
-      <fieldset className="grid gap-4 border-t pt-6">
-        <legend className="px-2 text-lg font-black text-primary">{text.details}</legend>
-        <Label htmlFor="weak-tags">{text.weakTags}</Label>
-        <Input
-          id="weak-tags"
-          name="weakTags"
-          value={draft.weakTags}
-          onChange={(event) =>
-            updateDraft((current) => ({ ...current, weakTags: event.target.value }))
-          }
-        />
-        <Label htmlFor="decision">{text.decision}</Label>
-        <select
-          id="decision"
-          name="decision"
-          value={draft.decision}
-          onChange={(event) =>
-            updateDraft((current) => ({
-              ...current,
-              decision: event.target.value as EvaluationDraft["decision"],
-            }))
-          }
-          className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-        >
-          <option value="passed">{text.passed}</option>
-          <option value="repeat">{text.repeat}</option>
-          <option value="next">{text.next}</option>
-        </select>
-        <Label htmlFor="homework">{text.homework}</Label>
-        <textarea
-          id="homework"
-          name="homework"
-          rows={3}
-          value={draft.homework}
-          onChange={(event) =>
-            updateDraft((current) => ({ ...current, homework: event.target.value }))
-          }
-          className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-        />
-        <Label htmlFor="family-note">{text.familyNote}</Label>
-        <textarea
-          id="family-note"
-          name="familyNote"
-          rows={3}
-          value={draft.familyNote}
-          onChange={(event) =>
-            updateDraft((current) => ({ ...current, familyNote: event.target.value }))
-          }
-          className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-        />
-      </fieldset>
+        <fieldset className="grid gap-4 border-t pt-6">
+          <legend className="px-2 text-lg font-black text-primary">{text.details}</legend>
+          <Label htmlFor="weak-tags">{text.weakTags}</Label>
+          <Input
+            id="weak-tags"
+            name="weakTags"
+            value={draft.weakTags}
+            onChange={(event) =>
+              updateDraft((current) => ({ ...current, weakTags: event.target.value }))
+            }
+          />
+          <Label htmlFor="decision">{text.decision}</Label>
+          <select
+            id="decision"
+            name="decision"
+            value={draft.decision}
+            onChange={(event) =>
+              updateDraft((current) => ({
+                ...current,
+                decision: event.target.value as EvaluationDraft["decision"],
+              }))
+            }
+            className="h-11 rounded-lg border bg-card px-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            <option value="passed">{text.passed}</option>
+            <option value="repeat">{text.repeat}</option>
+            <option value="next">{text.next}</option>
+          </select>
+          <Label htmlFor="homework">{text.homework}</Label>
+          <textarea
+            id="homework"
+            name="homework"
+            rows={3}
+            value={draft.homework}
+            onChange={(event) =>
+              updateDraft((current) => ({ ...current, homework: event.target.value }))
+            }
+            className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+          />
+          <Label htmlFor="family-note">{text.familyNote}</Label>
+          <textarea
+            id="family-note"
+            name="familyNote"
+            rows={3}
+            value={draft.familyNote}
+            onChange={(event) =>
+              updateDraft((current) => ({ ...current, familyNote: event.target.value }))
+            }
+            className="rounded-xl border bg-card p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+          />
+        </fieldset>
+      </div>
+
+      {reviewing ? (
+        <section className="rounded-2xl border border-secondary/30 bg-accent/25 p-5 sm:p-6">
+          <h3 className="text-xl font-black text-primary">{text.reviewTitle}</h3>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{text.reviewHelp}</p>
+          <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+            <ReviewItem label={text.type} value={sessionTypeLabel(draft.sessionType, locale)} />
+            <ReviewItem
+              label={text.range}
+              value={`${isArabic ? fromSurah.nameAr : fromSurah.nameEn} ${draft.fromAyah} — ${isArabic ? toSurah.nameAr : toSurah.nameEn} ${draft.toAyah}`}
+            />
+            <ReviewItem
+              label={text.preview}
+              value={
+                preview
+                  ? `${preview.totalScore}% · ${ratingLabels[locale][preview.rating - 1]}`
+                  : "—"
+              }
+            />
+            <ReviewItem label={text.decision} value={text[draft.decision]} />
+            <ReviewItem label={text.homework} value={draft.homework || "—"} />
+            <ReviewItem label={text.familyNote} value={draft.familyNote || "—"} />
+          </dl>
+        </section>
+      ) : null}
 
       <div
         className="grid gap-4 border-s-4 border-secondary bg-primary p-5 text-primary-foreground sm:grid-cols-[1fr_auto] sm:items-center"
@@ -420,9 +444,56 @@ export function SessionEvaluationForm({
             {text.local}
           </p>
         </div>
-        <AdminSubmitButton label={text.save} pendingLabel={text.saving} variant="gold" />
+        <div className="flex flex-wrap gap-2">
+          {reviewing ? (
+            <>
+              <Button type="button" variant="outline" onClick={() => setReviewing(false)}>
+                {locale === "ar" ? (
+                  <ArrowRight aria-hidden="true" />
+                ) : (
+                  <ArrowLeft aria-hidden="true" />
+                )}
+                {text.backToEdit}
+              </Button>
+              <AdminSubmitButton
+                label={text.lock}
+                pendingLabel={text.locking}
+                variant="gold"
+                name="intent"
+                value="lock"
+              />
+            </>
+          ) : (
+            <>
+              <AdminSubmitButton
+                label={text.saveDraft}
+                pendingLabel={text.savingDraft}
+                variant="outline"
+                name="intent"
+                value="draft"
+              />
+              <Button type="button" variant="gold" onClick={() => setReviewing(true)}>
+                {text.review}
+                {locale === "ar" ? (
+                  <ArrowLeft aria-hidden="true" />
+                ) : (
+                  <ArrowRight aria-hidden="true" />
+                )}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </form>
+  );
+}
+
+function ReviewItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-secondary/20 bg-card p-4">
+      <dt className="text-xs font-bold text-muted-foreground">{label}</dt>
+      <dd className="mt-1 font-black text-foreground">{value}</dd>
+    </div>
   );
 }
 

@@ -9,6 +9,7 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
+import { AdminSavedViews } from "@/components/admin/admin-saved-views";
 import { Button } from "@/components/ui/button";
 import { InterventionCenter } from "@/components/control-center/intervention-center";
 import { Input } from "@/components/ui/input";
@@ -143,6 +144,23 @@ export async function AdminControlCenter({
         </div>
       </form>
 
+      <AdminSavedViews
+        locale={locale}
+        pageKey="control-center"
+        currentParams={Object.fromEntries([
+          ...selectedQuery.entries(),
+          ...(interventionFilters.status
+            ? [["caseStatus", interventionFilters.status] as const]
+            : []),
+          ...(interventionFilters.priority
+            ? [["casePriority", interventionFilters.priority] as const]
+            : []),
+          ...(interventionFilters.ruleType
+            ? [["caseRule", interventionFilters.ruleType] as const]
+            : []),
+        ])}
+      />
+
       <div className="mt-7 grid gap-7">
         <SourceSection
           state={center.operations}
@@ -235,6 +253,7 @@ export async function AdminControlCenter({
         data={interventions.center}
         rules={interventions.rules}
         filters={interventionFilters}
+        assignees={interventions.assignees}
       />
     </section>
   );

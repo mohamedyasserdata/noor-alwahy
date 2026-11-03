@@ -10,7 +10,7 @@ for (const locale of [
   test(`${locale.code} student home uses the dedicated top navigation and visual system`, async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1680, height: 945 });
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await signInAs(page, locale.code, "student");
     await page.goto(`/${locale.code}/student/home`);
@@ -18,7 +18,7 @@ for (const locale of [
     await expect(page.locator("html")).toHaveAttribute("dir", locale.direction);
     await expect(page.getByTestId("student-portal-header")).toBeVisible();
     await expect(page.getByTestId("portal-sidebar")).toHaveCount(0);
-    await expect(page.getByTestId("portal-bottom-nav")).toHaveCount(0);
+    await expect(page.getByTestId("portal-bottom-nav")).toBeHidden();
     await expect(page.getByRole("heading", { level: 1, name: locale.title })).toBeVisible();
     const topNavigation = page.getByTestId("portal-navigation-top").filter({ visible: true });
     await expect(topNavigation).toBeVisible();
@@ -29,12 +29,25 @@ for (const locale of [
     );
     await expectNoHorizontalOverflow(page);
 
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 360, height: 800 });
     await expect(page.getByTestId("student-portal-header")).toBeVisible();
-    await expect(page.getByTestId("portal-navigation-top").filter({ visible: true })).toBeVisible();
+    await expect(page.getByTestId("portal-navigation-top").filter({ visible: true })).toHaveCount(
+      0,
+    );
+    await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+    await expect(
+      page
+        .getByTestId("portal-navigation-bottom")
+        .locator('a[aria-current="page"]')
+        .filter({ visible: true }),
+    ).toHaveCount(1);
     await expectNoHorizontalOverflow(page);
     await expectTouchTargets(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+    await page.setViewportSize({ width: 768, height: 900 });
+    await expect(page.getByTestId("portal-bottom-nav")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
   });
 }
 

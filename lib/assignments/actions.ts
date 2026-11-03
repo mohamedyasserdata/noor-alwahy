@@ -44,6 +44,9 @@ export async function manageAssignmentAction(
   }
   revalidatePath(`/${locale}/admin/assignments`);
   revalidatePath(`/${locale}/admin/students`);
+  revalidatePath(`/${locale}/admin/students/${value.studentId}`);
+  revalidatePath(`/${locale}/admin/teachers/${value.teacherId}`);
+  revalidatePath(`/${locale}/admin/dashboard`);
   go(locale, "assignmentStatus", value.action);
 }
 

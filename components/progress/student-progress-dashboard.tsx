@@ -9,182 +9,246 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { AppLocale } from "@/i18n/routing";
+import type { PlanAdherence } from "@/lib/memorization-plans/queries";
 import type { getStudentProgressDashboard } from "@/lib/progress/dashboard";
 
 type Data = Awaited<ReturnType<typeof getStudentProgressDashboard>>;
 
-const labels = {
-  ar: {
-    title: "ملخص رحلتك",
-    pages: "صفحة متقنة",
-    juz: "أجزاء مكتملة",
-    percent: "من المصحف",
-    speed: "صفحة أسبوعيًا",
-    expected: "الإتمام المتوقع",
-    attendance: "الحضور",
-    radar: "ملف التقييم",
-    current: "الشهر الحالي",
-    previous: "السابق",
-    curve: "منحنى الحفظ",
-    history: "آخر التقييمات",
-    review: "ورد المراجعة",
-    due: "مستحق",
-    overdue: "متأخر",
-    homework: "الواجب الحالي",
-    report: "آخر تقرير",
-    download: "تنزيل التقرير",
-    badges: "شاراتك",
-    consistency: "استمرار أسبوعي",
-    noData: "لا توجد بيانات بعد",
-    criteria: ["الحفظ", "التجويد", "المخارج", "الوقف", "الأداء", "الربط", "الالتزام"],
-  },
-  en: {
-    title: "Your journey at a glance",
-    pages: "mastered pages",
-    juz: "completed juz",
-    percent: "of the Quran",
-    speed: "pages per week",
-    expected: "Expected completion",
-    attendance: "Attendance",
-    radar: "Evaluation profile",
-    current: "Current month",
-    previous: "Previous",
-    curve: "Memorisation curve",
-    history: "Recent evaluations",
-    review: "Review portion",
-    due: "Due",
-    overdue: "Overdue",
-    homework: "Current homework",
-    report: "Latest report",
-    download: "Download report",
-    badges: "Your badges",
-    consistency: "Weekly consistency",
-    noData: "No data yet",
-    criteria: [
-      "Memorisation",
-      "Tajweed",
-      "Makharij",
-      "Waqf",
-      "Performance",
-      "Linking",
-      "Commitment",
-    ],
-  },
-} as const;
-
-export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; data: Data }) {
-  const t = labels[locale];
+export async function StudentProgressDashboard({
+  locale,
+  data,
+  plan,
+}: {
+  locale: AppLocale;
+  data: Data;
+  plan: PlanAdherence | null;
+}) {
+  const t = await getTranslations({ locale, namespace: "studentProgress" });
   const current = Object.values(data.radar.current);
   const previous = Object.values(data.radar.previous);
+  const criteria = t.raw("criteria") as string[];
+  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+  const expectedCompletion = data.metrics.expectedCompletion
+    ? date.format(new Date(`${data.metrics.expectedCompletion}T12:00:00Z`))
+    : t("noData");
+  const hasMeaningfulData = Boolean(
+    plan ||
+    data.metrics.masteredPages ||
+    data.history.length ||
+    data.homework ||
+    data.review.due ||
+    data.latestReport,
+  );
+
+  if (!hasMeaningfulData) {
+    return (
+      <section className="overflow-hidden rounded-3xl border border-secondary/25 bg-card shadow-card">
+        <div className="flex items-start gap-4 p-5 sm:items-center sm:p-6">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-secondary shadow-sm">
+            <BookMarked className="size-6" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-xs font-black text-secondary">{t("emptyStatus")}</p>
+            <h2 className="mt-1 text-xl font-black text-primary sm:text-2xl">{t("emptyTitle")}</h2>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+              {t("emptyDescription")}
+            </p>
+          </div>
+        </div>
+        <div className="grid border-t bg-muted/20 sm:grid-cols-2">
+          <div className="flex gap-3 border-b p-4 sm:border-e sm:border-b-0 sm:p-5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-secondary text-sm font-black text-primary">
+              1
+            </span>
+            <div>
+              <p className="font-black text-primary">{t("emptyCurrentTitle")}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {t("emptyCurrentDescription")}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3 p-4 sm:p-5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-secondary/35 bg-card text-sm font-black text-secondary">
+              2
+            </span>
+            <div>
+              <p className="font-black text-primary">{t("emptyNextTitle")}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {t("emptyNextDescription")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="student-progress-dashboard mt-6 grid gap-6">
+    <div className="student-progress-dashboard mt-5 grid gap-5">
+      {plan ? (
+        <section className="rounded-3xl border border-secondary/30 bg-primary p-5 text-primary-foreground shadow-card sm:p-6">
+          <h2 className="text-xl font-black text-primary-foreground">{t("goalTitle")}</h2>
+          <p className="mt-1 text-sm leading-6 text-primary-foreground/70">
+            {t("goalDescription")}
+          </p>
+          <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white/8 p-4">
+              <dt className="text-sm text-primary-foreground/70">{t("weeklyGoal")}</dt>
+              <dd className="mt-1 text-2xl font-black text-secondary">
+                {t("pagesValue", { count: plan.weekly_target_pages ?? 0 })}
+              </dd>
+            </div>
+            <div className="rounded-2xl bg-white/8 p-4">
+              <dt className="text-sm text-primary-foreground/70">{t("monthlyGoal")}</dt>
+              <dd className="mt-1 text-2xl font-black text-secondary">
+                {t("pagesValue", { count: plan.monthly_target_pages ?? 0 })}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
       <section aria-labelledby="journey-summary-title">
         <div className="mb-4 flex items-center gap-3">
           <Gauge className="size-6 text-secondary" aria-hidden="true" />
           <h2 id="journey-summary-title" className="text-2xl font-black text-primary">
-            {t.title}
+            {t("title")}
           </h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={data.metrics.masteredPages} label={t.pages} icon={BookMarked} tone="blue" />
-          <Stat value={data.metrics.completedJuz} label={t.juz} icon={Award} tone="gold" />
           <Stat
-            value={`${data.metrics.percent}%`}
-            label={t.percent}
+            value={
+              plan
+                ? t("percentValue", {
+                    value: number.format(Number(plan.weekly_adherence_percent ?? 0)),
+                  })
+                : t("noData")
+            }
+            label={t("planProgress")}
             icon={Gauge}
             tone="violet"
-            progressValue={data.metrics.percent}
+            progressValue={plan ? Number(plan.weekly_adherence_percent ?? 0) : undefined}
           />
-          <Stat value={data.metrics.weeklySpeed} label={t.speed} icon={TrendingUp} tone="green" />
+          <Stat
+            value={number.format(data.metrics.masteredPages)}
+            label={t("pages")}
+            icon={BookMarked}
+            tone="blue"
+          />
+          <Stat
+            value={number.format(data.metrics.weeklySpeed)}
+            label={t("speed")}
+            icon={TrendingUp}
+            tone="green"
+          />
+          <Stat
+            value={expectedCompletion}
+            label={t("expectedEstimate")}
+            icon={CalendarClock}
+            tone="gold"
+          />
         </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <p className="mt-3 text-xs leading-6 text-muted-foreground">{t("estimateHint")}</p>
+      </section>
+
+      <section className="rounded-3xl border border-secondary/20 bg-card p-5 shadow-card sm:p-6">
+        <h2 className="text-xl font-black text-primary">{t("currentWork")}</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <Detail
-            icon={<TrendingUp />}
-            label={t.expected}
-            value={data.metrics.expectedCompletion ?? t.noData}
+            icon={<BookMarked />}
+            label={t("review")}
+            value={t("reviewValue", { due: data.review.due, overdue: data.review.overdue })}
           />
-          <Detail
-            icon={<Award />}
-            label={t.attendance}
-            value={
-              data.metrics.attendanceRate == null ? t.noData : `${data.metrics.attendanceRate}%`
-            }
-          />
+          <Detail icon={<FileText />} label={t("homework")} value={data.homework ?? t("noData")} />
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title={t.radar} icon={<Sparkles />}>
-          <RadarChart
-            labels={t.criteria}
-            current={current}
-            previous={previous}
-            currentLabel={t.current}
-            previousLabel={t.previous}
-          />
-        </Panel>
-        <Panel title={t.curve} icon={<TrendingUp />}>
-          <ProgressCurve points={data.curve} emptyLabel={t.noData} />
-        </Panel>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
-        <Panel title={t.history} icon={<CalendarClock />}>
-          {data.history.length ? (
-            <ol className="divide-y">
-              {data.history.map((item) => (
-                <li key={item.id} className="flex items-center justify-between gap-4 py-3">
-                  <span className="text-sm text-muted-foreground tabular-nums">{item.date}</span>
-                  <strong className="text-primary tabular-nums">
-                    {item.score == null ? t.noData : `${item.score}%`}
-                  </strong>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-muted-foreground">{t.noData}</p>
-          )}
-        </Panel>
-        <div className="grid gap-4">
-          <Detail
-            icon={<BookMarked />}
-            label={t.review}
-            value={`${t.due}: ${data.review.due} · ${t.overdue}: ${data.review.overdue}`}
-          />
-          <Detail icon={<FileText />} label={t.homework} value={data.homework ?? t.noData} />
+      <details className="group rounded-3xl border border-secondary/20 bg-card shadow-card">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-black text-primary marker:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+          <span className="flex items-center gap-2">
+            <Sparkles className="size-5 text-secondary" aria-hidden="true" />
+            {t("analyticsTitle")}
+          </span>
+          <span className="text-sm font-bold text-muted-foreground group-open:hidden">
+            {t("open")}
+          </span>
+          <span className="hidden text-sm font-bold text-muted-foreground group-open:inline">
+            {t("close")}
+          </span>
+        </summary>
+        <div className="grid gap-5 border-t p-5 sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Panel title={t("radar")} icon={<Sparkles />}>
+              <RadarChart
+                labels={criteria}
+                current={current}
+                previous={previous}
+                currentLabel={t("current")}
+                previousLabel={t("previous")}
+              />
+            </Panel>
+            <Panel title={t("curve")} icon={<TrendingUp />}>
+              <ProgressCurve points={data.curve} emptyLabel={t("noData")} />
+            </Panel>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Panel title={t("history")} icon={<CalendarClock />}>
+              {data.history.length ? (
+                <ol className="divide-y">
+                  {data.history.map((item) => (
+                    <li key={item.id} className="flex items-center justify-between gap-4 py-3">
+                      <time className="text-sm text-muted-foreground" dateTime={item.date}>
+                        {date.format(new Date(`${item.date}T12:00:00Z`))}
+                      </time>
+                      <strong className="text-primary tabular-nums">
+                        {item.score == null
+                          ? t("noData")
+                          : t("percentValue", { value: number.format(item.score) })}
+                      </strong>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-muted-foreground">{t("noData")}</p>
+              )}
+            </Panel>
+            <Panel title={t("badges")} icon={<Award />}>
+              <div className="flex flex-wrap gap-3">
+                {data.badges.completedJuz.map((juz) => (
+                  <Badge key={juz} variant="secondary">
+                    {t("completedJuzBadge", { juz })}
+                  </Badge>
+                ))}
+                {data.badges.weeklyConsistency ? (
+                  <Badge variant="success">{t("consistency")}</Badge>
+                ) : null}
+                {!data.badges.completedJuz.length && !data.badges.weeklyConsistency ? (
+                  <span className="text-muted-foreground">{t("noData")}</span>
+                ) : null}
+              </div>
+            </Panel>
+          </div>
           {data.latestReport ? (
-            <div className="rounded-3xl border bg-card p-5">
-              <p className="font-black text-primary">{t.report}</p>
+            <div className="rounded-2xl bg-accent/35 p-5">
+              <p className="font-black text-primary">{t("report")}</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                {data.latestReport.period_start} — {data.latestReport.period_end}
+                {date.format(new Date(`${data.latestReport.period_start}T12:00:00Z`))} —{" "}
+                {date.format(new Date(`${data.latestReport.period_end}T12:00:00Z`))}
               </p>
               <Button asChild className="mt-4" variant="outline">
                 <Link href={`/api/pdf/reports/${data.latestReport.id}?locale=${locale}`}>
-                  {t.download}
+                  {t("download")}
                 </Link>
               </Button>
             </div>
           ) : null}
         </div>
-      </div>
-
-      <Panel title={t.badges} icon={<Award />}>
-        <div className="flex flex-wrap gap-3">
-          {data.badges.completedJuz.map((juz) => (
-            <Badge key={juz} variant="secondary">
-              {locale === "ar" ? `إتمام الجزء ${juz}` : `Juz ${juz} completed`}
-            </Badge>
-          ))}
-          {data.badges.weeklyConsistency ? <Badge variant="success">{t.consistency}</Badge> : null}
-          {!data.badges.completedJuz.length && !data.badges.weeklyConsistency ? (
-            <span className="text-muted-foreground">{t.noData}</span>
-          ) : null}
-        </div>
-      </Panel>
+      </details>
     </div>
   );
 }

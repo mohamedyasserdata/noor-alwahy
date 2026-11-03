@@ -80,6 +80,7 @@ export const studentFiltersSchema = z.object({
     .optional()
     .or(z.literal(""))
     .default(""),
+  workflow: z.enum(["all", "awaiting_assignment", "assigned"]).optional().default("all"),
   page: z.coerce.number().int().min(1).max(10_000).optional().default(1),
 });
 

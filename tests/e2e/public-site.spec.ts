@@ -138,6 +138,26 @@ for (const locale of locales) {
         /(?:whatsapp|wa\.me|\/(?:ar|en)\/contact)/i,
       );
 
+      if (locale.code === "ar" && viewport.name === "mobile") {
+        await page.goto("/ar#packages");
+        const priceForm = page.locator("#packages form");
+        await priceForm.getByLabel("دولة السعر").selectOption("SA");
+        await priceForm.getByRole("button", { name: "تحديث السعر" }).click();
+        await expect(homePackageCard.getByText(/40\.00\s+US\$/)).toBeVisible();
+        await expect(page).toHaveURL(/\/ar#packages$/);
+        expect(
+          await priceForm.evaluate((form) => Math.abs(form.getBoundingClientRect().top)),
+        ).toBeLessThan(page.viewportSize()!.height);
+
+        await priceForm.getByLabel("دولة السعر").selectOption("EG");
+        await priceForm.getByRole("button", { name: "تحديث السعر" }).click();
+        await expect(homePackageCard).toContainText("900");
+        await expect(page).toHaveURL(/\/ar#packages$/);
+        expect(
+          await priceForm.evaluate((form) => Math.abs(form.getBoundingClientRect().top)),
+        ).toBeLessThan(page.viewportSize()!.height);
+      }
+
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       if (viewport.name === "mobile") {
         await page

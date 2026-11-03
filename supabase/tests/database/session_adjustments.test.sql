@@ -1,6 +1,6 @@
 begin;
 
-select plan(36);
+select plan(38);
 
 select has_column('public', 'sessions', 'rescheduled_from', 'sessions link a replacement to its source');
 select has_index('public', 'sessions', 'sessions_rescheduled_from_once_idx', 'a session is rescheduled once');
@@ -22,14 +22,16 @@ insert into auth.users (id, aud, role, email, raw_app_meta_data, raw_user_meta_d
 values
   ('f7000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'adjustments.substitute@test.local', '{"role":"teacher"}', '{"full_name":"Substitute Teacher"}', now(), now()),
   ('f7000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'adjustments.female@test.local', '{"role":"teacher"}', '{"full_name":"Female Teacher"}', now(), now()),
-  ('f7000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'adjustments.otherstudent@test.local', '{"role":"student"}', '{"full_name":"Other Student"}', now(), now());
+  ('f7000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'adjustments.otherstudent@test.local', '{"role":"student"}', '{"full_name":"Other Student"}', now(), now()),
+  ('f7000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'adjustments.original@test.local', '{"role":"teacher"}', '{"full_name":"Original Teacher"}', now(), now()),
+  ('f7000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'adjustments.student@test.local', '{"role":"student"}', '{"full_name":"Adjustment Student"}', now(), now());
 
 insert into public.tracks (id, code, name_ar, name_en)
 values ('f7100000-0000-4000-8000-000000000001', 'adjustments-test', 'اختبار التعديلات', 'Adjustments test');
 
 insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
 values
-  ('f7200000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now()),
+  ('f7200000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000004', 'male', 'active', now(), now()),
   ('f7200000-0000-4000-8000-000000000002', 'f7000000-0000-4000-8000-000000000001', 'male', 'active', now(), now()),
   ('f7200000-0000-4000-8000-000000000003', 'f7000000-0000-4000-8000-000000000002', 'female', 'active', now(), now());
 
@@ -41,7 +43,7 @@ values
 
 insert into public.students (id, profile_id, full_name, gender, timezone)
 values
-  ('f7300000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'Adjustment Student', 'male', 'Africa/Cairo'),
+  ('f7300000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000005', 'Adjustment Student', 'male', 'Africa/Cairo'),
   ('f7300000-0000-4000-8000-000000000002', 'f7000000-0000-4000-8000-000000000003', 'Other Student', 'male', 'Africa/Cairo');
 
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, assigned_by, reason)
@@ -59,16 +61,19 @@ values (
   '{"cancel_notice_hours":12,"max_makeups_per_period":2,"makeup_valid_days":30,"student_no_show_consumes_credit":true,"student_no_show_pays_teacher":true}'
 );
 
-insert into public.sessions (id, assignment_id, student_id, teacher_id, scheduled_at, duration_min, status)
+insert into public.sessions (
+  id, assignment_id, student_id, teacher_id, scheduled_at, duration_min, status,
+  zoom_override_url, zoom_published_at
+)
 values
-  ('f7800000-0000-4000-8000-000000000001', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-01 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000002', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-03 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000003', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-09 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000004', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-01 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000005', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-02 10:00+00', 30, 'cancelled'),
-  ('f7800000-0000-4000-8000-000000000006', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-05 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000007', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-03 10:00+00', 30, 'scheduled'),
-  ('f7800000-0000-4000-8000-000000000008', 'f7500000-0000-4000-8000-000000000002', 'f7300000-0000-4000-8000-000000000002', 'f7200000-0000-4000-8000-000000000002', '2030-02-03 10:00+00', 30, 'scheduled');
+  ('f7800000-0000-4000-8000-000000000001', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-01 10:00+00', 30, 'scheduled', null, null),
+  ('f7800000-0000-4000-8000-000000000002', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-03 10:00+00', 30, 'scheduled', null, null),
+  ('f7800000-0000-4000-8000-000000000003', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-01-09 10:00+00', 30, 'scheduled', null, null),
+  ('f7800000-0000-4000-8000-000000000004', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-01 10:00+00', 30, 'scheduled', null, null),
+  ('f7800000-0000-4000-8000-000000000005', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-02 10:00+00', 30, 'cancelled', null, null),
+  ('f7800000-0000-4000-8000-000000000006', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-05 10:00+00', 30, 'scheduled', 'https://academy.zoom.us/j/source-secret', now()),
+  ('f7800000-0000-4000-8000-000000000007', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', '2030-02-03 10:00+00', 30, 'scheduled', null, null),
+  ('f7800000-0000-4000-8000-000000000008', 'f7500000-0000-4000-8000-000000000002', 'f7300000-0000-4000-8000-000000000002', 'f7200000-0000-4000-8000-000000000002', '2030-02-03 10:00+00', 30, 'scheduled', null, null);
 
 insert into public.makeup_entitlements (
   id, subscription_id, student_id, source_session_id, outside_period_cap, expires_at
@@ -149,6 +154,8 @@ select throws_ok(
   'P0001', 'session_not_adjustable', 'rescheduled source cannot be rescheduled twice'
 );
 reset role;
+select is((select zoom_override_url from public.sessions where rescheduled_from = 'f7800000-0000-4000-8000-000000000006'), null, 'replacement requires a freshly entered Zoom link');
+select is((select zoom_published_at from public.sessions where rescheduled_from = 'f7800000-0000-4000-8000-000000000006'), null, 'replacement Zoom link is not implicitly published');
 select ok((select count(*) >= 3 from public.notifications where type = 'schedule_changed'), 'student receives schedule change notifications');
 
 select * from finish();

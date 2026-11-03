@@ -52,7 +52,7 @@ export async function getTeacherReportsData() {
     supabase
       .from("reports")
       .select(
-        "id,student_id,period_type,period_start,period_end,body,status,approved_at,updated_at,content_template_version_id",
+        "id,student_id,period_type,period_start,period_end,body,status,approved_at,updated_at,content_template_version_id,review_note,published_version",
       )
       .eq("teacher_id", teacher.id)
       .order("period_start", { ascending: false }),

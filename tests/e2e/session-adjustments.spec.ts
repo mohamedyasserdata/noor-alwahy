@@ -54,11 +54,13 @@ test("P3-T06 admin approves substitute, reschedule, and linked makeup", async ({
   expect(source.status).toBe("rescheduled");
   const { data: replacement, error: replacementError } = await db
     .from("sessions")
-    .select("id,status")
+    .select("id,status,zoom_override_url,zoom_published_at")
     .eq("rescheduled_from", fixture.sessionId)
     .single();
   if (replacementError) throw replacementError;
   expect(replacement.status).toBe("scheduled");
+  expect(replacement.zoom_override_url).toBeNull();
+  expect(replacement.zoom_published_at).toBeNull();
 
   const makeupInput = page.locator(`#makeup-time-${fixture.entitlementId}`);
   await makeupInput.fill("2030-04-03T18:30");
@@ -178,6 +180,8 @@ async function createFixture() {
       duration_min: 30,
       ends_at: "2030-04-01T16:30:00.000Z",
       status: "scheduled",
+      zoom_override_url: "https://academy.zoom.us/j/source-must-not-be-reused",
+      zoom_published_at: now,
     },
     {
       id: sourceSessionId,

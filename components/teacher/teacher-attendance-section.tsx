@@ -6,23 +6,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getTeacherAttendanceHistory } from "@/lib/attendance/queries";
+import { getOwnTeacherAttendanceRegister } from "@/lib/attendance/teacher-register";
 import type { AttendanceStatus } from "@/lib/validators/attendance";
 
-export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }) {
-  const [t, history] = await Promise.all([
+export async function TeacherAttendanceSection({
+  locale,
+  embedded = false,
+  timezone,
+}: {
+  locale: AppLocale;
+  embedded?: boolean;
+  timezone?: string;
+}) {
+  const [t, history, ownRegister] = await Promise.all([
     getTranslations({ locale, namespace: "teacherAttendance" }),
-    getTeacherAttendanceHistory(),
+    embedded ? Promise.resolve(null) : getTeacherAttendanceHistory(),
+    getOwnTeacherAttendanceRegister(),
   ]);
 
-  if (!history) {
+  if (!embedded && !history) {
     return <p className="rounded-2xl border bg-card p-6 text-muted-foreground">{t("missing")}</p>;
   }
 
   const dateTime = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
-    timeZone: history.timezone,
+    timeZone: timezone ?? history?.timezone,
   });
+
+  if (embedded) {
+    return <OwnAttendanceRegister rows={ownRegister} dateTime={dateTime} t={t} />;
+  }
+  if (!history) return null;
 
   return (
     <section className="teacher-reference-page" aria-labelledby="teacher-attendance-title">
@@ -47,7 +62,10 @@ export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }
         </Link>
       </header>
 
-      <div className="teacher-metrics-grid mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <OwnAttendanceRegister rows={ownRegister} dateTime={dateTime} t={t} className="mt-5" />
+
+      <h2 className="mt-8 text-xl font-black text-primary">{t("studentOutcomesTitle")}</h2>
+      <div className="teacher-metrics-grid mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
           icon={<CalendarCheck />}
           label={t("metrics.scheduled")}
@@ -124,6 +142,69 @@ export async function TeacherAttendanceSection({ locale }: { locale: AppLocale }
         {t("timezone", { timezone: history.timezone })}
       </p>
     </section>
+  );
+}
+
+function OwnAttendanceRegister({
+  rows,
+  dateTime,
+  t,
+  className = "",
+}: {
+  rows: Awaited<ReturnType<typeof getOwnTeacherAttendanceRegister>>;
+  dateTime: Intl.DateTimeFormat;
+  t: Awaited<ReturnType<typeof getTranslations<"teacherAttendance">>>;
+  className?: string;
+}) {
+  return (
+    <Card className={`${className} overflow-hidden`} data-testid="own-teacher-attendance-register">
+      <CardHeader className="border-b bg-secondary/8">
+        <CardTitle>{t("ownRegister.title")}</CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">{t("ownRegister.description")}</p>
+      </CardHeader>
+      <CardContent className="p-0">
+        {!rows || rows.length === 0 ? (
+          <p className="p-6 text-muted-foreground">{t("ownRegister.empty")}</p>
+        ) : (
+          <div className="divide-y">
+            {rows.map((entry) => (
+              <article
+                key={entry.id}
+                className="grid gap-2 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+              >
+                <div>
+                  <p className="font-black text-primary">
+                    {t("ownRegister.session", { student: entry.studentName })}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground" dir="auto">
+                    {dateTime.format(new Date(entry.scheduledAt))}
+                  </p>
+                  {entry.note ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {t("ownRegister.note", { note: entry.note })}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                  <Badge
+                    variant={
+                      entry.status === "present" || entry.status === "late" ? "success" : "warning"
+                    }
+                  >
+                    {t(`ownRegister.statuses.${entry.status}`)}
+                  </Badge>
+                  <span className="text-sm font-bold text-muted-foreground">
+                    {entry.minutes === null
+                      ? t("ownRegister.minutesMissing")
+                      : t("minutes", { count: entry.minutes })}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

@@ -16,7 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
-import { approveReportAction, saveReportDraftAction } from "@/lib/reports/actions";
+import {
+  approveReportAction,
+  createReportBatchAction,
+  saveReportDraftAction,
+} from "@/lib/reports/actions";
 import { getTeacherReportsData } from "@/lib/reports/queries";
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
@@ -45,10 +49,15 @@ const copy = {
     noTemplate: "بدون قالب",
     save: "حفظ المسودة",
     saving: "جارٍ الحفظ…",
-    approve: "اعتماد التقرير",
-    approving: "جارٍ الاعتماد…",
+    approve: "إرسال إلى الإدارة",
+    approving: "جارٍ الإرسال…",
     saved: "حُفظت المسودة وحُدّثت المؤشرات.",
-    approved: "اعتُمد التقرير وأُرسل إلى دورة مراجعة الإدارة.",
+    approved: "أُرسل التقرير إلى الإدارة وهو مخفي عن الطالب والأسرة حتى الاعتماد النهائي.",
+    batchCreated: "أُنشئت مسودة مستقلة لكل طالب محدد باستخدام بياناته هو فقط.",
+    batchTitle: "إنشاء تقارير الطلاب دفعة واحدة",
+    batchHint: "اختر الطلاب والفترة؛ سينشئ النظام مسودة منفصلة ومؤشرات حقيقية لكل طالب.",
+    createBatch: "إنشاء المسودات",
+    revisionReason: "سبب طلب التعديل",
     invalid_fields: "راجع الفترة والحقول؛ كل حقل تربوي مطلوب.",
     duplicate_period: "يوجد تقرير لهذا الطالب والدورية وتاريخ البداية.",
     request_failed: "تعذر تنفيذ الطلب. حاول مرة أخرى.",
@@ -61,9 +70,9 @@ const copy = {
     download: "تنزيل PDF",
     status: {
       draft: "مسودة",
-      approved: "معتمد",
-      admin_review: "قيد مراجعة الإدارة",
-      visible: "ظاهر للأسرة",
+      approved: "بانتظار مراجعة الإدارة",
+      admin_review: "مطلوب تعديل",
+      visible: "معتمد ومنشور",
     },
   },
   en: {
@@ -89,10 +98,16 @@ const copy = {
     noTemplate: "No template",
     save: "Save draft",
     saving: "Saving…",
-    approve: "Approve report",
-    approving: "Approving…",
+    approve: "Send to administration",
+    approving: "Sending…",
     saved: "Draft saved and metrics refreshed.",
-    approved: "Report approved and sent to the admin review cycle.",
+    approved: "The report was sent to administration and remains hidden until final approval.",
+    batchCreated: "A separate draft was created for every selected student using only their data.",
+    batchTitle: "Create student reports in a batch",
+    batchHint:
+      "Choose students and a period; the system creates a separate draft with real metrics for each student.",
+    createBatch: "Create drafts",
+    revisionReason: "Revision reason",
     invalid_fields: "Check the period and fields; every educational field is required.",
     duplicate_period: "A report already exists for this student, period and start date.",
     request_failed: "The request could not be completed. Try again.",
@@ -105,12 +120,16 @@ const copy = {
     download: "Download PDF",
     status: {
       draft: "Draft",
-      approved: "Approved",
-      admin_review: "Admin review",
-      visible: "Visible to family",
+      approved: "Pending admin review",
+      admin_review: "Revision requested",
+      visible: "Approved and published",
     },
   },
 } as const;
+
+export function getTeacherReportCopy(locale: AppLocale) {
+  return copy[locale];
+}
 
 export async function TeacherReportsSection({
   locale,
@@ -152,7 +171,11 @@ export async function TeacherReportsSection({
 
       {status ? (
         <Alert className="mt-6" variant="success" aria-live="polite">
-          {status === "approved" ? t.approved : t.saved}
+          {status === "approved"
+            ? t.approved
+            : status === "batch_created"
+              ? t.batchCreated
+              : t.saved}
         </Alert>
       ) : null}
       {error ? (
@@ -162,6 +185,53 @@ export async function TeacherReportsSection({
           ] ?? t.request_failed}
         </Alert>
       ) : null}
+
+      <details className="mt-6 rounded-2xl border border-secondary/25 bg-card p-5 shadow-sm">
+        <summary className="cursor-pointer text-lg font-black text-primary">{t.batchTitle}</summary>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.batchHint}</p>
+        <form action={createReportBatchAction.bind(null, locale)} className="mt-5 grid gap-4">
+          <fieldset>
+            <legend className="font-black text-primary">{t.student}</legend>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {data.students.map((student) => (
+                <label
+                  key={student.id}
+                  className="flex min-h-11 items-center gap-3 rounded-xl border bg-background px-3 py-2"
+                >
+                  <input
+                    type="checkbox"
+                    name="studentIds"
+                    value={student.id}
+                    className="size-4 accent-primary"
+                  />
+                  <span className="font-bold">{student.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label={t.type} htmlFor="batch-period-type">
+              <select
+                id="batch-period-type"
+                name="periodType"
+                className="h-11 rounded-xl border bg-background px-3"
+              >
+                <option value="weekly">{t.weekly}</option>
+                <option value="monthly">{t.monthly}</option>
+              </select>
+            </Field>
+            <Field label={t.start} htmlFor="batch-period-start">
+              <Input id="batch-period-start" name="periodStart" type="date" required />
+            </Field>
+            <Field label={t.end} htmlFor="batch-period-end">
+              <Input id="batch-period-end" name="periodEnd" type="date" required />
+            </Field>
+          </div>
+          <div>
+            <AdminSubmitButton label={t.createBatch} pendingLabel={t.saving} />
+          </div>
+        </form>
+      </details>
 
       <div className="teacher-metrics-grid mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <TeacherMetricCard
@@ -185,14 +255,7 @@ export async function TeacherReportsSection({
         />
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(22rem,0.9fr)_minmax(0,1.35fr)]">
-        <aside className="self-start rounded-2xl border bg-card p-5 text-foreground shadow-card xl:sticky xl:top-24">
-          <FilePenLine className="size-8 text-secondary" aria-hidden="true" />
-          <h2 className="mt-4 text-xl font-black text-primary">{t.newTitle}</h2>
-          <p className="mt-2 text-sm leading-7 text-muted-foreground">{t.newHint}</p>
-          <ReportForm locale={locale} students={data.students} templates={data.templates} t={t} />
-        </aside>
-
+      <div className="mt-5">
         <div>
           <div className="mb-5 flex items-center gap-3">
             <BarChart3 className="size-6 text-secondary" aria-hidden="true" />
@@ -255,8 +318,14 @@ export async function TeacherReportsSection({
                       }
                     />
                   </div>
-                  {report.status === "draft" ? (
+                  {report.status === "draft" || report.status === "admin_review" ? (
                     <div className="p-5 sm:p-6">
+                      {report.status === "admin_review" ? (
+                        <Alert variant="warning" className="mb-5">
+                          <strong>{t.revisionReason}:</strong>{" "}
+                          {report.review_note ?? t.request_failed}
+                        </Alert>
+                      ) : null}
                       <ReportForm
                         locale={locale}
                         students={data.students}
@@ -293,24 +362,31 @@ export async function TeacherReportsSection({
 type T = (typeof copy)["ar"] | (typeof copy)["en"];
 type Report = Awaited<ReturnType<typeof getTeacherReportsData>>["reports"][number];
 
-function ReportForm({
+export function ReportForm({
   locale,
   students,
   templates,
   t,
   report,
+  fixedStudent,
+  returnToStudentId,
 }: {
   locale: AppLocale;
   students: { id: string; name: string }[];
   templates: Awaited<ReturnType<typeof getTeacherReportsData>>["templates"];
   t: T;
   report?: Report;
+  fixedStudent?: { id: string; name: string };
+  returnToStudentId?: string;
 }) {
   const fieldClass =
     "min-h-28 w-full resize-y rounded-xl border bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring";
   return (
     <form action={saveReportDraftAction.bind(null, locale)} className="mt-6 grid gap-4">
       {report ? <input type="hidden" name="reportId" value={report.id} /> : null}
+      {returnToStudentId ? (
+        <input type="hidden" name="returnToStudentId" value={returnToStudentId} />
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t.template} htmlFor={`template-${report?.id ?? "new"}`}>
           <select
@@ -330,26 +406,36 @@ function ReportForm({
               ))}
           </select>
         </Field>
-        <Field label={t.student} htmlFor={`student-${report?.id ?? "new"}`}>
-          <select
-            id={`student-${report?.id ?? "new"}`}
-            name="studentId"
-            defaultValue={report?.student_id ?? ""}
-            disabled={Boolean(report)}
-            required
-            className="h-11 w-full rounded-xl border bg-background px-3 text-sm text-foreground disabled:opacity-70"
-          >
-            <option value="" disabled>
-              {t.choose}
-            </option>
-            {students.map((student) => (
-              <option key={student.id} value={student.id}>
-                {student.name}
+        {fixedStudent ? (
+          <div className="grid gap-2">
+            <span className="text-sm font-bold text-foreground">{t.student}</span>
+            <p className="flex min-h-11 items-center rounded-xl border bg-muted/40 px-3 font-black text-primary">
+              {fixedStudent.name}
+            </p>
+            <input type="hidden" name="studentId" value={fixedStudent.id} />
+          </div>
+        ) : (
+          <Field label={t.student} htmlFor={`student-${report?.id ?? "new"}`}>
+            <select
+              id={`student-${report?.id ?? "new"}`}
+              name="studentId"
+              defaultValue={report?.student_id ?? ""}
+              disabled={Boolean(report)}
+              required
+              className="h-11 w-full rounded-xl border bg-background px-3 text-sm text-foreground disabled:opacity-70"
+            >
+              <option value="" disabled>
+                {t.choose}
               </option>
-            ))}
-          </select>
-          {report ? <input type="hidden" name="studentId" value={report.student_id} /> : null}
-        </Field>
+              {students.map((student) => (
+                <option key={student.id} value={student.id}>
+                  {student.name}
+                </option>
+              ))}
+            </select>
+            {report ? <input type="hidden" name="studentId" value={report.student_id} /> : null}
+          </Field>
+        )}
         <Field label={t.type} htmlFor={`type-${report?.id ?? "new"}`}>
           <select
             id={`type-${report?.id ?? "new"}`}

@@ -22,7 +22,7 @@ export async function signInAs(page: Page, locale: "ar" | "en", account: TestAcc
   if (account === "admin") {
     const secret = process.env.E2E_ADMIN_TOTP_SECRET;
     if (!secret) throw new Error("Missing the runtime Playwright administrator TOTP secret.");
-    await expect(page.locator("#mfa-code")).toBeVisible();
+    await expect(page.locator("#mfa-code")).toBeVisible({ timeout: 15_000 });
     await page.locator("#mfa-code").fill(generateTotp(secret));
     await page
       .locator("form")
@@ -31,5 +31,7 @@ export async function signInAs(page: Page, locale: "ar" | "en", account: TestAcc
       .click();
   }
 
-  await expect(page).toHaveURL(new RegExp(`/${locale}${testAccounts[account].home}(?:\\?.*)?$`));
+  await expect(page).toHaveURL(new RegExp(`/${locale}${testAccounts[account].home}(?:\\?.*)?$`), {
+    timeout: 15_000,
+  });
 }

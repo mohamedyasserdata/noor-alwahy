@@ -33,10 +33,19 @@ export async function getStudentDirectory(
     status: single(raw.status),
     level: single(raw.level),
     country: single(raw.country),
+    workflow: single(raw.workflow),
     page: single(raw.page),
   });
   const filters = parsed.success ? parsed.data : studentFiltersSchema.parse({});
   const supabase = await createClient();
+  const { data: currentAssignments, error: assignmentsError } = await supabase
+    .from("teacher_assignments")
+    .select("student_id")
+    .in("status", ["active", "paused"]);
+  if (assignmentsError) throw new Error("student_directory_unavailable");
+  const assignedStudentIds = [
+    ...new Set((currentAssignments ?? []).map((item) => item.student_id)),
+  ];
   const from = (filters.page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   let query = supabase
@@ -55,6 +64,14 @@ export async function getStudentDirectory(
   if (filters.status !== "all") query = query.eq("status", filters.status);
   if (filters.level !== "all") query = query.eq("level_id", filters.level);
   if (filters.country) query = query.eq("country_code", filters.country);
+  if (filters.workflow === "assigned") {
+    query = assignedStudentIds.length
+      ? query.in("id", assignedStudentIds)
+      : query.eq("id", "00000000-0000-0000-0000-000000000000");
+  }
+  if (filters.workflow === "awaiting_assignment" && assignedStudentIds.length) {
+    query = query.not("id", "in", `(${assignedStudentIds.join(",")})`).eq("status", "active");
+  }
 
   const [{ data, count, error }, { data: levels }] = await Promise.all([
     query,
@@ -112,6 +129,21 @@ export async function getStudentsForExport(filters: StudentFilters, locale: AppL
   if (filters.status !== "all") query = query.eq("status", filters.status);
   if (filters.level !== "all") query = query.eq("level_id", filters.level);
   if (filters.country) query = query.eq("country_code", filters.country);
+  if (filters.workflow !== "all") {
+    const { data: currentAssignments, error: assignmentsError } = await supabase
+      .from("teacher_assignments")
+      .select("student_id")
+      .in("status", ["active", "paused"]);
+    if (assignmentsError) throw new Error("student_export_unavailable");
+    const ids = [...new Set((currentAssignments ?? []).map((item) => item.student_id))];
+    if (filters.workflow === "assigned") {
+      query = ids.length
+        ? query.in("id", ids)
+        : query.eq("id", "00000000-0000-0000-0000-000000000000");
+    } else if (ids.length) {
+      query = query.not("id", "in", `(${ids.join(",")})`).eq("status", "active");
+    }
+  }
   const { data, error } = await query;
   if (error) throw new Error("student_export_unavailable");
   return (data ?? []).map((student) => mapStudent(student, locale));

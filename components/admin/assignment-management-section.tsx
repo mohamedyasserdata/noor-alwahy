@@ -63,7 +63,7 @@ export async function AssignmentManagementSection({
           <select
             id="assignment-student"
             name="studentId"
-            defaultValue={data.selection?.studentId}
+            defaultValue={data.selection?.studentId ?? data.requestedStudentId}
             className="min-h-11 rounded-xl border bg-background px-3"
             required
           >
@@ -81,7 +81,7 @@ export async function AssignmentManagementSection({
           <select
             id="assignment-track"
             name="trackId"
-            defaultValue={data.selection?.trackId}
+            defaultValue={data.selection?.trackId ?? data.requestedTrackId}
             className="min-h-11 rounded-xl border bg-background px-3"
             required
           >
@@ -252,6 +252,20 @@ function AssignmentCard({
         >
           {t(`statuses.${assignment.status}` as "statuses.active")}
         </Badge>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold">
+        <a
+          className="text-primary underline-offset-4 hover:underline"
+          href={`/${locale}/admin/students/${assignment.student_id}`}
+        >
+          {locale === "ar" ? "ملف الطالب" : "Student profile"}
+        </a>
+        <a
+          className="text-primary underline-offset-4 hover:underline"
+          href={`/${locale}/admin/teachers/${assignment.teacher_id}`}
+        >
+          {locale === "ar" ? "ملف المعلم" : "Teacher profile"}
+        </a>
       </div>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">{assignment.reason}</p>
       {controls ? (

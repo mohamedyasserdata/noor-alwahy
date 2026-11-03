@@ -31,22 +31,29 @@ select throws_ok(
 );
 select ok(exists(select 1 from cron.job where jobname = 'detect-teacher-lateness'), 'teacher lateness detector is scheduled');
 
+insert into auth.users (id, aud, role, email, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+values
+  ('f7000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'attendance.admin@test.local', '{"role":"admin"}', '{"full_name":"Attendance Admin"}', now(), now()),
+  ('f7000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'attendance.teacher@test.local', '{"role":"teacher"}', '{"full_name":"Attendance Teacher"}', now(), now()),
+  ('f7000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'attendance.student@test.local', '{"role":"student"}', '{"full_name":"Attendance Student"}', now(), now()),
+  ('f7000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'attendance.parent@test.local', '{"role":"parent"}', '{"full_name":"Attendance Parent"}', now(), now());
+
 insert into public.tracks (id, code, name_ar, name_en)
 values ('f7100000-0000-4000-8000-000000000001', 'attendance-controls', 'ضوابط الحضور', 'Attendance controls');
 
 insert into public.teachers (id, profile_id, gender, status, identity_verified_at, code_of_conduct_accepted_at)
-values ('f7200000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000002', 'male', 'active', now(), now());
+values ('f7200000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000002', 'male', 'active', now(), now());
 insert into public.teacher_tracks (teacher_id, track_id)
 values ('f7200000-0000-4000-8000-000000000001', 'f7100000-0000-4000-8000-000000000001');
 
 insert into public.students (id, profile_id, full_name, gender, timezone)
-values ('f7300000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'Attendance Controls Student', 'male', 'Africa/Cairo');
+values ('f7300000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000003', 'Attendance Controls Student', 'male', 'Africa/Cairo');
 insert into public.guardians (id, profile_id)
-values ('f7400000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000004');
+values ('f7400000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000004');
 insert into public.student_guardians (student_id, guardian_id, is_primary)
 values ('f7300000-0000-4000-8000-000000000001', 'f7400000-0000-4000-8000-000000000001', true);
 insert into public.teacher_assignments (id, student_id, teacher_id, track_id, assigned_by, reason)
-values ('f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'f7100000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Attendance controls test');
+values ('f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'f7100000-0000-4000-8000-000000000001', 'f7000000-0000-4000-8000-000000000001', 'Attendance controls test');
 
 insert into public.subscriptions (
   id, student_id, status, start_date, current_period_start, current_period_end,
@@ -60,7 +67,7 @@ values (
 insert into public.session_credit_ledger (subscription_id, delta, reason, note)
 values ('f7600000-0000-4000-8000-000000000001', 20, 'grant', 'attendance controls fixture');
 insert into public.teacher_rates (teacher_id, rate_per_session, currency, valid_from, created_by)
-values ('f7200000-0000-4000-8000-000000000001', 100, 'EGP', current_date - 365, '10000000-0000-4000-8000-000000000001');
+values ('f7200000-0000-4000-8000-000000000001', 100, 'EGP', current_date - 365, 'f7000000-0000-4000-8000-000000000001');
 
 insert into public.sessions (id, assignment_id, student_id, teacher_id, original_teacher_id, kind, scheduled_at, duration_min)
 values
@@ -70,7 +77,7 @@ values
   ('f7800000-0000-4000-8000-000000000004', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'regular', now() - interval '2 days', 30),
   ('f7800000-0000-4000-8000-000000000005', 'f7500000-0000-4000-8000-000000000001', 'f7300000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'f7200000-0000-4000-8000-000000000001', 'regular', now() - interval '1 day', 30);
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"f7000000-0000-4000-8000-000000000002","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select throws_ok(
   $$select public.record_attendance('f7800000-0000-4000-8000-000000000001', 'present')$$,
@@ -78,7 +85,7 @@ select throws_ok(
 );
 reset role;
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+select set_config('request.jwt.claims', '{"sub":"f7000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
 select lives_ok(
   $$select public.record_attendance('f7800000-0000-4000-8000-000000000001', 'present')$$,
@@ -94,25 +101,25 @@ select is(
 select is(private.detect_teacher_lateness(now()), 1, 'lateness detector creates one alert');
 select is(private.detect_teacher_lateness(now()), 0, 'lateness detector is idempotent');
 select is((select count(*)::integer from public.session_alerts where session_id = 'f7800000-0000-4000-8000-000000000002' and type = 'teacher_late'), 1, 'one teacher-late alert is persisted');
-select is((select count(*)::integer from public.notifications where user_id = '10000000-0000-4000-8000-000000000004' and type = 'teacher_late'), 1, 'parent receives immediate teacher-late notification');
-select is((select count(*)::integer from public.notifications where user_id = '10000000-0000-4000-8000-000000000001' and type = 'teacher_late'), 1, 'administrator receives teacher-late notification');
+select is((select count(*)::integer from public.notifications where user_id = 'f7000000-0000-4000-8000-000000000004' and type = 'teacher_late'), 1, 'parent receives immediate teacher-late notification');
+select is((select count(*)::integer from public.notifications where user_id = 'f7000000-0000-4000-8000-000000000001' and type = 'teacher_late'), 1, 'administrator receives teacher-late notification');
 
 insert into public.attendance (session_id, status, recorded_by, locked_at)
 values
-  ('f7800000-0000-4000-8000-000000000003', 'teacher_absent', '10000000-0000-4000-8000-000000000001', now()),
-  ('f7800000-0000-4000-8000-000000000004', 'teacher_absent', '10000000-0000-4000-8000-000000000001', now()),
-  ('f7800000-0000-4000-8000-000000000005', 'teacher_absent', '10000000-0000-4000-8000-000000000001', now());
+  ('f7800000-0000-4000-8000-000000000003', 'teacher_absent', 'f7000000-0000-4000-8000-000000000001', now()),
+  ('f7800000-0000-4000-8000-000000000004', 'teacher_absent', 'f7000000-0000-4000-8000-000000000001', now()),
+  ('f7800000-0000-4000-8000-000000000005', 'teacher_absent', 'f7000000-0000-4000-8000-000000000001', now());
 select is((select count(*)::integer from public.session_alerts where teacher_id = 'f7200000-0000-4000-8000-000000000001' and type = 'teacher_absence_threshold'), 1, 'absence threshold creates one aggregate alert');
-select is((select count(*)::integer from public.notifications where user_id = '10000000-0000-4000-8000-000000000001' and type = 'teacher_absence_threshold'), 1, 'administrator receives the threshold notification once');
+select is((select count(*)::integer from public.notifications where user_id = 'f7000000-0000-4000-8000-000000000001' and type = 'teacher_absence_threshold'), 1, 'administrator receives the threshold notification once');
 
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal1"}', true);
+select set_config('request.jwt.claims', '{"sub":"f7000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal1"}', true);
 set local role authenticated;
 select throws_ok(
   $$select * from public.get_attendance_report('monthly', current_date)$$,
   '42501', 'mfa_required', 'attendance reports require AAL2'
 );
 reset role;
-select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+select set_config('request.jwt.claims', '{"sub":"f7000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
 select lives_ok($$select * from public.get_attendance_report('daily', current_date)$$, 'daily attendance report is available');
 select lives_ok($$select * from public.get_attendance_report('weekly', current_date)$$, 'weekly attendance report is available');

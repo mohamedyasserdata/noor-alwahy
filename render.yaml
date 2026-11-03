@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: noor-alwahy-staging
+    runtime: node
+    plan: free
+    branch: deploy/render-staging-20261103
+    autoDeployTrigger: commit
+    buildCommand: corepack enable && corepack prepare pnpm@11.25.0 --activate && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start -- -H 0.0.0.0 -p $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.22.0
+      - key: DEPLOYMENT_ENVIRONMENT
+        value: staging
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PRIVATE_PRICING_ACCESS_KEY
+        generateValue: true
+      - key: APPLICATION_LOOKUP_PEPPER
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: ICS_TOKEN_PEPPER
+        generateValue: true
+      - key: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+        sync: false
+      - key: RECAPTCHA_SECRET_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: MONITORING_ALERT_WEBHOOK_URL
+        sync: false
+      - key: CHROMIUM_PACK_URL
+        sync: false
