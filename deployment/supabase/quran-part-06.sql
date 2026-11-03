@@ -1,4 +1,5 @@
 -- Quran dataset deployment part 6 of 6. Source: 20261020290000_import_quran_dataset.sql
+insert into public.quran_pages (page, juz, first_ayah_id, last_ayah_id) values
 (1, 1, 1, 7),
 (2, 1, 8, 12),
 (3, 1, 13, 23),

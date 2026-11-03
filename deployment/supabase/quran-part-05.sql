@@ -1,4 +1,5 @@
 -- Quran dataset deployment part 5 of 6. Source: 20261020290000_import_quran_dataset.sql
+insert into public.quran_ayahs (id, surah_id, ayah_no, page, juz, hizb_quarter, text_uthmani) values
 (5501, 74, 6, 575, 29, 230, 'وَلَا تَمْنُن تَسْتَكْثِرُ'),
 (5502, 74, 7, 575, 29, 230, 'وَلِرَبِّكَ فَٱصْبِرْ'),
 (5503, 74, 8, 575, 29, 230, 'فَإِذَا نُقِرَ فِى ٱلنَّاقُورِ'),
@@ -738,4 +739,3 @@ insert into public.quran_ayahs (id, surah_id, ayah_no, page, juz, hizb_quarter, 
 (6235, 114, 5, 604, 30, 240, 'ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ'),
 (6236, 114, 6, 604, 30, 240, 'مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ');
 
-insert into public.quran_pages (page, juz, first_ayah_id, last_ayah_id) values
