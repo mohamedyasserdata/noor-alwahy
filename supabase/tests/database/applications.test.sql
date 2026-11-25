@@ -12,10 +12,10 @@ select is(has_function_privilege('service_role', 'public.lookup_application_stat
 
 set local role service_role;
 select matches(
-  public.submit_application(
+  set_config('test.application_order', public.submit_application(
     '{"student_name":"متقدم اختبار","student_gender":"male","student_age":12,"guardian_name":"ولي اختبار","contact_email":"apply@example.test","contact_phone":"","country_code":"EG","timezone":"Africa/Cairo","track_id":"","package_id":"","self_level":"beginner","preferred_times":["Sunday 18:00"],"preferred_teacher_gender":"male","notes":"","consent_version":"2026-10-21","source":"website"}'::jsonb,
     repeat('a',64), repeat('b',64), repeat('c',64)
-  ),
+  ), true),
   '^NW-A-[A-F0-9]{20}$',
   'submission creates a non-sequential eighty-bit order number'
 );
@@ -32,7 +32,7 @@ reset role;
 
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
 set local role authenticated;
-select is((select count(*)::integer from public.applications), 1, 'AAL2 administrator reads applications');
+select is((select count(*)::integer from public.applications where order_no = current_setting('test.application_order')), 1, 'AAL2 administrator reads applications');
 reset role;
 
 select * from finish();
