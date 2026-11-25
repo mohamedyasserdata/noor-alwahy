@@ -1,0 +1,7 @@
+output/
+.lighthouseci/
+.agents/
+.playwright-cli/
+tests/
+supabase/.temp/
+supabase/.branches/
