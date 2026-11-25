@@ -111,7 +111,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
   return (
     <div className="student-home min-h-svh pb-12 sm:pb-16">
       <section
-        className="relative min-h-[27rem] overflow-hidden bg-[url('/images/student/golden-quran-sunlit-mosque.png')] bg-cover bg-[position:38%_62%] lg:min-h-[24rem] lg:bg-[position:center_62%]"
+        className="relative overflow-hidden bg-[url('/images/student/golden-quran-sunlit-mosque.png')] bg-cover bg-[position:38%_62%] sm:min-h-[27rem] lg:min-h-[24rem] lg:bg-[position:center_62%]"
         aria-labelledby="student-home-title"
       >
         <div
@@ -119,7 +119,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
           aria-hidden="true"
         />
         <div
-          className="relative mx-auto grid min-h-[27rem] w-full max-w-[100rem] items-end px-5 pt-16 pb-24 sm:px-8 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:px-12 lg:py-12"
+          className="relative mx-auto grid w-full max-w-[100rem] items-end px-5 pt-8 pb-12 sm:min-h-[27rem] sm:px-8 sm:pt-16 sm:pb-24 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:px-12 lg:py-12"
           dir="ltr"
         >
           <span aria-hidden="true" />
@@ -143,7 +143,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto -mt-16 w-full max-w-[100rem] px-4 sm:px-6 lg:px-10">
+      <div className="relative z-10 mx-auto -mt-6 w-full max-w-[100rem] px-4 sm:-mt-16 sm:px-6 lg:px-10">
         <NextSessionCard
           appearance="student-home"
           serverNowMs={sessionData.serverNowMs}

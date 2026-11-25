@@ -36,10 +36,12 @@ export function InviteSessionBridge({
         return;
       }
 
-      window.location.replace(destination);
+      if (active) window.location.replace(destination);
     };
 
-    void establishSession();
+    void establishSession().catch(() => {
+      if (active) setFailed(true);
+    });
     return () => {
       active = false;
     };

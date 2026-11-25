@@ -99,6 +99,11 @@ test("mobile homepage uses the compact transparent hero and closes navigation af
   expect(await hero.evaluate((element) => getComputedStyle(element).textAlign)).toMatch(
     /^(start|right)$/,
   );
+  const login = await hero.getByRole("link", { name: "تسجيل الدخول" }).boundingBox();
+  const features = await page.getByTestId("public-hero-features").boundingBox();
+  expect(login).not.toBeNull();
+  expect(features).not.toBeNull();
+  expect(features!.y - (login!.y + login!.height)).toBeGreaterThanOrEqual(16);
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
     path: join(screenshotDir, "mobile-home-ar-360.png"),
@@ -115,6 +120,14 @@ test("mobile homepage uses the compact transparent hero and closes navigation af
   await dialog.getByRole("link", { name: "المسارات" }).click();
   await expect(page).toHaveURL(/\/ar\/?#tracks$/);
   await expect(dialog).toBeHidden();
+});
+
+test("legacy package URLs take visitors to the localized pricing section", async ({ page }) => {
+  for (const locale of ["ar", "en"]) {
+    await page.goto(`/${locale}/packages`);
+    await expect(page).toHaveURL(new RegExp(`/${locale}#packages$`));
+    await expect(page.locator("#packages")).toBeVisible();
+  }
 });
 
 test("tablet hero stays transparent and follows locale alignment without changing desktop navigation", async ({

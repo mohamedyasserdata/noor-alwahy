@@ -444,15 +444,17 @@ export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
         </div>
       </section>
 
-      <Suspense
-        fallback={
-          <section id="packages" className="border-y border-secondary/15 bg-muted/35 px-4 py-20">
-            <div className="mx-auto h-72 max-w-[88rem] animate-pulse rounded-[1.25rem] bg-card shadow-card" />
-          </section>
-        }
-      >
-        <HomePackages locale={locale} />
-      </Suspense>
+      <div id="packages" className="scroll-mt-24">
+        <Suspense
+          fallback={
+            <div className="border-y border-secondary/15 bg-muted/35 px-4 py-20">
+              <div className="mx-auto h-72 max-w-[88rem] animate-pulse rounded-[1.25rem] bg-card shadow-card" />
+            </div>
+          }
+        >
+          <HomePackages locale={locale} />
+        </Suspense>
+      </div>
 
       <section className="px-4 py-20 sm:px-6 lg:py-24">
         <div className="mx-auto max-w-[88rem] rounded-[2rem] border border-secondary/20 bg-[#f8f2e7] p-6 shadow-card sm:p-10 dark:bg-card/55">

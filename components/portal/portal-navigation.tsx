@@ -146,7 +146,8 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
           isSidebar &&
             !isActive &&
             "text-muted-foreground hover:bg-accent/55 hover:text-foreground",
-          isTop && "shrink-0 gap-2 rounded-xl px-3.5 py-2.5 text-sm",
+          isTop &&
+            "min-w-0 justify-center gap-1.5 rounded-xl px-1.5 py-2 text-center text-xs min-[980px]:shrink-0 sm:gap-2 sm:px-3.5 sm:text-sm",
           isTop &&
             isActive &&
             "bg-[#f5e8ca] text-[#7d500d] shadow-sm dark:bg-accent dark:text-[#fff3cf]",
@@ -303,7 +304,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
         isSidebar
           ? "grid min-h-0 flex-1 [scrollbar-gutter:stable] content-start gap-1.5 overflow-y-auto overscroll-contain px-4 pb-4"
           : isTop
-            ? "flex min-w-0 [scrollbar-width:none] items-center gap-1 overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden"
+            ? "grid min-w-0 grid-cols-3 gap-1 min-[980px]:flex min-[980px]:flex-wrap min-[980px]:items-center sm:grid-cols-6"
             : "grid h-full items-stretch",
         !isSidebar && !isTop && sections.length <= 5 && "grid-cols-5",
         !isSidebar && !isTop && sections.length > 5 && "flex overflow-x-auto",

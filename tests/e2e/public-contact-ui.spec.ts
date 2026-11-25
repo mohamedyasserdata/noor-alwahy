@@ -21,13 +21,21 @@ for (const locale of locales) {
       await expect(page.getByRole("heading", { level: 1, name: locale.title })).toBeVisible();
       await expect(page.locator("[data-public-contact-page]")).toBeVisible();
       await expect(page.locator("iframe")).toHaveCount(0);
-      await expect(page.locator("#contact-form")).toBeVisible();
-      await expect(page.locator("#contact-phone")).toBeVisible();
-
       const channelHrefs = await page
-        .locator('[aria-labelledby="contact-channels-title"] a[href]')
+        .locator('[aria-labelledby="contact-channels-title"] ul a[href]')
         .evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).href));
       expect(new Set(channelHrefs).size).toBe(channelHrefs.length);
+      if (channelHrefs.some((href) => href.startsWith("mailto:"))) {
+        await expect(page.locator("#contact-form")).toBeVisible();
+        await expect(page.locator("#contact-phone")).toBeVisible();
+      } else {
+        await expect(page.locator("#contact-form")).toHaveCount(0);
+        if (channelHrefs.length === 0) {
+          const channels = page.locator('[aria-labelledby="contact-channels-title"]');
+          await expect(channels.locator('a[href$="/faq"]')).toBeVisible();
+          await expect(channels.locator('a[href$="/order-status"]')).toBeVisible();
+        }
+      }
 
       const dimensions = await page.evaluate(() => ({
         clientWidth: document.documentElement.clientWidth,

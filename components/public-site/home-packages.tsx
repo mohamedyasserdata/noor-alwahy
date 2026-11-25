@@ -35,7 +35,7 @@ export async function HomePackages({ locale }: HomePackagesProps) {
   const numberLocale = locale === "ar" ? "ar-EG-u-nu-latn" : "en-US";
 
   return (
-    <section id="packages" className="scroll-mt-24 border-y bg-muted/35">
+    <section className="border-y bg-muted/35">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,.55fr)] lg:items-end">
           <div className="max-w-3xl">

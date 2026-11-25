@@ -55,7 +55,7 @@ export function PublicHomeHero({ locale }: { locale: AppLocale }) {
   return (
     <>
       <section
-        className="relative isolate -mt-[5.7rem] min-h-[47rem] overflow-hidden rounded-b-[2.75rem] bg-[#d9ae63] bg-[url('/images/public/noor-home-hero.png')] bg-cover bg-[68%_center] pt-[8.2rem] sm:min-h-[50rem] sm:bg-[72%_center] sm:pt-[9rem] lg:min-h-[46rem] lg:bg-center"
+        className="relative isolate -mt-[5.7rem] flex flex-col overflow-hidden rounded-b-[2.75rem] bg-[#d9ae63] bg-[url('/images/public/noor-home-hero.png')] bg-cover bg-[68%_center] pt-[8.2rem] sm:min-h-[50rem] sm:bg-[72%_center] sm:pt-[9rem] lg:min-h-[46rem] lg:bg-center"
         aria-label={text.imageLabel}
       >
         <div className="absolute inset-0 -z-10 bg-[#07152b]/38 sm:bg-linear-to-r sm:from-[#fffaf0]/96 sm:via-[#fff9eb]/72 sm:to-transparent rtl:sm:bg-linear-to-l dark:bg-[#07152b]/58 dark:sm:from-[#07152b]/96 dark:sm:via-[#07152b]/70 dark:sm:to-transparent" />
@@ -66,7 +66,7 @@ export function PublicHomeHero({ locale }: { locale: AppLocale }) {
         />
 
         <div
-          className="mx-auto grid min-h-[35rem] max-w-[90rem] items-center px-5 pb-64 sm:px-8 sm:pb-52 lg:grid-cols-2 lg:px-12 lg:pb-36"
+          className="mx-auto grid w-full max-w-[90rem] flex-1 items-center px-5 pb-7 sm:px-8 sm:pb-10 lg:min-h-[35rem] lg:grid-cols-2 lg:px-12 lg:pb-36"
           dir="ltr"
         >
           <div
@@ -83,7 +83,9 @@ export function PublicHomeHero({ locale }: { locale: AppLocale }) {
             </p>
             <h1 className="mt-4 text-4xl leading-[1.18] font-black text-[#fffaf0] sm:text-6xl sm:text-[#101f3b] lg:text-[4.35rem] dark:text-[#fffaf0]">
               <span className="block">{text.title}</span>
-              <span className="mt-1 block text-[#af7721]">{text.accent}</span>
+              <span className="mt-1 block text-[#f8d995] sm:text-[#935d15] dark:text-[#f8d995]">
+                {text.accent}
+              </span>
             </h1>
             <p className="mt-6 max-w-[36rem] text-base leading-8 font-medium text-[#fffaf0]/88 sm:text-xl sm:leading-9 sm:text-[#31415d] dark:text-[#f5f0e6]/80">
               {text.description}
@@ -115,7 +117,7 @@ export function PublicHomeHero({ locale }: { locale: AppLocale }) {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 translate-y-px px-3 sm:px-6">
+        <div className="px-3 sm:px-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:translate-y-px">
           <div
             data-testid="public-hero-features"
             className="mx-auto grid max-w-[84rem] grid-cols-2 overflow-hidden rounded-t-[2rem] border border-[#c7a45a]/25 bg-[#fffdf9]/96 shadow-[0_-10px_45px_rgba(16,31,59,.12)] backdrop-blur-md lg:grid-cols-4 dark:bg-[#0c1b33]/96"

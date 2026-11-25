@@ -62,6 +62,7 @@ export function LocaleSwitcher({ compact = false, strongContrast = false }: Loca
           asChild
           variant={option === locale ? "default" : "ghost"}
           className={cn(
+            strongContrast && "transition-none",
             strongContrast &&
               (option === locale
                 ? "bg-[#00132f] text-xl font-black text-white hover:bg-[#00132f] dark:bg-white dark:text-[#00132f] dark:hover:bg-white"

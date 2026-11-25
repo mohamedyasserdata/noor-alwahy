@@ -267,8 +267,8 @@
           "description": "Session changes and official instructions that need your attention."
         },
         "requests": {
-          "label": "Change requests",
-          "title": "Change & makeup requests",
+          "label": "Schedule changes",
+          "title": "Schedule changes & makeup",
           "description": "Review schedule changes and follow the approved action channel."
         },
         "availability": {
@@ -1421,6 +1421,11 @@
       "request_failed": "The evaluation could not be saved. No partial record was kept."
     }
   },
+  "contactUnavailable": {
+    "description": "This is where the academy publishes its approved contact channels.",
+    "faq": "Frequently asked questions",
+    "trackApplication": "Track an application"
+  },
   "nextSession": {
     "eyebrow": "Your nearest appointment",
     "title": "Your next session",
@@ -1431,6 +1436,7 @@
     "meetingId": "Meeting ID",
     "passcode": "Passcode",
     "opensIn": "Join opens in",
+    "opensBeforeSession": "You can join 10 minutes before the lesson starts.",
     "windowOpen": "Join window is open",
     "windowClosed": "Join window has closed",
     "join": "Join session",

@@ -65,6 +65,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   cacheComponents: true,
+  async redirects() {
+    return [
+      { source: "/:locale(ar|en)/packages", destination: "/:locale#packages", permanent: true },
+      { source: "/packages", destination: "/ar#packages", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

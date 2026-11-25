@@ -1,7 +1,10 @@
 import { ExternalLink, Mail, MessageCircleMore, ShieldCheck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { ContactChannelIcon } from "@/components/contact/contact-channel-icon";
 import { ContactMessageForm } from "@/components/contact/contact-message-form";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { getPublicContactLinks, type ContactLink } from "@/lib/contact-links/get-contact-links";
 
@@ -74,7 +77,10 @@ function displayType(link: ContactLink) {
 
 export async function PublicContactPage({ locale }: { locale: AppLocale }) {
   const t = copy[locale];
-  const rawLinks = await getPublicContactLinks();
+  const [rawLinks, unavailable] = await Promise.all([
+    getPublicContactLinks(),
+    getTranslations({ locale, namespace: "contactUnavailable" }),
+  ]);
   const links = Array.from(
     new Map(rawLinks.filter((link) => link.isVisible).map((link) => [link.url, link])).values(),
   );
@@ -111,7 +117,7 @@ export async function PublicContactPage({ locale }: { locale: AppLocale }) {
             </h1>
             <p className="mt-5 text-xl font-black text-[#9b680c] dark:text-[#efc75d]">{t.lead}</p>
             <p className="mt-3 max-w-xl text-lg leading-9 text-[#44536d] dark:text-[#f5f0e6]/75">
-              {t.description}
+              {emailLink ? t.description : unavailable("description")}
             </p>
             <div
               className={`mt-7 flex items-center gap-3 text-[#b77c12] ${locale === "ar" ? "justify-end" : "justify-start"}`}
@@ -126,7 +132,10 @@ export async function PublicContactPage({ locale }: { locale: AppLocale }) {
       </section>
 
       <div className="relative z-10 mx-auto -mt-12 max-w-[90rem] px-4 pb-20 sm:px-6 lg:px-10">
-        <div className="grid items-start gap-6 xl:grid-cols-[1.05fr_.95fr]" dir="ltr">
+        <div
+          className={emailLink ? "grid items-start gap-6 xl:grid-cols-[1.05fr_.95fr]" : "grid"}
+          dir="ltr"
+        >
           <section
             className="islamic-pattern relative overflow-hidden rounded-[1.5rem] border border-[#d5a028]/70 bg-[#101f3b] p-6 text-start text-white shadow-[0_26px_70px_-34px_rgba(16,31,59,.85)] sm:p-8"
             aria-labelledby="contact-channels-title"
@@ -181,6 +190,18 @@ export async function PublicContactPage({ locale }: { locale: AppLocale }) {
                   />
                   <h3 className="mt-4 text-xl font-black">{t.emptyTitle}</h3>
                   <p className="mt-2 leading-7 text-[#f5f0e6]/65">{t.emptyDescription}</p>
+                  <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    <Button asChild variant="gold">
+                      <Link href="/faq">{unavailable("faq")}</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="border-[#efc75d]/55 bg-[#102b50] text-white transition-none hover:bg-[#18375e] hover:text-white dark:bg-[#102b50] dark:hover:bg-[#18375e]"
+                    >
+                      <Link href="/order-status">{unavailable("trackApplication")}</Link>
+                    </Button>
+                  </div>
                 </div>
               )}
 
@@ -191,11 +212,13 @@ export async function PublicContactPage({ locale }: { locale: AppLocale }) {
             </div>
           </section>
 
-          <ContactMessageForm
-            locale={locale}
-            emailHref={emailLink?.url ?? null}
-            phoneHref={phoneLink?.url ?? null}
-          />
+          {emailLink ? (
+            <ContactMessageForm
+              locale={locale}
+              emailHref={emailLink.url}
+              phoneHref={phoneLink?.url ?? null}
+            />
+          ) : null}
         </div>
       </div>
     </div>

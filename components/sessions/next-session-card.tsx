@@ -95,9 +95,12 @@ function LiveSessionCard({
   }, [router, session.joinUrl, windowState.canJoin]);
 
   const canOpen = windowState.canJoin && Boolean(session.joinUrl);
+  const showCountdown = windowState.phase !== "closed" && windowState.remainingSeconds < 3600;
   const countdownLabel =
     windowState.phase === "before"
-      ? t("opensIn")
+      ? showCountdown
+        ? t("opensIn")
+        : t("opensBeforeSession")
       : windowState.phase === "open"
         ? t("windowOpen")
         : t("windowClosed");
@@ -130,16 +133,14 @@ function LiveSessionCard({
           </div>
 
           <div className="rounded-2xl bg-[#f8f1e2] px-5 py-3 text-center dark:bg-accent/45">
-            <p className="text-xs font-bold text-muted-foreground">{countdownLabel}</p>
-            <p
-              className="mt-1 text-xl font-black text-primary tabular-nums"
-              aria-live="polite"
-              dir="ltr"
-            >
-              {windowState.phase === "closed"
-                ? "00:00:00"
-                : formatCountdown(windowState.remainingSeconds)}
+            <p className="text-xs font-bold text-muted-foreground" role="status">
+              {countdownLabel}
             </p>
+            {showCountdown ? (
+              <p className="mt-1 text-xl font-black text-primary tabular-nums" dir="ltr">
+                {formatCountdown(windowState.remainingSeconds)}
+              </p>
+            ) : null}
           </div>
 
           {canOpen && session.joinUrl ? (
@@ -216,12 +217,14 @@ function LiveSessionCard({
 
         <div className="rounded-3xl bg-primary p-5 text-primary-foreground sm:p-6">
           <Clock3 className="size-6 text-secondary" aria-hidden="true" />
-          <p className="mt-4 text-sm text-primary-foreground/75">{countdownLabel}</p>
-          <p className="mt-1 text-3xl font-black tabular-nums" aria-live="polite" dir="ltr">
-            {windowState.phase === "closed"
-              ? "00:00:00"
-              : formatCountdown(windowState.remainingSeconds)}
+          <p className="mt-4 text-sm text-primary-foreground/75" role="status">
+            {countdownLabel}
           </p>
+          {showCountdown ? (
+            <p className="mt-1 text-3xl font-black tabular-nums" dir="ltr">
+              {formatCountdown(windowState.remainingSeconds)}
+            </p>
+          ) : null}
           <div className="mt-5">
             {canOpen && session.joinUrl ? (
               <Button asChild variant="gold" size="lg" className="w-full">
