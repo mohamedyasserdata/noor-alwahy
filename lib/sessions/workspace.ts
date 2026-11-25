@@ -16,7 +16,7 @@ export async function getTeacherSessionWorkspace(sessionId: string) {
     supabase
       .from("sessions")
       .select(
-        "id,student_id,teacher_id,scheduled_at,ends_at,duration_min,status,kind,format,started_at,ended_at,student:students!sessions_student_id_fkey(full_name,student_no,timezone),participants:session_participants(student_id,is_primary,student:students!session_participants_student_id_fkey(full_name,student_no,timezone)),teacher:teachers!sessions_teacher_id_fkey(profile:profiles(full_name)),attendance(student_id,status,minutes,recorded_at,locked_at,correction_reason),evaluation:session_evaluations(id,is_locked,total_score,rating,session_type,family_note,locked_at)",
+        "id,student_id,teacher_id,scheduled_at,ends_at,duration_min,status,kind,format,started_at,ended_at,zoom_review_status,student:students!sessions_student_id_fkey(full_name,student_no,timezone),participants:session_participants(student_id,is_primary,student:students!session_participants_student_id_fkey(full_name,student_no,timezone)),teacher:teachers!sessions_teacher_id_fkey(profile:profiles(full_name)),attendance(student_id,status,minutes,recorded_at,locked_at,correction_reason),evaluation:session_evaluations(id,is_locked,total_score,rating,session_type,family_note,locked_at)",
       )
       .eq("id", sessionId)
       .maybeSingle(),
@@ -60,6 +60,7 @@ export async function getTeacherSessionWorkspace(sessionId: string) {
       format: session.format,
       startedAt: session.started_at,
       endedAt: session.ended_at,
+      zoomReviewStatus: session.zoom_review_status,
       student: {
         name: session.student.full_name,
         number: session.student.student_no,

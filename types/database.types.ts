@@ -745,6 +745,7 @@ export type Database = {
           issued_by: string;
           kind: string;
           locale: string;
+          original_file_name: string | null;
           payload_snapshot: NonNullable<Json>;
           pdf_path: string | null;
           pdf_sha256: string | null;
@@ -752,9 +753,11 @@ export type Database = {
           revoked_at: string | null;
           revoked_by: string | null;
           serial_no: string;
+          source: string;
           student_id: string;
           template_snapshot: NonNullable<Json>;
-          template_version_id: string;
+          template_version_id: string | null;
+          title: string | null;
           verify_code: string;
         };
         ComputedFields: never;
@@ -766,16 +769,19 @@ export type Database = {
           issued_by: string;
           kind: string;
           locale?: string;
-          payload_snapshot: NonNullable<Json>;
+          original_file_name?: string | null;
+          payload_snapshot?: NonNullable<Json>;
           pdf_path?: string | null;
           pdf_sha256?: string | null;
           revoke_reason?: string | null;
           revoked_at?: string | null;
           revoked_by?: string | null;
           serial_no: string;
+          source?: string;
           student_id: string;
-          template_snapshot: NonNullable<Json>;
-          template_version_id: string;
+          template_snapshot?: NonNullable<Json>;
+          template_version_id?: string | null;
+          title?: string | null;
           verify_code: string;
         };
         Update: {
@@ -786,6 +792,7 @@ export type Database = {
           issued_by?: string;
           kind?: string;
           locale?: string;
+          original_file_name?: string | null;
           payload_snapshot?: NonNullable<Json>;
           pdf_path?: string | null;
           pdf_sha256?: string | null;
@@ -793,9 +800,11 @@ export type Database = {
           revoked_at?: string | null;
           revoked_by?: string | null;
           serial_no?: string;
+          source?: string;
           student_id?: string;
           template_snapshot?: NonNullable<Json>;
-          template_version_id?: string;
+          template_version_id?: string | null;
+          title?: string | null;
           verify_code?: string;
         };
         Relationships: [
@@ -2183,6 +2192,92 @@ export type Database = {
             columns: ["student_id"];
             isOneToOne: false;
             referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      student_quran_baselines: {
+        Row: {
+          academy_start_page: number | null;
+          assessed_on: string;
+          assessment_notes: string | null;
+          created_at: string;
+          created_by: string;
+          prior_memorized_from_page: number | null;
+          prior_memorized_to_page: number | null;
+          student_id: string;
+          study_direction: string;
+          updated_at: string;
+          updated_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          academy_start_page?: number | null;
+          assessed_on?: string;
+          assessment_notes?: string | null;
+          created_at?: string;
+          created_by?: string;
+          prior_memorized_from_page?: number | null;
+          prior_memorized_to_page?: number | null;
+          student_id: string;
+          study_direction?: string;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Update: {
+          academy_start_page?: number | null;
+          assessed_on?: string;
+          assessment_notes?: string | null;
+          created_at?: string;
+          created_by?: string;
+          prior_memorized_from_page?: number | null;
+          prior_memorized_to_page?: number | null;
+          student_id?: string;
+          study_direction?: string;
+          updated_at?: string;
+          updated_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_quran_baselines_academy_start_page_fkey";
+            columns: ["academy_start_page"];
+            isOneToOne: false;
+            referencedRelation: "quran_pages";
+            referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "student_quran_baselines_prior_memorized_from_page_fkey";
+            columns: ["prior_memorized_from_page"];
+            isOneToOne: false;
+            referencedRelation: "quran_pages";
+            referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "student_quran_baselines_prior_memorized_to_page_fkey";
+            columns: ["prior_memorized_to_page"];
+            isOneToOne: false;
+            referencedRelation: "quran_pages";
+            referencedColumns: ["page"];
+          },
+          {
+            foreignKeyName: "student_quran_baselines_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: true;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_quran_baselines_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "student_quran_baselines_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -3610,6 +3705,9 @@ export type Database = {
           zoom_override_url: string | null;
           zoom_passcode: string | null;
           zoom_published_at: string | null;
+          zoom_review_status: string;
+          zoom_reviewed_at: string | null;
+          zoom_reviewed_by: string | null;
           zoom_unpublished_at: string | null;
         };
         ComputedFields: never;
@@ -3636,6 +3734,9 @@ export type Database = {
           zoom_override_url?: string | null;
           zoom_passcode?: string | null;
           zoom_published_at?: string | null;
+          zoom_review_status?: string;
+          zoom_reviewed_at?: string | null;
+          zoom_reviewed_by?: string | null;
           zoom_unpublished_at?: string | null;
         };
         Update: {
@@ -3661,6 +3762,9 @@ export type Database = {
           zoom_override_url?: string | null;
           zoom_passcode?: string | null;
           zoom_published_at?: string | null;
+          zoom_review_status?: string;
+          zoom_reviewed_at?: string | null;
+          zoom_reviewed_by?: string | null;
           zoom_unpublished_at?: string | null;
         };
         Relationships: [
@@ -5729,6 +5833,31 @@ export type Database = {
           p_locale: string;
           p_student: string;
           p_version: string;
+        };
+        Returns: string;
+      };
+      issue_uploaded_certificate: {
+        Args: {
+          p_issued_on?: string;
+          p_original_file_name: string;
+          p_pdf_path: string;
+          p_pdf_sha256: string;
+          p_student: string;
+          p_title: string;
+        };
+        Returns: string;
+      };
+      assign_teacher_with_schedule: {
+        Args: {
+          p_action: string;
+          p_create_schedule?: boolean;
+          p_duration_min: number;
+          p_local_start_time: string;
+          p_reason: string;
+          p_student: string;
+          p_teacher: string;
+          p_track: string;
+          p_weekdays: number[];
         };
         Returns: string;
       };

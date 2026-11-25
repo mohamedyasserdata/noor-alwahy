@@ -10,6 +10,13 @@ export const scheduleSlotSchema = z.object({
   anchorTimezone: z.string().trim().min(1).max(100).refine(isValidTimeZone),
 });
 
+export const scheduleSlotBatchSchema = z.object({
+  assignmentId: z.uuid(),
+  weekdays: z.array(z.coerce.number().int().min(0).max(6)).min(1).max(7),
+  localStartTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  durationMin: z.coerce.number().int().min(10).max(120),
+});
+
 const sessionId = z.uuid();
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$/);
 

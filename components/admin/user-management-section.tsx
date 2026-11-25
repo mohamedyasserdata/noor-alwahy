@@ -2,13 +2,14 @@ import { ShieldCheck, UserPlus, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
+import { AccountRoleFields } from "@/components/admin/account-role-fields";
 import { AuthNotice } from "@/components/auth/auth-notice";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
 import { createManagedAccountAction, setAccountActiveAction } from "@/lib/admin/user-actions";
-import { getManagedUsers } from "@/lib/admin/user-management";
+import { getManagedAccountSetupOptions, getManagedUsers } from "@/lib/admin/user-management";
 
 type UserManagementSectionProps = {
   locale: AppLocale;
@@ -16,12 +17,16 @@ type UserManagementSectionProps = {
 };
 
 export async function UserManagementSection({ locale, searchParams }: UserManagementSectionProps) {
-  const [query, users, t] = await Promise.all([
+  const [query, users, options, t] = await Promise.all([
     searchParams,
     getManagedUsers(),
+    getManagedAccountSetupOptions(),
     getTranslations({ locale, namespace: "userManagement" }),
   ]);
   const notice = getNotice(query, t);
+  const today = new Date().toISOString().slice(0, 10);
+  const localName = (row: { name_ar: string; name_en: string | null }) =>
+    locale === "ar" ? row.name_ar : (row.name_en ?? row.name_ar);
 
   return (
     <section className="mx-auto w-full max-w-6xl" aria-labelledby="users-title">
@@ -51,14 +56,14 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
             </div>
           </div>
 
-          <form action={createManagedAccountAction.bind(null, locale)} className="mt-6 grid gap-4">
+          <form
+            action={createManagedAccountAction.bind(null, locale)}
+            className="group mt-6 grid gap-4"
+            data-account-role="student"
+          >
             <div className="grid gap-2">
               <Label htmlFor="fullName">{t("fields.fullName")}</Label>
               <Input id="fullName" name="fullName" autoComplete="name" maxLength={160} required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="displayName">{t("fields.displayName")}</Label>
-              <Input id="displayName" name="displayName" autoComplete="off" maxLength={80} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="accountEmail">{t("fields.email")}</Label>
@@ -74,20 +79,20 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
               />
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Label htmlFor="role">{t("fields.role")}</Label>
-                <select
-                  id="role"
-                  name="role"
-                  className="h-11 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/25"
-                  defaultValue="student"
-                >
-                  <option value="admin">{t("roles.admin")}</option>
-                  <option value="teacher">{t("roles.teacher")}</option>
-                  <option value="student">{t("roles.student")}</option>
-                  <option value="parent">{t("roles.parent")}</option>
-                </select>
-              </div>
+              <AccountRoleFields
+                locale={locale}
+                roleLabels={{
+                  admin: t("roles.admin"),
+                  teacher: t("roles.teacher"),
+                  student: t("roles.student"),
+                  parent: t("roles.parent"),
+                }}
+                students={options.students.map((student) => ({
+                  id: student.id,
+                  full_name: student.full_name,
+                  student_no: student.student_no,
+                }))}
+              />
               <div className="grid gap-2">
                 <Label htmlFor="mode">{t("fields.mode")}</Label>
                 <select
@@ -124,6 +129,186 @@ export async function UserManagementSection({ locale, searchParams }: UserManage
               />
               <p className="text-xs leading-6 text-muted-foreground">{t("fields.passwordHint")}</p>
             </div>
+            <details className="hidden rounded-2xl border bg-background/60 p-4 group-data-[account-role=student]:block">
+              <summary className="cursor-pointer font-black text-primary">
+                {locale === "ar"
+                  ? "إعداد الطالب: الاشتراك والموعد"
+                  : "Student setup: subscription and time"}
+              </summary>
+              <p className="mt-2 text-xs leading-6 text-muted-foreground">
+                {locale === "ar"
+                  ? "املأ هذا الجزء عند إنشاء حساب طالب. بعد الحفظ ستظهر لك قائمة المعلمين المتاحين في الموعد المختار ثم باقي المعلمين."
+                  : "Complete this when creating a student. After saving, available teachers for the selected time appear first, followed by the remaining teachers."}
+              </p>
+              <div className="mt-4 grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="account-package">{locale === "ar" ? "الباقة" : "Package"}</Label>
+                  <select
+                    id="account-package"
+                    name="packageId"
+                    defaultValue={options.packages[0]?.id ?? ""}
+                    className="min-h-11 rounded-xl border bg-card px-3"
+                  >
+                    <option value="">{locale === "ar" ? "تُحدد لاحقًا" : "Set later"}</option>
+                    {options.packages.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {localName(item)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="account-country">
+                      {locale === "ar" ? "دولة التسعير" : "Pricing country"}
+                    </Label>
+                    <select
+                      id="account-country"
+                      name="countryCode"
+                      defaultValue={
+                        options.countries.find((item) => item.code === "EG")?.code ??
+                        options.countries[0]?.code ??
+                        ""
+                      }
+                      className="min-h-11 rounded-xl border bg-card px-3"
+                    >
+                      <option value="">{locale === "ar" ? "اختر الدولة" : "Choose country"}</option>
+                      {options.countries.map((item) => (
+                        <option key={item.code} value={item.code}>
+                          {localName(item)} · {item.currency}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="account-start">
+                      {locale === "ar" ? "بداية الاشتراك" : "Subscription start"}
+                    </Label>
+                    <Input id="account-start" name="startDate" type="date" defaultValue={today} />
+                  </div>
+                </div>
+                <fieldset className="grid gap-2">
+                  <legend className="font-bold text-primary">
+                    {locale === "ar" ? "أيام الحصص" : "Lesson days"}
+                  </legend>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[0, 1, 2, 3, 4, 5, 6].map((day) => (
+                      <label
+                        key={day}
+                        className="flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm font-bold has-[:checked]:border-secondary has-[:checked]:bg-secondary/10"
+                      >
+                        <input
+                          type="checkbox"
+                          name="weekdays"
+                          value={day}
+                          className="size-4 accent-primary"
+                        />
+                        {
+                          (locale === "ar"
+                            ? [
+                                "الأحد",
+                                "الاثنين",
+                                "الثلاثاء",
+                                "الأربعاء",
+                                "الخميس",
+                                "الجمعة",
+                                "السبت",
+                              ]
+                            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])[day]
+                        }
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="account-time">
+                      {locale === "ar" ? "وقت البداية بتوقيت مصر" : "Start time (Cairo)"}
+                    </Label>
+                    <Input id="account-time" name="localStartTime" type="time" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="account-duration">
+                      {locale === "ar" ? "مدة الحصة" : "Duration"}
+                    </Label>
+                    <select
+                      id="account-duration"
+                      name="durationMin"
+                      defaultValue="45"
+                      className="min-h-11 rounded-xl border bg-card px-3"
+                    >
+                      {[30, 45, 60, 90].map((value) => (
+                        <option key={value} value={value}>
+                          {value} {locale === "ar" ? "دقيقة" : "minutes"}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </details>
+            <details className="hidden rounded-2xl border bg-background/60 p-4 group-data-[account-role=teacher]:block">
+              <summary className="cursor-pointer font-black text-primary">
+                {locale === "ar" ? "إعداد المعلم: أوقات التفرغ" : "Teacher setup: availability"}
+              </summary>
+              <p className="mt-2 text-xs leading-6 text-muted-foreground">
+                {locale === "ar"
+                  ? "املأ هذا الجزء عند إنشاء حساب معلم فقط. تظهر هذه الأوقات للإدارة عند تعيين الطلاب."
+                  : "Complete this only for a teacher account. These times are used when assigning students."}
+              </p>
+              <div className="mt-4 grid gap-4">
+                <fieldset className="grid gap-2">
+                  <legend className="font-bold text-primary">
+                    {locale === "ar" ? "الأيام المتاحة" : "Available days"}
+                  </legend>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[0, 1, 2, 3, 4, 5, 6].map((day) => (
+                      <label
+                        key={day}
+                        className="flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm font-bold has-[:checked]:border-secondary has-[:checked]:bg-secondary/10"
+                      >
+                        <input
+                          type="checkbox"
+                          name="teacherWeekdays"
+                          value={day}
+                          className="size-4 accent-primary"
+                        />
+                        {
+                          (locale === "ar"
+                            ? [
+                                "الأحد",
+                                "الاثنين",
+                                "الثلاثاء",
+                                "الأربعاء",
+                                "الخميس",
+                                "الجمعة",
+                                "السبت",
+                              ]
+                            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])[day]
+                        }
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="teacher-start">
+                      {locale === "ar" ? "متاح من" : "Available from"}
+                    </Label>
+                    <Input id="teacher-start" name="teacherStartTime" type="time" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="teacher-end">
+                      {locale === "ar" ? "متاح حتى" : "Available until"}
+                    </Label>
+                    <Input id="teacher-end" name="teacherEndTime" type="time" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {locale === "ar" ? "جميع الأوقات بتوقيت مصر." : "All times use Cairo time."}
+                </p>
+              </div>
+            </details>
             <AdminSubmitButton label={t("create.action")} pendingLabel={t("create.pending")} />
           </form>
         </article>
@@ -204,6 +389,7 @@ function getNotice(
     cannot_disable_self: "errors.cannotDisableSelf",
     invalid_fields: "errors.invalidFields",
     request_failed: "errors.requestFailed",
+    setup_failed: "errors.requestFailed",
   } as const;
 
   if (status && status in statusKeys) {

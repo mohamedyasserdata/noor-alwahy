@@ -25,15 +25,37 @@ export async function POST(request: Request) {
   if (!(await verifyApplicationCaptcha(parsed.data.captcha_token, ip)))
     return Response.json({ error: "captcha_failed" }, { status: 400 });
 
+  const admin = createAdminClient();
+  const [countryResult, trackResult] = await Promise.all([
+    admin
+      .from("countries")
+      .select("default_timezone")
+      .eq("code", parsed.data.country_code)
+      .eq("is_enabled", true)
+      .maybeSingle(),
+    admin
+      .from("tracks")
+      .select("id")
+      .eq("is_active", true)
+      .order("sort_order")
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  if (countryResult.error || !countryResult.data)
+    return Response.json({ error: "invalid_fields" }, { status: 400 });
+  if (trackResult.error || !trackResult.data)
+    return Response.json({ error: "selection_unavailable" }, { status: 400 });
+
   const identifier = lookupIdentifier(parsed.data.contact_email, parsed.data.contact_phone);
   const contact = parsed.data.contact_email || parsed.data.contact_phone.replace(/\D/g, "");
   const payload = {
     ...parsed.data,
     captcha_token: undefined,
-    consent: undefined,
+    timezone: countryResult.data.default_timezone ?? "UTC",
+    track_id: trackResult.data.id,
+    preferred_teacher_gender: "",
     consent_version: legalDocumentVersion,
   };
-  const admin = createAdminClient();
   const { data, error } = await admin.rpc("submit_application", {
     p_payload: payload,
     p_lookup_hash: applicationHash(identifier.value),

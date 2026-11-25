@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { AdminSavedViews } from "@/components/admin/admin-saved-views";
-import { StudentImportPanel } from "@/components/admin/student-import-panel";
 import { AuthNotice } from "@/components/auth/auth-notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -131,47 +130,9 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
         )}
       />
 
-      <StudentImportPanel
-        locale={locale}
-        copy={{
-          title: t("import.title"),
-          description: t("import.description"),
-          template: t("import.template"),
-          file: t("import.file"),
-          preview: t("import.preview"),
-          previewing: t("import.previewing"),
-          confirm: t("import.confirm"),
-          confirming: t("import.confirming"),
-          ready: t("import.ready"),
-          errorTitle: t("import.errorTitle"),
-          columns: {
-            row: t("import.columns.row"),
-            name: t("import.columns.name"),
-            gender: t("import.columns.gender"),
-            joined: t("import.columns.joined"),
-            notes: t("import.columns.notes"),
-          },
-          yes: t("import.yes"),
-          no: t("import.no"),
-          errors: {
-            invalid_file: t("import.errors.invalidFile"),
-            unsafe_workbook: t("import.errors.unsafeWorkbook"),
-            missing_students_sheet: t("import.errors.missingSheet"),
-            formulas_not_allowed: t("import.errors.formulasNotAllowed"),
-            invalid_headers: t("import.errors.invalidHeaders"),
-            invalid_row_count: t("import.errors.invalidRowCount"),
-            unknown_level: t("import.errors.unknownLevel"),
-            invalid_boolean: t("import.errors.invalidBoolean"),
-            duplicate_student: t("import.errors.duplicateStudent"),
-            invalid_fields: t("import.errors.invalidFields"),
-            request_failed: t("import.errors.requestFailed"),
-          },
-        }}
-      />
-
       <form
         method="get"
-        className="mt-8 grid gap-3 rounded-2xl border bg-card p-4 shadow-card md:grid-cols-[minmax(12rem,1.4fr)_repeat(3,minmax(8rem,0.7fr))_auto]"
+        className="mt-8 grid gap-3 rounded-2xl border bg-card p-4 shadow-card md:grid-cols-[minmax(12rem,1.4fr)_repeat(2,minmax(8rem,0.7fr))_auto]"
       >
         <input type="hidden" name="workflow" value={directory.filters.workflow} />
         <div className="grid gap-2">
@@ -209,24 +170,15 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
             </option>
           ))}
         </FilterSelect>
-        <div className="grid gap-2">
-          <Label htmlFor="student-country">{t("filters.country")}</Label>
-          <Input
-            id="student-country"
-            name="country"
-            dir="ltr"
-            maxLength={2}
-            defaultValue={directory.filters.country}
-            placeholder="EG"
-          />
-        </div>
         <Button type="submit" className="self-end">
           <Search aria-hidden="true" />
           {t("filters.apply")}
         </Button>
       </form>
 
-      <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(21rem,0.65fr)]">
+      <div
+        className={`mt-6 grid items-start gap-6 ${selected ? "xl:grid-cols-[minmax(0,1.35fr)_minmax(21rem,0.65fr)]" : ""}`}
+      >
         <article className="min-w-0 rounded-3xl border bg-card p-5 shadow-card sm:p-7">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -277,7 +229,9 @@ export async function StudentManagementSection({ locale, searchParams }: Props) 
           </nav>
         </article>
 
-        <StudentForm locale={locale} student={selected} levels={directory.levels} t={t} />
+        {selected ? (
+          <StudentForm locale={locale} student={selected} levels={directory.levels} t={t} />
+        ) : null}
       </div>
 
       {selected ? (
@@ -312,7 +266,6 @@ function StudentRow({
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
           <bdi>{student.studentNo}</bdi> · {student.levelName ?? t("list.noLevel")}
-          {student.countryCode ? ` · ${student.countryCode}` : ""}
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -326,6 +279,13 @@ function StudentRow({
             {locale === "ar" ? "تعديل البيانات" : "Edit details"}
           </a>
         </Button>
+        {!student.isAssigned && student.status === "active" ? (
+          <Button asChild variant="gold" size="sm">
+            <a href={`/${locale}/admin/assignments?studentId=${student.id}`}>
+              {locale === "ar" ? "تعيين مدرس" : "Assign teacher"}
+            </a>
+          </Button>
+        ) : null}
         {student.status !== "archived" ? (
           <form action={archiveStudentAction.bind(null, locale)}>
             <input type="hidden" name="studentId" value={student.id} />
@@ -384,20 +344,24 @@ function StudentForm({
             <option value="male">{t("genders.male")}</option>
             <option value="female">{t("genders.female")}</option>
           </FilterSelect>
-          <FilterSelect
-            id="student-edit-status"
-            name="status"
-            label={t("fields.status")}
-            defaultValue={student?.status ?? "active"}
-          >
-            {(["active", "dropped", "graduated", "suspended", "archived"] as const).map(
-              (status) => (
-                <option key={status} value={status}>
-                  {t(`statuses.${status}`)}
-                </option>
-              ),
-            )}
-          </FilterSelect>
+          {student ? (
+            <FilterSelect
+              id="student-edit-status"
+              name="status"
+              label={t("fields.status")}
+              defaultValue={student.status}
+            >
+              {(["active", "dropped", "graduated", "suspended", "archived"] as const).map(
+                (status) => (
+                  <option key={status} value={status}>
+                    {t(`statuses.${status}`)}
+                  </option>
+                ),
+              )}
+            </FilterSelect>
+          ) : (
+            <Field id="student-birth" name="birthDate" type="date" label={t("fields.birthDate")} />
+          )}
         </div>
         <FilterSelect
           id="student-edit-level"
@@ -412,41 +376,45 @@ function StudentForm({
             </option>
           ))}
         </FilterSelect>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="student-birth"
-            name="birthDate"
-            type="date"
-            label={t("fields.birthDate")}
-            defaultValue={student?.birthDate ?? ""}
-          />
-          <Field
-            id="student-joined"
-            name="joinedAt"
-            type="date"
-            label={t("fields.joinedAt")}
-            defaultValue={student?.joinedAt ?? ""}
-            required
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="student-country-edit"
-            name="countryCode"
-            label={t("fields.country")}
-            defaultValue={student?.countryCode ?? ""}
-            dir="ltr"
-            maxLength={2}
-          />
-          <Field
-            id="student-timezone"
-            name="timezone"
-            label={t("fields.timezone")}
-            defaultValue={student?.timezone ?? "Africa/Cairo"}
-            dir="ltr"
-            required
-          />
-        </div>
+        {student ? (
+          <>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                id="student-birth"
+                name="birthDate"
+                type="date"
+                label={t("fields.birthDate")}
+                defaultValue={student.birthDate ?? ""}
+              />
+              <Field
+                id="student-joined"
+                name="joinedAt"
+                type="date"
+                label={t("fields.joinedAt")}
+                defaultValue={student.joinedAt ?? ""}
+                required
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                id="student-country-edit"
+                name="countryCode"
+                label={t("fields.country")}
+                defaultValue={student.countryCode ?? ""}
+                dir="ltr"
+                maxLength={2}
+              />
+              <Field
+                id="student-timezone"
+                name="timezone"
+                label={t("fields.timezone")}
+                defaultValue={student.timezone}
+                dir="ltr"
+                required
+              />
+            </div>
+          </>
+        ) : null}
         <div className="grid gap-2">
           <Label htmlFor="student-health">{t("fields.healthNotes")}</Label>
           <textarea
@@ -822,7 +790,13 @@ function getNotice(query: Record<string, string | string[] | undefined>, t: Tran
     };
   const familyStatus = typeof query.familyStatus === "string" ? query.familyStatus : "";
   const familyError = typeof query.familyError === "string" ? query.familyError : "";
-  const familyStatuses = ["linked", "unlinked", "parent_created", "student_created"] as const;
+  const familyStatuses = [
+    "linked",
+    "unlinked",
+    "parent_created",
+    "student_created",
+    "student_invited",
+  ] as const;
   if (familyStatuses.includes(familyStatus as (typeof familyStatuses)[number]))
     return {
       message: t(`family.notices.${familyStatus}` as "family.notices.linked"),

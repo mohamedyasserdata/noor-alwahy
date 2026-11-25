@@ -14,15 +14,15 @@ import {
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { getTeacherReportCopy, ReportForm } from "@/components/reports/teacher-reports-section";
 import { TeacherMetricCard, TeacherPanel } from "@/components/teacher/teacher-page-ui";
+import { OneMonthPlanForm } from "@/components/teacher/one-month-plan-form";
+import { QuranBaselineForm } from "@/components/quran/quran-baseline-form";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import type { AppLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
-import { saveMemorizationPlanAction } from "@/lib/memorization-plans/actions";
 import { approveReportAction } from "@/lib/reports/actions";
 import type { getTeacherReportsData } from "@/lib/reports/queries";
 import { saveTeacherStudentNoteAction } from "@/lib/teacher/student-notes-actions";
@@ -69,6 +69,10 @@ const copy = {
     duration: "المدة",
     score: "التقييم",
     noSessions: "لا توجد حصص مسجلة لهذا الطالب.",
+    weeklyAppointment: "الموعد الأسبوعي المحفوظ",
+    sessionNotGenerated:
+      "لم تُنشأ الحصة الفعلية بعد لأن اشتراك الطالب غير مفعّل. بعد تفعيل الإدارة للاشتراك ستظهر الحصة هنا، ويمكنك فتحها وإضافة رابط Zoom وإرساله للمراجعة.",
+    manageSessionLink: "إدارة الحصة والرابط",
     minutes: "{count} دقيقة",
     weekly: "هدف أسبوعي (صفحات)",
     monthly: "هدف شهري (صفحات)",
@@ -158,6 +162,10 @@ const copy = {
     duration: "Duration",
     score: "Score",
     noSessions: "No sessions are recorded for this student.",
+    weeklyAppointment: "Saved weekly appointment",
+    sessionNotGenerated:
+      "The actual session has not been generated because the student's subscription is not active. After administration activates it, the session will appear here so you can add its Zoom link and send it for review.",
+    manageSessionLink: "Manage session and link",
     minutes: "{count} min",
     weekly: "Weekly target (pages)",
     monthly: "Monthly target (pages)",
@@ -219,6 +227,7 @@ export function TeacherStudentProfile({
   notice,
   reportNotice,
   noteNotice,
+  baselineNotice,
   reportsData,
   tab,
 }: {
@@ -227,6 +236,7 @@ export function TeacherStudentProfile({
   notice?: "saved" | "error";
   reportNotice?: "saved" | "error";
   noteNotice?: "saved" | "error";
+  baselineNotice?: "saved" | "error";
   reportsData: Awaited<ReturnType<typeof getTeacherReportsData>>;
   tab: StudentProfileTab;
 }) {
@@ -316,11 +326,23 @@ export function TeacherStudentProfile({
           {notice === "saved" ? text.planSaved : text.planError}
         </Alert>
       ) : null}
+      {baselineNotice ? (
+        <Alert className="mt-4" variant={baselineNotice === "saved" ? "success" : "warning"}>
+          {baselineNotice === "saved"
+            ? locale === "ar"
+              ? "تم حفظ خط البداية القرآني للطالب."
+              : "The Quran starting point was saved."
+            : locale === "ar"
+              ? "تعذر حفظ نقطة البداية. راجع نطاق الصفحات ثم حاول مرة أخرى."
+              : "The starting point could not be saved. Review the page range and try again."}
+        </Alert>
+      ) : null}
 
       <div className="mt-5">
         {tab === "overview" ? (
           <Overview
             data={data}
+            locale={locale}
             text={text}
             dateTime={dateTime}
             adherence={adherence}
@@ -357,6 +379,7 @@ export function TeacherStudentProfile({
 
 function Overview({
   data,
+  locale,
   text,
   dateTime,
   adherence,
@@ -364,6 +387,7 @@ function Overview({
   hasPendingEvaluation,
 }: {
   data: TeacherStudent360Data;
+  locale: AppLocale;
   text: (typeof copy)[AppLocale];
   dateTime: Intl.DateTimeFormat;
   adherence: number;
@@ -417,9 +441,24 @@ function Overview({
                   {format(text.minutes, { count: data.nextSession.duration_min })}
                 </p>
               </div>
-              <Button asChild variant="outline">
-                <Link href="/teacher/schedule">{text.openSchedule}</Link>
-              </Button>
+              {"isWeeklyTemplate" in data.nextSession && data.nextSession.isWeeklyTemplate ? (
+                <div className="max-w-sm">
+                  <Button asChild variant="outline">
+                    <Link href="/teacher/schedule">{text.openSchedule}</Link>
+                  </Button>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    {locale === "ar"
+                      ? "الموعد الأسبوعي مسجل. ستتاح إضافة رابط الحصة بعد تفعيل اشتراك الطالب وتوليد الحصة الفعلية."
+                      : "The weekly time is saved. Link management becomes available after the student's subscription is active and the session is generated."}
+                  </p>
+                </div>
+              ) : (
+                <Button asChild variant="outline">
+                  <Link href={`/teacher/sessions/${data.nextSession.id}`}>
+                    {locale === "ar" ? "إدارة الحصة والرابط" : "Manage session and link"}
+                  </Link>
+                </Button>
+              )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">{text.noSessions}</p>
@@ -470,7 +509,39 @@ function Sessions({
   text: (typeof copy)[AppLocale];
   dateTime: Intl.DateTimeFormat;
 }) {
-  if (!data.sessions.length) return <Empty icon={CalendarClock} text={text.noSessions} />;
+  if (!data.sessions.length) {
+    const weeklyTemplate =
+      data.nextSession &&
+      "isWeeklyTemplate" in data.nextSession &&
+      data.nextSession.isWeeklyTemplate
+        ? data.nextSession
+        : null;
+
+    if (!weeklyTemplate) return <Empty icon={CalendarClock} text={text.noSessions} />;
+
+    return (
+      <TeacherPanel
+        title={text.sessions}
+        action={<CalendarClock className="size-5 text-secondary" aria-hidden="true" />}
+      >
+        <div className="rounded-2xl border border-secondary/25 bg-accent/25 p-4 sm:p-5">
+          <Badge variant="outline">{text.weeklyAppointment}</Badge>
+          <p className="mt-3 text-xl font-black text-primary">
+            {dateTime.format(new Date(weeklyTemplate.scheduled_at))}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {format(text.minutes, { count: weeklyTemplate.duration_min })}
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground">
+            {text.sessionNotGenerated}
+          </p>
+          <Button asChild className="mt-4" variant="outline">
+            <Link href="/teacher/schedule">{text.openSchedule}</Link>
+          </Button>
+        </div>
+      </TeacherPanel>
+    );
+  }
   return (
     <TeacherPanel title={text.sessions}>
       <div className="overflow-x-auto">
@@ -523,9 +594,7 @@ function Sessions({
                 </td>
                 <td className="px-3 py-4">
                   <Button asChild size="sm" variant="outline">
-                    <Link href={`/teacher/sessions/${session.id}`}>
-                      {locale === "ar" ? "فتح الحصة" : "Open session"}
-                    </Link>
+                    <Link href={`/teacher/sessions/${session.id}`}>{text.manageSessionLink}</Link>
                   </Button>
                 </td>
               </tr>
@@ -550,66 +619,45 @@ function Plan({
 }) {
   const monthly = Number(data.adherence?.monthly_adherence_percent ?? 0);
   return (
-    <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
-      <TeacherPanel title={text.plan}>
-        <div className="grid gap-5">
-          <Achievement
-            label={text.actualWeekly}
-            achieved={data.adherence?.weekly_achieved_pages ?? 0}
-            target={data.plan?.weekly_target_pages ?? 0}
-            percent={adherence}
-          />
-          <Achievement
-            label={text.actualMonthly}
-            achieved={data.adherence?.monthly_achieved_pages ?? 0}
-            target={data.plan?.monthly_target_pages ?? 0}
-            percent={monthly}
-          />
-        </div>
-      </TeacherPanel>
-      <TeacherPanel title={text.editPlan}>
-        <p className="mb-4 text-sm leading-6 text-muted-foreground">
-          {data.plan ? text.editPlan : text.planMissing}
-        </p>
-        <form
-          action={saveMemorizationPlanAction.bind(null, locale)}
-          className="grid gap-4 sm:grid-cols-2"
-        >
-          <input type="hidden" name="studentId" value={data.student.id} />
-          <input type="hidden" name="returnToProfile" value="true" />
-          <PlanField
-            id="weekly"
-            name="weeklyTargetPages"
-            label={text.weekly}
-            defaultValue={data.plan?.weekly_target_pages ?? 4}
-            min={1}
-          />
-          <PlanField
-            id="monthly"
-            name="monthlyTargetPages"
-            label={text.monthly}
-            defaultValue={data.plan?.monthly_target_pages ?? 16}
-            min={1}
-          />
-          <PlanField
-            id="starts"
-            name="startsOn"
-            label={text.starts}
-            defaultValue={data.plan?.starts_on ?? new Date().toISOString().slice(0, 10)}
-            type="date"
-          />
-          <PlanField
-            id="ends"
-            name="endsOn"
-            label={`${text.ends} · ${text.optional}`}
-            defaultValue={data.plan?.ends_on ?? ""}
-            type="date"
-          />
-          <div className="sm:col-span-2">
-            <AdminSubmitButton label={text.save} pendingLabel={text.saving} />
+    <div className="grid gap-5">
+      <QuranBaselineForm
+        locale={locale}
+        studentId={data.student.id}
+        role="teacher"
+        surahs={data.quranLocations}
+        baseline={data.quranBaseline}
+      />
+      <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
+        <TeacherPanel title={text.plan}>
+          <div className="grid gap-5">
+            <Achievement
+              label={text.actualWeekly}
+              achieved={data.adherence?.weekly_achieved_pages ?? 0}
+              target={data.plan?.weekly_target_pages ?? 0}
+              percent={adherence}
+            />
+            <Achievement
+              label={text.actualMonthly}
+              achieved={data.adherence?.monthly_achieved_pages ?? 0}
+              target={data.plan?.monthly_target_pages ?? 0}
+              percent={monthly}
+            />
           </div>
-        </form>
-      </TeacherPanel>
+        </TeacherPanel>
+        <TeacherPanel title={text.editPlan}>
+          <p className="mb-4 text-sm leading-6 text-muted-foreground">
+            {data.plan ? text.editPlan : text.planMissing}
+          </p>
+          <OneMonthPlanForm
+            locale={locale}
+            studentId={data.student.id}
+            initialMonthlyTarget={data.plan?.monthly_target_pages ?? 16}
+            initialStart={data.plan?.starts_on ?? new Date().toISOString().slice(0, 10)}
+            saveLabel={data.plan ? (locale === "ar" ? "تحديث الخطة" : "Update plan") : text.save}
+            savingLabel={text.saving}
+          />
+        </TeacherPanel>
+      </div>
     </div>
   );
 }
@@ -894,36 +942,6 @@ function Notes({
   );
 }
 
-function PlanField({
-  id,
-  name,
-  label,
-  defaultValue,
-  min,
-  type = "number",
-}: {
-  id: string;
-  name: string;
-  label: string;
-  defaultValue: string | number;
-  min?: number;
-  type?: "number" | "date";
-}) {
-  return (
-    <div>
-      <Label htmlFor={`${id}-${name}`}>{label}</Label>
-      <Input
-        id={`${id}-${name}`}
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        min={min}
-        required={name !== "endsOn"}
-        className="mt-1.5"
-      />
-    </div>
-  );
-}
 function Achievement({
   label,
   achieved,

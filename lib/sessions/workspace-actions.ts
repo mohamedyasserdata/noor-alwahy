@@ -12,7 +12,7 @@ import { isAllowedZoomUrl } from "@/lib/validators/teacher-zoom";
 
 const zoomSchema = z.object({
   sessionId: z.uuid(),
-  action: z.enum(["publish", "unpublish"]),
+  action: z.enum(["submit", "unpublish"]),
   joinUrl: z.string().trim().max(2048),
 });
 
@@ -28,7 +28,7 @@ export async function manageSessionZoomAction(localeValue: string, formData: For
   });
   if (
     !parsed.success ||
-    (parsed.data.action === "publish" && !isAllowedZoomUrl(parsed.data.joinUrl))
+    (parsed.data.action === "submit" && !isAllowedZoomUrl(parsed.data.joinUrl))
   ) {
     go(locale, String(formData.get("sessionId") ?? ""), "zoomError", "invalid_fields");
   }
@@ -37,7 +37,7 @@ export async function manageSessionZoomAction(localeValue: string, formData: For
   const { error } = await supabase.rpc("manage_session_zoom", {
     p_session_id: parsed.data.sessionId,
     p_action: parsed.data.action,
-    p_join_url: parsed.data.action === "publish" ? parsed.data.joinUrl : undefined,
+    p_join_url: parsed.data.action === "submit" ? parsed.data.joinUrl : undefined,
   });
   if (error) {
     const code = ["session_forbidden", "session_not_publishable", "invalid_zoom_url"].find((item) =>

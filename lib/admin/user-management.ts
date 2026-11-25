@@ -47,3 +47,40 @@ export async function getManagedUsers(): Promise<ManagedUser[]> {
     role: profile.role,
   }));
 }
+
+export async function getManagedAccountSetupOptions() {
+  await connection();
+  const supabase = await createClient();
+  const [packages, countries, tracks, students] = await Promise.all([
+    supabase
+      .from("packages")
+      .select("id,name_ar,name_en")
+      .eq("is_active", true)
+      .eq("is_published", true)
+      .order("sort_order"),
+    supabase
+      .from("countries")
+      .select("code,name_ar,name_en,currency")
+      .eq("is_enabled", true)
+      .order("code"),
+    supabase
+      .from("tracks")
+      .select("id,name_ar,name_en")
+      .eq("is_active", true)
+      .order("sort_order")
+      .limit(1),
+    supabase
+      .from("students")
+      .select("id,full_name,student_no,status")
+      .neq("status", "archived")
+      .order("full_name"),
+  ]);
+  if (packages.error || countries.error || tracks.error || students.error)
+    throw new Error("managed_account_options_unavailable");
+  return {
+    packages: packages.data ?? [],
+    countries: countries.data ?? [],
+    track: tracks.data?.[0] ?? null,
+    students: students.data ?? [],
+  };
+}

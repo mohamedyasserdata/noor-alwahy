@@ -1,5 +1,6 @@
 "use server";
 
+import { DateTime } from "luxon";
 import type { Route } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -7,12 +8,13 @@ import { z } from "zod";
 
 import { routing, type AppLocale } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/require-role";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { wallClockToUtc } from "@/lib/time";
 import {
   makeupSessionSchema,
   rescheduleSessionSchema,
-  scheduleSlotSchema,
+  scheduleSlotBatchSchema,
   substituteSessionSchema,
 } from "@/lib/validators/schedules";
 
@@ -24,31 +26,54 @@ export async function saveScheduleSlotAction(
     ? (localeValue as AppLocale)
     : routing.defaultLocale;
   await requireRole("admin", locale);
-  const parsed = scheduleSlotSchema.safeParse({
+  const parsed = scheduleSlotBatchSchema.safeParse({
     assignmentId: formData.get("assignmentId"),
-    weekday: formData.get("weekday"),
+    weekdays: formData.getAll("weekdays"),
     localStartTime: formData.get("localStartTime"),
     durationMin: formData.get("durationMin"),
-    anchorTimezone: formData.get("anchorTimezone"),
   });
   if (!parsed.success) go(locale, "scheduleError", "invalid_fields");
   const value = parsed.data;
   const supabase = await createClient();
-  const { error } = await supabase.from("schedule_slots").insert({
-    assignment_id: value.assignmentId,
-    weekday: value.weekday,
-    local_start_time: value.localStartTime,
-    duration_min: value.durationMin,
-    anchor_timezone: value.anchorTimezone,
-  });
+  const { data: assignment } = await supabase
+    .from("teacher_assignments")
+    .select("student_id,teacher_id")
+    .eq("id", value.assignmentId)
+    .maybeSingle();
+  const { error } = await supabase.from("schedule_slots").insert(
+    value.weekdays.map((weekday) => ({
+      assignment_id: value.assignmentId,
+      weekday,
+      local_start_time: value.localStartTime,
+      duration_min: value.durationMin,
+      anchor_timezone: "Africa/Cairo",
+    })),
+  );
   if (error)
     go(
       locale,
       "scheduleError",
       error.message.includes("duplicate") ? "duplicate" : "request_failed",
     );
+  const generationStart = DateTime.now().setZone("Africa/Cairo").toISODate();
+  if (generationStart) {
+    const { error: generationError } = await createAdminClient().rpc("generate_sessions", {
+      p_window_start: generationStart,
+      p_horizon_days: 28,
+    });
+    if (generationError) {
+      console.error("schedule_session_generation_failed", generationError.message);
+    }
+  }
   for (const portal of ["admin", "teacher", "student", "parent"]) {
     revalidatePath(`/${locale}/${portal}/schedule`);
+  }
+  revalidatePath(`/${locale}/teacher/today`);
+  revalidatePath(`/${locale}/student/home`);
+  revalidatePath(`/${locale}/parent/home`);
+  if (assignment) {
+    revalidatePath(`/${locale}/admin/students/${assignment.student_id}`);
+    revalidatePath(`/${locale}/admin/teachers/${assignment.teacher_id}`);
   }
   go(locale, "scheduleStatus", "saved");
 }

@@ -60,7 +60,7 @@ export const packageWizardSchema = z
     name_en: z.string().trim().max(160).optional().default(""),
     description_ar: z.string().trim().max(4000).optional().default(""),
     description_en: z.string().trim().max(4000).optional().default(""),
-    audience: z.enum(["child", "adult", "women"]),
+    audience: z.enum(["all", "child", "adult", "women"]),
     teacher_gender: z.enum(["male", "female", ""]),
     sessions_per_week: z.number().int().min(1).max(14),
     duration_min: z.number().int().min(10).max(120),

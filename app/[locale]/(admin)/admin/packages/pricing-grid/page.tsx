@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { PricingGrid } from "@/components/packages/pricing-grid";
 import { routing } from "@/i18n/routing";
 
+export const instant = false;
+
 export default async function PricingGridPage({
   params,
   searchParams,

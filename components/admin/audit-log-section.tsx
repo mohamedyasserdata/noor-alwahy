@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   auditActions,
   getAuditFieldChanges,
@@ -26,10 +25,7 @@ type AuditLogSectionProps = {
 type AuditTranslations = Awaited<ReturnType<typeof getTranslations>>;
 
 export async function AuditLogSection({ locale, searchParams }: AuditLogSectionProps) {
-  const [portalT, auditT] = await Promise.all([
-    getTranslations({ locale, namespace: "portals.admin.sections.audit" }),
-    getTranslations({ locale, namespace: "auditLog" }),
-  ]);
+  const auditT = await getTranslations({ locale, namespace: "auditLog" });
 
   return (
     <section className="mx-auto w-full max-w-6xl" aria-labelledby="portal-page-title">
@@ -41,10 +37,12 @@ export async function AuditLogSection({ locale, searchParams }: AuditLogSectionP
           id="portal-page-title"
           className="text-3xl font-black tracking-tight text-balance text-primary sm:text-4xl lg:text-5xl"
         >
-          {portalT("title")}
+          {locale === "ar" ? "سجل الأمان" : "Security log"}
         </h1>
         <p className="mt-4 text-base leading-8 text-pretty text-muted-foreground sm:text-lg">
-          {portalT("description")}
+          {locale === "ar"
+            ? "مراجعة واضحة للعمليات المهمة: من نفذها، ومتى، وما الذي تغير."
+            : "A clear review of important actions: who performed them, when, and what changed."}
         </p>
       </header>
 
@@ -130,7 +128,7 @@ function AuditLogFilters({
 }) {
   return (
     <form
-      action={`/${locale}/admin/audit`}
+      action={`/${locale}/admin/settings`}
       className="rounded-2xl border bg-card p-5 shadow-card sm:p-6"
       data-testid="audit-log-filters"
     >
@@ -141,7 +139,8 @@ function AuditLogFilters({
         <h2 className="text-lg font-black text-primary">{t("filters.title")}</h2>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-3">
+      <input type="hidden" name="panel" value="security-log" />
+      <div className="mt-5 grid gap-4 md:max-w-md">
         <label className="grid gap-2 text-sm font-bold text-foreground" htmlFor="audit-action">
           {t("filters.action")}
           <select
@@ -158,34 +157,6 @@ function AuditLogFilters({
             ))}
           </select>
         </label>
-
-        <label className="grid gap-2 text-sm font-bold text-foreground" htmlFor="audit-table">
-          {t("filters.table")}
-          <Input
-            id="audit-table"
-            name="table"
-            defaultValue={filters.tableName}
-            placeholder={t("filters.tablePlaceholder")}
-            dir="ltr"
-            maxLength={63}
-            autoComplete="off"
-            spellCheck={false}
-          />
-        </label>
-
-        <label className="grid gap-2 text-sm font-bold text-foreground" htmlFor="audit-record">
-          {t("filters.record")}
-          <Input
-            id="audit-record"
-            name="record"
-            defaultValue={filters.recordId}
-            placeholder={t("filters.recordPlaceholder")}
-            dir="ltr"
-            maxLength={128}
-            autoComplete="off"
-            spellCheck={false}
-          />
-        </label>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3">
@@ -196,7 +167,7 @@ function AuditLogFilters({
           {t("filters.apply")}
         </button>
         <Link
-          href={`/${locale}/admin/audit`}
+          href={`/${locale}/admin/settings?panel=security-log`}
           className="inline-flex min-h-11 touch-manipulation items-center justify-center rounded-lg border bg-background px-5 text-sm font-extrabold text-primary transition-colors outline-none hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
         >
           {t("filters.clear")}
@@ -231,14 +202,16 @@ function AuditLogCards({
               <div>
                 <Badge variant={actionVariant(entry.action)}>{actionLabel(t, entry.action)}</Badge>
                 <p className="mt-3 font-black text-primary">
-                  <bdi>{entry.table_name ?? t("unknownRecord")}</bdi>
+                  <bdi>{entityLabel(locale, entry.table_name, t("unknownRecord"))}</bdi>
                 </p>
                 <p
                   className="mt-1 text-xs break-all text-muted-foreground tabular-nums"
                   dir="ltr"
                   translate="no"
                 >
-                  {entry.record_id ?? t("unknownRecord")}
+                  {entry.record_id
+                    ? `${locale === "ar" ? "رقم السجل" : "Record"}: ${entry.record_id.slice(0, 12)}`
+                    : t("unknownRecord")}
                 </p>
               </div>
               <time
@@ -301,14 +274,16 @@ function AuditLogTable({
               <td className="px-5 py-5">
                 <Badge variant={actionVariant(entry.action)}>{actionLabel(t, entry.action)}</Badge>
                 <p className="mt-2 font-bold text-primary">
-                  <bdi>{entry.table_name ?? t("unknownRecord")}</bdi>
+                  <bdi>{entityLabel(locale, entry.table_name, t("unknownRecord"))}</bdi>
                 </p>
                 <p
                   className="mt-1 max-w-56 truncate text-xs text-muted-foreground tabular-nums"
                   dir="ltr"
                   translate="no"
                 >
-                  {entry.record_id ?? t("unknownRecord")}
+                  {entry.record_id
+                    ? `${locale === "ar" ? "رقم السجل" : "Record"}: ${entry.record_id.slice(0, 12)}`
+                    : t("unknownRecord")}
                 </p>
               </td>
               <td className="min-w-72 px-5 py-5">
@@ -458,7 +433,35 @@ function actorLabel(t: AuditTranslations, actors: Record<string, string>, userId
 function fieldLabel(t: AuditTranslations, field: string) {
   if (field === "role") return t("fields.role");
   if (field === "is_active") return t("fields.is_active");
-  return field.replaceAll("_", " ");
+  const labels: Record<string, string> = {
+    status: "الحالة",
+    full_name: "الاسم",
+    teacher_id: "المعلم",
+    student_id: "الطالب",
+    scheduled_at: "موعد الحصة",
+    amount: "المبلغ",
+  };
+  return labels[field] ?? field.replaceAll("_", " ");
+}
+
+function entityLabel(locale: AppLocale, table: string | null, fallback: string) {
+  if (!table) return fallback;
+  const labels: Record<string, [string, string]> = {
+    profiles: ["الحسابات", "Accounts"],
+    students: ["الطلاب", "Students"],
+    teachers: ["المعلمون", "Teachers"],
+    teacher_assignments: ["تعيين الطلاب", "Student assignments"],
+    schedule_slots: ["الجداول", "Schedules"],
+    sessions: ["الحصص", "Sessions"],
+    attendance: ["حضور الطلاب", "Student attendance"],
+    teacher_attendance: ["حضور المعلمين", "Teacher attendance"],
+    reports: ["التقارير", "Reports"],
+    subscriptions: ["الاشتراكات", "Subscriptions"],
+    certificates: ["الشهادات", "Certificates"],
+    packages: ["الباقات", "Packages"],
+  };
+  const label = labels[table];
+  return label ? label[locale === "ar" ? 0 : 1] : table.replaceAll("_", " ");
 }
 
 function formatAuditValue(
@@ -483,8 +486,7 @@ function formatAuditTime(locale: AppLocale, value: string) {
 function auditPageHref(locale: AppLocale, filters: AuditLogFilters, page: number) {
   const params = new URLSearchParams();
   if (filters.action) params.set("action", filters.action);
-  if (filters.tableName) params.set("table", filters.tableName);
-  if (filters.recordId) params.set("record", filters.recordId);
+  params.set("panel", "security-log");
   params.set("page", String(page));
-  return `/${locale}/admin/audit?${params.toString()}` as Route;
+  return `/${locale}/admin/settings?${params.toString()}` as Route;
 }

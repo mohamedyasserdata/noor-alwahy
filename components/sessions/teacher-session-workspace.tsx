@@ -56,23 +56,25 @@ const copy = {
     makeup: "تعويضية",
     extra: "إضافية",
     zoomTitle: "رابط Zoom للحصة",
-    zoomPublished: "منشور للطالب المصرح له",
-    zoomHidden: "غير منشور",
+    zoomPublished: "وافقت الإدارة ونُشر للطالب",
+    zoomHidden: "لم يُرسل للمراجعة",
+    zoomPending: "بانتظار موافقة الإدارة",
+    zoomRejected: "أعادته الإدارة للتعديل",
     zoomHelp:
       "يُتاح الرابط للطالب فقط داخل نافذة الانضمام المعتمدة، ولا يُستخدم رابط المعلم العام تلقائيًا.",
     zoomUrl: "رابط دخول المشارك",
-    reviewPublish: "مراجعة نشر الرابط",
+    reviewPublish: "إرسال الرابط لمراجعة الإدارة",
     reviewUnpublish: "مراجعة إلغاء النشر",
     operation: "العملية",
     result: "النتيجة",
     audience: "الجمهور",
-    publish: "نشر الرابط للحصة",
-    publishing: "جارٍ النشر…",
+    publish: "إرسال الرابط للمراجعة",
+    publishing: "جارٍ الإرسال…",
     unpublish: "إلغاء نشر الرابط",
     unpublishing: "جارٍ إلغاء النشر…",
     audienceValue: "هذا الطالب فقط",
     groupAudienceValue: "جميع الطلاب المسجلين في الحصة ({count})",
-    publishResult: "سيصبح زر دخول الحصة متاحًا داخل نافذة الوقت.",
+    publishResult: "ستراجعه الإدارة أولًا، ولن يصل للطالب قبل الموافقة.",
     unpublishResult: "سيتوقف الطالب عن استلام الرابط فورًا مع بقاء سجل الحصة.",
     openZoom: "فتح Zoom",
     attendanceTitle: "حضور الطالب",
@@ -108,7 +110,7 @@ const copy = {
     evaluationWaitAttendance: "سجّل حضور الطالب أولًا، ثم أنهِ الحصة لفتح التقييم.",
     evaluationAbsent: "تم تسجيل الغياب؛ لا يلزم إنشاء تسميع أو درجة وهمية.",
     evaluationReady: "أكمل التقييم ثم اعتمده لينعكس على ملف الطالب وصفحة التقدم.",
-    zoomSuccessPublish: "نُشر رابط الحصة بنجاح.",
+    zoomSuccessPublish: "أُرسل رابط الحصة إلى الإدارة للمراجعة.",
     zoomSuccessUnpublish: "أُلغي نشر رابط الحصة مع الاحتفاظ به في سجلها.",
     sessionStarted: "بدأت الحصة.",
     sessionEnded: "انتهت الحصة وأصبح توثيق التقييم متاحًا.",
@@ -140,23 +142,25 @@ const copy = {
     makeup: "Makeup",
     extra: "Extra",
     zoomTitle: "Session Zoom link",
-    zoomPublished: "Published to the authorized student",
-    zoomHidden: "Not published",
+    zoomPublished: "Approved by administration and published",
+    zoomHidden: "Not submitted",
+    zoomPending: "Awaiting administration approval",
+    zoomRejected: "Returned for correction",
     zoomHelp:
       "The student receives the link only in the approved join window. The teacher's general link is never used automatically.",
     zoomUrl: "Participant join URL",
-    reviewPublish: "Review link publication",
+    reviewPublish: "Submit link for administration review",
     reviewUnpublish: "Review unpublishing",
     operation: "Operation",
     result: "Result",
     audience: "Audience",
-    publish: "Publish for this session",
-    publishing: "Publishing…",
+    publish: "Submit link for review",
+    publishing: "Submitting…",
     unpublish: "Unpublish link",
     unpublishing: "Unpublishing…",
     audienceValue: "This student only",
     groupAudienceValue: "All registered session students ({count})",
-    publishResult: "The join button will become available inside the approved time window.",
+    publishResult: "Administration reviews it first; the student cannot see it before approval.",
     unpublishResult:
       "The student will immediately stop receiving the link while session history remains.",
     openZoom: "Open Zoom",
@@ -194,7 +198,7 @@ const copy = {
     evaluationAbsent: "Absence is recorded; no fake recitation or zero score is required.",
     evaluationReady:
       "Complete and approve the evaluation to update the student profile and progress page.",
-    zoomSuccessPublish: "The session link was published.",
+    zoomSuccessPublish: "The session link was submitted for administration review.",
     zoomSuccessUnpublish: "The session link was unpublished while its history was retained.",
     sessionStarted: "The session started.",
     sessionEnded: "The session ended and evaluation is now available.",
@@ -227,7 +231,7 @@ export function TeacherSessionWorkspace({
   const attendance = session.attendance?.status;
   const isAbsent = attendance === "student_absent" || attendance === "student_excused";
   const success =
-    query.zoomStatus === "publish"
+    query.zoomStatus === "submit"
       ? text.zoomSuccessPublish
       : query.zoomStatus === "unpublish"
         ? text.zoomSuccessUnpublish
@@ -309,8 +313,24 @@ export function TeacherSessionWorkspace({
         <TeacherPanel
           title={text.zoomTitle}
           action={
-            <Badge variant={data.zoom.is_published ? "success" : "outline"}>
-              {data.zoom.is_published ? text.zoomPublished : text.zoomHidden}
+            <Badge
+              variant={
+                data.zoom.is_published
+                  ? "success"
+                  : session.zoomReviewStatus === "pending"
+                    ? "warning"
+                    : session.zoomReviewStatus === "rejected"
+                      ? "destructive"
+                      : "outline"
+              }
+            >
+              {data.zoom.is_published
+                ? text.zoomPublished
+                : session.zoomReviewStatus === "pending"
+                  ? text.zoomPending
+                  : session.zoomReviewStatus === "rejected"
+                    ? text.zoomRejected
+                    : text.zoomHidden}
             </Badge>
           }
         >
@@ -334,7 +354,7 @@ export function TeacherSessionWorkspace({
                   className="mt-4 grid gap-3"
                 >
                   <input type="hidden" name="sessionId" value={session.id} />
-                  <input type="hidden" name="action" value="publish" />
+                  <input type="hidden" name="action" value="submit" />
                   <Label htmlFor="session-zoom-url">{text.zoomUrl}</Label>
                   <Input
                     id="session-zoom-url"

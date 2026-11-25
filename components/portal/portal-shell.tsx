@@ -6,6 +6,7 @@ import { AccountMenu } from "@/components/account/account-menu";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { NotificationCenter } from "@/components/notifications/notification-center";
+import { ParentChildSwitcher } from "@/components/parent/parent-child-switcher";
 import type { PortalId } from "@/components/portal/portal-config";
 import { PortalNavigation } from "@/components/portal/portal-navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -13,6 +14,7 @@ import type { AppLocale } from "@/i18n/routing";
 import type { UserRole } from "@/lib/auth/roles";
 import { getPublicAppSettings } from "@/lib/settings/public-settings";
 import { getNotificationCenter } from "@/lib/notifications/queries";
+import { getGuardianPortalContext } from "@/lib/parent/children";
 import { cn } from "@/lib/utils";
 
 type PortalShellProps = {
@@ -28,10 +30,11 @@ type PortalShellProps = {
 };
 
 export async function PortalShell({ account, children, locale, portal }: PortalShellProps) {
-  const [t, settings, notificationCenter] = await Promise.all([
+  const [t, settings, notificationCenter, parentContext] = await Promise.all([
     getTranslations({ locale, namespace: "portals" }),
     getPublicAppSettings(),
     getNotificationCenter(),
+    portal === "parent" ? getGuardianPortalContext() : Promise.resolve(null),
   ]);
   const academyName =
     locale === "ar" ? settings.academyProfile.nameAr : settings.academyProfile.nameEn;
@@ -84,7 +87,23 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
               labelClassName="hidden max-w-48 text-base leading-6 min-[560px]:block"
             />
 
-            <div className="hidden min-w-0 px-2 min-[980px]:block">
+            <div className="hidden min-w-0 items-center gap-3 px-2 min-[980px]:flex">
+              {parentContext ? (
+                <Suspense
+                  fallback={
+                    <span className="h-11 w-44 rounded-xl border bg-card" aria-hidden="true" />
+                  }
+                >
+                  <ParentChildSwitcher
+                    options={parentContext.children.map((child) => ({
+                      id: child.id,
+                      name: child.name,
+                    }))}
+                    compact
+                    locale={locale}
+                  />
+                </Suspense>
+              ) : null}
               <PortalNavigation portal={portal} variant="top" />
             </div>
 
@@ -113,6 +132,24 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
                 portal === "student" && "hidden",
               )}
             >
+              {parentContext ? (
+                <div className="mb-1.5 flex justify-center">
+                  <Suspense
+                    fallback={
+                      <span className="h-11 w-48 rounded-xl border bg-card" aria-hidden="true" />
+                    }
+                  >
+                    <ParentChildSwitcher
+                      options={parentContext.children.map((child) => ({
+                        id: child.id,
+                        name: child.name,
+                      }))}
+                      compact
+                      locale={locale}
+                    />
+                  </Suspense>
+                </div>
+              ) : null}
               <PortalNavigation portal={portal} variant="top" />
             </div>
           </div>

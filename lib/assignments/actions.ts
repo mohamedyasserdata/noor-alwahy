@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
-import { assignmentActionSchema } from "@/lib/validators/assignments";
+import { assignmentActionSchema, assignmentWithScheduleSchema } from "@/lib/validators/assignments";
 
 export async function manageAssignmentAction(
   localeValue: string,
@@ -48,6 +48,58 @@ export async function manageAssignmentAction(
   revalidatePath(`/${locale}/admin/teachers/${value.teacherId}`);
   revalidatePath(`/${locale}/admin/dashboard`);
   go(locale, "assignmentStatus", value.action);
+}
+
+export async function assignTeacherWithScheduleAction(
+  localeValue: string,
+  formData: FormData,
+): Promise<never> {
+  const locale = routing.locales.includes(localeValue as AppLocale)
+    ? (localeValue as AppLocale)
+    : routing.defaultLocale;
+  await requireRole("admin", locale);
+  const parsed = assignmentWithScheduleSchema.safeParse({
+    studentId: formData.get("studentId"),
+    teacherId: formData.get("teacherId"),
+    trackId: formData.get("trackId"),
+    action: formData.get("action"),
+    reason: formData.get("reason"),
+    weekdays: formData.getAll("weekdays"),
+    localStartTime: formData.get("localStartTime"),
+    durationMin: formData.get("durationMin"),
+    createSchedule: formData.get("createSchedule"),
+  });
+  if (!parsed.success) go(locale, "assignmentError", "invalid_fields");
+  const value = parsed.data;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("assign_teacher_with_schedule", {
+    p_action: value.action,
+    p_create_schedule: value.createSchedule,
+    p_duration_min: value.durationMin,
+    p_local_start_time: value.localStartTime,
+    p_reason: value.reason,
+    p_student: value.studentId,
+    p_teacher: value.teacherId,
+    p_track: value.trackId,
+    p_weekdays: value.weekdays,
+  });
+  if (error) {
+    const code = error.message.includes("gender_mismatch")
+      ? "gender_mismatch"
+      : error.message.includes("capacity")
+        ? "capacity_reached"
+        : error.message.includes("weekly_schedule_conflict")
+          ? "schedule_conflict"
+          : "request_failed";
+    go(locale, "assignmentError", code);
+  }
+  revalidatePath(`/${locale}/admin/assignments`);
+  revalidatePath(`/${locale}/admin/students`);
+  revalidatePath(`/${locale}/admin/students/${value.studentId}`);
+  revalidatePath(`/${locale}/admin/teachers/${value.teacherId}`);
+  revalidatePath(`/${locale}/admin/schedule`);
+  revalidatePath(`/${locale}/admin/dashboard`);
+  go(locale, "assignmentStatus", value.createSchedule ? "assigned_with_schedule" : "assign");
 }
 
 function go(locale: AppLocale, key: string, value: string): never {

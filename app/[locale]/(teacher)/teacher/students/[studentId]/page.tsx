@@ -49,6 +49,8 @@ export default async function TeacherStudentProfilePage({
         : undefined;
   const noteNotice =
     query.noteStatus === "saved" ? "saved" : query.noteStatus === "error" ? "error" : undefined;
+  const baselineNotice =
+    query.baselineStatus === "saved" ? "saved" : query.baselineError ? "error" : undefined;
   return (
     <TeacherStudentProfile
       data={data}
@@ -57,6 +59,7 @@ export default async function TeacherStudentProfilePage({
       notice={notice}
       reportNotice={reportNotice}
       noteNotice={noteNotice}
+      baselineNotice={baselineNotice}
       reportsData={reportsData}
     />
   );

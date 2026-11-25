@@ -932,7 +932,7 @@
     "form": {
       "createTitle": "Add a student",
       "editTitle": "Edit student",
-      "description": "Core details and sensitive notes are saved atomically."
+      "description": "Enter the essential details only. The student is created as active today, then you can create their account and link a parent."
     },
     "fields": {
       "fullName": "Full name",
@@ -991,7 +991,8 @@
         "linked": "The parent was linked to this student.",
         "unlinked": "The parent link was removed.",
         "parent_created": "The parent account was created and linked.",
-        "student_created": "The student account was created and linked."
+        "student_created": "The student account was created and linked.",
+        "student_invited": "The student record and account were created from the application, and a password setup link was sent."
       },
       "errors": {
         "invalidFields": "Review the family and account details, then try again.",
@@ -1795,7 +1796,7 @@
     "description": "{name}'s memorisation record, recitations, teacher notes, and pages that need review.",
     "mapPageEyebrow": "Complete map",
     "mapPageTitle": "Quran map",
-    "mapPageDescription": "Browse all 30 juz and open any page to see its memorisation status, latest review, and evaluation results.",
+    "mapPageDescription": "Browse surahs in Quran order and see what you have completed, mastered, and need to review.",
     "backToProgress": "Back to progress details",
     "mapTitle": "Madinah Mushaf pages",
     "journeyProgressLabel": "Quran pages mastered",
@@ -1828,6 +1829,44 @@
       "lastReviewed": "Last reviewed",
       "average": "Review average",
       "evaluations": "Evaluation count"
+    },
+    "surahMap": {
+      "overallLabel": "Total mastered",
+      "started": "Studied",
+      "mastered": "Mastered",
+      "review": "To review",
+      "search": "Search by surah name or number",
+      "filterLabel": "Filter surahs by progress",
+      "filters": {
+        "all": "All surahs",
+        "started": "In progress",
+        "review": "Needs review",
+        "mastered": "Completed"
+      },
+      "title": "Surahs of the Quran",
+      "description": "Each surah has a clear summary; open it for page status and review details.",
+      "resultCount": "{count} surahs",
+      "pageRange": "Pages {first}–{last} · {count} pages",
+      "completedValue": "Completed {count}",
+      "masteredValue": "Mastered {count}",
+      "reviewValue": "Review {count}",
+      "mastery": "Mastery",
+      "emptyTitle": "No matching surah",
+      "emptyDescription": "Change the search or choose another status."
+    },
+    "surahDetail": {
+      "eyebrow": "Surah details",
+      "description": "Track {count} pages and see which ones need reinforcement and review.",
+      "back": "Back to surah list",
+      "mastery": "Mastery rate",
+      "pages": "Surah pages",
+      "completed": "Pages studied",
+      "masteredPages": "Pages mastered",
+      "reviewPages": "Needs review",
+      "pageStatusTitle": "Surah page status",
+      "pageStatusDescription": "Statuses update from memorisation and evaluation results recorded in the system.",
+      "page": "Page {page}",
+      "juz": "Juz {juz}"
     }
   },
   "applicationCrm": {
@@ -1859,6 +1898,9 @@
     "none": "No recommendation",
     "placementNotes": "Placement notes",
     "savePlacement": "Save placement",
+    "saveAndCreateAccount": "Save placement and create account",
+    "creatingAccount": "Creating student and account…",
+    "accountEmailRequired": "Add an email address to the application before creating the student account.",
     "convert": "Convert to student",
     "openStudent": "Open student record",
     "converting": "Converting…",
@@ -1898,7 +1940,10 @@
       "invalid_placement": "Review the placement scores and recommendations.",
       "placement_failed": "The placement could not be saved.",
       "not_accepted": "Accept the application before conversion.",
-      "conversion_failed": "The application could not be converted to a student."
+      "conversion_failed": "The application could not be converted to a student.",
+      "email_required": "A student account cannot be created without an email address.",
+      "account_exists": "An account already uses this email. Review accounts before trying again.",
+      "account_failed": "The placement was saved, but the sign-in account could not be created. Review the email and try again."
     }
   },
   "applicationsPublic": {
@@ -2246,7 +2291,12 @@
       "trialEnabled": "Enable trial session",
       "trialPrice": "Trial price percentage"
     },
-    "audiences": { "child": "Children", "adult": "Adults", "women": "Women" },
+    "audiences": {
+      "all": "All students",
+      "child": "Children",
+      "adult": "Adults",
+      "women": "Women"
+    },
     "genders": { "male": "Male teacher", "female": "Female teacher" },
     "billing": { "monthly": "Monthly", "quarterly": "Quarterly", "yearly": "Yearly" },
     "optional": "Optional",

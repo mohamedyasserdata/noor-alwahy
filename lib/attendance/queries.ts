@@ -69,9 +69,9 @@ export async function getTeacherTodaySessions() {
       .eq("status", "active"),
     supabase
       .from("reports")
-      .select("student_id")
+      .select("student_id,status")
       .eq("teacher_id", teacher.id)
-      .gte("period_end", localNow.minus({ days: 7 }).toISODate()),
+      .in("status", ["draft", "admin_review"]),
   ]);
   if (sessionsResult.error || assignmentsResult.error || recentReportsResult.error) {
     throw new Error("teacher_day_unavailable");
@@ -142,11 +142,10 @@ export async function getTeacherTodaySessions() {
         )
         .map((session) => ({ id: session.id, studentName: session.students.full_name })),
       reportReminders: assignedStudents
-        .filter(
-          (assignment) =>
-            !(recentReportsResult.data ?? []).some(
-              (report) => report.student_id === assignment.student_id,
-            ),
+        .filter((assignment) =>
+          (recentReportsResult.data ?? []).some(
+            (report) => report.student_id === assignment.student_id,
+          ),
         )
         .map((assignment) => ({
           id: assignment.student_id,

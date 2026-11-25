@@ -48,3 +48,12 @@ export const revokeCertificateSchema = z.object({
   certificateId: z.uuid(),
   reason: z.string().trim().min(5).max(500),
 });
+
+export const uploadedCertificateSchema = z.object({
+  studentId: z.uuid(),
+  title: z.string().trim().min(2).max(180),
+  issuedOn: z.iso
+    .date()
+    .refine((value) => value <= new Date().toISOString().slice(0, 10), "issued_on_in_future")
+    .optional(),
+});

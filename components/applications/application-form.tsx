@@ -9,18 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
-import { legalDocumentVersion } from "@/lib/legal/documents";
 
 type Option = { id: string; name: string };
 type Country = { code: string; name: string };
 
 export function ApplicationForm({
-  tracks,
   packages,
   countries,
   siteKey,
 }: {
-  tracks: Option[];
   packages: Option[];
   countries: Country[];
   siteKey: string;
@@ -44,21 +41,16 @@ export function ApplicationForm({
         student_name: form.get("student_name"),
         student_gender: gender,
         student_age: Number(form.get("student_age")),
-        guardian_name: form.get("guardian_name"),
         contact_email: form.get("contact_email"),
         contact_phone: form.get("contact_phone"),
         country_code: form.get("country_code"),
-        timezone: form.get("timezone"),
-        track_id: form.get("track_id"),
         package_id: form.get("package_id"),
         self_level: form.get("self_level"),
         preferred_times: String(form.get("preferred_times") ?? "")
           .split(/\r?\n|,/)
           .map((item) => item.trim())
           .filter(Boolean),
-        preferred_teacher_gender: form.get("preferred_teacher_gender"),
         notes: form.get("notes"),
-        consent: form.get("consent") === "on",
         captcha_token: captcha,
         source: "application_page",
       };
@@ -131,7 +123,6 @@ export function ApplicationForm({
               { value: "female", label: t("female") },
             ]}
           />
-          <Field name="guardian_name" label={t("guardianName")} />
           <Field name="contact_email" label={t("email")} type="email" dir="ltr" />
           <Field name="contact_phone" label={t("phone")} type="tel" dir="ltr" />
         </fieldset>
@@ -144,21 +135,6 @@ export function ApplicationForm({
             label={t("country")}
             required
             options={countries.map((item) => ({ value: item.code, label: item.name }))}
-          />
-          <Field
-            name="timezone"
-            label={t("timezone")}
-            defaultValue={Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Cairo"}
-            dir="ltr"
-            required
-          />
-          <Select
-            name="track_id"
-            label={t("track")}
-            options={[
-              { value: "", label: t("noPreference") },
-              ...tracks.map((item) => ({ value: item.id, label: item.name })),
-            ]}
           />
           <Select
             name="package_id"
@@ -176,14 +152,6 @@ export function ApplicationForm({
               value,
               label: t(`levels.${value}`),
             }))}
-          />
-          <Select
-            name="preferred_teacher_gender"
-            label={t("teacherGender")}
-            options={[
-              { value: "", label: t("automatic") },
-              { value: gender, label: gender === "male" ? t("maleTeacher") : t("femaleTeacher") },
-            ]}
           />
         </fieldset>
         <div className="grid gap-2">
@@ -206,23 +174,6 @@ export function ApplicationForm({
             className="min-h-24 rounded-xl border bg-background p-3 leading-7"
           />
         </div>
-        <label className="flex items-start gap-3 rounded-xl border bg-background p-4 text-sm leading-7">
-          <input name="consent" type="checkbox" required className="mt-1 size-5 accent-primary" />
-          <span>
-            {t("consentPrefix")}{" "}
-            <Link href="/privacy" className="font-bold underline">
-              {t("privacyPolicy")}
-            </Link>{" "}
-            {t("and")}{" "}
-            <Link href="/terms" className="font-bold underline">
-              {t("terms")}
-            </Link>
-            . {t("consentSuffix")}
-            <span className="mt-1 block text-xs text-muted-foreground">
-              {t("consentVersion", { version: legalDocumentVersion })}
-            </span>
-          </span>
-        </label>
         {error ? (
           <p role="alert" className="font-bold text-destructive">
             {t(`errors.${error}` as "errors.submission_failed")}

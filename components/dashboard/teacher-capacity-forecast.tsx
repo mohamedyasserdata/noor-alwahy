@@ -34,9 +34,11 @@ export function TeacherCapacityForecast({ locale, data }: { locale: AppLocale; d
           <Badge variant={data.projectedBalance >= 0 ? "success" : "destructive"}>
             {ar ? "رصيد السعة" : "Capacity balance"}: {data.projectedBalance}
           </Badge>
-          <Badge variant="outline">
-            {ar ? "بانتظار التعيين" : "Waiting"}: {data.waitingStudents}
-          </Badge>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/students?workflow=awaiting_assignment">
+              {ar ? "طلاب بلا معلم" : "Unassigned students"}: {data.waitingStudents}
+            </Link>
+          </Button>
         </div>
       </header>
       {data.rows.length ? (
@@ -45,7 +47,9 @@ export function TeacherCapacityForecast({ locale, data }: { locale: AppLocale; d
             <article key={row.id} className="rounded-2xl border bg-background/50 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="font-black text-primary">{row.name}</h3>
+                  <h3 className="font-black text-primary">
+                    {ar ? `م. ${row.name}` : `T. ${row.name}`}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {ar
                       ? `${row.scheduledSessions} حصة مجدولة خلال 28 يومًا`

@@ -4,6 +4,8 @@ import { DateTime } from "luxon";
 import { connection } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { buildQuranLocationOptions } from "@/lib/quran/location-options";
+import { convertNextOccurrence } from "@/lib/schedules/conversion";
 
 const PAGE_SIZE = 8;
 
@@ -14,7 +16,7 @@ function one<T>(value: T | T[] | null): T | null {
 export type TeacherStudentFilters = {
   page?: number;
   q?: string;
-  status?: "all" | "active" | "dropped" | "graduated" | "suspended" | "archived";
+  status?: "all" | "active" | "inactive";
   followUp?: "all" | "regular" | "needs_follow_up" | "evaluation_pending";
   sort?: "name" | "next_session" | "recent_evaluation";
 };
@@ -40,7 +42,7 @@ export async function getTeacherStudents(filters: TeacherStudentFilters = {}) {
   const { data: assignments, error: assignmentsError } = await supabase
     .from("teacher_assignments")
     .select(
-      "student_id,created_at,students!teacher_assignments_student_id_fkey(id,full_name,student_no,status,timezone,level:levels(id,name_ar,name_en,track:tracks(name_ar,name_en)))",
+      "id,student_id,created_at,students!teacher_assignments_student_id_fkey(id,full_name,student_no,status,timezone,level:levels(id,name_ar,name_en,track:tracks(name_ar,name_en)))",
     )
     .eq("teacher_id", teacher.id)
     .eq("status", "active")
@@ -50,7 +52,8 @@ export async function getTeacherStudents(filters: TeacherStudentFilters = {}) {
   const query = (filters.q ?? "").trim().toLocaleLowerCase();
   const requestedStatus = filters.status ?? "all";
   const base = (assignments ?? []).filter((assignment) => {
-    if (requestedStatus !== "all" && assignment.students.status !== requestedStatus) return false;
+    if (requestedStatus === "active" && assignment.students.status !== "active") return false;
+    if (requestedStatus === "inactive" && assignment.students.status === "active") return false;
     if (!query) return true;
     return `${assignment.students.full_name} ${assignment.students.student_no}`
       .toLocaleLowerCase()
@@ -59,38 +62,54 @@ export async function getTeacherStudents(filters: TeacherStudentFilters = {}) {
   const studentIds = base.map((item) => item.student_id);
 
   const now = new Date().toISOString();
-  const [sessionsResult, plansResult, adherenceResult, reportsResult] = studentIds.length
-    ? await Promise.all([
-        supabase
-          .from("sessions")
-          .select(
-            "id,student_id,scheduled_at,ends_at,status,attendance(status),evaluation:session_evaluations(total_score,is_locked,updated_at)",
-          )
-          .in("student_id", studentIds)
-          .order("scheduled_at", { ascending: false })
-          .limit(Math.max(studentIds.length * 12, 40)),
-        supabase
-          .from("memorization_plans")
-          .select("student_id,weekly_target_pages,monthly_target_pages,starts_on,ends_on")
-          .in("student_id", studentIds),
-        supabase
-          .from("v_memorization_plan_adherence")
-          .select("student_id,weekly_adherence_percent,weekly_achieved_pages,weekly_target_pages")
-          .in("student_id", studentIds),
-        supabase
-          .from("reports")
-          .select("id,student_id,status,period_end,updated_at")
-          .eq("teacher_id", teacher.id)
-          .in("student_id", studentIds)
-          .order("updated_at", { ascending: false }),
-      ])
-    : [
-        { data: [], error: null },
-        { data: [], error: null },
-        { data: [], error: null },
-        { data: [], error: null },
-      ];
-  if (sessionsResult.error || plansResult.error || adherenceResult.error || reportsResult.error) {
+  const [sessionsResult, plansResult, adherenceResult, reportsResult, scheduleResult] =
+    studentIds.length
+      ? await Promise.all([
+          supabase
+            .from("sessions")
+            .select(
+              "id,student_id,scheduled_at,ends_at,status,attendance(status),evaluation:session_evaluations(total_score,is_locked,updated_at)",
+            )
+            .in("student_id", studentIds)
+            .order("scheduled_at", { ascending: false })
+            .limit(Math.max(studentIds.length * 12, 40)),
+          supabase
+            .from("memorization_plans")
+            .select("student_id,weekly_target_pages,monthly_target_pages,starts_on,ends_on")
+            .in("student_id", studentIds),
+          supabase
+            .from("v_memorization_plan_adherence")
+            .select("student_id,weekly_adherence_percent,weekly_achieved_pages,weekly_target_pages")
+            .in("student_id", studentIds),
+          supabase
+            .from("reports")
+            .select("id,student_id,status,period_end,updated_at")
+            .eq("teacher_id", teacher.id)
+            .in("student_id", studentIds)
+            .order("updated_at", { ascending: false }),
+          supabase
+            .from("schedule_slots")
+            .select("id,assignment_id,weekday,local_start_time,duration_min,anchor_timezone")
+            .in(
+              "assignment_id",
+              base.map((assignment) => assignment.id),
+            )
+            .eq("is_active", true),
+        ])
+      : [
+          { data: [], error: null },
+          { data: [], error: null },
+          { data: [], error: null },
+          { data: [], error: null },
+          { data: [], error: null },
+        ];
+  if (
+    sessionsResult.error ||
+    plansResult.error ||
+    adherenceResult.error ||
+    reportsResult.error ||
+    scheduleResult.error
+  ) {
     throw new Error("teacher_students_unavailable");
   }
 
@@ -114,9 +133,28 @@ export async function getTeacherStudents(filters: TeacherStudentFilters = {}) {
 
   let enriched = base.map((assignment) => {
     const sessions = sessionsByStudent.get(assignment.student_id) ?? [];
-    const nextSession = sessions
+    const nextRecordedSession = sessions
       .filter((session) => session.scheduled_at >= now && session.status === "scheduled")
       .toSorted((left, right) => left.scheduled_at.localeCompare(right.scheduled_at))[0];
+    const nextWeeklySlot = (scheduleResult.data ?? [])
+      .filter((slot) => slot.assignment_id === assignment.id)
+      .map((slot) => {
+        const occurrence = convertNextOccurrence({
+          weekday: slot.weekday,
+          time: slot.local_start_time,
+          anchorTimezone: slot.anchor_timezone,
+          viewerTimezone: "Africa/Cairo",
+        });
+        if (!occurrence) return null;
+        let start = DateTime.fromISO(occurrence.isoLocal, { setZone: true });
+        if (start.plus({ minutes: slot.duration_min }) < DateTime.now().setZone("Africa/Cairo")) {
+          start = start.plus({ days: 7 });
+        }
+        return { id: slot.id, scheduled_at: start.toUTC().toISO()! };
+      })
+      .filter((slot): slot is NonNullable<typeof slot> => Boolean(slot))
+      .sort((left, right) => left.scheduled_at.localeCompare(right.scheduled_at))[0];
+    const nextSession = nextRecordedSession ?? nextWeeklySlot;
     const lastEvaluation = sessions
       .map((session) => ({ session, evaluation: one(session.evaluation) }))
       .find((item) => item.evaluation?.is_locked);
@@ -219,7 +257,7 @@ export async function getTeacherStudent360(studentId: string) {
   const { data: assignment, error: assignmentError } = await supabase
     .from("teacher_assignments")
     .select(
-      "student_id,students!teacher_assignments_student_id_fkey(id,full_name,student_no,status,timezone,joined_at,level:levels(id,name_ar,name_en,track:tracks(name_ar,name_en)))",
+      "id,student_id,students!teacher_assignments_student_id_fkey(id,full_name,student_no,status,timezone,joined_at,level:levels(id,name_ar,name_en,track:tracks(name_ar,name_en)))",
     )
     .eq("teacher_id", teacher.id)
     .eq("student_id", studentId)
@@ -236,6 +274,10 @@ export async function getTeacherStudent360(studentId: string) {
     reportsResult,
     teacherNotesResult,
     sharedNotesResult,
+    scheduleResult,
+    baselineResult,
+    quranSurahsResult,
+    quranPagesResult,
   ] = await Promise.all([
     supabase
       .from("sessions")
@@ -278,6 +320,25 @@ export async function getTeacherStudent360(studentId: string) {
       .eq("student_id", studentId)
       .order("created_at", { ascending: false }),
     supabase.rpc("get_shared_student_notes", { p_student: studentId }).maybeSingle(),
+    supabase
+      .from("schedule_slots")
+      .select("id,weekday,local_start_time,duration_min,anchor_timezone")
+      .eq("assignment_id", assignment.id)
+      .eq("is_active", true),
+    supabase
+      .from("student_quran_baselines")
+      .select(
+        "prior_memorized_from_page,prior_memorized_to_page,academy_start_page,study_direction,assessment_notes,assessed_on,updated_at",
+      )
+      .eq("student_id", studentId)
+      .maybeSingle(),
+    supabase.from("quran_surahs").select("id,name_ar,name_en").order("id"),
+    supabase
+      .from("quran_pages")
+      .select(
+        "page,first_ayah:quran_ayahs!quran_pages_first_ayah_id_fkey(surah_id),last_ayah:quran_ayahs!quran_pages_last_ayah_id_fkey(surah_id)",
+      )
+      .order("page"),
   ]);
   if (
     sessionsResult.error ||
@@ -286,7 +347,11 @@ export async function getTeacherStudent360(studentId: string) {
     progressResult.error ||
     reportsResult.error ||
     teacherNotesResult.error ||
-    sharedNotesResult.error
+    sharedNotesResult.error ||
+    scheduleResult.error ||
+    baselineResult.error ||
+    quranSurahsResult.error ||
+    quranPagesResult.error
   ) {
     throw new Error("teacher_student_unavailable");
   }
@@ -297,10 +362,39 @@ export async function getTeacherStudent360(studentId: string) {
     evaluation: one(session.evaluation),
   }));
   const now = new Date().toISOString();
-  const nextSession =
+  const nextRecordedSession =
     sessions
       .filter((session) => session.scheduled_at >= now && session.status === "scheduled")
       .toSorted((left, right) => left.scheduled_at.localeCompare(right.scheduled_at))[0] ?? null;
+  const nextWeeklySlot =
+    (scheduleResult.data ?? [])
+      .map((slot) => {
+        const occurrence = convertNextOccurrence({
+          weekday: slot.weekday,
+          time: slot.local_start_time,
+          anchorTimezone: slot.anchor_timezone,
+          viewerTimezone: "Africa/Cairo",
+        });
+        if (!occurrence) return null;
+        let start = DateTime.fromISO(occurrence.isoLocal, { setZone: true });
+        if (start.plus({ minutes: slot.duration_min }) < DateTime.now().setZone("Africa/Cairo")) {
+          start = start.plus({ days: 7 });
+        }
+        return {
+          id: slot.id,
+          isWeeklyTemplate: true as const,
+          scheduled_at: start.toUTC().toISO()!,
+          ends_at: start.plus({ minutes: slot.duration_min }).toUTC().toISO()!,
+          duration_min: slot.duration_min,
+          status: "scheduled" as const,
+          kind: "regular" as const,
+          attendance: null,
+          evaluation: null,
+        };
+      })
+      .filter((slot): slot is NonNullable<typeof slot> => Boolean(slot))
+      .sort((left, right) => left.scheduled_at.localeCompare(right.scheduled_at))[0] ?? null;
+  const nextSession = nextRecordedSession ?? nextWeeklySlot;
   const lockedEvaluations = sessions.filter((session) => session.evaluation?.is_locked);
   const progress = progressResult.data ?? [];
   const today = DateTime.now().setZone(assignment.students.timezone).toISODate() ?? "";
@@ -347,6 +441,11 @@ export async function getTeacherStudent360(studentId: string) {
         date: session.scheduled_at,
         note: session.evaluation!.family_note!,
       })),
+    quranBaseline: baselineResult.data,
+    quranLocations: buildQuranLocationOptions(
+      quranSurahsResult.data ?? [],
+      quranPagesResult.data ?? [],
+    ),
   };
 }
 

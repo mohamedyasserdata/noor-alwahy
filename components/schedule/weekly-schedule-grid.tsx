@@ -1,5 +1,6 @@
 import { CalendarDays, Clock3, GraduationCap, UserRound } from "lucide-react";
 import { DateTime } from "luxon";
+import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import type { AppLocale } from "@/i18n/routing";
@@ -26,17 +27,23 @@ const toneClasses = [
   "border-rose-200 bg-rose-50/90 text-rose-950 dark:border-rose-900/70 dark:bg-rose-950/35 dark:text-rose-100",
 ] as const;
 
+const emptyScheduleTimes = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"];
+
 export function WeeklyScheduleGrid({
   slots,
   locale,
   role,
   timezone,
   labels,
+  variant = "grid",
+  action,
 }: {
   slots: ScheduleSlot[];
   locale: AppLocale;
   role: string;
   timezone: string;
+  variant?: "compact" | "grid";
+  action?: ReactNode;
   labels: {
     title: string;
     description: string;
@@ -48,16 +55,11 @@ export function WeeklyScheduleGrid({
     weekdays: string[];
   };
 }) {
-  if (!slots.length) {
-    return (
-      <section className="mt-8 rounded-[1.75rem] border border-dashed border-secondary/35 bg-card/75 p-10 text-center text-muted-foreground">
-        <CalendarDays className="mx-auto size-9 text-secondary" aria-hidden="true" />
-        <p className="mt-3">{labels.empty}</p>
-      </section>
-    );
-  }
-
-  const { times, slotsByCell } = buildWeeklyScheduleGrid(slots);
+  const built = buildWeeklyScheduleGrid(slots);
+  const times = [...new Set([...emptyScheduleTimes, ...built.times])].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  const slotsByCell = built.slotsByCell;
   const today = DateTime.now().setZone(timezone).startOf("day");
   const todayIndex = today.weekday % 7;
   const weekStart = today.minus({ days: todayIndex });
@@ -67,7 +69,7 @@ export function WeeklyScheduleGrid({
       .setLocale(locale === "ar" ? "ar-EG" : "en-US")
       .toFormat("d LLL"),
   );
-  const mobileDays = labels.weekdays.flatMap((day, index) => {
+  const mobileDays = labels.weekdays.map((day, index) => {
     const daySlots = slots
       .filter((slot) => (slot.viewer?.weekday ?? slot.weekday) === index)
       .toSorted((left, right) =>
@@ -75,8 +77,110 @@ export function WeeklyScheduleGrid({
           right.viewer?.time ?? right.local_start_time,
         ),
       );
-    return daySlots.length ? [{ day, date: dates[index], index, slots: daySlots }] : [];
+    return { day, date: dates[index], index, slots: daySlots };
   });
+
+  if (variant === "compact") {
+    const scheduledDays = mobileDays.filter((day) => day.slots.length > 0);
+    return (
+      <section
+        className="mt-8 overflow-hidden rounded-[1.75rem] border bg-card shadow-card"
+        aria-labelledby="weekly-list-title"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b px-5 py-5 sm:px-7">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="grid size-10 place-items-center rounded-2xl bg-secondary/12 text-secondary">
+                <CalendarDays className="size-5" aria-hidden="true" />
+              </span>
+              <h2 id="weekly-list-title" className="text-xl font-black text-primary sm:text-2xl">
+                {labels.title}
+              </h2>
+            </div>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+              {labels.description}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">{locale === "ar" ? "توقيت مصر" : "Cairo time"}</Badge>
+            <Badge className="tabular-nums" variant="secondary">
+              {labels.lessonCount.replace("{count}", String(slots.length))}
+            </Badge>
+            {action}
+          </div>
+        </div>
+
+        {scheduledDays.length ? (
+          <div className="grid gap-4 p-4 sm:p-6 lg:grid-cols-2">
+            {scheduledDays.map((day) => (
+              <article
+                key={day.index}
+                className={`overflow-hidden rounded-2xl border ${day.index === todayIndex ? "border-secondary bg-secondary/5" : "bg-background/55"}`}
+              >
+                <header className="flex items-center justify-between gap-3 border-b px-4 py-3">
+                  <h3 className="text-lg font-black text-primary">{day.day}</h3>
+                  {day.index === todayIndex ? (
+                    <Badge variant="secondary">{locale === "ar" ? "اليوم" : "Today"}</Badge>
+                  ) : null}
+                </header>
+                <div className="grid gap-2 p-3">
+                  {day.slots.map((slot) => {
+                    const time = slot.viewer?.time ?? slot.local_start_time;
+                    return (
+                      <div
+                        key={slot.slot_id}
+                        className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center"
+                      >
+                        <div className="min-w-24 rounded-xl bg-primary px-3 py-2 text-center text-primary-foreground">
+                          <Clock3 className="mx-auto size-4 text-secondary" aria-hidden="true" />
+                          <strong className="mt-1 block tabular-nums" dir="ltr">
+                            {formatTime(time, locale)}
+                          </strong>
+                          <span className="text-xs text-primary-foreground/70">
+                            {slot.duration_min} {locale === "ar" ? "دقيقة" : "min"}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-black text-primary">
+                            {locale === "ar"
+                              ? slot.track_name_ar
+                              : (slot.track_name_en ?? slot.track_name_ar)}
+                          </h4>
+                          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                            <GraduationCap
+                              className="size-4 shrink-0 text-secondary"
+                              aria-hidden="true"
+                            />
+                            {slot.teacher_name}
+                          </p>
+                          {role !== "student" ? (
+                            <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                              <UserRound
+                                className="size-4 shrink-0 text-secondary"
+                                aria-hidden="true"
+                              />
+                              {slot.student_name}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="p-5 sm:p-7">
+            <div className="rounded-2xl border border-dashed border-secondary/35 bg-secondary/5 px-5 py-10 text-center text-muted-foreground">
+              <CalendarDays className="mx-auto size-8 text-secondary" aria-hidden="true" />
+              <p className="mt-3">{labels.empty}</p>
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
 
   return (
     <section
@@ -98,18 +202,26 @@ export function WeeklyScheduleGrid({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline">{timezone}</Badge>
+          <Badge variant="outline">{locale === "ar" ? "توقيت مصر" : "Cairo time"}</Badge>
           <Badge className="tabular-nums" variant="secondary">
             {labels.lessonCount.replace("{count}", String(slots.length))}
           </Badge>
+          {action}
         </div>
       </div>
 
-      <div className="grid gap-3 p-4 xl:hidden">
+      {!slots.length ? (
+        <div className="mx-4 mt-4 flex items-center gap-3 rounded-2xl border border-dashed border-secondary/35 bg-secondary/5 px-4 py-3 text-sm text-muted-foreground sm:mx-5">
+          <CalendarDays className="size-5 shrink-0 text-secondary" aria-hidden="true" />
+          <p>{labels.empty}</p>
+        </div>
+      ) : null}
+
+      <div className="flex snap-x gap-3 overflow-x-auto p-4 xl:hidden">
         {mobileDays.map((day) => (
           <section
             key={day.index}
-            className={`overflow-hidden rounded-2xl border ${day.index === todayIndex ? "border-blue-300 bg-blue-50/45 dark:border-blue-800 dark:bg-blue-950/15" : "bg-background/45"}`}
+            className={`w-[82vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-2xl border ${day.index === todayIndex ? "border-secondary bg-secondary/5" : "bg-background/45"}`}
             aria-label={`${day.day} ${day.date}`}
           >
             <header className="flex items-center justify-between gap-3 border-b px-4 py-3">
@@ -117,40 +229,46 @@ export function WeeklyScheduleGrid({
               <time className="text-sm text-muted-foreground">{day.date}</time>
             </header>
             <div className="grid gap-3 p-3">
-              {day.slots.map((slot) => {
-                const time = slot.viewer?.time ?? slot.local_start_time;
-                return (
-                  <article key={slot.slot_id} className="rounded-xl border bg-card p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h4 className="font-black text-primary">
-                          {locale === "ar"
-                            ? slot.track_name_ar
-                            : (slot.track_name_en ?? slot.track_name_ar)}
-                        </h4>
-                        <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                          <GraduationCap className="size-4 text-secondary" aria-hidden="true" />
-                          {slot.teacher_name}
-                        </p>
-                        {role !== "student" ? (
-                          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                            <UserRound className="size-4 text-secondary" aria-hidden="true" />
-                            {slot.student_name}
+              {day.slots.length ? (
+                day.slots.map((slot) => {
+                  const time = slot.viewer?.time ?? slot.local_start_time;
+                  return (
+                    <article key={slot.slot_id} className="rounded-xl border bg-card p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h4 className="font-black text-primary">
+                            {locale === "ar"
+                              ? slot.track_name_ar
+                              : (slot.track_name_en ?? slot.track_name_ar)}
+                          </h4>
+                          <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                            <GraduationCap className="size-4 text-secondary" aria-hidden="true" />
+                            {slot.teacher_name}
                           </p>
-                        ) : null}
+                          {role !== "student" ? (
+                            <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                              <UserRound className="size-4 text-secondary" aria-hidden="true" />
+                              {slot.student_name}
+                            </p>
+                          ) : null}
+                        </div>
+                        <div className="shrink-0 text-end">
+                          <strong className="block text-primary tabular-nums" dir="ltr">
+                            {formatTime(time, locale)}
+                          </strong>
+                          <span className="mt-1 block text-xs text-muted-foreground">
+                            {slot.duration_min} min
+                          </span>
+                        </div>
                       </div>
-                      <div className="shrink-0 text-end">
-                        <strong className="block text-primary tabular-nums" dir="ltr">
-                          {formatTime(time, locale)}
-                        </strong>
-                        <span className="mt-1 block text-xs text-muted-foreground">
-                          {slot.duration_min} min
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+                    </article>
+                  );
+                })
+              ) : (
+                <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+                  {labels.empty}
+                </p>
+              )}
             </div>
           </section>
         ))}
@@ -196,7 +314,7 @@ export function WeeklyScheduleGrid({
                 row.push(
                   <div
                     key={`${day}-${time}`}
-                    className={`min-h-28 border-e border-b p-2 last:border-e-0 ${day === todayIndex ? "bg-blue-50/25 dark:bg-blue-950/10" : ""}`}
+                    className={`min-h-24 border-e border-b p-2 last:border-e-0 ${day === todayIndex ? "bg-secondary/[0.035]" : ""}`}
                     data-testid={`schedule-cell-${day}-${time}`}
                   >
                     {role === "admin" && cellSlots.length > 1 ? (
@@ -244,6 +362,14 @@ export function WeeklyScheduleGrid({
                           </p>
                         </article>
                       ))}
+                      {!cellSlots.length ? (
+                        <span
+                          className="mx-auto my-auto block pt-6 text-xs text-muted-foreground/35"
+                          aria-hidden="true"
+                        >
+                          —
+                        </span>
+                      ) : null}
                     </div>
                   </div>,
                 );

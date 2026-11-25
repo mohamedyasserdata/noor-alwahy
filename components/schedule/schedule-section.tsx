@@ -1,13 +1,13 @@
-import { CalendarDays, Globe2 } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { CalendarExports } from "@/components/schedule/calendar-exports";
+import { ScheduleAssignmentPicker } from "@/components/schedule/schedule-assignment-picker";
 import { SessionAdjustmentsSection } from "@/components/schedule/session-adjustments-section";
 import { WeeklyScheduleGrid } from "@/components/schedule/weekly-schedule-grid";
 import { StudentPageShell } from "@/components/student/student-page-shell";
 import { Alert } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +31,12 @@ export async function ScheduleSection({
   const [t, data] = await Promise.all([
     getTranslations({ locale, namespace: "schedules" }),
     getScheduleWorkspace({
-      studentId: typeof query.studentId === "string" ? query.studentId : undefined,
+      studentId:
+        typeof query.studentId === "string"
+          ? query.studentId
+          : typeof query.student === "string"
+            ? query.student
+            : undefined,
       teacherId: typeof query.teacherId === "string" ? query.teacherId : undefined,
     }),
   ]);
@@ -58,17 +63,8 @@ export async function ScheduleSection({
           <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
             {t("description")}
           </p>
-          <Badge className="mt-4" variant="outline">
-            <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
-          </Badge>
         </header>
-      ) : (
-        <div className="mb-6 flex justify-end">
-          <Badge variant="outline" className="border-secondary/35 bg-[#fffaf0] dark:bg-accent/30">
-            <Globe2 className="size-4" aria-hidden="true" /> {data.timezone}
-          </Badge>
-        </div>
-      )}
+      ) : null}
       {status ? (
         <Alert className="mt-6" variant="success">
           {t("saved")}
@@ -98,46 +94,51 @@ export async function ScheduleSection({
       {data.role === "admin" ? (
         <form
           action={saveScheduleSlotAction.bind(null, locale)}
-          className="mt-8 grid min-w-0 gap-4 rounded-3xl border bg-card p-5 shadow-card lg:grid-cols-5 lg:items-end"
+          className="mt-8 grid min-w-0 gap-5 rounded-3xl border bg-card p-5 shadow-card lg:grid-cols-2"
         >
           <div className="grid min-w-0 gap-2 lg:col-span-2">
-            <Label htmlFor="schedule-assignment">{t("assignment")}</Label>
-            <select
-              id="schedule-assignment"
-              name="assignmentId"
-              required
-              className="min-h-11 w-full min-w-0 rounded-xl border bg-background px-3"
-            >
-              <option value="">{t("chooseAssignment")}</option>
-              {data.assignments.map((assignment) => {
+            <ScheduleAssignmentPicker
+              locale={locale}
+              assignments={data.assignments.map((assignment) => {
                 const student = relation(assignment.student);
                 const teacher = relation(assignment.teacher);
                 const profile = teacher ? relation(teacher.profile) : null;
-                const track = relation(assignment.track);
-                return (
-                  <option key={assignment.id} value={assignment.id}>
-                    {student?.full_name} · {profile?.full_name} ·{" "}
-                    {locale === "ar" ? track?.name_ar : (track?.name_en ?? track?.name_ar)}
-                  </option>
-                );
+                return {
+                  id: assignment.id,
+                  studentId: assignment.student_id,
+                  studentName: student?.full_name ?? "—",
+                  teacherId: assignment.teacher_id,
+                  teacherName: profile?.full_name ?? "—",
+                };
               })}
-            </select>
+            />
+            {!data.assignments.length ? (
+              <p className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+                {locale === "ar"
+                  ? "لا يوجد طالب مرتبط بمدرس حاليًا. أنشئ التعيين أولًا ثم أضف الموعد."
+                  : "No student is currently assigned to a teacher. Create the assignment first."}
+              </p>
+            ) : null}
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="schedule-weekday">{t("weekday")}</Label>
-            <select
-              id="schedule-weekday"
-              name="weekday"
-              required
-              className="min-h-11 w-full min-w-0 rounded-xl border bg-background px-3"
-            >
+          <fieldset className="grid gap-2 lg:col-span-2">
+            <legend className="font-bold text-primary">{t("weekday")}</legend>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
               {[0, 1, 2, 3, 4, 5, 6].map((day) => (
-                <option value={day} key={day}>
+                <label
+                  key={day}
+                  className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border bg-background px-3 text-sm font-bold has-[:checked]:border-secondary has-[:checked]:bg-secondary/10"
+                >
+                  <input
+                    type="checkbox"
+                    name="weekdays"
+                    value={day}
+                    className="size-4 accent-primary"
+                  />
                   {t(`weekdays.${day}` as "weekdays.0")}
-                </option>
+                </label>
               ))}
-            </select>
-          </div>
+            </div>
+          </fieldset>
           <div className="grid gap-2">
             <Label htmlFor="schedule-time">{t("time")}</Label>
             <Input id="schedule-time" name="localStartTime" type="time" required />
@@ -154,16 +155,7 @@ export async function ScheduleSection({
               required
             />
           </div>
-          <div className="grid gap-2 lg:col-span-2">
-            <Label htmlFor="schedule-timezone">{t("anchorTimezone")}</Label>
-            <Input
-              id="schedule-timezone"
-              name="anchorTimezone"
-              defaultValue="Africa/Cairo"
-              required
-            />
-          </div>
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <AdminSubmitButton label={t("save")} pendingLabel={t("saving")} />
           </div>
         </form>
@@ -173,6 +165,7 @@ export async function ScheduleSection({
         locale={locale}
         role={data.role}
         timezone={data.timezone}
+        variant={appearance === "student" ? "compact" : "grid"}
         labels={{
           title: t("grid.title"),
           description: t("grid.description"),
@@ -184,53 +177,6 @@ export async function ScheduleSection({
           weekdays: [0, 1, 2, 3, 4, 5, 6].map((day) => t(`weekdays.${day}` as "weekdays.0")),
         }}
       />
-      {appearance === "standard" && data.role === "teacher" ? (
-        <section className="mt-6 rounded-2xl border bg-card p-4 shadow-card sm:p-5">
-          <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
-            <div>
-              <h2 className="text-lg font-black text-primary">
-                {locale === "ar" ? "الحصص القادمة" : "Upcoming sessions"}
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {locale === "ar"
-                  ? "افتح مساحة الحصة لإدارة الرابط والحضور والتقييم."
-                  : "Open the session workspace to manage access, attendance, and evaluation."}
-              </p>
-            </div>
-            <Badge variant="secondary">{data.teacherSessions.length}</Badge>
-          </div>
-          {data.teacherSessions.length ? (
-            <ul className="mt-3 grid gap-2">
-              {data.teacherSessions.map((session) => (
-                <li
-                  key={session.id}
-                  className="flex flex-col gap-3 rounded-xl border border-secondary/15 bg-background/45 p-3 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div>
-                    <p className="font-black text-primary">{session.student.full_name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat(locale, {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                        timeZone: data.timezone,
-                      }).format(new Date(session.scheduled_at))}
-                    </p>
-                  </div>
-                  <Button asChild size="sm" variant="outline">
-                    <Link href={`/teacher/sessions/${session.id}`}>
-                      {locale === "ar" ? "فتح الحصة" : "Open session"}
-                    </Link>
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-4 text-sm text-muted-foreground">
-              {locale === "ar" ? "لا توجد حصص قادمة." : "No upcoming sessions."}
-            </p>
-          )}
-        </section>
-      ) : null}
       <CalendarExports
         labels={{
           title: t("exports.title"),

@@ -13,6 +13,8 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/dev/ui">): Promise<Metadata> {
   const { locale } = await params;
 
+  if (process.env.NODE_ENV !== "development") notFound();
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -27,6 +29,8 @@ export async function generateMetadata({
 
 export default async function UiShowcasePage({ params }: PageProps<"/[locale]/dev/ui">) {
   const { locale } = await params;
+
+  if (process.env.NODE_ENV !== "development") notFound();
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

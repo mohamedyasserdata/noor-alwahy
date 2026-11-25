@@ -6,9 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
 const filtersSchema = z.object({
-  status: z
-    .enum(["all", "new", "contacted", "trial_booked", "accepted", "rejected", "postponed"])
-    .default("all"),
+  status: z.enum(["all", "new", "accepted"]).default("all"),
   q: z.string().trim().max(120).default(""),
 });
 
@@ -24,6 +22,8 @@ export async function getApplicationCrm(query: Record<string, string | string[] 
     .select(
       "id,order_no,status,student_name,student_gender,student_age,guardian_name,contact_email,contact_phone,country_code,timezone,track_id,package_id,self_level,preferred_times,preferred_teacher_gender,notes,source,internal_notes,converted_student_id,created_at,updated_at",
     )
+    .is("converted_student_id", null)
+    .in("status", ["new", "accepted"])
     .order("created_at", { ascending: false })
     .limit(100);
   if (filters.status !== "all") request = request.eq("status", filters.status);

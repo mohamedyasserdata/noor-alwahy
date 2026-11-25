@@ -21,6 +21,7 @@ export type StudentListItem = {
   levelId: string | null;
   levelName: string | null;
   trackName: string | null;
+  isAssigned: boolean;
 };
 
 export async function getStudentDirectory(
@@ -86,7 +87,10 @@ export async function getStudentDirectory(
 
   return {
     filters,
-    students: (data ?? []).map((student) => mapStudent(student, locale)),
+    students: (data ?? []).map((student) => ({
+      ...mapStudent(student, locale),
+      isAssigned: assignedStudentIds.includes(student.id),
+    })),
     levels: (levels ?? []).map((level) => ({
       id: level.id,
       label: locale === "ar" ? level.name_ar : (level.name_en ?? level.name_ar),
@@ -197,6 +201,7 @@ function mapStudent(value: unknown, locale: AppLocale): StudentListItem {
     levelId: student.level_id,
     levelName: level ? (locale === "ar" ? level.name_ar : (level.name_en ?? level.name_ar)) : null,
     trackName: track ? (locale === "ar" ? track.name_ar : (track.name_en ?? track.name_ar)) : null,
+    isAssigned: false,
   };
 }
 

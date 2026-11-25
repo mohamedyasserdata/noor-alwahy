@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { connection } from "next/server";
 
 import type { AppLocale } from "@/i18n/routing";
+import { convertNextOccurrence } from "@/lib/schedules/conversion";
 import { createClient } from "@/lib/supabase/server";
 
 function firstRelation<T>(value: T | T[] | null): T | null {
@@ -19,7 +20,7 @@ export async function getNextSessionCard(locale: AppLocale) {
   if (!user) throw new Error("session_auth_required");
 
   const now = DateTime.utc();
-  const [profileResult, sessionResult] = await Promise.all([
+  const [profileResult, sessionResult, scheduleResult] = await Promise.all([
     supabase.from("profiles").select("timezone").eq("id", user.id).single(),
     supabase
       .from("sessions")
@@ -31,23 +32,64 @@ export async function getNextSessionCard(locale: AppLocale) {
       .order("scheduled_at", { ascending: true })
       .limit(1)
       .maybeSingle(),
+    supabase.rpc("get_visible_schedule"),
   ]);
 
-  if (profileResult.error || sessionResult.error) throw new Error("next_session_unavailable");
+  if (profileResult.error || sessionResult.error || scheduleResult.error) {
+    throw new Error("next_session_unavailable");
+  }
   const session = sessionResult.data;
-  if (!session) return { serverNowMs: now.toMillis(), session: null };
+  if (!session) {
+    const viewerTimezone = "Africa/Cairo";
+    const nextSlot = (scheduleResult.data ?? [])
+      .map((slot) => {
+        const occurrence = convertNextOccurrence({
+          weekday: slot.weekday,
+          time: slot.local_start_time,
+          anchorTimezone: slot.anchor_timezone,
+          viewerTimezone,
+        });
+        if (!occurrence) return null;
+        let start = DateTime.fromISO(occurrence.isoLocal, { setZone: true });
+        if (start.plus({ minutes: slot.duration_min }).toUTC() < now.minus({ minutes: 15 })) {
+          start = start.plus({ days: 7 });
+        }
+        return { slot, start };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .sort((left, right) => left.start.toMillis() - right.start.toMillis())[0];
+
+    if (!nextSlot) return { serverNowMs: now.toMillis(), session: null };
+    const end = nextSlot.start.plus({ minutes: nextSlot.slot.duration_min });
+    return {
+      serverNowMs: now.toMillis(),
+      session: {
+        id: nextSlot.slot.slot_id,
+        scheduledAtMs: nextSlot.start.toMillis(),
+        endsAtMs: end.toMillis(),
+        dateLabel: nextSlot.start.setLocale(locale).toLocaleString({
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        }),
+        timeLabel: `${nextSlot.start.toFormat("HH:mm")}–${end.toFormat("HH:mm")}`,
+        timezone: viewerTimezone,
+        studentName: nextSlot.slot.student_name,
+        teacherName: nextSlot.slot.teacher_name,
+        joinUrl: null,
+        meetingId: null,
+        passcode: null,
+      },
+    };
+  }
 
   const { data: joinRows, error: joinError } = await supabase.rpc("get_session_join", {
     p_session_id: session.id,
   });
   if (joinError) throw new Error("session_join_unavailable");
 
-  const start = DateTime.fromISO(session.scheduled_at, { setZone: true }).setZone(
-    profileResult.data.timezone,
-  );
-  const end = DateTime.fromISO(session.ends_at, { setZone: true }).setZone(
-    profileResult.data.timezone,
-  );
+  const start = DateTime.fromISO(session.scheduled_at, { setZone: true }).setZone("Africa/Cairo");
+  const end = DateTime.fromISO(session.ends_at, { setZone: true }).setZone("Africa/Cairo");
   const student = firstRelation(session.student);
   const teacher = firstRelation(session.teacher);
   const teacherProfile = teacher ? firstRelation(teacher.profile) : null;
@@ -65,7 +107,7 @@ export async function getNextSessionCard(locale: AppLocale) {
         month: "long",
       }),
       timeLabel: `${start.toFormat("HH:mm")}–${end.toFormat("HH:mm")}`,
-      timezone: profileResult.data.timezone,
+      timezone: "Africa/Cairo",
       studentName: student?.full_name ?? null,
       teacherName: teacherProfile?.full_name ?? null,
       joinUrl: join?.join_url ?? null,

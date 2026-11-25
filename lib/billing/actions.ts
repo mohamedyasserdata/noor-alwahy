@@ -7,6 +7,7 @@ import { DateTime } from "luxon";
 
 import { routing, type AppLocale } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/require-role";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
   paymentDecisionSchema,
@@ -29,6 +30,11 @@ function refresh(value: AppLocale) {
   revalidatePath(`/${value}/admin/finance`);
   revalidatePath(`/${value}/admin/subscriptions`);
   revalidatePath(`/${value}/parent/billing`);
+  revalidatePath(`/${value}/teacher/today`);
+  revalidatePath(`/${value}/teacher/schedule`);
+  revalidatePath(`/${value}/teacher/students`);
+  revalidatePath(`/${value}/student/home`);
+  revalidatePath(`/${value}/student/schedule`);
 }
 
 export async function recordPaymentAction(localeValue: string, formData: FormData): Promise<never> {
@@ -93,6 +99,18 @@ export async function decidePaymentAction(localeValue: string, formData: FormDat
         ? "mfa_required"
         : "decision_failed";
     go(currentLocale, "financeError", code);
+  }
+  if (parsed.data.decision === "confirmed") {
+    const generationStart = DateTime.now().setZone("Africa/Cairo").toISODate();
+    if (generationStart) {
+      const { error: generationError } = await createAdminClient().rpc("generate_sessions", {
+        p_window_start: generationStart,
+        p_horizon_days: 28,
+      });
+      if (generationError) {
+        console.error("payment_session_generation_failed", generationError.message);
+      }
+    }
   }
   refresh(currentLocale);
   go(currentLocale, "financeStatus", parsed.data.decision);

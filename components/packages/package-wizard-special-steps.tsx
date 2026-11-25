@@ -156,7 +156,7 @@ export function PackagePricesStep({
           return (
             <article
               key={price.country_code}
-              className="grid gap-4 rounded-2xl border bg-background p-4 lg:grid-cols-[1.2fr_repeat(3,1fr)_auto] lg:items-end"
+              className="grid gap-4 rounded-2xl border bg-background p-4 lg:grid-cols-[1.2fr_1fr_auto] lg:items-end"
             >
               <div>
                 <p className="font-black text-primary">{country?.name ?? price.country_code}</p>
@@ -169,24 +169,6 @@ export function PackagePricesStep({
                   inputMode="decimal"
                   value={price.amount}
                   onChange={(event) => update(index, { amount: event.target.value })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor={`min-${index}`}>{t("fields.minAmount")}</Label>
-                <Input
-                  id={`min-${index}`}
-                  inputMode="decimal"
-                  value={price.min_amount}
-                  onChange={(event) => update(index, { min_amount: event.target.value })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor={`max-${index}`}>{t("fields.maxAmount")}</Label>
-                <Input
-                  id={`max-${index}`}
-                  inputMode="decimal"
-                  value={price.max_amount}
-                  onChange={(event) => update(index, { max_amount: event.target.value })}
                 />
               </div>
               <Button

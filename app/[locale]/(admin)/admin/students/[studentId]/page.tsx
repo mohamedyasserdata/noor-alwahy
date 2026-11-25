@@ -9,12 +9,17 @@ export const instant = false;
 
 export default async function AdminStudentProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; studentId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, studentId } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
-  const data = await getAdminStudentProfile(studentId, locale);
+  const [data, query] = await Promise.all([
+    getAdminStudentProfile(studentId, locale),
+    searchParams,
+  ]);
   if (!data) notFound();
-  return <AdminStudentProfile locale={locale} data={data} />;
+  return <AdminStudentProfile locale={locale} data={data} query={query} />;
 }

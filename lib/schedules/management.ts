@@ -20,11 +20,9 @@ export async function getScheduleWorkspace(
     supabase.rpc("get_visible_schedule"),
   ]);
   if (profileResult.error || scheduleResult.error) throw new Error("schedule_unavailable");
-  const timezone = profileResult.data.timezone;
+  const timezone = "Africa/Cairo";
   const adminData =
     profileResult.data.role === "admin" ? await getAdminScheduleData(supabase, filters) : null;
-  const teacherSessions =
-    profileResult.data.role === "teacher" ? await getTeacherUpcomingSessions(supabase) : [];
   return {
     timezone,
     role: profileResult.data.role,
@@ -42,7 +40,6 @@ export async function getScheduleWorkspace(
         }),
       })),
     assignments: adminData?.assignments ?? [],
-    teacherSessions,
     adjustments: adminData
       ? {
           assignments: adminData.assignments,
@@ -52,18 +49,6 @@ export async function getScheduleWorkspace(
         }
       : null,
   };
-}
-
-async function getTeacherUpcomingSessions(supabase: Awaited<ReturnType<typeof createClient>>) {
-  const { data, error } = await supabase
-    .from("sessions")
-    .select("id,scheduled_at,duration_min,kind,student:students(full_name)")
-    .eq("status", "scheduled")
-    .gte("scheduled_at", DateTime.utc().toISO())
-    .order("scheduled_at")
-    .limit(12);
-  if (error) throw new Error("teacher_sessions_unavailable");
-  return data ?? [];
 }
 
 async function getAdminScheduleData(

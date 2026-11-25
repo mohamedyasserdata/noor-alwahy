@@ -2,7 +2,6 @@ import { ArrowRight, Check, Grid3X3, PackagePlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { PackageOrderBoard } from "@/components/packages/package-order-board";
-import { PackageImportPanel } from "@/components/packages/package-import-panel";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -79,8 +78,6 @@ export async function PackageAdminSection({
           {t(`errors.${error}` as "errors.save_failed")}
         </Alert>
       ) : null}
-
-      <PackageImportPanel />
 
       {preview ? (
         <article className="mt-8 overflow-hidden rounded-3xl border border-secondary/35 bg-card shadow-soft">

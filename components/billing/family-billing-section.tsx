@@ -10,14 +10,38 @@ import { getFamilyBillingData } from "@/lib/billing/family-queries";
 export async function FamilyBillingSection({
   appearance = "standard",
   locale,
+  searchParams = Promise.resolve({}),
 }: {
   appearance?: "standard" | "student";
   locale: AppLocale;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [t, data] = await Promise.all([
+  const [t, rawData, query] = await Promise.all([
     getTranslations({ locale, namespace: "familyBilling" }),
     getFamilyBillingData(),
+    searchParams,
   ]);
+  const selectedStudentId = typeof query.student === "string" ? query.student : null;
+  const invoices = selectedStudentId
+    ? rawData.invoices.filter((invoice) => invoice.student_id === selectedStudentId)
+    : rawData.invoices;
+  const invoiceIds = new Set(invoices.map((invoice) => invoice.id));
+  const data = selectedStudentId
+    ? {
+        ...rawData,
+        invoices,
+        balances: rawData.balances.filter(
+          (item) => item.invoice_id != null && invoiceIds.has(item.invoice_id),
+        ),
+        items: rawData.items.filter(
+          (item) => item.invoice_id != null && invoiceIds.has(item.invoice_id),
+        ),
+        payments: rawData.payments.filter(
+          (item) => item.invoice_id != null && invoiceIds.has(item.invoice_id),
+        ),
+        statement: rawData.statement.filter((item) => item.student_id === selectedStudentId),
+      }
+    : rawData;
   const money = (amount: number | string, currency: string) =>
     new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(amount));
   const content = (

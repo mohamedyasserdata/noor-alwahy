@@ -98,7 +98,9 @@ export async function TeacherTodaySection({
         </Alert>
       ) : (
         <div className="mt-5">
-          <NextSessionCard serverNowMs={nextSession.serverNowMs} session={nextSession.session} />
+          <div className="mb-8">
+            <NextSessionCard serverNowMs={nextSession.serverNowMs} session={nextSession.session} />
+          </div>
 
           <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <OverviewCard

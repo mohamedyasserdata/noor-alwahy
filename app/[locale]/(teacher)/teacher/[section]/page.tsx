@@ -8,7 +8,7 @@ import { TeacherReportsSection } from "@/components/reports/teacher-reports-sect
 import { TeacherTodaySection } from "@/components/teacher/teacher-today-section";
 import { TeacherNotificationsSection } from "@/components/teacher/teacher-notifications-section";
 import { TeacherProfileSection } from "@/components/teacher/teacher-profile-section";
-import { TeacherEarningsSection } from "@/components/payouts/teacher-earnings-section";
+import { TeacherAttendanceSection } from "@/components/teacher/teacher-attendance-section";
 import { routing } from "@/i18n/routing";
 
 export const instant = false;
@@ -24,7 +24,7 @@ export default async function TeacherSectionPage({
   const { locale, section } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   await connection();
-  if (section === "attendance") redirect(`/${locale}/teacher/profile?tab=attendance`);
+  if (section === "earnings") redirect(`/${locale}/teacher/attendance`);
   if (section === "availability") redirect(`/${locale}/teacher/profile?tab=availability`);
   if (section === "evaluations") redirect(`/${locale}/teacher/students?status=evaluation_pending`);
   if (section === "requests") redirect(`/${locale}/teacher/notifications`);
@@ -39,8 +39,8 @@ export default async function TeacherSectionPage({
     content = <TeacherNotificationsSection locale={locale} />;
   } else if (section === "schedule") {
     content = <ScheduleSection locale={locale} />;
-  } else if (section === "earnings") {
-    content = <TeacherEarningsSection locale={locale} />;
+  } else if (section === "attendance") {
+    content = <TeacherAttendanceSection locale={locale} />;
   } else if (section === "profile") {
     content = <TeacherProfileSection locale={locale} searchParams={searchParams} />;
   } else {

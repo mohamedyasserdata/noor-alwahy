@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import type { Route } from "next";
 import { revalidatePath } from "next/cache";
@@ -17,6 +17,7 @@ import {
   issueCertificateSchema,
   processCertificateBatchSchema,
   revokeCertificateSchema,
+  uploadedCertificateSchema,
 } from "@/lib/validators/certificates";
 
 function locale(value: string): AppLocale {
@@ -272,6 +273,100 @@ export async function revokeCertificateAction(localeValue: string, formData: For
   if (error) go(current, "certificateError", "revoke_failed");
   refresh(current);
   go(current, "certificateStatus", "revoked");
+}
+
+export async function uploadStudentCertificateAction(
+  localeValue: string,
+  studentId: string,
+  formData: FormData,
+) {
+  const current = locale(localeValue);
+  await requireRole("admin", current);
+  const parsed = uploadedCertificateSchema.safeParse({
+    studentId,
+    title: formData.get("title"),
+    issuedOn: formData.get("issuedOn") || undefined,
+  });
+  const file = formData.get("certificate");
+  if (
+    !parsed.success ||
+    !(file instanceof File) ||
+    file.size === 0 ||
+    file.size > 10_485_760 ||
+    file.type !== "application/pdf"
+  ) {
+    redirect(`/${current}/admin/students/${studentId}?certificateError=invalid_file` as Route);
+  }
+
+  const bytes = Buffer.from(await file.arrayBuffer());
+  if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") {
+    redirect(`/${current}/admin/students/${studentId}?certificateError=invalid_file` as Route);
+  }
+
+  const supabase = await createClient();
+  const path = `students/${parsed.data.studentId}/${randomUUID()}.pdf`;
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const { error: uploadError } = await supabase.storage
+    .from("student-certificates")
+    .upload(path, bytes, { contentType: "application/pdf", upsert: false });
+  if (uploadError) {
+    redirect(`/${current}/admin/students/${studentId}?certificateError=upload_failed` as Route);
+  }
+
+  const { error } = await supabase.rpc("issue_uploaded_certificate", {
+    p_student: parsed.data.studentId,
+    p_title: parsed.data.title,
+    p_pdf_path: path,
+    p_pdf_sha256: sha256,
+    p_original_file_name: safePdfName(file.name),
+    ...(parsed.data.issuedOn ? { p_issued_on: parsed.data.issuedOn } : {}),
+  });
+  if (error) {
+    await supabase.storage.from("student-certificates").remove([path]);
+    redirect(`/${current}/admin/students/${studentId}?certificateError=save_failed` as Route);
+  }
+
+  revalidatePath(`/${current}/admin/students/${studentId}`);
+  revalidatePath(`/${current}/student/certificates`);
+  redirect(`/${current}/admin/students/${studentId}?certificateStatus=uploaded` as Route);
+}
+
+export async function revokeStudentCertificateAction(
+  localeValue: string,
+  studentId: string,
+  formData: FormData,
+) {
+  const current = locale(localeValue);
+  await requireRole("admin", current);
+  const parsed = revokeCertificateSchema.safeParse({
+    certificateId: formData.get("certificateId"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) {
+    redirect(
+      `/${current}/admin/students/${studentId}?certificateError=invalid_revocation` as Route,
+    );
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("revoke_certificate", {
+    p_certificate: parsed.data.certificateId,
+    p_reason: parsed.data.reason,
+  });
+  if (error) {
+    redirect(`/${current}/admin/students/${studentId}?certificateError=revoke_failed` as Route);
+  }
+  revalidatePath(`/${current}/admin/students/${studentId}`);
+  revalidatePath(`/${current}/student/certificates`);
+  redirect(`/${current}/admin/students/${studentId}?certificateStatus=revoked` as Route);
+}
+
+function safePdfName(value: string) {
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\\/\u0000-\u001f\u007f]/g, "-")
+    .trim();
+  const name = normalized.toLowerCase().endsWith(".pdf") ? normalized : `${normalized}.pdf`;
+  return name.slice(0, 180) || "certificate.pdf";
 }
 
 async function uploadAsset(

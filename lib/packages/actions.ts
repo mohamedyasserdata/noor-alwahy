@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import type { Route } from "next";
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
@@ -39,10 +40,37 @@ export async function savePackageAction(localeValue: string, formData: FormData)
   } catch {
     redirect(destination(locale, "packageError", "invalid_fields"));
   }
-  const parsed = packageWizardSchema.safeParse(payload);
+  const supabase = await createClient();
+  const { data: track, error: trackError } = await supabase
+    .from("tracks")
+    .select("id")
+    .eq("is_active", true)
+    .order("sort_order")
+    .limit(1)
+    .maybeSingle();
+  if (trackError || !track || !payload || typeof payload !== "object" || Array.isArray(payload))
+    redirect(destination(locale, "packageError", "invalid_fields"));
+  const rawPayload = payload as Record<string, unknown>;
+  const normalized = {
+    ...rawPayload,
+    slug:
+      typeof rawPayload.slug === "string" && rawPayload.slug
+        ? rawPayload.slug
+        : `package-${randomUUID().slice(0, 8)}`,
+    track_id: track.id,
+    audience: "all",
+    teacher_gender: "",
+    prices: Array.isArray(rawPayload.prices)
+      ? rawPayload.prices.map((price) =>
+          price && typeof price === "object"
+            ? { ...(price as Record<string, unknown>), min_amount: "", max_amount: "" }
+            : price,
+        )
+      : rawPayload.prices,
+  };
+  const parsed = packageWizardSchema.safeParse(normalized);
   if (!parsed.success) redirect(destination(locale, "packageError", "invalid_fields"));
 
-  const supabase = await createClient();
   const { error } = await supabase.rpc("save_package", { p_payload: parsed.data });
   if (error) {
     const code = error.message.includes("package_slug_exists")

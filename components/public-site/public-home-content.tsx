@@ -20,6 +20,7 @@ import { HomePackages } from "@/components/public-site/home-packages";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
+import { publicFaqContent } from "@/lib/public-site/faq-content";
 import { getPublicPackages } from "@/lib/public-site/packages";
 
 const copy = {
@@ -96,32 +97,7 @@ const copy = {
       eyebrow: "إجابات سريعة",
       title: "الأسئلة الشائعة",
       description: "أهم ما تحتاج معرفته قبل تقديم الطلب.",
-      items: [
-        [
-          "كيف أقدّم للطالب؟",
-          "افتح نموذج الالتحاق، وأدخل البيانات المطلوبة، ثم تراجع الإدارة الطلب وتتواصل عبر القنوات الرسمية.",
-        ],
-        [
-          "كيف يُحدد المستوى؟",
-          "تحدد الأكاديمية نقطة البداية المناسبة قبل اعتماد المسار والخطة التعليمية.",
-        ],
-        [
-          "كيف تُنظم الحصص؟",
-          "تظهر المواعيد في بوابة الطالب بالتوقيت المحلي مع أدوات التقويم المعتمدة.",
-        ],
-        [
-          "كيف يتابع ولي الأمر؟",
-          "تتيح بوابة ولي الأمر الاطلاع على البيانات المصرح بها للطلاب المرتبطين بحسابه.",
-        ],
-        [
-          "كيف تظهر الأسعار؟",
-          "اختر الدولة في قسم الباقات لعرض العملة والسعر الساري المسجل في النظام.",
-        ],
-        [
-          "كيف أحصل على شهادة؟",
-          "تظهر الشهادات في البوابة بعد إصدارها واعتمادها، ويمكن تنزيلها والتحقق منها.",
-        ],
-      ],
+      items: publicFaqContent.ar.map((item) => [item.question, item.answer] as const),
     },
     closing: {
       title: "ابدأ رحلتك مع القرآن الكريم",
@@ -213,32 +189,7 @@ const copy = {
       eyebrow: "Quick answers",
       title: "Frequently asked questions",
       description: "The essentials to know before applying.",
-      items: [
-        [
-          "How do I apply?",
-          "Open the application form, enter the required details, and the academy will review it and contact you through official channels.",
-        ],
-        [
-          "How is the level assessed?",
-          "The academy identifies the right starting point before confirming the track and learning plan.",
-        ],
-        [
-          "How are lessons organised?",
-          "Times appear in the student portal in the local timezone, alongside approved calendar tools.",
-        ],
-        [
-          "How can a parent follow progress?",
-          "The parent portal shows authorised information for students linked to the parent’s account.",
-        ],
-        [
-          "How are prices displayed?",
-          "Choose a country in the packages section to see the active system price and currency.",
-        ],
-        [
-          "How do certificates work?",
-          "Certificates appear after issue and approval, ready to download and verify.",
-        ],
-      ],
+      items: publicFaqContent.en.map((item) => [item.question, item.answer] as const),
     },
     closing: {
       title: "Begin your journey with the Quran",
@@ -256,9 +207,11 @@ const experienceIcons = [CalendarCheck2, BarChart3, FileChartColumnIncreasing] a
 export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
   const t = copy[locale];
   const packages = await getPublicPackages("ZZ");
+  const quranPackages = packages.filter((item) => item.trackNameAr?.includes("القرآن"));
+  const trackPackages = quranPackages.length ? quranPackages : packages.slice(0, 1);
   const tracks = Array.from(
     new Map(
-      packages.map((item) => {
+      trackPackages.map((item) => {
         const name = locale === "en" && item.trackNameEn ? item.trackNameEn : item.trackNameAr;
         return [name || t.tracks.general, item] as const;
       }),
@@ -279,8 +232,8 @@ export async function PublicHomeContent({ locale }: { locale: AppLocale }) {
             description={t.tracks.description}
           />
           {tracks.length ? (
-            <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {tracks.slice(0, 6).map(([name, item], index) => (
+            <div className="mt-10 grid max-w-3xl gap-5">
+              {tracks.slice(0, 1).map(([name, item], index) => (
                 <article
                   key={name}
                   className="group relative overflow-hidden rounded-[1.25rem] border border-[#c7a45a]/25 bg-card p-7 shadow-card"

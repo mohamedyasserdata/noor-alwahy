@@ -28,12 +28,9 @@ const copy = {
     planned: "لديهم خطة",
     search: "ابحث بالاسم أو رقم الطالب",
     filters: "تصفية الطلاب",
-    allStatuses: "كل الحالات",
+    allStatuses: "كل الطلاب",
     active: "نشط",
-    suspended: "موقوف",
-    graduated: "متخرج",
-    dropped: "منسحب",
-    archived: "مؤرشف",
+    inactive: "غير نشط",
     allFollowUp: "كل حالات المتابعة",
     regular: "منتظم",
     needsFollowUp: "يحتاج متابعة",
@@ -74,12 +71,9 @@ const copy = {
     planned: "With a plan",
     search: "Search by name or student number",
     filters: "Filter students",
-    allStatuses: "All statuses",
+    allStatuses: "All students",
     active: "Active",
-    suspended: "Suspended",
-    graduated: "Graduated",
-    dropped: "Dropped",
-    archived: "Archived",
+    inactive: "Inactive",
     allFollowUp: "All follow-up states",
     regular: "On track",
     needsFollowUp: "Needs follow-up",
@@ -181,10 +175,7 @@ export async function TeacherStudentsCenter({ locale, filters }: Props) {
           <FilterSelect name="status" defaultValue={filters.status ?? "all"} label={text.filters}>
             <option value="all">{text.allStatuses}</option>
             <option value="active">{text.active}</option>
-            <option value="suspended">{text.suspended}</option>
-            <option value="graduated">{text.graduated}</option>
-            <option value="dropped">{text.dropped}</option>
-            <option value="archived">{text.archived}</option>
+            <option value="inactive">{text.inactive}</option>
           </FilterSelect>
           <FilterSelect
             name="followUp"

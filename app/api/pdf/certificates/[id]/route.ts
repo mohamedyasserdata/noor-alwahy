@@ -23,10 +23,35 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const admin = createAdminClient();
   const { data: certificate, error } = await admin
     .from("certificates")
-    .select("id,serial_no,verify_code,locale,payload_snapshot,template_snapshot,pdf_sha256")
+    .select(
+      "id,serial_no,verify_code,locale,payload_snapshot,template_snapshot,pdf_sha256,pdf_path,source",
+    )
     .eq("id", accessible.id)
     .single();
   if (error) return new Response(null, { status: 404 });
+  if (certificate.source === "uploaded") {
+    if (!certificate.pdf_path || !certificate.pdf_sha256)
+      return new Response(null, { status: 404 });
+    const { data, error: downloadError } = await admin.storage
+      .from("student-certificates")
+      .download(certificate.pdf_path);
+    if (downloadError) return new Response(null, { status: 404 });
+    const pdf = Buffer.from(await data.arrayBuffer());
+    const hash = createHash("sha256").update(pdf).digest("hex");
+    if (hash !== certificate.pdf_sha256) {
+      console.error("uploaded_certificate_hash_mismatch", certificate.id);
+      return Response.json({ error: "certificate_unavailable" }, { status: 503 });
+    }
+    return new Response(Uint8Array.from(pdf).buffer, {
+      headers: {
+        "Cache-Control": "private, no-store, max-age=0",
+        "Content-Disposition": `attachment; filename="certificate-${certificate.serial_no}.pdf"`,
+        "Content-Type": "application/pdf",
+        "X-Certificate-SHA256": hash,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
   const template = certificate.template_snapshot as CertificatePdfDocument["template"] & {
     logo_path?: string;
     seal_path?: string;

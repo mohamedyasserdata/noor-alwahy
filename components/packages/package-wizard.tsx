@@ -49,7 +49,7 @@ export function PackageWizard({ tracks, countries, validFrom, initialValue }: Pr
       name_en: "",
       description_ar: "",
       description_en: "",
-      audience: "child",
+      audience: "all",
       teacher_gender: "",
       sessions_per_week: 3,
       duration_min: 30,
@@ -78,8 +78,7 @@ export function PackageWizard({ tracks, countries, validFrom, initialValue }: Pr
   );
   const DirectionIcon = rtl ? ArrowLeft : ArrowRight;
   const BackIcon = rtl ? ArrowRight : ArrowLeft;
-  const canContinue =
-    step !== 0 || (value.name_ar.trim().length >= 2 && value.slug.trim().length >= 3);
+  const canContinue = step !== 0 || value.name_ar.trim().length >= 2;
 
   return (
     <div className="mx-auto w-full max-w-6xl">
@@ -217,14 +216,6 @@ function IdentityStep({ value, setValue, t }: StepProps) {
         dir="ltr"
         onChange={(name_en) => setValue({ ...value, name_en })}
       />
-      <Field
-        id="slug"
-        label={t("fields.slug")}
-        value={value.slug}
-        dir="ltr"
-        onChange={(slug) => setValue({ ...value, slug })}
-      />
-      <div />
       <TextArea
         id="description-ar"
         label={t("fields.descriptionAr")}
@@ -242,47 +233,12 @@ function IdentityStep({ value, setValue, t }: StepProps) {
   );
 }
 
-function AudienceStep({ value, setValue, tracks, t }: StepProps & { tracks: Props["tracks"] }) {
+function AudienceStep({ tracks, t }: StepProps & { tracks: Props["tracks"] }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-3">
-      <SelectField
-        id="track"
-        label={t("fields.track")}
-        value={value.track_id}
-        options={[
-          { value: "", label: t("optional") },
-          ...tracks.map((track) => ({ value: track.id, label: track.name })),
-        ]}
-        onChange={(track_id) => setValue({ ...value, track_id })}
-      />
-      <SelectField
-        id="audience"
-        label={t("fields.audience")}
-        value={value.audience}
-        options={["child", "adult", "women"].map((item) => ({
-          value: item,
-          label: t(`audiences.${item}`),
-        }))}
-        onChange={(audience) =>
-          setValue({ ...value, audience: audience as PackageWizardInput["audience"] })
-        }
-      />
-      <SelectField
-        id="teacher-gender"
-        label={t("fields.teacherGender")}
-        value={value.teacher_gender}
-        options={[
-          { value: "", label: t("automatic") },
-          { value: "male", label: t("genders.male") },
-          { value: "female", label: t("genders.female") },
-        ]}
-        onChange={(teacher_gender) =>
-          setValue({
-            ...value,
-            teacher_gender: teacher_gender as PackageWizardInput["teacher_gender"],
-          })
-        }
-      />
+    <div className="rounded-2xl border border-secondary/30 bg-secondary/10 p-6">
+      <p className="text-sm font-bold text-muted-foreground">{t("fields.audience")}</p>
+      <p className="mt-2 text-xl font-black text-primary">{t("audiences.all")}</p>
+      <p className="mt-3 text-sm leading-7 text-muted-foreground">{tracks[0]?.name ?? ""}</p>
     </div>
   );
 }

@@ -3,11 +3,17 @@ import "server-only";
 import { connection } from "next/server";
 
 import type { AppLocale } from "@/i18n/routing";
+import { requireRole } from "@/lib/auth/require-role";
+import { buildQuranLocationOptions } from "@/lib/quran/location-options";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { convertNextOccurrence } from "@/lib/schedules/conversion";
 
 export async function getAdminStudentProfile(studentId: string, locale: AppLocale) {
   await connection();
+  await requireRole("admin", locale);
   const supabase = await createClient();
+  const adminSupabase = createAdminClient();
   const [
     studentResult,
     guardiansResult,
@@ -18,6 +24,11 @@ export async function getAdminStudentProfile(studentId: string, locale: AppLocal
     reportsResult,
     subscriptionsResult,
     progressResult,
+    certificatesResult,
+    scheduleResult,
+    baselineResult,
+    quranSurahsResult,
+    quranPagesResult,
   ] = await Promise.all([
     supabase
       .from("students")
@@ -40,10 +51,10 @@ export async function getAdminStudentProfile(studentId: string, locale: AppLocal
       )
       .eq("student_id", studentId)
       .order("created_at", { ascending: false }),
-    supabase
+    adminSupabase
       .from("sessions")
       .select(
-        "id,teacher_id,kind,scheduled_at,ends_at,status,duration_min,teacher:teachers!sessions_teacher_id_fkey(profile:profiles(full_name))",
+        "id,teacher_id,kind,scheduled_at,ends_at,status,duration_min,zoom_override_url,zoom_review_status,zoom_published_at,teacher:teachers!sessions_teacher_id_fkey(profile:profiles(full_name))",
       )
       .eq("student_id", studentId)
       .order("scheduled_at", { ascending: false })
@@ -79,6 +90,35 @@ export async function getAdminStudentProfile(studentId: string, locale: AppLocal
       .from("memorization_progress")
       .select("status,next_review_due,avg_score,review_count")
       .eq("student_id", studentId),
+    supabase
+      .from("certificates")
+      .select("id,title,original_file_name,serial_no,issued_at,revoked_at,source")
+      .eq("student_id", studentId)
+      .order("issued_at", { ascending: false }),
+    supabase
+      .from("schedule_slots")
+      .select(
+        "id,weekday,local_start_time,duration_min,anchor_timezone,assignment:teacher_assignments!inner(student_id,status,student:students(full_name),teacher:teachers(profile:profiles(full_name)),track:tracks(name_ar,name_en))",
+      )
+      .eq("is_active", true)
+      .eq("assignment.student_id", studentId)
+      .eq("assignment.status", "active")
+      .order("weekday")
+      .order("local_start_time"),
+    supabase
+      .from("student_quran_baselines")
+      .select(
+        "prior_memorized_from_page,prior_memorized_to_page,academy_start_page,study_direction,assessment_notes,assessed_on,updated_at",
+      )
+      .eq("student_id", studentId)
+      .maybeSingle(),
+    supabase.from("quran_surahs").select("id,name_ar,name_en").order("id"),
+    supabase
+      .from("quran_pages")
+      .select(
+        "page,first_ayah:quran_ayahs!quran_pages_first_ayah_id_fkey(surah_id),last_ayah:quran_ayahs!quran_pages_last_ayah_id_fkey(surah_id)",
+      )
+      .order("page"),
   ]);
 
   if (studentResult.error) throw new Error("admin_student_profile_unavailable");
@@ -92,6 +132,11 @@ export async function getAdminStudentProfile(studentId: string, locale: AppLocal
     reportsResult,
     subscriptionsResult,
     progressResult,
+    certificatesResult,
+    scheduleResult,
+    baselineResult,
+    quranSurahsResult,
+    quranPagesResult,
   ];
   if (related.some((result) => result.error)) throw new Error("admin_student_profile_unavailable");
 
@@ -142,7 +187,40 @@ export async function getAdminStudentProfile(studentId: string, locale: AppLocal
     evaluations: evaluationsResult.data ?? [],
     reports: reportsResult.data ?? [],
     subscriptions: subscriptionsResult.data ?? [],
+    certificates: certificatesResult.data ?? [],
+    scheduleSlots: (scheduleResult.data ?? []).flatMap((slot) => {
+      const assignment = one(slot.assignment);
+      const student = assignment ? one(assignment.student) : null;
+      const teacher = assignment ? one(assignment.teacher) : null;
+      const profile = teacher ? one(teacher.profile) : null;
+      const slotTrack = assignment ? one(assignment.track) : null;
+      if (!student || !profile || !slotTrack) return [];
+      return [
+        {
+          slot_id: slot.id,
+          student_name: student.full_name,
+          teacher_name: profile.full_name,
+          track_name_ar: slotTrack.name_ar,
+          track_name_en: slotTrack.name_en,
+          weekday: slot.weekday,
+          local_start_time: slot.local_start_time,
+          duration_min: slot.duration_min,
+          anchor_timezone: slot.anchor_timezone,
+          viewer: convertNextOccurrence({
+            weekday: slot.weekday,
+            time: slot.local_start_time,
+            anchorTimezone: slot.anchor_timezone,
+            viewerTimezone: "Africa/Cairo",
+          }),
+        },
+      ];
+    }),
     progress: { masteredPages, reviewDue, totalTracked: progress.length },
+    quranBaseline: baselineResult.data,
+    quranLocations: buildQuranLocationOptions(
+      quranSurahsResult.data ?? [],
+      quranPagesResult.data ?? [],
+    ),
   };
 }
 

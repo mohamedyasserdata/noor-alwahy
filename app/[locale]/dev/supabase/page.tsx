@@ -15,6 +15,8 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/dev/supabase">): Promise<Metadata> {
   const { locale } = await params;
 
+  if (process.env.NODE_ENV !== "development") notFound();
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -29,6 +31,8 @@ export async function generateMetadata({
 
 export default async function SupabaseCheckPage({ params }: PageProps<"/[locale]/dev/supabase">) {
   const { locale } = await params;
+
+  if (process.env.NODE_ENV !== "development") notFound();
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

@@ -23,14 +23,7 @@ export default async function TeacherStudentsPage({
   const filters: TeacherStudentFilters = {
     q: stringValue(query.q),
     page: positiveInteger(query.page),
-    status: allowed(query.status, [
-      "all",
-      "active",
-      "dropped",
-      "graduated",
-      "suspended",
-      "archived",
-    ]),
+    status: allowed(query.status, ["all", "active", "inactive"]),
     followUp: allowed(query.followUp, ["all", "regular", "needs_follow_up", "evaluation_pending"]),
     sort: allowed(query.sort, ["name", "next_session", "recent_evaluation"]),
   };

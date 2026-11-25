@@ -8,16 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AppLocale } from "@/i18n/routing";
-import {
-  convertApplicationAction,
-  savePlacementAction,
-  updateApplicationAction,
-} from "@/lib/applications/actions";
+import { convertApplicationAction, savePlacementAction } from "@/lib/applications/actions";
 import { getApplicationCrm } from "@/lib/applications/crm";
 import { createSubscriptionAction } from "@/lib/subscriptions/actions";
 
 type Query = Promise<Record<string, string | string[] | undefined>>;
-const states = ["new", "contacted", "trial_booked", "accepted", "rejected", "postponed"] as const;
+const states = ["new", "accepted"] as const;
 
 export async function ApplicationCrmSection({
   locale,
@@ -148,34 +144,9 @@ export async function ApplicationCrmSection({
                       </p>
                     ) : null}
                   </div>
-                  <form action={updateApplicationAction.bind(null, locale)} className="grid gap-3">
-                    <input type="hidden" name="applicationId" value={application.id} />
-                    <Label htmlFor={`status-${application.id}`}>{t("workflowStatus")}</Label>
-                    <select
-                      id={`status-${application.id}`}
-                      name="status"
-                      defaultValue={application.status}
-                      className="min-h-11 rounded-xl border bg-background px-3"
-                    >
-                      {states.map((item) => (
-                        <option key={item} value={item}>
-                          {t(`states.${item}`)}
-                        </option>
-                      ))}
-                    </select>
-                    <Label htmlFor={`notes-${application.id}`}>{t("internalNotes")}</Label>
-                    <textarea
-                      id={`notes-${application.id}`}
-                      name="internalNotes"
-                      defaultValue={application.internal_notes ?? ""}
-                      maxLength={5000}
-                      className="min-h-24 rounded-xl border bg-background p-3"
-                    />
-                    <AdminSubmitButton label={t("saveWorkflow")} pendingLabel={t("saving")} />
-                  </form>
                   <form
                     action={savePlacementAction.bind(null, locale)}
-                    className="grid gap-3 rounded-2xl border bg-background p-4 lg:col-span-2"
+                    className="grid gap-3 rounded-2xl border bg-background p-4"
                   >
                     <input type="hidden" name="applicationId" value={application.id} />
                     <h2 className="flex items-center gap-2 font-black text-primary">
@@ -219,18 +190,35 @@ export async function ApplicationCrmSection({
                       maxLength={3000}
                       className="min-h-20 rounded-xl border bg-card p-3"
                     />
-                    <AdminSubmitButton
-                      label={t("savePlacement")}
-                      pendingLabel={t("saving")}
-                      variant="outline"
-                    />
+                    <div className="flex flex-wrap gap-3">
+                      <AdminSubmitButton
+                        label={t("savePlacement")}
+                        pendingLabel={t("saving")}
+                        variant="outline"
+                      />
+                      {!application.converted_student_id &&
+                      application.status !== "rejected" &&
+                      application.contact_email ? (
+                        <AdminSubmitButton
+                          name="intent"
+                          value="create_account"
+                          label={t("saveAndCreateAccount")}
+                          pendingLabel={t("creatingAccount")}
+                        />
+                      ) : null}
+                    </div>
+                    {!application.converted_student_id && !application.contact_email ? (
+                      <p className="text-sm font-bold text-destructive">
+                        {t("accountEmailRequired")}
+                      </p>
+                    ) : null}
                   </form>
-                  {application.status === "accepted" ? (
+                  {application.status === "accepted" && application.converted_student_id ? (
                     <div className="flex flex-wrap gap-3 lg:col-span-2">
                       <form action={convertApplicationAction.bind(null, locale)}>
                         <input type="hidden" name="applicationId" value={application.id} />
                         <AdminSubmitButton
-                          label={application.converted_student_id ? t("openStudent") : t("convert")}
+                          label={t("openStudent")}
                           pendingLabel={t("converting")}
                         />
                       </form>

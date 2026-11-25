@@ -34,7 +34,10 @@ export default async function ParentSectionPage({
   if (section === "schedule")
     return <ScheduleSection appearance="student" locale={locale} searchParams={searchParams} />;
 
-  if (section === "billing") return <FamilyBillingSection appearance="student" locale={locale} />;
+  if (section === "billing")
+    return (
+      <FamilyBillingSection appearance="student" locale={locale} searchParams={searchParams} />
+    );
 
   if (section === "children") {
     return <ParentChildrenSection locale={locale} searchParams={searchParams} />;

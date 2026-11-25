@@ -1,24 +1,18 @@
 import { hasLocale } from "next-intl";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
 
-import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AssignmentManagementSection } from "@/components/admin/assignment-management-section";
+import { AuditLogSection } from "@/components/admin/audit-log-section";
 import { AppSettingsSection } from "@/components/admin/app-settings-section";
 import { AnnouncementAdminSection } from "@/components/announcements/announcement-admin-section";
 import { ContactLinksAdminSection } from "@/components/admin/contact-links-section";
-import { EvaluationSettingsSection } from "@/components/admin/evaluation-settings-section";
-import { ExamManagementSection } from "@/components/exams/exam-management-section";
 import { StudentManagementSection } from "@/components/admin/student-management-section";
-import { TeacherManagementSection } from "@/components/admin/teacher-management-section";
+import { TeacherDirectorySection } from "@/components/admin/teacher-directory-section";
 import { UserManagementSection } from "@/components/admin/user-management-section";
 import { TeacherApplicationSection } from "@/components/admin/teacher-application-section";
 import { AttendanceReportSection } from "@/components/attendance/attendance-report-section";
 import { ApplicationCrmSection } from "@/components/applications/application-crm-section";
-import { FinanceAdminSection } from "@/components/billing/finance-admin-section";
-import { CertificateAdminSection } from "@/components/certificates/certificate-admin-section";
-import { ContentTemplateAdmin } from "@/components/content-templates/content-template-admin";
-import { AdminControlCenter } from "@/components/control-center/admin-control-center";
 import { AdminDashboardSection } from "@/components/dashboard/admin-dashboard-section";
 import { PackageAdminSection } from "@/components/packages/package-admin-section";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
@@ -49,12 +43,15 @@ export default async function AdminSectionPage({
     return <AdminDashboardSection locale={locale} searchParams={searchParams} />;
   }
 
-  if (section === "control-center") {
-    return <AdminControlCenter locale={locale} searchParams={searchParams} />;
-  }
-
+  if (section === "control-center") redirect(`/${locale}/admin/dashboard`);
   if (section === "audit") {
-    return <AuditLogSection locale={locale} searchParams={searchParams} />;
+    const query = await searchParams;
+    const next = new URLSearchParams({ panel: "security-log" });
+    for (const key of ["action", "table", "record", "page"] as const) {
+      const value = query[key];
+      if (typeof value === "string" && value) next.set(key, value);
+    }
+    redirect(`/${locale}/admin/settings?${next}`);
   }
 
   if (section === "applications") {
@@ -73,9 +70,7 @@ export default async function AdminSectionPage({
     return <SubscriptionAdminSection locale={locale} searchParams={searchParams} />;
   }
 
-  if (section === "finance") {
-    return <FinanceAdminSection locale={locale} searchParams={searchParams} />;
-  }
+  if (section === "finance") redirect(`/${locale}/admin/subscriptions`);
 
   if (section === "users") {
     return <UserManagementSection locale={locale} searchParams={searchParams} />;
@@ -86,7 +81,7 @@ export default async function AdminSectionPage({
   }
 
   if (section === "teachers") {
-    return <TeacherManagementSection locale={locale} searchParams={searchParams} />;
+    return <TeacherDirectorySection locale={locale} searchParams={searchParams} />;
   }
 
   if (section === "assignments") {
@@ -101,17 +96,8 @@ export default async function AdminSectionPage({
     return <AttendanceReportSection locale={locale} searchParams={searchParams} />;
   }
 
-  if (section === "evaluation") {
-    return <EvaluationSettingsSection locale={locale} searchParams={searchParams} />;
-  }
-
-  if (section === "exams") {
-    return <ExamManagementSection locale={locale} portal="admin" searchParams={searchParams} />;
-  }
-
-  if (section === "certificates") {
-    return <CertificateAdminSection locale={locale} searchParams={searchParams} />;
-  }
+  if (section === "evaluation" || section === "exams") redirect(`/${locale}/admin/reports`);
+  if (section === "certificates") redirect(`/${locale}/admin/students`);
 
   if (section === "reports") {
     return <AdminReportsSection locale={locale} searchParams={searchParams} />;
@@ -121,15 +107,16 @@ export default async function AdminSectionPage({
     return <AnnouncementAdminSection locale={locale} searchParams={searchParams} />;
   }
 
-  if (section === "templates") {
-    return <ContentTemplateAdmin locale={locale} searchParams={searchParams} />;
-  }
+  if (section === "templates") redirect(`/${locale}/admin/settings`);
 
   if (section === "settings") {
     return (
       <div className="grid gap-16">
         <AppSettingsSection locale={locale} searchParams={searchParams} />
         <ContactLinksAdminSection locale={locale} searchParams={searchParams} embedded />
+        <div id="security-log" className="scroll-mt-24 border-t border-secondary/20 pt-12">
+          <AuditLogSection locale={locale} searchParams={searchParams} />
+        </div>
       </div>
     );
   }

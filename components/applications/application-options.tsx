@@ -9,15 +9,11 @@ import { createPublicClient } from "@/lib/supabase/public";
 type ApplicationOptionsProps = { locale: AppLocale };
 
 export async function ApplicationOptions({ locale }: ApplicationOptionsProps) {
-  const { countries, packages, tracks } = await getApplicationOptions();
+  const { countries, packages } = await getApplicationOptions();
 
   return (
     <ApplicationForm
       siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? ""}
-      tracks={tracks.map((item) => ({
-        id: item.id,
-        name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),
-      }))}
       packages={packages.map((item) => ({
         id: item.id,
         name: locale === "ar" ? item.name_ar : (item.name_en ?? item.name_ar),
@@ -36,8 +32,7 @@ async function getApplicationOptions() {
   cacheTag("public-application-options", "public-packages");
 
   const supabase = createPublicClient();
-  const [tracks, packages, countries] = await Promise.all([
-    supabase.from("tracks").select("id,name_ar,name_en").eq("is_active", true).order("sort_order"),
+  const [packages, countries] = await Promise.all([
     supabase
       .from("packages")
       .select("id,name_ar,name_en")
@@ -47,13 +42,12 @@ async function getApplicationOptions() {
     supabase.from("countries").select("code,name_ar,name_en").eq("is_enabled", true).order("code"),
   ]);
 
-  if (tracks.error || packages.error || countries.error) {
+  if (packages.error || countries.error) {
     throw new Error("application_options_unavailable");
   }
 
   return {
     countries: countries.data ?? [],
     packages: packages.data ?? [],
-    tracks: tracks.data ?? [],
   };
 }

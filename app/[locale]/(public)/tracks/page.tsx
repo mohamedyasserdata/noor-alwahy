@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BookHeart, BookOpenCheck, Sparkles } from "lucide-react";
+import { BookHeart } from "lucide-react";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -7,13 +7,8 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { getPublicPackages } from "@/lib/public-site/packages";
 import { localizedMetadata } from "@/lib/seo/metadata";
-
-const tracks = [
-  { key: "memorization", Icon: BookHeart },
-  { key: "recitation", Icon: BookOpenCheck },
-  { key: "foundation", Icon: Sparkles },
-] as const;
 
 export async function generateMetadata({
   params,
@@ -32,7 +27,15 @@ export async function generateMetadata({
 export default async function TracksPage({ params }: PageProps<"/[locale]/tracks">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
-  const t = await getTranslations({ locale, namespace: "publicSite.tracks" });
+  const [t, packages] = await Promise.all([
+    getTranslations({ locale, namespace: "publicSite.tracks" }),
+    getPublicPackages("ZZ"),
+  ]);
+  const publishedTrack =
+    packages.find((item) => item.trackNameAr?.includes("القرآن")) ?? packages[0];
+  const trackName =
+    (locale === "en" ? publishedTrack?.trackNameEn : publishedTrack?.trackNameAr) ??
+    t("items.memorization.title");
 
   return (
     <>
@@ -49,28 +52,23 @@ export default async function TracksPage({ params }: PageProps<"/[locale]/tracks
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8" aria-label={t("listLabel")}>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {tracks.map(({ key, Icon }) => (
-            <article
-              key={key}
-              className="flex flex-col border-t-4 border-secondary bg-card p-7 shadow-card sm:p-8"
-            >
-              <span className="grid size-14 place-items-center rounded-full bg-primary text-secondary">
-                <Icon className="size-7" aria-hidden="true" />
-              </span>
-              <h2 className="mt-6 text-2xl font-black text-primary">{t(`items.${key}.title`)}</h2>
-              <p className="mt-3 leading-8 text-muted-foreground">
-                {t(`items.${key}.description`)}
+        <article className="grid overflow-hidden rounded-3xl border border-secondary/25 bg-card shadow-card lg:grid-cols-[auto_minmax(0,1fr)]">
+          <div className="grid place-items-center bg-primary px-10 py-10 text-secondary sm:px-14 lg:min-w-64">
+            <BookHeart className="size-20" strokeWidth={1.5} aria-hidden="true" />
+          </div>
+          <div className="p-7 sm:p-10">
+            <h2 className="text-3xl font-black text-primary">{trackName}</h2>
+            <p className="mt-4 max-w-3xl text-lg leading-9 text-muted-foreground">
+              {t("items.memorization.description")}
+            </p>
+            <div className="mt-7 border-t border-secondary/20 pt-5">
+              <h3 className="text-sm font-black text-primary">{t("focusLabel")}</h3>
+              <p className="mt-2 max-w-3xl leading-8 text-muted-foreground">
+                {t("items.memorization.focus")}
               </p>
-              <div className="mt-7 border-t pt-5">
-                <h3 className="text-sm font-black text-primary">{t("focusLabel")}</h3>
-                <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                  {t(`items.${key}.focus`)}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
+            </div>
+          </div>
+        </article>
       </section>
 
       <section className="border-t bg-muted/55">

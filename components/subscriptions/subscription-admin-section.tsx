@@ -34,6 +34,14 @@ export async function SubscriptionAdminSection({
   const alerts = typeof query.alerts === "string" ? query.alerts : "0";
   const invoices = typeof query.invoices === "string" ? query.invoices : "0";
   const today = DateTime.utc().toISODate() ?? "";
+  const renewalDeadline = DateTime.utc().plus({ days: 14 }).toISODate() ?? today;
+  const upcomingRenewals = data.subscriptions.filter(
+    (item) =>
+      ["trial", "active", "paused"].includes(item.status) &&
+      item.renew_date &&
+      item.renew_date >= today &&
+      item.renew_date <= renewalDeadline,
+  );
   const localized = (value: { name_ar: string; name_en: string | null }) =>
     locale === "ar" ? value.name_ar : (value.name_en ?? value.name_ar);
 
@@ -67,6 +75,37 @@ export async function SubscriptionAdminSection({
           {t(`errors.${error}` as "errors.create_failed")}
         </p>
       ) : null}
+
+      <section className="mt-7 rounded-3xl border border-warning/35 bg-warning/10 p-5 sm:p-6">
+        <div className="flex items-center gap-2">
+          <CalendarClock className="size-5 text-secondary" aria-hidden="true" />
+          <h2 className="text-xl font-black text-primary">
+            {locale === "ar" ? "تجديدات خلال 14 يومًا" : "Renewals in the next 14 days"}
+          </h2>
+          <Badge variant={upcomingRenewals.length ? "warning" : "success"}>
+            {upcomingRenewals.length}
+          </Badge>
+        </div>
+        {upcomingRenewals.length ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {upcomingRenewals.map((item) => {
+              const student = Array.isArray(item.students) ? item.students[0] : item.students;
+              return (
+                <div key={item.id} className="rounded-xl border bg-card px-4 py-3">
+                  <p className="font-black text-primary">
+                    {student?.full_name ?? t("unknownStudent")}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.renew_date}</p>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {locale === "ar" ? "لا توجد تجديدات قريبة حاليًا." : "No renewals are due soon."}
+          </p>
+        )}
+      </section>
 
       <form
         action={createSubscriptionAction.bind(null, locale, false)}

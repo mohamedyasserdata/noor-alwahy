@@ -1,6 +1,7 @@
 "use server";
 
 import type { Route } from "next";
+import { DateTime } from "luxon";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -15,23 +16,31 @@ function parseLocale(value: string): AppLocale {
     : routing.defaultLocale;
 }
 
-function go(locale: AppLocale, key: "studentError" | "studentStatus", value: string): never {
-  redirect(`/${locale}/admin/students?${new URLSearchParams({ [key]: value })}` as Route);
+function go(
+  locale: AppLocale,
+  key: "studentError" | "studentStatus",
+  value: string,
+  studentId?: string,
+): never {
+  const params = new URLSearchParams({ [key]: value });
+  if (studentId) params.set("student", studentId);
+  redirect(`/${locale}/admin/students?${params}` as Route);
 }
 
 export async function saveStudentAction(localeValue: string, formData: FormData): Promise<never> {
   const locale = parseLocale(localeValue);
   await requireRole("admin", locale);
+  const studentId = String(formData.get("studentId") ?? "") || null;
   const parsed = studentFormSchema.safeParse({
-    studentId: formData.get("studentId") || null,
+    studentId,
     fullName: formData.get("fullName"),
     gender: formData.get("gender"),
     birthDate: formData.get("birthDate") || undefined,
-    status: formData.get("status"),
+    status: formData.get("status") || "active",
     levelId: formData.get("levelId") || undefined,
-    joinedAt: formData.get("joinedAt"),
+    joinedAt: formData.get("joinedAt") || DateTime.now().setZone("Africa/Cairo").toISODate() || "",
     countryCode: formData.get("countryCode") || undefined,
-    timezone: formData.get("timezone"),
+    timezone: formData.get("timezone") || "Africa/Cairo",
     healthNotes: formData.get("healthNotes") || undefined,
     specialNotes: formData.get("specialNotes") || undefined,
     shareWithTeacher: formData.get("shareWithTeacher") === "on" ? "true" : "false",
@@ -40,7 +49,7 @@ export async function saveStudentAction(localeValue: string, formData: FormData)
 
   const supabase = await createClient();
   const value = parsed.data;
-  const { error } = await supabase.rpc("upsert_student", {
+  const { data: savedStudentId, error } = await supabase.rpc("upsert_student", {
     p_payload: {
       birth_date: value.birthDate,
       country_code: value.countryCode,
@@ -59,7 +68,12 @@ export async function saveStudentAction(localeValue: string, formData: FormData)
   if (error) go(locale, "studentError", "request_failed");
   revalidatePath(`/${locale}/admin/students`);
   revalidatePath(`/${locale}/admin/audit`);
-  go(locale, "studentStatus", value.studentId ? "updated" : "created");
+  go(
+    locale,
+    "studentStatus",
+    value.studentId ? "updated" : "created",
+    savedStudentId ?? value.studentId ?? undefined,
+  );
 }
 
 export async function archiveStudentAction(

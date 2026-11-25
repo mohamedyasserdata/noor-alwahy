@@ -10,6 +10,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WeeklyScheduleGrid } from "@/components/schedule/weekly-schedule-grid";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import type { getAdminTeacherProfile } from "@/lib/admin/teacher-profile";
@@ -144,6 +145,14 @@ export function AdminTeacherProfile({ locale, data }: { locale: AppLocale; data:
                             {ar ? "نقل أو تعديل" : "Move or change"}
                           </Link>
                         </Button>
+                        <Button asChild variant="outline" size="sm">
+                          <Link
+                            href={`/admin/schedule?teacherId=${data.teacher.id}&studentId=${assignment.student_id}`}
+                          >
+                            <CalendarDays aria-hidden="true" />
+                            {ar ? "إضافة موعد" : "Add time"}
+                          </Link>
+                        </Button>
                       </div>
                     </article>
                   );
@@ -159,41 +168,36 @@ export function AdminTeacherProfile({ locale, data }: { locale: AppLocale; data:
               />
             )}
           </Panel>
-          <Panel
-            icon={<CalendarDays />}
-            title={ar ? "الحصص الأخيرة والقادمة" : "Recent and upcoming sessions"}
-          >
-            {data.sessions.length ? (
-              <div className="grid divide-y">
-                {data.sessions.slice(0, 8).map((session) => {
-                  const student = one(session.student);
-                  return (
-                    <div
-                      key={session.id}
-                      className="flex flex-wrap items-center justify-between gap-3 py-3"
-                    >
-                      <div>
-                        <p className="font-black text-primary">{student?.full_name ?? "—"}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {formatDate(session.scheduled_at, locale)} · {session.duration_min}{" "}
-                          {ar ? "دقيقة" : "min"}
-                        </p>
-                      </div>
-                      <Badge variant={session.status === "held" ? "success" : "outline"}>
-                        {sessionStatus(session.status, ar)}
-                      </Badge>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <Empty
-                text={
-                  ar ? "لا توجد حصص مرتبطة بهذا المعلم." : "No sessions are linked to this teacher."
-                }
-              />
-            )}
-          </Panel>
+          <WeeklyScheduleGrid
+            slots={data.scheduleSlots}
+            locale={locale}
+            role="admin"
+            timezone="Africa/Cairo"
+            action={
+              <Button asChild size="sm">
+                <Link href={`/admin/schedule?teacherId=${data.teacher.id}`}>
+                  <CalendarDays aria-hidden="true" />
+                  {ar ? "إضافة موعد للطالب" : "Add student time"}
+                </Link>
+              </Button>
+            }
+            labels={{
+              title: ar ? "الجدول الأسبوعي للمعلم" : "Teacher weekly schedule",
+              description: ar
+                ? "يتحدث تلقائيًا عند إضافة موعد أو تعديل تعيين، ويعرض أوقات الحصص بتوقيت مصر."
+                : "Updates automatically when a time or assignment changes and uses Cairo time.",
+              lessonCount: ar ? "{count} موعد أسبوعي" : "{count} weekly lessons",
+              lessonsAtTime: ar ? "{count} حصص" : "{count} lessons",
+              student: ar ? "الطالب" : "Student",
+              teacher: ar ? "المعلم" : "Teacher",
+              empty: ar
+                ? "لا توجد حصص في هذا اليوم. ستظهر المواعيد هنا بمجرد إضافتها."
+                : "No lessons on this day. New times will appear here automatically.",
+              weekdays: ar
+                ? ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
+                : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            }}
+          />
           <Panel icon={<UserRoundCheck />} title={ar ? "سجل التعيينات" : "Assignment history"}>
             {data.assignments.length ? (
               <div className="grid divide-y">
@@ -311,11 +315,6 @@ function Empty({ text }: { text: string }) {
 function one<T>(value: T | T[] | null | undefined): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
 }
-function formatDate(value: string, locale: AppLocale) {
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(value),
-  );
-}
 function weekday(value: number, ar: boolean) {
   const days = ar
     ? ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
@@ -326,23 +325,5 @@ function teacherStatus(status: string, ar: boolean) {
   const map = ar
     ? { pending: "بانتظار التفعيل", active: "نشط", on_leave: "في إجازة", inactive: "غير نشط" }
     : { pending: "Pending", active: "Active", on_leave: "On leave", inactive: "Inactive" };
-  return map[status as keyof typeof map] ?? status;
-}
-function sessionStatus(status: string, ar: boolean) {
-  const map = ar
-    ? {
-        scheduled: "مجدولة",
-        held: "منعقدة",
-        missed: "لم تنعقد",
-        cancelled: "ملغاة",
-        rescheduled: "أعيدت جدولتها",
-      }
-    : {
-        scheduled: "Scheduled",
-        held: "Held",
-        missed: "Missed",
-        cancelled: "Cancelled",
-        rescheduled: "Rescheduled",
-      };
   return map[status as keyof typeof map] ?? status;
 }

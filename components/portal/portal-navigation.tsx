@@ -17,55 +17,41 @@ import {
   GraduationCap,
   House,
   Mail,
-  Menu,
   Megaphone,
   PackageOpen,
-  Scale,
-  ScrollText,
   Settings,
   Files,
   Sparkles,
   UserRoundCheck,
   UserRoundCog,
   Users,
-  WalletCards,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useSelectedLayoutSegment } from "next/navigation";
-import { Suspense } from "react";
+import { useSearchParams, useSelectedLayoutSegment } from "next/navigation";
 
-import { LocaleSwitcher } from "@/components/locale-switcher";
 import { portalConfig, type PortalId } from "@/components/portal/portal-config";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const sectionIcons = {
   dashboard: ChartNoAxesCombined,
-  "control-center": Command,
   packages: PackageOpen,
   applications: ClipboardList,
   "teacher-applications": UserRoundCheck,
   subscriptions: CreditCard,
-  finance: Banknote,
   assignments: UserRoundCheck,
   students: Users,
   teachers: GraduationCap,
   users: UserRoundCog,
-  audit: ScrollText,
   settings: Settings,
   today: Clock3,
   reports: FileChartColumn,
   announcements: Megaphone,
-  templates: Files,
   home: House,
   progress: Sparkles,
   schedule: CalendarDays,
   attendance: CalendarCheck,
-  evaluation: Scale,
-  exams: ClipboardList,
   notifications: Bell,
-  earnings: WalletCards,
   profile: Settings,
   certificates: BadgeCheck,
   children: Users,
@@ -80,8 +66,8 @@ type PortalNavigationProps = {
 
 export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   const activeSection = useSelectedLayoutSegment();
+  const searchParams = useSearchParams();
   const t = useTranslations(`portals.${portal}`);
-  const portalT = useTranslations("portals");
   const sections = portalConfig[portal].sections;
   const isSidebar = variant === "sidebar";
   const isTop = variant === "top";
@@ -97,14 +83,14 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
           {
             id: "academics",
             icon: BookOpenCheck,
-            sections: ["schedule", "attendance", "evaluation", "exams", "reports", "certificates"],
+            sections: ["schedule", "attendance", "reports"],
           },
-          { id: "finance", icon: Banknote, sections: ["packages", "subscriptions", "finance"] },
-          { id: "content", icon: Files, sections: ["announcements", "templates"] },
+          { id: "finance", icon: Banknote, sections: ["packages", "subscriptions"] },
+          { id: "content", icon: Files, sections: ["announcements"] },
           {
             id: "system",
             icon: Settings,
-            sections: ["control-center", "users", "audit", "settings"],
+            sections: ["users", "settings"],
           },
         ]
       : null;
@@ -112,19 +98,25 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
     "today",
     "schedule",
     "students",
+    "attendance",
     "reports",
     "notifications",
   ] as const;
-  const teacherToolSections = ["earnings", "profile"] as const;
+  const teacherToolSections = ["profile"] as const;
 
   const renderSection = (section: (typeof sections)[number]) => {
     const Icon = sectionIcons[section] ?? BookOpenCheck;
     const isActive = activeSection === section;
 
+    const selectedChild = portal === "parent" ? searchParams.get("student") : null;
+    const href = selectedChild
+      ? { pathname: `/${portal}/${section}` as const, query: { student: selectedChild } }
+      : (`/${portal}/${section}` as const);
+
     return (
       <Link
         key={section}
-        href={`/${portal}/${section}`}
+        href={href}
         aria-current={isActive ? "page" : undefined}
         className={cn(
           "group relative flex min-h-11 touch-manipulation items-center font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none",
@@ -140,7 +132,7 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
           isTop && !isActive && "text-primary hover:bg-accent/45",
           !isSidebar &&
             !isTop &&
-            "min-w-18 flex-1 flex-col justify-center gap-1 px-1 py-2 text-center text-xs leading-tight",
+            "w-20 shrink-0 flex-col justify-center gap-1 px-1 py-2 text-center text-xs leading-tight",
           !isSidebar && !isTop && isActive && "text-primary",
           !isSidebar && !isTop && !isActive && "text-muted-foreground hover:text-foreground",
         )}
@@ -165,161 +157,37 @@ export function PortalNavigation({ portal, variant }: PortalNavigationProps) {
   };
 
   if (portal === "student" && variant === "bottom") {
-    const primarySections = ["home", "progress", "schedule"] as const;
-    const moreSections = ["billing", "certificates", "contact"] as const;
-
     return (
       <nav
         aria-label={t("navigationLabel")}
         data-testid="portal-navigation-bottom"
-        className="grid h-full grid-cols-4 items-stretch"
+        className="flex h-full min-w-0 [scrollbar-width:none] items-stretch gap-1 overflow-x-auto overscroll-x-contain px-1 [&::-webkit-scrollbar]:hidden"
       >
-        {primarySections.map((section) => renderSection(section))}
-        <details className="group/mobile-nav relative min-w-0">
-          <summary
-            className="relative flex h-full min-h-11 cursor-pointer touch-manipulation list-none flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-bold text-muted-foreground marker:hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden"
-            data-testid="student-mobile-more"
-          >
-            <Menu className="size-5" aria-hidden="true" />
-            <span>{t("more")}</span>
-          </summary>
-          <section className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[68svh] overflow-y-auto rounded-2xl border border-secondary/25 bg-card p-4 shadow-[0_1.25rem_3.5rem_-1rem_rgb(16_31_59_/_0.42)]">
-            <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
-              <h2 className="font-black text-primary">{t("moreTitle")}</h2>
-              <span className="text-xs text-muted-foreground">{moreSections.length}</span>
-            </div>
-            <div className="mt-3 grid gap-2">
-              {moreSections.map((section) => renderSection(section))}
-            </div>
-            <div className="mt-4 flex items-center gap-2 border-t border-secondary/15 pt-4">
-              <ThemeToggle
-                enableDarkLabel={portalT("theme.enableDark")}
-                enableLightLabel={portalT("theme.enableLight")}
-              />
-              <Suspense fallback={<span className="block h-11 flex-1 rounded-lg border" />}>
-                <LocaleSwitcher />
-              </Suspense>
-            </div>
-          </section>
-        </details>
+        {sections.map(renderSection)}
       </nav>
     );
   }
 
   if (portal === "admin" && variant === "bottom") {
-    const primarySections = ["dashboard", "applications", "schedule", "subscriptions"] as const;
-    const moreSections = sections.filter(
-      (section) => !primarySections.includes(section as (typeof primarySections)[number]),
-    );
-
     return (
       <nav
         aria-label={t("navigationLabel")}
         data-testid="portal-navigation-bottom"
-        className="grid h-full grid-cols-5 items-stretch"
+        className="flex h-full min-w-0 [scrollbar-width:none] items-stretch gap-1 overflow-x-auto overscroll-x-contain px-1 [&::-webkit-scrollbar]:hidden"
       >
-        {primarySections
-          .slice(0, 2)
-          .map((section) => renderSection(section as (typeof sections)[number]))}
-        <details className="group/mobile-nav relative min-w-0">
-          <summary
-            className="relative flex h-full min-h-11 cursor-pointer touch-manipulation list-none flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-bold text-muted-foreground marker:hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden"
-            data-testid="admin-mobile-more"
-          >
-            <Menu className="size-5" aria-hidden="true" />
-            <span>{t("groups.more")}</span>
-          </summary>
-          <section className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[68svh] overflow-y-auto rounded-2xl border border-secondary/25 bg-card p-4 shadow-[0_1.25rem_3.5rem_-1rem_rgb(16_31_59_/_0.42)]">
-            <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
-              <h2 className="font-black text-primary">{t("groups.allSections")}</h2>
-              <span className="text-xs text-muted-foreground">{moreSections.length}</span>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {moreSections.map((section) => {
-                const Icon = sectionIcons[section] ?? BookOpenCheck;
-                const isActive = activeSection === section;
-                return (
-                  <Link
-                    key={section}
-                    href={`/admin/${section}`}
-                    aria-current={isActive ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-14 items-center gap-2 rounded-xl border px-3 py-2 text-start text-sm font-bold transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                      isActive
-                        ? "border-secondary bg-secondary/15 text-primary"
-                        : "border-secondary/15 bg-background/55 text-muted-foreground hover:bg-accent/55 hover:text-foreground",
-                    )}
-                  >
-                    <Icon className="size-5 shrink-0" aria-hidden="true" />
-                    <span className="min-w-0">{t(`sections.${section}.label`)}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        </details>
-        {primarySections
-          .slice(2)
-          .map((section) => renderSection(section as (typeof sections)[number]))}
+        {sections.map(renderSection)}
       </nav>
     );
   }
 
   if (portal === "teacher" && variant === "bottom") {
-    const primarySections = ["today", "schedule", "students", "reports"] as const;
-    const moreSections = sections.filter(
-      (section) => !primarySections.includes(section as (typeof primarySections)[number]),
-    );
-
     return (
       <nav
         aria-label={t("navigationLabel")}
         data-testid="portal-navigation-bottom"
-        className="grid h-full grid-cols-5 items-stretch"
+        className="flex h-full min-w-0 [scrollbar-width:none] items-stretch gap-1 overflow-x-auto overscroll-x-contain px-1 [&::-webkit-scrollbar]:hidden"
       >
-        {primarySections
-          .slice(0, 2)
-          .map((section) => renderSection(section as (typeof sections)[number]))}
-        <details className="group/mobile-nav relative min-w-0">
-          <summary
-            className="relative flex h-full min-h-11 cursor-pointer touch-manipulation list-none flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-bold text-muted-foreground marker:hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden"
-            data-testid="teacher-mobile-more"
-          >
-            <Menu className="size-5" aria-hidden="true" />
-            <span>{t("more")}</span>
-          </summary>
-          <section className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-50 max-h-[68svh] overflow-y-auto rounded-2xl border border-secondary/25 bg-card p-4 shadow-[0_1.25rem_3.5rem_-1rem_rgb(16_31_59_/_0.42)]">
-            <div className="flex items-center justify-between gap-3 border-b border-secondary/15 pb-3">
-              <h2 className="font-black text-primary">{t("allSections")}</h2>
-              <span className="text-xs text-muted-foreground">{moreSections.length}</span>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {moreSections.map((section) => {
-                const Icon = sectionIcons[section] ?? BookOpenCheck;
-                const isActive = activeSection === section;
-                return (
-                  <Link
-                    key={section}
-                    href={`/teacher/${section}`}
-                    aria-current={isActive ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-14 items-center gap-2 rounded-xl border px-3 py-2 text-start text-sm font-bold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                      isActive
-                        ? "border-secondary bg-secondary/15 text-primary"
-                        : "border-secondary/15 bg-background/55 text-muted-foreground hover:bg-accent/55 hover:text-foreground",
-                    )}
-                  >
-                    <Icon className="size-5 shrink-0" aria-hidden="true" />
-                    <span className="min-w-0">{t(`sections.${section}.label`)}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        </details>
-        {primarySections
-          .slice(2)
-          .map((section) => renderSection(section as (typeof sections)[number]))}
+        {sections.map(renderSection)}
       </nav>
     );
   }
