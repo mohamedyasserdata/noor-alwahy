@@ -53,7 +53,7 @@ test("US-010 routes a teacher to the teacher portal and rejects the admin portal
   await page.goto("/en/admin/dashboard");
 
   await expect(page).toHaveURL(/\/en\/teacher\/today$/);
-  await expect(page.getByRole("heading", { level: 1, name: "My sessions today" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Teacher dashboard" })).toBeVisible();
 });
 
 test("account settings signs out the current browser and returns home", async ({ page }) => {

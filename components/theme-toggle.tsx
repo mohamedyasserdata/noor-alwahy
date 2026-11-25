@@ -49,8 +49,9 @@ export function ThemeToggle({
       size={compact ? "icon" : "default"}
       className={cn(!compact && "w-full justify-start", className)}
       onClick={toggleTheme}
+      disabled={isDark === null}
       aria-label={accessibleLabel}
-      aria-pressed={isDark}
+      aria-pressed={isDark ?? false}
       title={accessibleLabel}
       data-testid="theme-toggle"
     >
@@ -77,5 +78,5 @@ function getThemeSnapshot() {
 }
 
 function getServerThemeSnapshot() {
-  return false;
+  return null;
 }
