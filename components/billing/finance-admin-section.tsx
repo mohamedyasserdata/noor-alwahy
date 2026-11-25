@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { Banknote, Download, ReceiptText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -23,10 +24,23 @@ export async function FinanceAdminSection({
   locale: AppLocale;
   searchParams: Query;
 }) {
-  const [t, data, query] = await Promise.all([
+  const query = await searchParams;
+  const overdue =
+    query.invoiceStatus === "overdue"
+      ? {
+          country:
+            typeof query.country === "string" && /^[A-Z]{2}$/.test(query.country)
+              ? query.country
+              : "",
+          currency:
+            typeof query.currency === "string" && /^[A-Z]{3}$/.test(query.currency)
+              ? query.currency
+              : "",
+        }
+      : undefined;
+  const [t, data] = await Promise.all([
     getTranslations({ locale, namespace: "financeAdmin" }),
-    getFinanceAdminData(),
-    searchParams,
+    getFinanceAdminData(overdue),
   ]);
   const status = typeof query.financeStatus === "string" ? query.financeStatus : "";
   const error = typeof query.financeError === "string" ? query.financeError : "";
@@ -54,7 +68,17 @@ export async function FinanceAdminSection({
         </p>
       ) : null}
       <FinancialReportsAdmin locale={locale} data={data} />
-      <div className="mt-8 grid gap-5">
+      <div id="invoice-list" className="mt-8 grid scroll-mt-24 gap-5">
+        {overdue && (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-bold">
+              {t("overdueList")} {[overdue.country, overdue.currency].filter(Boolean).join(" · ")}
+            </h2>
+            <Button asChild variant="outline">
+              <Link href="/admin/finance">{t("allInvoices")}</Link>
+            </Button>
+          </div>
+        )}
         {data.invoices.length ? (
           data.invoices.map((invoice) => {
             const student = Array.isArray(invoice.students)

@@ -13,28 +13,45 @@ export function ApplicationStatusForm() {
   const locale = useLocale() as "ar" | "en";
   const t = useTranslations("applicationsPublic.status");
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<"notFound" | "unavailable" | null>(null);
   const [result, setResult] = useState<{ status: string; updated_at: string } | null>(null);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending) return;
     setPending(true);
-    setError(false);
+    setError(null);
     setResult(null);
     const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/applications/status", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        order_no: form.get("order_no"),
-        identifier: form.get("identifier"),
-        locale,
-      }),
-    });
-    const body = (await response.json()) as { status?: string; updated_at?: string };
-    if (response.ok && body.status && body.updated_at)
+    try {
+      const response = await fetch("/api/applications/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_no: form.get("order_no"),
+          identifier: form.get("identifier"),
+          locale,
+        }),
+      });
+      if (!response.ok) {
+        setError(response.status === 404 ? "notFound" : "unavailable");
+        return;
+      }
+      const body = await response.json();
+      if (
+        typeof body?.status !== "string" ||
+        !t.has(`states.${body.status}` as "states.new") ||
+        typeof body.updated_at !== "string" ||
+        !DateTime.fromISO(body.updated_at).isValid
+      ) {
+        setError("unavailable");
+        return;
+      }
       setResult({ status: body.status, updated_at: body.updated_at });
-    else setError(true);
-    setPending(false);
+    } catch {
+      setError("unavailable");
+    } finally {
+      setPending(false);
+    }
   }
   return (
     <form
@@ -51,11 +68,14 @@ export function ApplicationStatusForm() {
       </div>
       {error ? (
         <p role="alert" className="font-bold text-destructive">
-          {t("notFound")}
+          {t(error)}
         </p>
       ) : null}
       {result ? (
-        <div className="rounded-2xl border border-success/30 bg-success/10 p-5 text-center">
+        <div
+          role="status"
+          className="rounded-2xl border border-success/30 bg-success/10 p-5 text-center"
+        >
           <p className="text-sm text-muted-foreground">{t("current")}</p>
           <p className="mt-2 text-xl font-black text-primary">
             {t(`states.${result.status}` as "states.new")}

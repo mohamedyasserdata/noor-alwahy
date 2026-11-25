@@ -31,6 +31,7 @@ export async function ApplicationCrmSection({
     getTranslations({ locale, namespace: "applicationCrm" }),
     getApplicationCrm(query),
   ]);
+  const filterLabels = await getTranslations({ locale, namespace: "adminDashboard.filters" });
   const status = typeof query.applicationStatus === "string" ? query.applicationStatus : "";
   const error = typeof query.applicationError === "string" ? query.applicationError : "";
   const subscriptionStatus =
@@ -79,7 +80,27 @@ export async function ApplicationCrmSection({
         method="get"
         className="mt-7 grid gap-3 rounded-2xl border bg-card p-4 sm:grid-cols-[1fr_14rem_auto]"
       >
-        <Input name="q" defaultValue={data.filters.q} placeholder={t("search")} />
+        {(data.filters.from || data.filters.to || data.filters.country) && (
+          <div className="col-span-full flex flex-wrap items-end gap-4">
+            {(["from", "to", "country"] as const).map((key) => (
+              <label key={key} className="grid gap-1 text-sm">
+                {filterLabels(key)}
+                <Input
+                  type={key === "country" ? "text" : "date"}
+                  maxLength={key === "country" ? 2 : undefined}
+                  name={key}
+                  defaultValue={data.filters[key]}
+                />
+              </label>
+            ))}
+          </div>
+        )}
+        <Input
+          aria-label={t("search")}
+          name="q"
+          defaultValue={data.filters.q}
+          placeholder={t("search")}
+        />
         <select
           name="status"
           defaultValue={data.filters.status}

@@ -53,9 +53,7 @@ export default async function TracksPage({ params }: PageProps<"/[locale]/tracks
               const Icon = icons[index % icons.length]!;
               const name = locale === "en" && track.nameEn ? track.nameEn : track.nameAr;
               const description =
-                (locale === "en" && track.descriptionEn
-                  ? track.descriptionEn
-                  : track.descriptionAr) || t("description");
+                locale === "en" && track.descriptionEn ? track.descriptionEn : track.descriptionAr;
               return (
                 <article
                   key={track.id}
@@ -65,11 +63,9 @@ export default async function TracksPage({ params }: PageProps<"/[locale]/tracks
                     <Icon className="size-7" aria-hidden="true" />
                   </span>
                   <h2 className="mt-6 text-2xl font-black text-primary">{name}</h2>
-                  <p className="mt-3 leading-8 text-muted-foreground">{description}</p>
-                  <div className="mt-7 border-t pt-5">
-                    <h3 className="text-sm font-black text-primary">{t("focusLabel")}</h3>
-                    <p className="mt-2 text-sm leading-7 text-muted-foreground">{name}</p>
-                  </div>
+                  {description && (
+                    <p className="mt-3 leading-8 text-muted-foreground">{description}</p>
+                  )}
                 </article>
               );
             })}
@@ -90,7 +86,9 @@ export default async function TracksPage({ params }: PageProps<"/[locale]/tracks
             </p>
           </div>
           <Button asChild size="lg">
-            <Link href="/contact">{t("help.action")}</Link>
+            <Link href={tracks.length ? "/apply" : "/contact"}>
+              {t(tracks.length ? "apply" : "help.action")}
+            </Link>
           </Button>
         </div>
       </section>

@@ -116,6 +116,10 @@ export async function TeacherTodaySection({
               icon={<ListChecks />}
               label={t("overview.evaluations")}
               value={day.overview.pendingEvaluations.length}
+              tasks={day.overview.pendingEvaluations.map((item) => ({
+                href: `/teacher/evaluations?sessionId=${item.id}`,
+                label: item.studentName + " · " + timeFormatter.format(new Date(item.scheduledAt)),
+              }))}
               detail={t("overview.tasksDetail", {
                 attendance: day.overview.pendingAttendance,
                 evaluations: day.overview.pendingEvaluations.length,
@@ -126,10 +130,14 @@ export async function TeacherTodaySection({
               label={t("overview.reports")}
               value={day.overview.reportReminders.length}
               detail={
-                day.overview.reportReminders.map((item) => item.studentName).join("، ") ||
-                t("overview.none")
+                day.overview.reportReminders.length
+                  ? t("overview.chooseStudent")
+                  : t("overview.none")
               }
-              href="/teacher/reports"
+              tasks={day.overview.reportReminders.map((item) => ({
+                href: `/teacher/reports?student=${item.id}`,
+                label: item.studentName,
+              }))}
             />
           </div>
 
@@ -283,13 +291,13 @@ function OverviewCard({
   label,
   value,
   detail,
-  href,
+  tasks,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   detail: string;
-  href?: "/teacher/reports";
+  tasks?: { href: string; label: string }[];
 }) {
   const content = (
     <>
@@ -301,18 +309,30 @@ function OverviewCard({
         <strong className="mt-1 block text-2xl font-black text-primary tabular-nums">
           {value}
         </strong>
-        <p className="mt-1 truncate text-xs text-muted-foreground">{detail}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
       </div>
     </>
   );
   const className =
     "flex min-h-32 min-w-0 max-w-full gap-3 overflow-hidden rounded-2xl border bg-card p-4 transition hover:border-secondary/60";
-  return href ? (
-    <Link href={href} className={className}>
-      {content}
-    </Link>
-  ) : (
-    <div className={className}>{content}</div>
+  return (
+    <div className="min-w-0">
+      <div className={className}>{content}</div>
+      {tasks?.length ? (
+        <ul aria-label={label} className="mt-1 divide-y rounded-xl border bg-card px-3">
+          {tasks.map((task) => (
+            <li key={task.href}>
+              <Link
+                href={task.href}
+                className="flex min-h-11 items-center text-sm font-bold text-primary underline underline-offset-4"
+              >
+                {task.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
 

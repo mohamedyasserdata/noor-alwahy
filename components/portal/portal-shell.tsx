@@ -68,7 +68,7 @@ export async function PortalShell({ account, children, locale, portal }: PortalS
       ) : null}
       {isHorizontalPortal ? (
         <header
-          className="sticky top-0 z-40 border-b border-secondary/20 bg-[#fffdf8]/96 shadow-[0_0.35rem_1.5rem_-1.1rem_rgb(15_37_71_/_0.25)] backdrop-blur-xl dark:bg-card/96"
+          className="relative top-0 z-40 border-b border-secondary/20 bg-[#fffdf8]/96 shadow-[0_0.35rem_1.5rem_-1.1rem_rgb(15_37_71_/_0.25)] backdrop-blur-xl min-[769px]:sticky dark:bg-card/96"
           data-testid={`${portal}-portal-header`}
         >
           <div className="safe-header mx-auto grid w-full max-w-[100rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-4 sm:px-6 lg:px-8">

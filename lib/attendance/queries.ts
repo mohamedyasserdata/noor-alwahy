@@ -140,7 +140,11 @@ export async function getTeacherTodaySessions() {
             Boolean(one(session.attendance)) &&
             !one(session.evaluation)?.is_locked,
         )
-        .map((session) => ({ id: session.id, studentName: session.students.full_name })),
+        .map((session) => ({
+          id: session.id,
+          studentName: session.students.full_name,
+          scheduledAt: session.scheduled_at,
+        })),
       reportReminders: assignedStudents
         .filter(
           (assignment) =>

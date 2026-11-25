@@ -169,8 +169,9 @@ for (const locale of locales) {
       await themeToggle.click();
       await expect(page.locator("html")).not.toHaveClass(/dark/);
 
-      const hiddenPricingResponse = await page.goto(`/${locale.code}/packages`);
-      expect(hiddenPricingResponse?.status()).toBe(404);
+      await page.goto(`/${locale.code}/packages`);
+      await expect(page).toHaveURL(new RegExp(`/${locale.code}#packages$`));
+      await expect(homePackageCard).toBeVisible();
 
       await page.goto(`/${locale.code}/offer/local-pricing-preview`);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute(

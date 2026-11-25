@@ -96,6 +96,14 @@ test("admin English dark mode preserves LTR and controls", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Apply filters" })).toBeVisible();
   await expect(page.getByRole("link", { name: "PDF" })).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await page.getByRole("link", { name: /Students needing follow-up/ }).click();
+  await expect(page.locator("#dashboard-risk")).toBeVisible();
+  await page.getByRole("link", { name: /Applications received in the period/ }).click();
+  await expect(page.locator('input[name="from"]')).not.toHaveValue("");
+  await page.goBack();
+  await page.locator('a[href*="invoiceStatus=overdue"]').click();
+  await expect(page.getByRole("heading", { name: /Overdue invoices/ })).toBeVisible();
+  await page.goto("/en/admin/dashboard");
   await page.screenshot({
     path: "output/screenshots/admin-dashboard-en-dark-1440.png",
     fullPage: true,

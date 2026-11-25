@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ContactLinksSection } from "@/components/contact/contact-links-section";
 import { FamilyBillingSection } from "@/components/billing/family-billing-section";
+import { ParentNotifications } from "@/components/parent/parent-notifications";
 import { ParentChildrenSection } from "@/components/parent/parent-children-section";
 import { ParentHomeDashboard } from "@/components/parent/parent-home-dashboard";
 import { getPortalStaticParams, PortalSectionRoute } from "@/components/portal/portal-routes";
@@ -12,7 +13,7 @@ import { routing } from "@/i18n/routing";
 export const instant = false;
 
 export function generateStaticParams() {
-  return getPortalStaticParams("parent");
+  return [...getPortalStaticParams("parent"), { section: "notifications" }];
 }
 
 export default async function ParentSectionPage({
@@ -29,6 +30,8 @@ export default async function ParentSectionPage({
     return <ContactLinksSection locale={locale} />;
   }
 
+  if (section === "notifications")
+    return <ParentNotifications locale={locale} searchParams={searchParams} />;
   if (section === "home") return <ParentHomeDashboard locale={locale} />;
 
   if (section === "schedule")

@@ -135,7 +135,7 @@ export async function ParentHomeDashboard({ locale }: { locale: AppLocale }) {
           <NextSessionSummary
             session={nextSession.session}
             fallbackTeacherName={
-              context.children.find((child) => child.name === nextSession.session?.studentName)
+              context.children.find((child) => child.id === nextSession.session?.studentId)
                 ?.teacherName
             }
             t={t}
@@ -221,7 +221,7 @@ function NextSessionSummary({
       )}
       {session ? (
         <p className="mt-4 text-xs text-muted-foreground">
-          {t("timezone", { timezone: session.timezone })}
+          {t("timezone", { timezone: session.timezoneLabel })}
         </p>
       ) : null}
     </section>

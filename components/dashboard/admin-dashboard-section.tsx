@@ -79,6 +79,65 @@ export async function AdminDashboardSection({
           </Button>
         </div>
       </header>
+      <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+        <section className="border bg-card p-5 shadow-card sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#fff0d1] text-[#a76600]">
+              <CircleAlert className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="text-xl font-black text-primary">{t("attention.title")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("attention.description")}</p>
+            </div>
+          </div>
+          <div className="mt-5 grid divide-y">
+            <ActionRow
+              href={`/admin/applications?${new URLSearchParams({ from, to, country })}`}
+              label={t("attention.newApplications")}
+              value={number.format(data.totals.new_applications)}
+            />
+            <ActionRow
+              href={`/admin/dashboard?${exportParams}&view=risk#dashboard-risk`}
+              label={t("attention.riskFlags")}
+              value={number.format(data.riskFlags.length)}
+            />
+            <ActionRow
+              href={`/admin/finance?${new URLSearchParams({ invoiceStatus: "overdue", country, currency })}#invoice-list`}
+              label={t("attention.overdue")}
+              value={moneyValues(data.overdue, locale)}
+            />
+          </div>
+        </section>
+
+        <section className="border bg-card p-5 shadow-card sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#dfedff] text-[#2563b8]">
+              <ClipboardCheck className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="text-xl font-black text-primary">{t("quickActions.title")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("quickActions.description")}</p>
+            </div>
+          </div>
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            {[
+              { key: "applications", href: "/admin/applications" },
+              { key: "subscriptions", href: "/admin/subscriptions" },
+              { key: "schedule", href: "/admin/schedule" },
+              { key: "reports", href: "/admin/reports" },
+            ].map(({ key, href }) => (
+              <Link
+                key={key}
+                href={href}
+                className="flex min-h-12 items-center justify-center rounded-xl border border-secondary/20 bg-accent/25 px-3 py-2 text-center text-sm font-black text-primary transition-colors hover:border-secondary/45 hover:bg-accent/55 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                {t(`quickActions.${key}`)}
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+
       <details className="admin-dashboard-filter mt-6 overflow-hidden border bg-card shadow-card">
         <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-3 marker:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
           <span>
@@ -150,66 +209,10 @@ export async function AdminDashboardSection({
         />
       </div>
 
-      <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
-        <section className="border bg-card p-5 shadow-card sm:p-6">
-          <div className="flex items-start gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#fff0d1] text-[#a76600]">
-              <CircleAlert className="size-5" aria-hidden="true" />
-            </span>
-            <div>
-              <h2 className="text-xl font-black text-primary">{t("attention.title")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{t("attention.description")}</p>
-            </div>
-          </div>
-          <div className="mt-5 grid divide-y">
-            <ActionRow
-              href="/admin/applications"
-              label={t("attention.newApplications")}
-              value={number.format(data.totals.new_applications)}
-            />
-            <ActionRow
-              href="/admin/reports"
-              label={t("attention.riskFlags")}
-              value={number.format(data.riskFlags.length)}
-            />
-            <ActionRow
-              href="/admin/finance"
-              label={t("attention.overdue")}
-              value={moneyValues(data.overdue, locale)}
-            />
-          </div>
-        </section>
-
-        <section className="border bg-card p-5 shadow-card sm:p-6">
-          <div className="flex items-start gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#dfedff] text-[#2563b8]">
-              <ClipboardCheck className="size-5" aria-hidden="true" />
-            </span>
-            <div>
-              <h2 className="text-xl font-black text-primary">{t("quickActions.title")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{t("quickActions.description")}</p>
-            </div>
-          </div>
-          <div className="mt-5 grid grid-cols-2 gap-2">
-            {[
-              { key: "applications", href: "/admin/applications" },
-              { key: "subscriptions", href: "/admin/subscriptions" },
-              { key: "schedule", href: "/admin/schedule" },
-              { key: "reports", href: "/admin/reports" },
-            ].map(({ key, href }) => (
-              <Link
-                key={key}
-                href={href}
-                className="flex min-h-12 items-center justify-center rounded-xl border border-secondary/20 bg-accent/25 px-3 py-2 text-center text-sm font-black text-primary transition-colors hover:border-secondary/45 hover:bg-accent/55 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-              >
-                {t(`quickActions.${key}`)}
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <details className="admin-dashboard-analytics mt-7 overflow-hidden border bg-card/65 shadow-card">
+      <details
+        open={query.view === "risk"}
+        className="admin-dashboard-analytics mt-7 overflow-hidden border bg-card/65 shadow-card"
+      >
         <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 marker:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
           <span>
             <span className="block text-lg font-black text-primary">{t("analytics.title")}</span>
@@ -281,7 +284,10 @@ export async function AdminDashboardSection({
               }))}
             />
           </div>
-          <section className="mt-6 border bg-card p-5 shadow-card sm:p-7">
+          <section
+            id="dashboard-risk"
+            className="mt-6 scroll-mt-24 border bg-card p-5 shadow-card sm:p-7"
+          >
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-xl font-black text-primary">{t("risk.title")}</h2>

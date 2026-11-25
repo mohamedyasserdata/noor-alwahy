@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import {
   Award,
   BookOpenCheck,
@@ -31,7 +32,6 @@ const labels = {
     attendance: "نسبة الحضور",
     overallProgress: "التقدم العام في الحفظ",
     progressTitle: "تقدم حفظ القرآن الكريم",
-    progressDescription: "ملخص محسوب من سجل الحفظ المعتمد دون عرض نصوص الآيات.",
     recentTitle: "آخر التقييمات",
     reviewTitle: "المراجعة الحالية",
     due: "مراجعات مستحقة",
@@ -42,7 +42,6 @@ const labels = {
     noReport: "لا يوجد تقرير ظاهر حتى الآن.",
     openProgress: "عرض صفحة التقدم",
     openSchedule: "عرض الجدول الكامل",
-    score: "النتيجة",
     completed: "مكتمل",
   },
   en: {
@@ -53,8 +52,6 @@ const labels = {
     attendance: "Attendance rate",
     overallProgress: "Overall memorisation progress",
     progressTitle: "Quran memorisation progress",
-    progressDescription:
-      "A summary calculated from the approved progress record without verse text.",
     recentTitle: "Recent evaluations",
     reviewTitle: "Current review",
     due: "Reviews due",
@@ -65,7 +62,6 @@ const labels = {
     noReport: "No report is currently visible.",
     openProgress: "View progress",
     openSchedule: "View full schedule",
-    score: "Score",
     completed: "complete",
   },
 } as const;
@@ -77,6 +73,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
     getStudentProgressDashboard(),
   ]);
   const t = labels[locale];
+  const links = await getTranslations({ locale, namespace: "progressLinks" });
   const progress = progressData.metrics.percent;
   const attendance = progressData.metrics.attendanceRate;
   const latestHistory = progressData.history.slice(0, 4);
@@ -167,7 +164,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
                   <Sparkles className="size-6 text-secondary" aria-hidden="true" />
                   {t.progressTitle}
                 </h2>
-                <p className="mt-2 leading-7 text-muted-foreground">{t.progressDescription}</p>
+                <p className="mt-2 leading-7 text-muted-foreground">{links("mastery")}</p>
               </div>
               <Button asChild variant="outline" className="border-secondary/40">
                 <Link href="/student/progress">{t.openProgress}</Link>
@@ -210,7 +207,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
                 {t.recentTitle}
               </h2>
               <Button asChild variant="ghost" size="sm" className="min-h-11">
-                <Link href="/student/progress">{t.openProgress}</Link>
+                <Link href="/student/progress#evaluation-history">{links("history")}</Link>
               </Button>
             </div>
 
@@ -222,9 +219,11 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
                       <Target className="size-5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-black text-primary">{t.score}</p>
+                      <p className="font-black text-primary">{links("sessionScore")}</p>
                       <time className="text-sm text-muted-foreground" dateTime={item.date}>
-                        {item.date}
+                        {DateTime.fromISO(item.date, { zone: "utc" })
+                          .setLocale(locale)
+                          .toLocaleString(DateTime.DATE_MED)}
                       </time>
                     </div>
                     <strong className="text-lg font-black text-[#237a4b] tabular-nums dark:text-success">
@@ -248,7 +247,7 @@ export async function StudentHomeDashboard({ locale }: { locale: AppLocale }) {
               <SmallStat icon={Clock3} label={t.overdue} value={progressData.review.overdue} />
             </div>
             <Button asChild className="mt-5 w-full" variant="outline">
-              <Link href="/student/progress">{t.openProgress}</Link>
+              <Link href="/student/progress#student-required-title">{links("review")}</Link>
             </Button>
           </section>
         </div>

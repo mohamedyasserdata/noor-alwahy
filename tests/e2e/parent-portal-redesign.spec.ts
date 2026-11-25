@@ -24,6 +24,11 @@ test("parent portal supports one, multiple, and empty families with isolated chi
     await expect(page.getByRole("heading", { name: "الحصة القادمة" })).toBeVisible();
     await page.screenshot({ path: join(screenshotDir, "parent-home-ar-1440.png"), fullPage: true });
 
+    await page.getByRole("link", { name: "عرض كل التنبيهات" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "الإشعارات" })).toBeVisible();
+    await page.goto("/en/parent/home");
+    await page.getByRole("link", { name: "View all alerts" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Notifications" })).toBeVisible();
     await page.goto(`/ar/parent/children?student=${fixture.firstChildId}`);
     await expect(
       page.getByRole("heading", { level: 1, name: fixture.firstChildName }),

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import {
   Award,
   BookMarked,
@@ -204,13 +205,15 @@ export function StudentProgressDashboard({ locale, data }: { locale: AppLocale; 
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
-            <Panel title={t.history} icon={<CalendarClock />}>
+            <Panel id="evaluation-history" title={t.history} icon={<CalendarClock />}>
               {data.history.length ? (
                 <ol className="divide-y">
                   {data.history.map((item) => (
                     <li key={item.id} className="flex items-center justify-between gap-4 py-3">
                       <span className="text-sm text-muted-foreground tabular-nums">
-                        {item.date}
+                        {DateTime.fromISO(item.date, { zone: "utc" })
+                          .setLocale(locale)
+                          .toLocaleString(DateTime.DATE_MED)}
                       </span>
                       <strong className="text-primary tabular-nums">
                         {item.score == null ? t.noData : `${item.score}%`}
@@ -347,16 +350,21 @@ function Detail({
   );
 }
 function Panel({
+  id,
   title,
   icon,
   children,
 }: {
+  id?: string;
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-6">
+    <section
+      id={id}
+      className="rounded-3xl border border-secondary/20 bg-card/96 p-5 shadow-card sm:p-6"
+    >
       <h3 className="mb-5 flex items-center gap-2 text-lg font-black text-primary">
         <span className="text-secondary [&>svg]:size-5">{icon}</span>
         {title}

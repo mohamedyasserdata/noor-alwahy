@@ -62,7 +62,7 @@ test("P5 report flows from teacher approval through admin publication to isolate
   await expect(page).not.toHaveURL(/reportStatus=updated/);
   await publishDialog.getByRole("button", { name: "Publish to family" }).click();
   await expect(page).toHaveURL(/reportStatus=updated/);
-  await expect(adminCard.getByText("visible", { exact: true })).toBeVisible();
+  await expect(adminCard.getByRole("definition").filter({ hasText: /^Published$/ })).toBeVisible();
 
   await signIn(page, fixture.parentEmail, fixture.password, "/en/parent/home");
   await page.goto(`/en/parent/children?student=${fixture.unrelatedStudentId}&view=reports`);

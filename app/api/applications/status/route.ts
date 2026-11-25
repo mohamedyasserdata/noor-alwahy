@@ -20,7 +20,8 @@ export async function POST(request: Request) {
       p_lookup_hash: applicationHash(parsed.data.identifier),
     })
     .maybeSingle();
-  if (error || !data) return Response.json({ error: "not_found" }, { status: 404 });
+  if (error) return Response.json({ error: "unavailable" }, { status: 503 });
+  if (!data) return Response.json({ error: "not_found" }, { status: 404 });
   return Response.json(
     { status: data.status, updated_at: data.updated_at },
     { headers: { "Cache-Control": "private, no-store, max-age=0" } },

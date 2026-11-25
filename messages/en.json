@@ -495,7 +495,7 @@
       "eyebrow": "Secure access to your academy workspace",
       "title": "Every role reaches what it needs, with clarity and privacy",
       "description": "Sign in with your approved account to go straight to your portal without exposing data outside your role.",
-      "principle": "Identity is verified on the server, and permissions are enforced again inside the database."
+      "principle": "If you forget your password, use your account email to reset it."
     },
     "fields": {
       "email": "Email address",
@@ -1197,6 +1197,7 @@
       "late": "Late today",
       "tasks": "Pending tasks",
       "reports": "Reports to write",
+      "chooseStudent": "Choose a student to write their report",
       "tasksDetail": "{attendance} attendance · {evaluations} evaluations",
       "none": "No cases"
     },
@@ -1451,7 +1452,15 @@
       "closed": "Closed"
     }
   },
+  "progressLinks": {
+    "sessionScore": "Session score",
+    "mastery": "Memorisation progress is the share of the 604 pages recorded as mastered.",
+    "history": "Evaluation history",
+    "review": "View review tasks"
+  },
   "notifications": {
+    "previous": "Previous",
+    "next": "Next",
     "open": "Open notifications",
     "title": "Notifications",
     "unreadCount": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
@@ -1771,6 +1780,7 @@
       "identifier": "Email or last 4 phone digits",
       "check": "Check status",
       "checking": "Checking…",
+      "unavailable": "We couldn’t check your application. Check your connection and try again.",
       "notFound": "No matching application was found. Check the number and identifier.",
       "current": "Current status",
       "updated": "Last updated: {date}",
@@ -1891,7 +1901,8 @@
       },
       "eyebrow": "A track for every starting point",
       "title": "A defined learning goal, with a plan that changes as the student grows",
-      "description": "The track sets the direction. The personal plan then adjusts the amount of learning and review to the student’s level and available time.",
+      "apply": "Start your application",
+      "description": "Start with the student’s goal: learning to read, improving recitation, or retaining what they have memorised. Compare that goal with the tracks below.",
       "listLabel": "Academy learning tracks",
       "focusLabel": "What it focuses on",
       "empty": "No learning tracks are currently published.",
@@ -1914,7 +1925,7 @@
       },
       "help": {
         "title": "Not sure which track fits?",
-        "description": "Tell us about the student’s level and goal, and we will help identify the most suitable starting point.",
+        "description": "Share the student’s level and goal when contacting the academy or applying so the team can help choose a starting point.",
         "action": "Ask the academy"
       }
     },
@@ -2210,6 +2221,8 @@
     }
   },
   "financeAdmin": {
+    "overdueList": "Overdue invoices",
+    "allInvoices": "All invoices",
     "eyebrow": "P7 · Financial ledger",
     "title": "Invoices and payments",
     "description": "Record payments and refunds, then review them before confirmation. A subscription is activated and credited only after confirmed payments cover the invoice.",
@@ -2549,7 +2562,7 @@
     "attention": {
       "title": "Needs attention",
       "description": "Work that currently needs an administration decision.",
-      "newApplications": "New enrollment applications",
+      "newApplications": "Applications received in the period",
       "riskFlags": "Students needing follow-up",
       "overdue": "Overdue balances"
     },

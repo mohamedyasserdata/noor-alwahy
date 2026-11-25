@@ -83,6 +83,29 @@ export async function getNotificationCenter(): Promise<NotificationCenterData | 
   };
 }
 
+export async function getNotificationPage(page: number) {
+  await connection();
+  const supabase = await createClient();
+  const offset = (page - 1) * 20;
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("id,type,payload,created_at,read_at")
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .range(offset, offset + 20);
+  if (error) throw new Error("notifications_unavailable");
+  return {
+    hasMore: data.length > 20,
+    items: data.slice(0, 20).map((item) => ({
+      id: item.id,
+      type: item.type,
+      createdAt: item.created_at,
+      readAt: item.read_at,
+      payload: readPayload(item.payload),
+    })),
+  };
+}
+
 function readPreferences(value: unknown): NotificationPreferences {
   if (!value || typeof value !== "object" || Array.isArray(value)) return defaultPreferences;
   const prefs = value as Record<string, unknown>;

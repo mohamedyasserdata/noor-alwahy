@@ -24,7 +24,7 @@ export async function getNextSessionCard(locale: AppLocale) {
     supabase
       .from("sessions")
       .select(
-        "id,scheduled_at,ends_at,status,student:students!sessions_student_id_fkey(full_name),teacher:teachers!sessions_teacher_id_fkey(profile:profiles!teachers_profile_id_fkey(full_name))",
+        "id,student_id,scheduled_at,ends_at,status,student:students!sessions_student_id_fkey(full_name),teacher:teachers!sessions_teacher_id_fkey(profile:profiles!teachers_profile_id_fkey(full_name))",
       )
       .in("status", ["scheduled", "held"])
       .gte("ends_at", now.minus({ minutes: 15 }).toISO())
@@ -63,9 +63,18 @@ export async function getNextSessionCard(locale: AppLocale) {
         weekday: "long",
         day: "numeric",
         month: "long",
+        ...(start.year !== now.setZone(profileResult.data.timezone).year
+          ? { year: "numeric" as const }
+          : {}),
       }),
       timeLabel: `${start.toFormat("HH:mm")}–${end.toFormat("HH:mm")}`,
       timezone: profileResult.data.timezone,
+      timezoneLabel:
+        start
+          .setLocale(locale)
+          .toLocaleParts({ timeZoneName: "long" })
+          .find((part) => part.type === "timeZoneName")?.value ?? profileResult.data.timezone,
+      studentId: session.student_id,
       studentName: student?.full_name ?? null,
       teacherName: teacherProfile?.full_name ?? null,
       joinUrl: join?.join_url ?? null,

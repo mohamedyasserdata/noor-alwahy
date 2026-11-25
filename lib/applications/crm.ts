@@ -1,6 +1,7 @@
 import "server-only";
 
 import { connection } from "next/server";
+import { DateTime } from "luxon";
 import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
@@ -8,13 +9,22 @@ import { createClient } from "@/lib/supabase/server";
 const filtersSchema = z.object({
   status: z
     .enum(["all", "new", "contacted", "trial_booked", "accepted", "rejected", "postponed"])
-    .default("all"),
-  q: z.string().trim().max(120).default(""),
+    .catch("all"),
+  from: z.iso.date().catch(""),
+  to: z.iso.date().catch(""),
+  country: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .catch(""),
+  q: z.string().trim().max(120).catch(""),
 });
 
 export async function getApplicationCrm(query: Record<string, string | string[] | undefined>) {
   await connection();
   const filters = filtersSchema.parse({
+    from: query.from,
+    to: query.to,
+    country: query.country,
     status: typeof query.status === "string" ? query.status : undefined,
     q: typeof query.q === "string" ? query.q : undefined,
   });
@@ -27,6 +37,13 @@ export async function getApplicationCrm(query: Record<string, string | string[] 
     .order("created_at", { ascending: false })
     .limit(100);
   if (filters.status !== "all") request = request.eq("status", filters.status);
+  if (filters.country) request = request.eq("country_code", filters.country);
+  if (filters.from) request = request.gte("created_at", filters.from + "T00:00:00Z");
+  if (filters.to)
+    request = request.lt(
+      "created_at",
+      DateTime.fromISO(filters.to, { zone: "utc" }).plus({ days: 1 }).toISO()!,
+    );
   if (filters.q)
     request = request.or(
       `student_name.ilike.%${escapeFilter(filters.q)}%,order_no.ilike.%${escapeFilter(filters.q)}%,contact_email.ilike.%${escapeFilter(filters.q)}%`,

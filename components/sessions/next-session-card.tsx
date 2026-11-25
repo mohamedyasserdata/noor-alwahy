@@ -17,6 +17,7 @@ type SessionCard = {
   dateLabel: string;
   timeLabel: string;
   timezone: string;
+  timezoneLabel: string;
   studentName: string | null;
   teacherName: string | null;
   joinUrl: string | null;
@@ -178,7 +179,7 @@ function LiveSessionCard({
             <CalendarClock className="size-4 text-secondary" aria-hidden="true" />
             {session.dateLabel} · {session.timeLabel}
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">{session.timezone}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{session.timezoneLabel}</p>
           <dl className="mt-5 grid gap-2 text-sm sm:grid-cols-2">
             {session.studentName ? (
               <div>
